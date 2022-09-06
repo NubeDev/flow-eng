@@ -10,7 +10,7 @@ import (
 )
 
 type Delay struct {
-	info node.NodeInfo
+	info node.Info
 
 	Input  *node.InputPort
 	Output *node.OutputPort
@@ -22,13 +22,13 @@ type Delay struct {
 }
 
 func NewDelay(timer flowctrl.TimedDelay) *Delay {
-	input := node.NewInputPort(buffer.Int8, &node.Details{})
-	output := node.NewOutputPort(buffer.Int8, &node.Details{})
-	info := node.NodeInfo{Name: "delay", Description: "passed data to another node with delay", Version: "1.0.0"}
+	input := node.NewInputPort(buffer.Int8)
+	output := node.NewOutputPort(buffer.Int8)
+	info := node.Info{Name: "delay", Description: "passed data to another node with delay", Version: "1.0.0"}
 	return &Delay{info, input, output, adapter.NewInt8(input), adapter.NewInt8(output), timer}
 }
 
-func (node *Delay) Info() node.NodeInfo {
+func (node *Delay) Info() node.Info {
 	return node.info
 }
 

@@ -1,8 +1,5 @@
 [
   {
-    "nodeID": "1111",
-    "name": "a123",
-    "node": "PASS",
     "inputs": [
       {
         "name": "in1",
@@ -10,8 +7,7 @@
         "connection": {
           "nodeID": "",
           "port": ""
-        },
-        "nodeDetails": null
+        }
       }
     ],
     "outputs": [
@@ -20,27 +16,29 @@
         "type": "int8",
         "connection": [
           {
-            "nodeID": "b123",
+            "nodeID": "pass_c4593a9f",
             "port": "in1"
           }
-        ],
-        "nodeDetails": null
+        ]
       }
-    ]
+    ],
+    "info": {
+      "nodeID": "pass_cc8eebaa",
+      "name": "nodeA",
+      "type": "pass",
+      "description": "desc",
+      "version": "1"
+    }
   },
   {
-    "nodeID": "1111",
-    "name": "b123",
-    "node": "PASS",
     "inputs": [
       {
         "name": "in1",
         "type": "int8",
         "connection": {
-          "nodeID": "b123",
+          "nodeID": "pass_cc8eebaa",
           "port": "out1"
-        },
-        "nodeDetails": null
+        }
       }
     ],
     "outputs": [
@@ -52,9 +50,15 @@
             "nodeID": "",
             "port": ""
           }
-        ],
-        "nodeDetails": null
+        ]
       }
-    ]
+    ],
+    "info": {
+      "nodeID": "pass_c4593a9f",
+      "name": "nodeB",
+      "type": "pass",
+      "description": "desc",
+      "version": "1"
+    }
   }
 ]

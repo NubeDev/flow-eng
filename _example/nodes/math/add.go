@@ -1,12 +1,10 @@
-package nodes
+package math
 
 import (
 	"fmt"
+	"github.com/NubeDev/flow-eng/_example/nodes"
 	"github.com/NubeDev/flow-eng/node"
 )
-
-// a node out should be able to have multiple connections
-// if we ref a Connection by the name it's easier to manage migrations but will be more work in coding the app
 
 type Node struct {
 	InputList  []*node.TypeInput  `json:"inputs"`
@@ -15,28 +13,35 @@ type Node struct {
 }
 
 const (
-	nodeType    = "pass"
-	inputCount  = 1
-	outputCount = 1
+	category    = "math"
+	nodeType    = "add"
+	inputCount  = 2
+	outputCount = 2
 )
 
-func New(body *Node) (*Node, error) {
-	body, err := Check(body, NodeSpec{nodeType, inputCount, outputCount})
-	if err != nil {
-		return nil, err
-	}
+func New(body *nodes.Node) (*Node, error) {
+	//body, err := nodes.Check(body, nodes.NodeSpec{NodeType: nodeType, InputCount: inputCount, OutputCount: outputCount})
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//buildIn1 := nodes.BuildInput(node.TypeInt8, nodes.GetInput(body, 0).Connection)
+	//buildOut1 := nodes.BuildOutput(node.TypeInt8, nodes.GetOutConnections(body, 0))
+	//
+	//return &Node{
+	//	InputList:  []*node.TypeInput{buildIn1},
+	//	OutputList: []*node.TypeOutput{buildOut1},
+	//	Info: node.NodeInfo{
+	//		NodeID:      body.Info.NodeID,
+	//		Name:        body.Info.Name,
+	//		Type:        nodeType,
+	//		Category:    category,
+	//		Description: "desc",
+	//		Version:     "1",
+	//	},
+	//}, nil
 
-	return &Node{
-		InputList:  BuildInputs(body),
-		OutputList: BuildOutputs(body),
-		Info: node.Info{
-			NodeID:      body.Info.NodeID,
-			Name:        body.Info.Name,
-			Type:        nodeType,
-			Description: "desc",
-			Version:     "1",
-		},
-	}, nil
+	return nil, nil
 }
 
 func (n *Node) GetName() string {

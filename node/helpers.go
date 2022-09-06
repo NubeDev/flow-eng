@@ -1,24 +1,35 @@
 package node
 
-import (
-	"reflect"
-)
+import "reflect"
 
 func Ports(node Node, direction Direction) []Port {
 	ports := make([]Port, 0, 1)
-	for _, input := range node.Inputs() {
+	for _, input := range node.GetInputs() {
 		if input.InputPort.Direction() != direction {
 			continue
 		}
 		ports = append(ports, input.InputPort)
 	}
-	for _, output := range node.Outputs() {
+	for _, output := range node.GetOutputs() {
 		if output.OutputPort.Direction() != direction {
 			continue
 		}
 		ports = append(ports, output.OutputPort)
 	}
 	return ports
+}
+
+func Connectors(ports []Port) []*Connector {
+	connectors := make([]*Connector, 0, 1)
+	for i := 0; i < len(ports); i++ {
+		port := ports[i]
+		portConnectors := port.Connectors()
+		if len(portConnectors) == 0 {
+			continue
+		}
+		connectors = append(connectors, portConnectors...)
+	}
+	return connectors
 }
 
 func PortsOld(node Node, direction Direction) []Port {
@@ -38,17 +49,4 @@ func PortsOld(node Node, direction Direction) []Port {
 		ports = append(ports, port)
 	}
 	return ports
-}
-
-func Connectors(ports []Port) []*Connector {
-	connectors := make([]*Connector, 0, 1)
-	for i := 0; i < len(ports); i++ {
-		port := ports[i]
-		portConnectors := port.Connectors()
-		if len(portConnectors) == 0 {
-			continue
-		}
-		connectors = append(connectors, portConnectors...)
-	}
-	return connectors
 }

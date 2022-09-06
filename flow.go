@@ -21,19 +21,19 @@ func (p *Flow) Get() *Flow {
 	return p
 }
 
-func (p *Flow) GetNode(name string) node.Node {
+func (p *Flow) GetNode(id string) node.Node {
 	for _, n := range p.Get().nodes {
-		if n.Info().Name == name {
+		if n.GetID() == id {
 			return n
 		}
 	}
 	return nil
 }
 
-func (p *Flow) GetNodeRunner(name string) *node.Runner {
+func (p *Flow) GetNodeRunner(id string) *node.Runner {
 	for _, n := range p.Get().Graphs {
 		for _, runner := range n.Runners {
-			if runner.Name() == name {
+			if runner.NodeId() == id {
 				return runner
 			}
 		}
@@ -41,10 +41,10 @@ func (p *Flow) GetNodeRunner(name string) *node.Runner {
 	return nil
 }
 
-func (p *Flow) ReplaceNode(name string, node node.Node) node.Node {
+func (p *Flow) ReplaceNode(id string, node node.Node) node.Node {
 	var found bool
 	for _, n := range p.Get().nodes {
-		if n.Info().Name == name {
+		if n.GetID() == id {
 			n = nil
 			found = true
 		}
@@ -52,7 +52,7 @@ func (p *Flow) ReplaceNode(name string, node node.Node) node.Node {
 	if found {
 		p.AddNode(node)
 	}
-	return p.GetNode(name)
+	return p.GetNode(id)
 }
 
 func (p *Flow) AddNode(node node.Node) *Flow {

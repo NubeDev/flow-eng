@@ -1,115 +1,61 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	flowctrl "github.com/NubeDev/flow-eng"
 	"github.com/NubeDev/flow-eng/_example/nodes"
-	"log"
-	"time"
-
+	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
+	"io/ioutil"
+	"log"
+	"os"
+	"time"
 )
-
-type typeInput struct {
-	Name       string      `json:"name"`
-	Type       string      `json:"type"`
-	Connection *connection `json:"connection"`
-}
-
-type connection struct {
-	NodeID string `json:"nodeID"`
-	Port   string `json:"port"`
-}
-
-type typeOutput struct {
-	Name        string        `json:"name"`
-	Type        string        `json:"type"`
-	Connections []*connection `json:"connections"`
-}
-
-type commonNode struct {
-	NodeID  string        `json:"nodeID"` // abc
-	Name    string        `json:"name"`   // my node
-	Node    string        `json:"node"`   // PASS
-	Inputs  []*typeInput  `json:"inputs"`
-	Outputs []*typeOutput `json:"outputs"`
-}
 
 func main() {
 
-	nodeA := nodes.New(&nodes.Node{
-		NodeID:   "a123",
-		Name:     "a123",
-		NodeType: "PASS",
-		InputList: []*node.TypeInput{&node.TypeInput{
-			PortCommon: &node.PortCommon{
-				Name: "in1",
-				Type: "int8",
-				Connection: &node.Connection{
-					NodeID: "",
-					Port:   "",
-				},
-			},
-		}},
-		OutputList: []*node.TypeOutput{&node.TypeOutput{
-			PortCommonOut: &node.PortCommonOut{
-				Name: "out1",
-				Type: "int8",
-				Connections: []*node.Connection{&node.Connection{
-					NodeID: "b123",
-					Port:   "in1",
-				}},
-			},
-		}},
-	})
+	var nodesParsed []*nodes.Node
+	jsonFile, err := os.Open("../flow-eng/_example/test.json")
+	if err != nil {
+		fmt.Println(err)
+	}
+	// defer the closing of our jsonFile so that we can parse it later on
+	defer jsonFile.Close()
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+	json.Unmarshal(byteValue, &nodesParsed)
+	//pprint.PrintJOSN(nodesParsed)
 
-	nodeB := nodes.New(&nodes.Node{
-		NodeID:   "b123",
-		Name:     "b123",
-		NodeType: "PASS",
-		InputList: []*node.TypeInput{&node.TypeInput{
-			PortCommon: &node.PortCommon{
-				Name: "in1",
-				Type: "int8",
-				Connection: &node.Connection{
-					NodeID: "b123",
-					Port:   "out1",
-				},
-			},
-		}},
-		OutputList: []*node.TypeOutput{&node.TypeOutput{
-			PortCommonOut: &node.PortCommonOut{
-				Name: "out1",
-				Type: "int8",
-				Connections: []*node.Connection{&node.Connection{
-					NodeID: "",
-					Port:   "",
-				}},
-			},
-		}},
-	})
+	var nodeA *nodes.Node
+	var nodeB *nodes.Node
 
-	var nodesList []*nodes.Node
-	nodesList = append(nodesList, nodeA)
-	nodesList = append(nodesList, nodeB)
+	for _, n := range nodesParsed {
+		if n.GetName() == "nodeA" {
+			nodeA = n
+		}
+		if n.GetName() == "nodeB" {
+			nodeB = n
+		}
+	}
+
+	nodeA, _ = nodes.New(nodeA)
+	nodeB, _ = nodes.New(nodeB)
 
 	graph := flowctrl.New()
 	graph.AddNode(nodeA)
 	graph.AddNode(nodeB)
 
-	getA := graph.GetNode(nodeA.Name).(*nodes.Node)
-	getB := graph.GetNode(nodeB.Name).(*nodes.Node)
+	getA := graph.GetNode(nodeA.GetID())
+	getB := graph.GetNode(nodeB.GetID())
 
-	for _, output := range getA.OutputList {
-		for _, input := range getB.InputList {
-			fmt.Println(11111, "SET")
+	for _, output := range getA.GetOutputs() {
+		for _, input := range getB.GetInputs() {
 			output.OutputPort.Connect(input.InputPort)
 		}
-
 	}
 
-	graph.ReplaceNode(nodeA.Name, getA)
-	graph.ReplaceNode(nodeB.Name, getB)
+	graph.ReplaceNode(nodeA.GetID(), getA)
+	graph.ReplaceNode(nodeB.GetID(), getB)
 
 	for _, ordered := range graph.Get().Graphs {
 		for _, runner := range ordered.Runners {
@@ -140,4 +86,59 @@ func main() {
 		//}
 	}
 
+}
+
+func buildJson() {
+
+	nodeA, _ := nodes.New(&nodes.Node{
+		InputList: []*node.TypeInput{&node.TypeInput{
+			PortCommon: &node.PortCommon{
+				Name: "in1",
+				Type: "int8",
+				Connection: &node.Connection{
+					NodeID:   "",
+					NodePort: "",
+				},
+			},
+		}},
+		OutputList: []*node.TypeOutput{&node.TypeOutput{
+			PortCommonOut: &node.PortCommonOut{
+				Name: "out1",
+				Type: "int8",
+				Connections: []*node.Connection{&node.Connection{
+					NodeID:   "",
+					NodePort: "in1",
+				}},
+			},
+		}},
+	})
+
+	nodeB, _ := nodes.New(&nodes.Node{
+		InputList: []*node.TypeInput{&node.TypeInput{
+			PortCommon: &node.PortCommon{
+				Name: "in1",
+				Type: "int8",
+				Connection: &node.Connection{
+					NodeID:   "",
+					NodePort: "out1",
+				},
+			},
+		}},
+		OutputList: []*node.TypeOutput{&node.TypeOutput{
+			PortCommonOut: &node.PortCommonOut{
+				Name: "out1",
+				Type: "int8",
+				Connections: []*node.Connection{&node.Connection{
+					NodeID:   "",
+					NodePort: "",
+				}},
+			},
+		}},
+	})
+
+	var nodesList []*nodes.Node
+
+	nodesList = append(nodesList, nodeA)
+	nodesList = append(nodesList, nodeB)
+	pprint.PrintJOSN(nodesList)
 }

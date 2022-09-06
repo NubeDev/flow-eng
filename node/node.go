@@ -2,28 +2,57 @@ package node
 
 import "github.com/NubeDev/flow-eng/buffer/adapter"
 
-type NodeInfo struct {
-	Name        string `json:"-"`
-	Type        string `json:"-"`
-	Description string `json:"-"`
-	Version     string `json:"-"`
+type Node interface {
+	Process()
+	Cleanup()
+	GetName() string
+	GetID() string
+	GetType() string
+	GetInfo() Info
+	GetInputs() []*TypeInput
+	GetOutputs() []*TypeOutput
+}
+
+//type Spec struct {
+//	Node
+//	InputList  []*TypeInput  `json:"inputs"`
+//	OutputList []*TypeOutput `json:"outputs"`
+//	Info       Info      `json:"info"`
+//}
+//
+//
+//func (n *Spec) GetName() string{
+//	return n.Info.Name
+//}
+
+type Info struct {
+	NodeID      string `json:"nodeID"` // abc
+	Name        string `json:"name"`
+	Type        string `json:"type"`
+	Category    string `json:"category"`
+	Description string `json:"description"`
+	Version     string `json:"version"`
 }
 
 type DataTypes string
 type PortName string
 
 const (
-	TypeInt8 DataTypes = "int8"
+	TypeAny     DataTypes = "any"
+	TypeString  DataTypes = "string"
+	TypeInt8    DataTypes = "int8"
+	TypeFloat64 DataTypes = "float64"
 )
 
 const (
 	In1  PortName = "in1"
+	In2  PortName = "in2"
 	Out1 PortName = "out1"
 )
 
 type Connection struct {
-	NodeID string `json:"nodeID"`
-	Port   string `json:"port"`
+	NodeID   string `json:"nodeID"`
+	NodePort string `json:"nodePortName"`
 }
 
 type PortCommon struct {
@@ -41,19 +70,13 @@ type PortCommonOut struct {
 type TypeInput struct {
 	*PortCommon
 	*InputPort
-	Value *adapter.Int8
+	ValueFloat64 *adapter.Float64 `json:"-"`
+	ValueString  *adapter.String  `json:"-"`
 }
 
 type TypeOutput struct {
 	*PortCommonOut
 	*OutputPort
-	Value *adapter.Int8
-}
-
-type Node interface {
-	Process()
-	Cleanup()
-	Info() NodeInfo
-	Inputs() []*TypeInput
-	Outputs() []*TypeOutput
+	ValueFloat64 *adapter.Float64 `json:"-"`
+	ValueString  *adapter.String  `json:"-"`
 }

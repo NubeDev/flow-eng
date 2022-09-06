@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"github.com/NubeDev/flow-eng"
 	"github.com/NubeDev/flow-eng/_example/nodes"
+	pprint "github.com/NubeDev/flow-eng/helpers/print"
+	"io/ioutil"
 	"log"
+	"os"
 	"time"
 )
 
@@ -41,16 +44,16 @@ func main() {
 	nodesParsed = append(nodesParsed, nameA_)
 	nodesParsed = append(nodesParsed, nameB_)
 
-	//pprint.PrintJOSN(nodesParsed)
-	////var nodesParsed []*genericNode
-	//jsonFile, err := os.Open("../flowctrl/_example/test.json")
-	//// if we os.Open returns an error then handle it
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-	//// defer the closing of our jsonFile so that we can parse it later on
-	//defer jsonFile.Close()
-	//byteValue, _ := ioutil.ReadAll(jsonFile)
+	pprint.PrintJOSN(nodesParsed)
+	//var nodesParsed []*genericNode
+	jsonFile, err := os.Open("../flowctrl/_example/test.json")
+	// if we os.Open returns an error then handle it
+	if err != nil {
+		fmt.Println(err)
+	}
+	// defer the closing of our jsonFile so that we can parse it later on
+	defer jsonFile.Close()
+	byteValue, _ := ioutil.ReadAll(jsonFile)
 	//
 	//// we initialize our Users array
 	////nodesParsed []*genericNode

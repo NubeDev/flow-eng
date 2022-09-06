@@ -8,6 +8,7 @@ import (
 
 type Runner struct {
 	uuid       uuid.Value
+	nodeId     string
 	name       string
 	node       Node
 	inputs     []Port
@@ -19,14 +20,19 @@ func NewRunner(node Node) *Runner {
 	inputs := Ports(node, DirectionInput)
 	outputs := Ports(node, DirectionOutput)
 	connectors := Connectors(inputs)
-	info := node.Info()
+	info := node.GetInfo()
+	nodeID := node.GetID()
 	id := uuid.New()
 	name := fmt.Sprintf("%s_%s_%s", info.Name, info.Version, id)
-	return &Runner{id, name, node, inputs, outputs, connectors}
+	return &Runner{id, nodeID, name, node, inputs, outputs, connectors}
 }
 
 func (runner *Runner) Name() string {
 	return runner.name
+}
+
+func (runner *Runner) NodeId() string {
+	return runner.nodeId
 }
 
 func (runner *Runner) UUID() uuid.Value {

@@ -7,14 +7,13 @@ import (
 
 type OutputPort struct {
 	*buffer.Const
-	uuid        uuid.Value
-	direction   Direction
-	connectors  []*Connector
-	NodeDetails *Details `json:"nodeDetails"`
+	uuid       uuid.Value
+	direction  Direction
+	connectors []*Connector
 }
 
-func NewOutputPort(_type buffer.Type, nodeDetails *Details) *OutputPort {
-	return &OutputPort{buffer.NewConst(_type), uuid.New(), DirectionOutput, make([]*Connector, 0, 1), nodeDetails}
+func NewOutputPort(_type buffer.Type) *OutputPort {
+	return &OutputPort{buffer.NewConst(_type), uuid.New(), DirectionOutput, make([]*Connector, 0, 1)}
 }
 
 func (p *OutputPort) Write(data []byte) (int, error) {
@@ -35,10 +34,6 @@ func (p *OutputPort) UUID() uuid.Value {
 
 func (p *OutputPort) Direction() Direction {
 	return p.direction
-}
-
-func (p *OutputPort) GetNodeDetails() *Details {
-	return p.NodeDetails
 }
 
 func (p *OutputPort) Connectors() []*Connector {

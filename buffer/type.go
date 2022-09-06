@@ -15,4 +15,6 @@ const (
 	Float32 Type = 4
 	Float64 Type = 8
 	Byte    Type = Int8
+	String  Type = 9
+	Any     Type = 10
 )
