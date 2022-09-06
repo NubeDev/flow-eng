@@ -1,0 +1,60 @@
+[
+  {
+    "nodeID": "1111",
+    "name": "a123",
+    "node": "PASS",
+    "inputs": [
+      {
+        "name": "in1",
+        "type": "int8",
+        "connection": {
+          "nodeID": "",
+          "port": ""
+        },
+        "nodeDetails": null
+      }
+    ],
+    "outputs": [
+      {
+        "name": "out1",
+        "type": "int8",
+        "connection": [
+          {
+            "nodeID": "b123",
+            "port": "in1"
+          }
+        ],
+        "nodeDetails": null
+      }
+    ]
+  },
+  {
+    "nodeID": "1111",
+    "name": "b123",
+    "node": "PASS",
+    "inputs": [
+      {
+        "name": "in1",
+        "type": "int8",
+        "connection": {
+          "nodeID": "b123",
+          "port": "out1"
+        },
+        "nodeDetails": null
+      }
+    ],
+    "outputs": [
+      {
+        "name": "out1",
+        "type": "int8",
+        "connection": [
+          {
+            "nodeID": "",
+            "port": ""
+          }
+        ],
+        "nodeDetails": null
+      }
+    ]
+  }
+]
