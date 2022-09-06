@@ -24,7 +24,6 @@ func main() {
 	defer jsonFile.Close()
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 	json.Unmarshal(byteValue, &nodesParsed)
-	//pprint.PrintJOSN(nodesParsed)
 
 	var nodeA *node.Spec
 	var nodeB *node.Spec

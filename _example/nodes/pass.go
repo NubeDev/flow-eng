@@ -1,7 +1,6 @@
 package nodes
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 )
 
@@ -9,7 +8,7 @@ import (
 // if we ref a Connection by the name it's easier to manage migrations but will be more work in coding the app
 
 type Node struct {
-	*node.Spec
+	Node *node.NodeBase
 }
 
 const (
@@ -39,18 +38,18 @@ func New(body *node.Spec) (*node.Spec, error) {
 
 func (n *Node) Process() {
 
-	for _, input := range n.GetInputs() {
-		fmt.Println("READ-VALUE", input.ValueFloat64.Get(), "NAME", n.Info.Name)
-	}
-
-	for _, output := range n.GetOutputs() {
-		if n.Info.Name == "nodeA" {
-			fmt.Println("WRITE-VALUE", output.ValueFloat64.Get(), "NAME", n.Info.Name)
-			output.ValueFloat64.Set(33.3)
-
-		}
-
-	}
+	//for _, input := range n.GetInputs() {
+	//	fmt.Println("READ-VALUE", input.ValueFloat64.Get(), "NAME", n.Info.Name)
+	//}
+	//
+	//for _, output := range n.GetOutputs() {
+	//	if n.Info.Name == "nodeA" {
+	//		fmt.Println("WRITE-VALUE", output.ValueFloat64.Get(), "NAME", n.Info.Name)
+	//		output.ValueFloat64.Set(33.3)
+	//
+	//	}
+	//
+	//}
 }
 
 func (n *Node) Cleanup() {}

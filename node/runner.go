@@ -7,11 +7,10 @@ import (
 )
 
 type Runner struct {
-	uuid   uuid.Value
-	nodeId string
-	name   string
-	node   Node
-
+	uuid       uuid.Value
+	nodeId     string
+	name       string
+	node       Node
 	inputs     []Port
 	outputs    []Port
 	connectors []*Connector

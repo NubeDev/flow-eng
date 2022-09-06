@@ -4,15 +4,19 @@ import (
 	"github.com/NubeDev/flow-eng/buffer/adapter"
 )
 
-type Node interface {
-	Process()
-	Cleanup()
+type NodeBase interface {
 	GetName() string
 	GetID() string
 	GetType() string
 	GetInfo() Info
 	GetInputs() []*TypeInput
 	GetOutputs() []*TypeOutput
+}
+
+type Node interface {
+	Process()
+	Cleanup()
+	NodeBase
 }
 
 type Spec struct {
