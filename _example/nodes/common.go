@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers"
+	"github.com/NubeDev/flow-eng/node"
 )
 
 type NodeSpec struct {
@@ -12,7 +13,7 @@ type NodeSpec struct {
 	OutputCount int
 }
 
-func Check(body *Node, nodeSpec NodeSpec) (*Node, error) {
+func Check(body *node.Spec, nodeSpec NodeSpec) (*node.Spec, error) {
 	if body == nil {
 		return nil, errors.New("node body can not be empty")
 	}

@@ -9,9 +9,7 @@ import (
 // if we ref a Connection by the name it's easier to manage migrations but will be more work in coding the app
 
 type Node struct {
-	InputList  []*node.TypeInput  `json:"inputs"`
-	OutputList []*node.TypeOutput `json:"outputs"`
-	Info       node.Info          `json:"info"`
+	*node.Spec
 }
 
 const (
@@ -20,13 +18,13 @@ const (
 	outputCount = 1
 )
 
-func New(body *Node) (*Node, error) {
+func New(body *node.Spec) (*node.Spec, error) {
 	body, err := Check(body, NodeSpec{nodeType, inputCount, outputCount})
 	if err != nil {
 		return nil, err
 	}
 
-	return &Node{
+	return &node.Spec{
 		InputList:  BuildInputs(body),
 		OutputList: BuildOutputs(body),
 		Info: node.Info{
@@ -37,30 +35,6 @@ func New(body *Node) (*Node, error) {
 			Version:     "1",
 		},
 	}, nil
-}
-
-func (n *Node) GetName() string {
-	return n.GetInfo().Name
-}
-
-func (n *Node) GetID() string {
-	return n.GetInfo().NodeID
-}
-
-func (n *Node) GetType() string {
-	return n.GetInfo().Type
-}
-
-func (n *Node) GetInputs() []*node.TypeInput {
-	return n.InputList
-}
-
-func (n *Node) GetOutputs() []*node.TypeOutput {
-	return n.OutputList
-}
-
-func (n *Node) GetInfo() node.Info {
-	return n.Info
 }
 
 func (n *Node) Process() {

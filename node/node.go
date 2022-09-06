@@ -1,6 +1,8 @@
 package node
 
-import "github.com/NubeDev/flow-eng/buffer/adapter"
+import (
+	"github.com/NubeDev/flow-eng/buffer/adapter"
+)
 
 type Node interface {
 	Process()
@@ -13,17 +15,32 @@ type Node interface {
 	GetOutputs() []*TypeOutput
 }
 
-//type Spec struct {
-//	Node
-//	InputList  []*TypeInput  `json:"inputs"`
-//	OutputList []*TypeOutput `json:"outputs"`
-//	Info       Info      `json:"info"`
-//}
-//
-//
-//func (n *Spec) GetName() string{
-//	return n.Info.Name
-//}
+type Spec struct {
+	Node
+	InputList  []*TypeInput  `json:"inputs"`
+	OutputList []*TypeOutput `json:"outputs"`
+	Info       Info          `json:"info"`
+}
+
+func (n *Spec) GetInfo() Info {
+	return n.Info
+}
+
+func (n *Spec) GetID() string {
+	return n.Info.NodeID
+}
+
+func (n *Spec) GetName() string {
+	return n.Info.Name
+}
+
+func (n *Spec) GetInputs() []*TypeInput {
+	return n.InputList
+}
+
+func (n *Spec) GetOutputs() []*TypeOutput {
+	return n.OutputList
+}
 
 type Info struct {
 	NodeID      string `json:"nodeID"` // abc

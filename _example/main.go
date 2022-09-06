@@ -15,7 +15,7 @@ import (
 
 func main() {
 
-	var nodesParsed []*nodes.Node
+	var nodesParsed []*node.Spec
 	jsonFile, err := os.Open("../flow-eng/_example/test.json")
 	if err != nil {
 		fmt.Println(err)
@@ -26,8 +26,8 @@ func main() {
 	json.Unmarshal(byteValue, &nodesParsed)
 	//pprint.PrintJOSN(nodesParsed)
 
-	var nodeA *nodes.Node
-	var nodeB *nodes.Node
+	var nodeA *node.Spec
+	var nodeB *node.Spec
 
 	for _, n := range nodesParsed {
 		if n.GetName() == "nodeA" {
@@ -76,6 +76,7 @@ func main() {
 	for {
 
 		err := runner.Process()
+		fmt.Println(err)
 		if err != nil {
 			panic(err)
 		}
@@ -90,7 +91,7 @@ func main() {
 
 func buildJson() {
 
-	nodeA, _ := nodes.New(&nodes.Node{
+	nodeA, _ := nodes.New(&node.Spec{
 		InputList: []*node.TypeInput{&node.TypeInput{
 			PortCommon: &node.PortCommon{
 				Name: "in1",
@@ -113,7 +114,7 @@ func buildJson() {
 		}},
 	})
 
-	nodeB, _ := nodes.New(&nodes.Node{
+	nodeB, _ := nodes.New(&node.Spec{
 		InputList: []*node.TypeInput{&node.TypeInput{
 			PortCommon: &node.PortCommon{
 				Name: "in1",
@@ -136,7 +137,7 @@ func buildJson() {
 		}},
 	})
 
-	var nodesList []*nodes.Node
+	var nodesList []*node.Spec
 
 	nodesList = append(nodesList, nodeA)
 	nodesList = append(nodesList, nodeB)
