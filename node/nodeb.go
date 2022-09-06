@@ -7,7 +7,10 @@ type NodeB struct {
 }
 
 func (n *NodeB) Process() {
-	fmt.Println("Node B>>>", n.GetName())
+
+	for _, input := range n.GetInputs() {
+		fmt.Println("Node B>>>", n.GetName(), input.ValueFloat64.Get())
+	}
 }
 
 func (n *NodeB) Cleanup() {
