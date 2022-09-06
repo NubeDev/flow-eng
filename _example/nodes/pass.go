@@ -1,6 +1,7 @@
 package nodes
 
 import (
+	"fmt"
 	"github.com/NubeDev/flow-eng/buffer"
 	"github.com/NubeDev/flow-eng/buffer/adapter"
 	"github.com/NubeDev/flow-eng/node"
@@ -9,95 +10,62 @@ import (
 // a node out should be able to have multiple connections
 // if we ref a Connection by the name it's easier to manage migrations but will be more work in coding the app
 
-type Connection struct {
-	NodeID string `json:"nodeID"`
-	Port   string `json:"port"`
-}
-
-type PortCommon struct {
-	Name       portName    `json:"name"` // in1
-	Type       dataTypes   `json:"type"` // int8
-	Connection *Connection `json:"connection"`
-}
-
-type PortCommonOut struct {
-	Name        portName      `json:"name"` // in1
-	Type        dataTypes     `json:"type"` // int8
-	Connections []*Connection `json:"connection"`
-}
-
-type TypeInput struct {
-	*PortCommon
-	*node.InputPort
-	value *adapter.Int8
-}
-
-type TypeOutput struct {
-	*PortCommonOut
-	*node.OutputPort
-	value *adapter.Int8
-}
-
-type dataTypes string
-type portName string
-
-const (
-	typeInt8 dataTypes = "int8"
-)
-
-const (
-	in1  portName = "in1"
-	out1 portName = "out1"
-)
-
 type Node struct {
-	NodeID  string        `json:"nodeID"` // abc
-	Name    string        `json:"name"`   // my node
-	Node    string        `json:"node"`   // PASS
-	Inputs  []*TypeInput  `json:"inputs"`
-	Outputs []*TypeOutput `json:"outputs"`
-	info    node.NodeInfo
+	NodeID     string             `json:"nodeID"` // abc
+	Name       string             `json:"name"`   // my node
+	NodeType   string             `json:"node"`   // PASS
+	InputList  []*node.TypeInput  `json:"inputs"`
+	OutputList []*node.TypeOutput `json:"outputs"`
+	info       node.NodeInfo
 }
 
-func buildInput(inputType dataTypes, conn *Connection) *TypeInput {
+func (n *Node) Inputs() []*node.TypeInput {
+	return n.InputList
+}
+
+func (n *Node) Outputs() []*node.TypeOutput {
+	return n.OutputList
+}
+
+func buildInput(inputType node.DataTypes, conn *node.Connection) *node.TypeInput {
 	var dataType buffer.Type
-	if inputType == typeInt8 {
+	if inputType == node.TypeInt8 {
 		dataType = buffer.Int8
 	}
 	var port = node.NewInputPort(dataType, nil)
-	return &TypeInput{
-		PortCommon: &PortCommon{
-			Name: in1,
-			Type: typeInt8,
-			Connection: &Connection{
+	return &node.TypeInput{
+		PortCommon: &node.PortCommon{
+			Name: node.In1,
+			Type: node.TypeInt8,
+			Connection: &node.Connection{
 				NodeID: conn.NodeID,
 				Port:   conn.Port,
 			},
 		},
 		InputPort: port,
-		value:     adapter.NewInt8(port),
+		Value:     adapter.NewInt8(port),
 	}
 }
 
-func buildOutput(inputType dataTypes, conn []*Connection) *TypeOutput {
+func buildOutput(inputType node.DataTypes, conn []*node.Connection) *node.TypeOutput {
 	var dataType buffer.Type
-	if inputType == typeInt8 {
+	if inputType == node.TypeInt8 {
 		dataType = buffer.Int8
 	}
 	var port = node.NewOutputPort(dataType, nil)
-	return &TypeOutput{
-		PortCommonOut: &PortCommonOut{
-			Name:        out1,
-			Type:        typeInt8,
+	return &node.TypeOutput{
+		PortCommonOut: &node.PortCommonOut{
+			Name:        node.Out1,
+			Type:        node.TypeInt8,
 			Connections: conn,
 		},
 		OutputPort: port,
-		value:      adapter.NewInt8(port),
+		Value:      adapter.NewInt8(port),
 	}
 }
 
-func getInput(body *Node, num int) *TypeInput {
-	for i, input := range body.Inputs {
+func getInput(body *Node, num int) *node.TypeInput {
+	for i, input := range body.InputList {
 		if i == num {
 			return input
 		}
@@ -105,27 +73,50 @@ func getInput(body *Node, num int) *TypeInput {
 	return nil
 }
 
+func getOutConnections(body *Node, num int) []*node.Connection {
+	for _, output := range body.OutputList {
+		return output.Connections
+	}
+	return nil
+}
+
 func New(body *Node) *Node {
-	buildIn1 := buildInput(typeInt8, getInput(body, 0).Connection)
-	buildOut1 := buildOutput(typeInt8, body.Outputs[0].Connections)
+	buildIn1 := buildInput(node.TypeInt8, getInput(body, 0).Connection)
+	buildOut1 := buildOutput(node.TypeInt8, getOutConnections(body, 0))
+
 	return &Node{
-		NodeID:  "1111",
-		Name:    body.Name,
-		Node:    "PASS",
-		Inputs:  []*TypeInput{buildIn1},
-		Outputs: []*TypeOutput{buildOut1},
+		NodeID:     body.NodeID,
+		Name:       body.Name,
+		NodeType:   "PASS",
+		InputList:  []*node.TypeInput{buildIn1},
+		OutputList: []*node.TypeOutput{buildOut1},
+		info: node.NodeInfo{
+			Name:        body.Name,
+			Type:        "PASS",
+			Description: "desc",
+			Version:     "1",
+		},
 	}
 }
 
-func (node *Node) Get() node.NodeInfo {
-	return node.info
+func (n *Node) Info() node.NodeInfo {
+	return n.info
 }
 
-func (node *Node) Info() node.NodeInfo {
-	return node.info
-}
+func (n *Node) Process() {
 
-func (node *Node) Process() {
+	for _, input := range n.InputList {
+		fmt.Println("READ-VALUE", input.Value.Get(), "NAME", n.info.Name)
+	}
+
+	for _, output := range n.OutputList {
+		if n.info.Name == "a123" {
+			fmt.Println("WRITE-VALUE", output.Value.Get(), "NAME", n.info.Name)
+			output.Value.Set(11)
+
+		}
+
+	}
 
 	//read := node.reader.Get()
 	//if node.Info().Name == "nodeA" {
@@ -138,4 +129,4 @@ func (node *Node) Process() {
 
 }
 
-func (node *Node) Cleanup() {}
+func (n *Node) Cleanup() {}
