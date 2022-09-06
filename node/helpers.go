@@ -2,7 +2,7 @@ package node
 
 import "reflect"
 
-func Ports(node Node, direction Direction) []Port {
+func Ports(node *Node, direction Direction) []Port {
 	ports := make([]Port, 0, 1)
 	for _, input := range node.GetInputs() {
 		if input.InputPort.Direction() != direction {

@@ -8,10 +8,10 @@ import (
 
 type Flow struct {
 	Graphs []*graph.Ordered
-	nodes  []node.Node
+	nodes  []*node.Node
 }
 
-func New(nodes ...node.Node) *Flow {
+func New(nodes ...*node.Node) *Flow {
 	runners := makeRunners(nodes)
 	ordered := makeGraphs(runners)
 	return &Flow{ordered, nodes}
@@ -21,7 +21,7 @@ func (p *Flow) Get() *Flow {
 	return p
 }
 
-func (p *Flow) GetNode(id string) node.Node {
+func (p *Flow) GetNode(id string) *node.Node {
 	for _, n := range p.Get().nodes {
 		if n.GetID() == id {
 			return n
@@ -41,7 +41,7 @@ func (p *Flow) GetNodeRunner(id string) *node.Runner {
 	return nil
 }
 
-func (p *Flow) ReplaceNode(id string, node node.Node) node.Node {
+func (p *Flow) ReplaceNode(id string, node *node.Node) *node.Node {
 	var found bool
 	for _, n := range p.Get().nodes {
 		if n.GetID() == id {
@@ -55,7 +55,7 @@ func (p *Flow) ReplaceNode(id string, node node.Node) node.Node {
 	return p.GetNode(id)
 }
 
-func (p *Flow) AddNode(node node.Node) *Flow {
+func (p *Flow) AddNode(node *node.Node) *Flow {
 	flows := p.Get()
 	flows.nodes = append(flows.nodes, node)
 	runners := makeRunners(flows.nodes)
@@ -64,7 +64,7 @@ func (p *Flow) AddNode(node node.Node) *Flow {
 	return flows
 }
 
-func makeRunners(nodes []node.Node) []*node.Runner {
+func makeRunners(nodes []*node.Node) []*node.Runner {
 	nodesCount := len(nodes)
 	runners := make([]*node.Runner, 0, nodesCount)
 	for i := 0; i < nodesCount; i++ {

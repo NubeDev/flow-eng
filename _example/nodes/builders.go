@@ -6,7 +6,7 @@ import (
 	"github.com/NubeDev/flow-eng/node"
 )
 
-func BuildInputs(body *node.Spec) []*node.TypeInput {
+func BuildInputs(body *node.Node) []*node.TypeInput {
 	var out []*node.TypeInput
 	for _, input := range body.InputList {
 		out = append(out, buildInputFloat(input.PortCommon.Name, input.PortCommon.Connection))
@@ -14,7 +14,7 @@ func BuildInputs(body *node.Spec) []*node.TypeInput {
 	return out
 }
 
-func BuildOutputs(body *node.Spec) []*node.TypeOutput {
+func BuildOutputs(body *node.Node) []*node.TypeOutput {
 	var out []*node.TypeOutput
 	for _, output := range body.OutputList {
 		out = append(out, buildOutputFloat(output.PortCommonOut.Name, output.PortCommonOut.Connections))
@@ -84,7 +84,7 @@ func buildOutputFloat(outputName node.PortName, conn []*node.Connection) *node.T
 	}
 }
 
-func GetInput(body *node.Spec, num int) *node.TypeInput {
+func GetInput(body *node.Node, num int) *node.TypeInput {
 	for i, input := range body.InputList {
 		if i == num {
 			return input
@@ -93,7 +93,7 @@ func GetInput(body *node.Spec, num int) *node.TypeInput {
 	return nil
 }
 
-func GetOutConnections(body *node.Spec, num int) []*node.Connection {
+func GetOutConnections(body *node.Node, num int) []*node.Connection {
 	for i, output := range body.OutputList {
 		if i == num {
 			return output.Connections

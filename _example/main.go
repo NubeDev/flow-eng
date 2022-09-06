@@ -5,7 +5,6 @@ import (
 	"fmt"
 	flowctrl "github.com/NubeDev/flow-eng"
 	"github.com/NubeDev/flow-eng/_example/nodes"
-	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"io/ioutil"
 	"log"
@@ -15,7 +14,9 @@ import (
 
 func main() {
 
-	var nodesParsed []*node.Spec
+	buildJson()
+
+	var nodesParsed []*node.Node
 	jsonFile, err := os.Open("../flow-eng/_example/test.json")
 	if err != nil {
 		fmt.Println(err)
@@ -25,10 +26,13 @@ func main() {
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 	json.Unmarshal(byteValue, &nodesParsed)
 
-	var nodeA *node.Spec
-	var nodeB *node.Spec
+	var nodeA *node.Node
+	var nodeB *node.Node
+
+	//pprint.PrintJOSN(nodesParsed)
 
 	for _, n := range nodesParsed {
+		fmt.Println(n.Info.Name, n.GetName())
 		if n.GetName() == "nodeA" {
 			nodeA = n
 		}
@@ -90,7 +94,7 @@ func main() {
 
 func buildJson() {
 
-	nodeA, _ := nodes.New(&node.Spec{
+	nodeA, _ := nodes.New(&node.Node{
 		InputList: []*node.TypeInput{&node.TypeInput{
 			PortCommon: &node.PortCommon{
 				Name: "in1",
@@ -113,7 +117,7 @@ func buildJson() {
 		}},
 	})
 
-	nodeB, _ := nodes.New(&node.Spec{
+	nodeB, _ := nodes.New(&node.Node{
 		InputList: []*node.TypeInput{&node.TypeInput{
 			PortCommon: &node.PortCommon{
 				Name: "in1",
@@ -136,9 +140,9 @@ func buildJson() {
 		}},
 	})
 
-	var nodesList []*node.Spec
+	var nodesList []*node.Node
 
 	nodesList = append(nodesList, nodeA)
 	nodesList = append(nodesList, nodeB)
-	pprint.PrintJOSN(nodesList)
+	//pprint.PrintJOSN(nodesList)
 }

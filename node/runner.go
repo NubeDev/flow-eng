@@ -10,14 +10,13 @@ type Runner struct {
 	uuid       uuid.Value
 	nodeId     string
 	name       string
-	node       Node
+	node       *Node
 	inputs     []Port
 	outputs    []Port
 	connectors []*Connector
-	spec       *Spec
 }
 
-func NewRunner(node Node) *Runner {
+func NewRunner(node *Node) *Runner {
 	inputs := Ports(node, DirectionInput)
 	outputs := Ports(node, DirectionOutput)
 	connectors := Connectors(inputs)
@@ -25,7 +24,7 @@ func NewRunner(node Node) *Runner {
 	nodeID := node.GetID()
 	id := uuid.New()
 	name := fmt.Sprintf("%s_%s_%s", info.Name, info.Version, id)
-	return &Runner{id, nodeID, name, node, inputs, outputs, connectors, nil}
+	return &Runner{id, nodeID, name, node, inputs, outputs, connectors}
 }
 
 func (runner *Runner) Name() string {
@@ -48,7 +47,7 @@ func (runner *Runner) Process() error {
 	}
 
 	// run processing node
-	runner.node.Process()
+	runner.node.NodeProcess.Process()
 	return nil
 }
 

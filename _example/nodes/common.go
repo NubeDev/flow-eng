@@ -13,7 +13,7 @@ type NodeSpec struct {
 	OutputCount int
 }
 
-func Check(body *node.Spec, nodeSpec NodeSpec) (*node.Spec, error) {
+func Check(body *node.Node, nodeSpec NodeSpec) (*node.Node, error) {
 	if body == nil {
 		return nil, errors.New("node body can not be empty")
 	}
