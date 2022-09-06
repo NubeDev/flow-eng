@@ -1,11 +1,12 @@
 package node
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/buffer/adapter"
 )
 
-type NodeBase interface {
+type NodeProcess interface {
+	Process()
+	Cleanup()
 	GetName() string
 	GetID() string
 	GetType() string
@@ -14,26 +15,10 @@ type NodeBase interface {
 	GetOutputs() []*TypeOutput
 }
 
-type NodeProcess interface {
-	Process()
-	Cleanup()
-	NodeBase
-}
-
 type Node struct {
-	NodeProcess NodeProcess   `json:"-"`
-	InputList   []*TypeInput  `json:"inputs"`
-	OutputList  []*TypeOutput `json:"outputs"`
-	Info        Info          `json:"info"`
-}
-
-func (n *Node) Process() {
-
-	fmt.Println("DONTY here")
-}
-
-func (n *Node) Cleanup() {
-
+	InputList  []*TypeInput  `json:"inputs"`
+	OutputList []*TypeOutput `json:"outputs"`
+	Info       Info          `json:"info"`
 }
 
 func (n *Node) GetType() string {

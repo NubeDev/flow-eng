@@ -13,7 +13,6 @@ import (
 )
 
 func main() {
-
 	buildJson()
 
 	var nodesParsed []*node.Node
@@ -26,47 +25,29 @@ func main() {
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 	json.Unmarshal(byteValue, &nodesParsed)
 
-	var nodeA *node.Node
-	var nodeB *node.Node
-
-	//pprint.PrintJOSN(nodesParsed)
-
+	graph := flowctrl.New()
 	for _, n := range nodesParsed {
-		fmt.Println(n.Info.Name, n.GetName())
-		if n.GetName() == "nodeA" {
-			nodeA = n
-		}
-		if n.GetName() == "nodeB" {
-			nodeB = n
-		}
+		node_, _ := nodes.New(n)
+		graph.AddNode(node_)
 	}
 
-	nodeA, _ = nodes.New(nodeA)
-	nodeB, _ = nodes.New(nodeB)
-
-	graph := flowctrl.New()
-	graph.AddNode(nodeA)
-	graph.AddNode(nodeB)
-
-	getA := graph.GetNode(nodeA.GetID())
-	getB := graph.GetNode(nodeB.GetID())
-
+	// START >>> <<<====JUST FOR TEST ====>>>
+	getA := graph.GetNode("pass_a6160d20")
+	getB := graph.GetNode("pass_23e61419")
 	for _, output := range getA.GetOutputs() {
 		for _, input := range getB.GetInputs() {
 			output.OutputPort.Connect(input.InputPort)
 		}
 	}
-
-	graph.ReplaceNode(nodeA.GetID(), getA)
-	graph.ReplaceNode(nodeB.GetID(), getB)
+	graph.ReplaceNode("pass_a6160d20", getA)
+	graph.ReplaceNode("pass_23e61419", getB)
+	// END >>> <<<====JUST FOR TEST ====>>>
 
 	for _, ordered := range graph.Get().Graphs {
 		for _, runner := range ordered.Runners {
-			//fmt.Println("RUNNER-1", runner.Name(), len(runner.Outputs()), "LEN", "UUID", runner.UUID())
-
+			// fmt.Println("RUNNER-1", runner.Name(), len(runner.Outputs()), "LEN", "UUID", runner.UUID())
 			for _, port := range runner.Outputs() {
 				for _, connector := range port.Connectors() {
-
 					fmt.Println("RUNNER-TO-------------", connector.FromUUID(), connector.ToUUID())
 				}
 			}
@@ -77,23 +58,16 @@ func main() {
 
 	log.Println("Flow started")
 	for {
-
 		err := runner.Process()
 		fmt.Println(err)
 		if err != nil {
 			panic(err)
 		}
 		time.Sleep(5 * time.Second)
-		//// wait for delayed node to propagate data
-		//if endReader.Get() != 0 {
-		//	break
-		//}
 	}
-
 }
 
 func buildJson() {
-
 	nodeA, _ := nodes.New(&node.Node{
 		InputList: []*node.TypeInput{&node.TypeInput{
 			PortCommon: &node.PortCommon{
@@ -140,9 +114,8 @@ func buildJson() {
 		}},
 	})
 
-	var nodesList []*node.Node
+	var nodesList []interface{}
 
 	nodesList = append(nodesList, nodeA)
 	nodesList = append(nodesList, nodeB)
-	//pprint.PrintJOSN(nodesList)
 }

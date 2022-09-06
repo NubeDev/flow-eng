@@ -47,7 +47,15 @@ func (runner *Runner) Process() error {
 	}
 
 	// run processing node
-	runner.node.NodeProcess.Process()
+	if runner.node.GetName() == "nodeA" {
+		n := NodeB{Node: runner.node}
+		n.Process()
+	} else if runner.node.GetName() == "nodeB" {
+		n := NodeA{Node: runner.node}
+		n.Process()
+	}
+	// np := NodeProcessor{}
+	// np.getProcess(runner.node)
 	return nil
 }
 
