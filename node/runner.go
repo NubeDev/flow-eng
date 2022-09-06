@@ -2,7 +2,6 @@ package node
 
 import (
 	"fmt"
-
 	"github.com/NubeDev/flow-eng/uuid"
 )
 
@@ -23,7 +22,7 @@ func NewRunner(node *Node) *Runner {
 	info := node.GetInfo()
 	nodeID := node.GetID()
 	id := uuid.New()
-	name := fmt.Sprintf("%s_%s_%s", info.Name, info.Version, id)
+	name := fmt.Sprintf("%s_%s_%d", info.Name, info.Version, id)
 	return &Runner{id, nodeID, name, node, inputs, outputs, connectors}
 }
 

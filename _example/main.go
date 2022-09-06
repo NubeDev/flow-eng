@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	flowctrl "github.com/NubeDev/flow-eng"
-	"github.com/NubeDev/flow-eng/_example/nodes"
 	"github.com/NubeDev/flow-eng/node"
 	"io/ioutil"
 	"log"
@@ -27,20 +26,20 @@ func main() {
 
 	graph := flowctrl.New()
 	for _, n := range nodesParsed {
-		node_, _ := nodes.New(n)
+		node_, _ := node.New(n)
 		graph.AddNode(node_)
 	}
 
 	// START >>> <<<====JUST FOR TEST ====>>>
-	getA := graph.GetNode("pass_a6160d20")
-	getB := graph.GetNode("pass_23e61419")
+	getA := graph.GetNode("a123")
+	getB := graph.GetNode("b123")
 	for _, output := range getA.GetOutputs() {
 		for _, input := range getB.GetInputs() {
-			output.OutputPort.Connect(input.InputPort)
+			output.Connect(input.InputPort)
 		}
 	}
-	graph.ReplaceNode("pass_a6160d20", getA)
-	graph.ReplaceNode("pass_23e61419", getB)
+	graph.ReplaceNode("a123", getA)
+	graph.ReplaceNode("b123", getB)
 	// END >>> <<<====JUST FOR TEST ====>>>
 
 	for _, ordered := range graph.Get().Graphs {
@@ -63,59 +62,48 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		time.Sleep(5 * time.Second)
+		time.Sleep(5000 * time.Millisecond)
 	}
 }
 
 func buildJson() {
-	nodeA, _ := nodes.New(&node.Node{
-		InputList: []*node.TypeInput{&node.TypeInput{
-			PortCommon: &node.PortCommon{
-				Name: "in1",
-				Type: "int8",
-				Connection: &node.Connection{
-					NodeID:   "",
-					NodePort: "",
-				},
-			},
-		}},
-		OutputList: []*node.TypeOutput{&node.TypeOutput{
-			PortCommonOut: &node.PortCommonOut{
-				Name: "out1",
-				Type: "int8",
-				Connections: []*node.Connection{&node.Connection{
-					NodeID:   "",
-					NodePort: "in1",
-				}},
-			},
-		}},
-	})
 
-	nodeB, _ := nodes.New(&node.Node{
-		InputList: []*node.TypeInput{&node.TypeInput{
-			PortCommon: &node.PortCommon{
-				Name: "in1",
-				Type: "int8",
-				Connection: &node.Connection{
-					NodeID:   "",
-					NodePort: "out1",
-				},
-			},
-		}},
-		OutputList: []*node.TypeOutput{&node.TypeOutput{
-			PortCommonOut: &node.PortCommonOut{
-				Name: "out1",
-				Type: "int8",
-				Connections: []*node.Connection{&node.Connection{
-					NodeID:   "",
-					NodePort: "",
-				}},
-			},
-		}},
-	})
-
+	//var nodeA *node.Node
+	var count = []string{"nodeA", "nodeB"}
 	var nodesList []interface{}
+	nodeA := &node.Node{
+		Inputs: []*node.Input{&node.Input{
+			InputPort: &node.InputPort{
+				Name:     "",
+				DataType: "",
+				Connection: &node.Connection{
+					NodeID:   "",
+					NodePort: "",
+				},
+			},
+		}},
+		Outputs: []*node.Output{&node.Output{
+			OutputPort: &node.OutputPort{
+				Name:     "",
+				DataType: "",
+				Connections: []*node.Connection{&node.Connection{
+					NodeID:   "",
+					NodePort: "",
+				},
+				},
+			},
+			ValueFloat64: nil,
+			ValueString:  nil,
+		}},
+	}
+	for _, name := range count {
+		fmt.Println(name)
+		var node node.Node
+		node.Info.Name = name
+		node = *nodeA
 
-	nodesList = append(nodesList, nodeA)
-	nodesList = append(nodesList, nodeB)
+		nodesList = append(nodesList, node)
+	}
+
+	//pprint.PrintJOSN(nodesList)
 }

@@ -6,14 +6,29 @@ import (
 )
 
 type InputPort struct {
+	Name       PortName    `json:"name"` // in1
+	DataType   DataTypes   `json:"type"` // int8
+	Connection *Connection `json:"connection"`
 	*buffer.Const
 	uuid      uuid.Value
 	direction Direction
 	connector *Connector
 }
 
-func NewInputPort(_type buffer.Type) *InputPort {
-	return &InputPort{buffer.NewConst(_type), uuid.New(), DirectionInput, nil}
+//func NewInputPort(_type buffer.Type) *InputPort {
+//	return &InputPort{buffer.NewConst(_type), uuid.New(), DirectionInput, nil}
+//}
+
+func NewInputPort(_type buffer.Type, body *InputPort) *InputPort {
+
+	return &InputPort{
+		body.Name,
+		body.DataType,
+		body.Connection,
+		buffer.NewConst(_type),
+		uuid.New(),
+		DirectionInput,
+		nil}
 }
 
 func (p *InputPort) UUID() uuid.Value {

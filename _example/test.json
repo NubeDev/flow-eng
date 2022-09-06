@@ -16,19 +16,18 @@
         "type": "float64",
         "connection": [
           {
-            "nodeID": "",
+            "nodeID": "b123",
             "nodePortName": "in1"
           }
         ]
       }
     ],
     "info": {
-      "nodeID": "pass_a6160d20",
+      "nodeID": "a123",
       "name": "nodeA",
-      "type": "pass",
       "category": "",
-      "description": "desc",
-      "version": "1"
+      "description": "",
+      "version": ""
     }
   },
   {
@@ -37,15 +36,15 @@
         "name": "in1",
         "type": "float64",
         "connection": {
-          "nodeID": "",
-          "nodePortName": ""
+          "nodeID": "a123",
+          "nodePortName": "out1"
         }
       }
     ],
     "outputs": [
       {
-        "name": "out1",
-        "type": "float64",
+        "name": "",
+        "type": "",
         "connection": [
           {
             "nodeID": "",
@@ -55,12 +54,11 @@
       }
     ],
     "info": {
-      "nodeID": "pass_23e61419",
+      "nodeID": "b123",
       "name": "nodeB",
-      "type": "pass",
       "category": "",
-      "description": "desc",
-      "version": "1"
+      "description": "",
+      "version": ""
     }
   }
 ]
