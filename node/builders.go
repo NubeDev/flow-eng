@@ -1,23 +1,12 @@
 package node
 
 import (
-	"errors"
 	"github.com/NubeDev/flow-eng/buffer"
 	"github.com/NubeDev/flow-eng/buffer/adapter"
 	"github.com/NubeDev/flow-eng/helpers"
 )
 
-func Builder(body *BaseNode) (Node, error) {
-	switch body.GetName() {
-	case nodeA:
-		return NewNodeA(body)
-	case nodeB:
-		//return NewNodeB(body)
-	}
-	return nil, errors.New("node not found")
-}
-
-func buildInput(portName PortName, dataType DataTypes, inputs []*Input) *Input {
+func BuildInput(portName PortName, dataType DataTypes, inputs []*Input) *Input {
 	out := &Input{}
 	port := &InputPort{
 		Name:     portName,
@@ -44,7 +33,7 @@ func buildInput(portName PortName, dataType DataTypes, inputs []*Input) *Input {
 	return out
 }
 
-func buildOutput(portName PortName, dataType DataTypes, outputs []*Output) *Output {
+func BuildOutput(portName PortName, dataType DataTypes, outputs []*Output) *Output {
 	out := &Output{}
 	port := &OutputPort{
 		Name:        portName,
@@ -69,7 +58,7 @@ func buildOutput(portName PortName, dataType DataTypes, outputs []*Output) *Outp
 	return out
 }
 
-func buildInputs(body ...*Input) []*Input {
+func BuildInputs(body ...*Input) []*Input {
 	var out []*Input
 	for _, input := range body {
 		out = append(out, input)
@@ -77,7 +66,7 @@ func buildInputs(body ...*Input) []*Input {
 	return out
 }
 
-func buildOutputs(body ...*Output) []*Output {
+func BuildOutputs(body ...*Output) []*Output {
 	var out []*Output
 	for _, output := range body {
 		out = append(out, output)
@@ -85,7 +74,7 @@ func buildOutputs(body ...*Output) []*Output {
 	return out
 }
 
-func emptyNode(body *BaseNode) *BaseNode {
+func EmptyNode(body *BaseNode) *BaseNode {
 	if body == nil {
 		body = &BaseNode{
 			Info: Info{
@@ -96,7 +85,7 @@ func emptyNode(body *BaseNode) *BaseNode {
 	return body
 }
 
-func setUUID(uuid string) string {
+func SetUUID(uuid string) string {
 	if uuid == "" {
 		uuid = helpers.ShortUUID("node")
 	}

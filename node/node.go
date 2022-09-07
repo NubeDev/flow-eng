@@ -48,8 +48,8 @@ func (n *BaseNode) GetOutputs() []*Output {
 	return n.Outputs
 }
 
-func (n *BaseNode) readPinNum(name PortName) (*float64, float64, bool) {
-	pinValPointer, _ := n.readPin(name)
+func (n *BaseNode) ReadPinNum(name PortName) (*float64, float64, bool) {
+	pinValPointer, _ := n.ReadPin(name)
 	valPointer, val, err := float.StringFloatErr(pinValPointer)
 	if err != nil {
 		return nil, 0, true
@@ -57,7 +57,7 @@ func (n *BaseNode) readPinNum(name PortName) (*float64, float64, bool) {
 	return valPointer, val, float.NotNil(valPointer)
 }
 
-func (n *BaseNode) readPin(name PortName) (*string, string) {
+func (n *BaseNode) ReadPin(name PortName) (*string, string) {
 	for _, out := range n.GetInputs() {
 		if name == out.Name {
 			if !str.IsNil(out.Connection.Value) { // this would be that the user wrote a value to the input directly
@@ -70,7 +70,7 @@ func (n *BaseNode) readPin(name PortName) (*string, string) {
 	return nil, ""
 }
 
-func (n *BaseNode) writePin(name PortName, value *string) bool {
+func (n *BaseNode) WritePin(name PortName, value *string) bool {
 	for _, out := range n.GetOutputs() {
 		if name == out.Name {
 			out.Value.Set(value)
@@ -80,8 +80,8 @@ func (n *BaseNode) writePin(name PortName, value *string) bool {
 	return false
 }
 
-func (n *BaseNode) writePinNum(name PortName, value float64) bool {
-	ok := n.writePin(name, float.ToStrPtr(value))
+func (n *BaseNode) WritePinNum(name PortName, value float64) bool {
+	ok := n.WritePin(name, float.ToStrPtr(value))
 	return ok
 }
 

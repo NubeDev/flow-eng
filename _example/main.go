@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	flowctrl "github.com/NubeDev/flow-eng"
+	"github.com/NubeDev/flow-eng/_example/nodes"
 	"github.com/NubeDev/flow-eng/node"
 	"io/ioutil"
 	"log"
@@ -27,7 +28,7 @@ func main() {
 
 	graph := flowctrl.New()
 	for _, n := range nodesParsed {
-		node_, err := node.Builder(n)
+		node_, err := nodes.Builder(n)
 		fmt.Println("ADD:", node_.GetName(), node_.GetNodeName(), "ERR", err)
 		graph.AddNode(node_)
 	}
