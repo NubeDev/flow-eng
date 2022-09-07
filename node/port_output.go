@@ -15,7 +15,7 @@ type OutputPort struct {
 	connectors []*Connector
 }
 
-func NewOutputPort(_type buffer.Type, body *OutputPort) *OutputPort {
+func newOutputPort(_type buffer.Type, body *OutputPort) *OutputPort {
 	return &OutputPort{
 		body.Name,
 		body.DataType,

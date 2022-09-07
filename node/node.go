@@ -1,6 +1,9 @@
 package node
 
-import "github.com/NubeDev/flow-eng/buffer/adapter"
+import (
+	"github.com/NubeDev/flow-eng/buffer/adapter"
+	"github.com/NubeDev/flow-eng/helpers/float"
+)
 
 //type NodeProcess interface {
 //	Process()
@@ -29,6 +32,10 @@ func (n *Node) GetName() string {
 	return n.Info.Name
 }
 
+func (n *Node) GetNodeName() string {
+	return n.Info.NodeName
+}
+
 func (n *Node) GetInputs() []*Input {
 	return n.Inputs
 }
@@ -37,9 +44,29 @@ func (n *Node) GetOutputs() []*Output {
 	return n.Outputs
 }
 
+func (n *Node) readPinValue(name PortName) *float64 {
+	for _, out := range n.GetInputs() {
+		if name == out.Name {
+			return float.New(out.ValueFloat64.Get())
+		}
+	}
+	return nil
+}
+
+func (n *Node) writePinValue(name PortName, value float64) bool {
+	for _, out := range n.GetOutputs() {
+		if name == out.Name {
+			out.ValueFloat64.Set(value)
+			return true
+		}
+	}
+	return false
+}
+
 type Info struct {
-	NodeID      string `json:"nodeID"` // abc
-	Name        string `json:"name"`
+	NodeID      string `json:"nodeID"`   // a123
+	Name        string `json:"name"`     // add, or
+	NodeName    string `json:"nodeName"` // my-node-abc
 	Category    string `json:"category"`
 	Description string `json:"description"`
 	Version     string `json:"version"`
@@ -62,8 +89,8 @@ const (
 )
 
 type Connection struct {
-	NodeID   string `json:"nodeID"`
-	NodePort string `json:"nodePortName"`
+	NodeID   string   `json:"nodeID"`
+	NodePort PortName `json:"nodePortName"`
 }
 
 type Input struct {

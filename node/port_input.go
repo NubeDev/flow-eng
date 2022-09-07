@@ -19,7 +19,7 @@ type InputPort struct {
 //	return &InputPort{buffer.NewConst(_type), uuid.New(), DirectionInput, nil}
 //}
 
-func NewInputPort(_type buffer.Type, body *InputPort) *InputPort {
+func newInputPort(_type buffer.Type, body *InputPort) *InputPort {
 
 	return &InputPort{
 		body.Name,

@@ -1,6 +1,8 @@
 package flowctrl
 
 import (
+	"errors"
+	"fmt"
 	"github.com/NubeDev/flow-eng/graph"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/uuid"
@@ -19,6 +21,10 @@ func New(nodes ...*node.Node) *Flow {
 
 func (p *Flow) Get() *Flow {
 	return p
+}
+
+func (p *Flow) GetNodes() []*node.Node {
+	return p.nodes
 }
 
 func (p *Flow) GetNode(id string) *node.Node {
@@ -53,6 +59,43 @@ func (p *Flow) ReplaceNode(id string, node *node.Node) *node.Node {
 		p.AddNode(node)
 	}
 	return p.GetNode(id)
+}
+
+func (p *Flow) NodeConnector(sourceID string) error {
+	a := p.GetNode(sourceID)
+	if a == nil {
+		return errors.New("failed to find node by that id")
+	}
+	for _, output := range a.Outputs {
+		for _, connector := range output.Connections {
+			destID := connector.NodeID
+			if destID == "" {
+				continue
+			}
+			fmt.Println("----------------")
+			fmt.Printf(fmt.Sprintf("source-id:%s  dest-id:%s", sourceID, destID))
+			fmt.Println()
+
+			n := p.GetNode(destID)
+			if n == nil {
+				return errors.New("failed to match ports for node connections")
+			}
+			for _, input := range n.GetInputs() {
+				port := input.Name
+
+				if port == connector.NodePort {
+					fmt.Println("*************************", port, connector.NodePort, sourceID, input.Connection.NodeID)
+					fmt.Printf(fmt.Sprintf("source-id:%s  dest-port-id:%s", sourceID, input.Connection.NodeID))
+					fmt.Println()
+					if sourceID == input.Connection.NodeID {
+						fmt.Println("*************************")
+						output.OutputPort.Connect(input.InputPort)
+					}
+				}
+			}
+		}
+	}
+	return nil
 }
 
 func (p *Flow) AddNode(node *node.Node) *Flow {

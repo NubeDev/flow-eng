@@ -41,10 +41,12 @@ func (runner *Runner) UUID() uuid.Value {
 func (runner *Runner) Process() error {
 	// trigger all connectors to input ports
 	err := runner.processConnectors()
+	fmt.Println("RUNNER", runner.node.GetName(), runner.node.GetNodeName(), "ERROR", err)
 	if err != nil {
 		return err
 	}
 	// run processing node
+
 	if runner.node.GetName() == "nodeA" {
 		n := NodeA{Node: runner.node}
 		n.Process()

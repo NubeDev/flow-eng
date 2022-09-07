@@ -1,116 +1,110 @@
 package node
 
 import (
+	"errors"
 	"github.com/NubeDev/flow-eng/buffer"
 	"github.com/NubeDev/flow-eng/buffer/adapter"
+	"github.com/NubeDev/flow-eng/helpers"
 )
 
-func New(body *Node) (*Node, error) {
-	//body, err := Check(body, Spec{nodeType, inputCount, outputCount})
-	//if err != nil {
-	//	return nil, err
-	//}
-
-	//return &Node{
-	//	Inputs:  BuildInputs(body, spec),
-	//	Outputs: BuildOutputs(body, spec),
-	//	Info: Info{
-	//		NodeID:      body.Info.NodeID,
-	//		Name:        body.Info.Name,
-	//		Description: "desc",
-	//		Version:     "1",
-	//	},
-	//}, nil
-
-	return nil, nil
+func Builder(name string, body *Node) (*Node, error) {
+	switch name {
+	case nodeA:
+		return SpecNodeA(body)
+	case nodeB:
+		return SpecNodeA(body)
+	}
+	return nil, errors.New("node not found")
 }
 
-//func Check(body *Node, nodeSpec Spec) (*Node, error) {
-//	if body == nil {
-//		return nil, errors.New("node body can not be empty")
-//	}
-//	if body.Info.Name == "" {
-//		return nil, errors.New("node name can not be empty, try AND, OR")
-//	}
-//	if body.Info.NodeID == "" {
-//		body.Info.NodeID = helpers.ShortUUID(nodeSpec.Name)
-//	}
-//	if len(body.Inputs) != nodeSpec.InputCount {
-//		return nil, errors.New(fmt.Sprintf("input count is incorrect required:%d provided:%d", nodeSpec.InputCount, len(body.Inputs)))
-//	}
-//	if len(body.Outputs) != nodeSpec.OutputCount {
-//		return nil, errors.New(fmt.Sprintf("output count is incorrect required:%d provided:%d", nodeSpec.OutputCount, len(body.Outputs)))
-//	}
-//	return body, nil
-//}
-
-//func BuildInputs(body *Node, spec *Spec) []*Input {
-//	var out []*Input
-//
-//	for i := 0; i < spec.InputCount; i++ {
-//
-//		//out = append(out, BuildInputFloat(input.Name, input.Connection))
-//	}
-//
-//	for _, input := range body.Inputs {
-//		out = append(out, BuildInputFloat(input.Name, input.Connection))
-//	}
-//	return out
-//}
-
-//func BuildOutputs(body *Node, spec *Spec) []*Output {
-//	var out []*Output
-//	for _, output := range body.Outputs {
-//		out = append(out, BuildOutputFloat(output.Name, output.Connections))
-//	}
-//	return out
-//}
-
-func BuildInputFloat(portName PortName, conn *Connection) *Input {
+func buildInput(portName PortName, dataType DataTypes, inputs []*Input) *Input {
 	out := &Input{}
 	port := &InputPort{
-		Name:       portName,
-		DataType:   "",
-		Connection: conn,
-		Const:      nil,
+		Name:     portName,
+		DataType: dataType,
 	}
-	var dataType buffer.Type
-	dataType = buffer.Float64
-	port = NewInputPort(dataType, port)
+	var _dataType buffer.Type
+	if dataType == TypeFloat64 {
+		_dataType = buffer.Float64
+	}
+	port = newInputPort(_dataType, port)
 	out.InputPort = port
 	out.ValueFloat64 = adapter.NewFloat64(port)
+	var addConnections bool
+	for _, input := range inputs {
+		if input.Name == portName {
+			addConnections = true
+			if input.Connection != nil { // this would be when the flow comes from json
+				out.Connection = input.Connection
+			} else {
+				out.Connection = &Connection{}
+			}
+		}
+	}
+	if !addConnections {
+		out.Connection = &Connection{}
+	}
 	return out
 }
 
-func BuildOutputFloat(portName PortName, conn []*Connection) *Output {
+func buildOutput(portName PortName, dataType DataTypes, outputs []*Output) *Output {
 	out := &Output{}
 	port := &OutputPort{
 		Name:        portName,
-		DataType:    "",
-		Connections: conn,
+		DataType:    dataType,
+		Connections: nil,
 	}
-	var dataType buffer.Type
-	dataType = buffer.Float64
-	port = NewOutputPort(dataType, port)
+	var _dataType buffer.Type
+	if dataType == TypeFloat64 {
+		_dataType = buffer.Float64
+	}
+	port = newOutputPort(_dataType, port)
 	out.OutputPort = port
 	out.ValueFloat64 = adapter.NewFloat64(port)
+
+	for _, output := range outputs {
+		if output.Name == portName {
+			for _, connection := range output.Connections {
+				out.Connections = []*Connection{connection}
+			}
+		}
+	}
+	if out.Connections == nil {
+		out.Connections = []*Connection{&Connection{}}
+	}
 	return out
 }
 
-func GetInput(body *Node, num int) *Input {
-	for i, input := range body.Inputs {
-		if i == num {
-			return input
-		}
+func buildInputs(body ...*Input) []*Input {
+	var out []*Input
+	for _, input := range body {
+		out = append(out, input)
 	}
-	return nil
+	return out
 }
 
-func GetOutConnections(body *Node, num int) []*Connection {
-	for i, output := range body.Outputs {
-		if i == num {
-			return output.Connections
+func buildOutputs(body ...*Output) []*Output {
+	var out []*Output
+	for _, output := range body {
+		out = append(out, output)
+	}
+	return out
+}
+
+func emptyNode(body *Node) *Node {
+	if body == nil {
+		body = &Node{
+			Info: Info{
+				NodeID: "",
+			},
 		}
 	}
-	return nil
+	return body
+}
+
+func setUUID(uuid string) string {
+	if uuid == "" {
+		uuid = helpers.ShortUUID("node")
+	}
+	return uuid
 }

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	flowctrl "github.com/NubeDev/flow-eng"
-	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"io/ioutil"
 	"log"
@@ -27,25 +26,52 @@ func main() {
 
 	graph := flowctrl.New()
 	for _, n := range nodesParsed {
-		node_, _ := node.New(n)
+		node_, err := node.Builder(n.GetName(), n)
+		fmt.Println("ADD:", node_.GetName(), node_.GetNodeName(), "ERR", err)
 		graph.AddNode(node_)
 	}
 
-	// START >>> <<<====JUST FOR TEST ====>>>
-	getA := graph.GetNode("a123")
-	getB := graph.GetNode("b123")
-	for _, output := range getA.GetOutputs() {
-		for _, input := range getB.GetInputs() {
-			output.Connect(input.InputPort)
+	for _, n := range graph.GetNodes() {
+		fmt.Println("build connections:", n.GetName(), n.GetNodeName())
+		err := graph.NodeConnector(n.GetID())
+		fmt.Println("build connections", err)
+		if err != nil {
+			return
 		}
 	}
-	graph.ReplaceNode("a123", getA)
-	graph.ReplaceNode("b123", getB)
+
+	for _, n := range graph.GetNodes() {
+		fmt.Println("REPLACE", n.GetName(), n.GetNodeName())
+		graph.ReplaceNode(n.GetID(), n)
+
+		//if err != nil {
+		//	return
+		//}
+	}
+
+	//for _, n := range nodesParsed {
+	//	err := graph.NodeConnector(n)
+	//	fmt.Println("build connections", err)
+	//	if err != nil {
+	//		return
+	//	}
+	//}
+
+	//// START >>> <<<====JUST FOR TEST ====>>>
+	//getA := graph.GetNode("a123")
+	//getB := graph.GetNode("b123")
+	//for _, output := range getA.GetOutputs() {
+	//	for _, input := range getB.GetInputs() {
+	//		output.Connect(input.InputPort)
+	//	}
+	//}
+	//graph.ReplaceNode("a123", getA)
+	//graph.ReplaceNode("b123", getB)
 	// END >>> <<<====JUST FOR TEST ====>>>
 
 	for _, ordered := range graph.Get().Graphs {
 		for _, runner := range ordered.Runners {
-			// fmt.Println("RUNNER-1", runner.Name(), len(runner.Outputs()), "LEN", "UUID", runner.UUID())
+			fmt.Println("RUNNER-1", runner.Name(), len(runner.Outputs()), "LEN", "UUID", runner.UUID())
 			for _, port := range runner.Outputs() {
 				for _, connector := range port.Connectors() {
 					fmt.Println("RUNNER-TO-------------", connector.FromUUID(), connector.ToUUID())
@@ -98,8 +124,7 @@ func buildJson() {
 		}},
 	}
 
-	a := node.GetNodeSpec("nodeA", nodeA)
-	pprint.PrintJOSN(a)
+	//pprint.PrintJOSN(a)
 	for _, name := range count {
 
 		var node node.Node
