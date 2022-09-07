@@ -43,31 +43,7 @@ func main() {
 	for _, n := range graph.GetNodes() {
 		fmt.Println("REPLACE", n.GetName(), n.GetNodeName())
 		graph.ReplaceNode(n.GetID(), n)
-
-		//if err != nil {
-		//	return
-		//}
 	}
-
-	//for _, n := range nodesParsed {
-	//	err := graph.NodeConnector(n)
-	//	fmt.Println("build connections", err)
-	//	if err != nil {
-	//		return
-	//	}
-	//}
-
-	//// START >>> <<<====JUST FOR TEST ====>>>
-	//getA := graph.GetNode("a123")
-	//getB := graph.GetNode("b123")
-	//for _, output := range getA.GetOutputs() {
-	//	for _, input := range getB.GetInputs() {
-	//		output.Connect(input.InputPort)
-	//	}
-	//}
-	//graph.ReplaceNode("a123", getA)
-	//graph.ReplaceNode("b123", getB)
-	// END >>> <<<====JUST FOR TEST ====>>>
 
 	for _, ordered := range graph.Get().Graphs {
 		for _, runner := range ordered.Runners {
@@ -133,6 +109,4 @@ func buildJson() {
 
 		nodesList = append(nodesList, node)
 	}
-
-	//pprint.PrintJOSN(nodesList)
 }
