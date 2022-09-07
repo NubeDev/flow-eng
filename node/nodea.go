@@ -23,7 +23,7 @@ func (n *NodeA) Process() {
 	v := n.readPinValue("in1")
 	fmt.Println("read", float.NonNil(v), "NAME", n.GetNodeName())
 	if n.GetNodeName() == "name-a123" {
-		n.writePinValue("out1", 222)
+		n.writePinValue("out1", float.New(333333))
 	}
 
 }

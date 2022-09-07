@@ -2,7 +2,6 @@ package node
 
 import (
 	"github.com/NubeDev/flow-eng/buffer/adapter"
-	"github.com/NubeDev/flow-eng/helpers/float"
 )
 
 //type NodeProcess interface {
@@ -47,13 +46,13 @@ func (n *Node) GetOutputs() []*Output {
 func (n *Node) readPinValue(name PortName) *float64 {
 	for _, out := range n.GetInputs() {
 		if name == out.Name {
-			return float.New(out.ValueFloat64.Get())
+			return out.ValueFloat64.Get()
 		}
 	}
 	return nil
 }
 
-func (n *Node) writePinValue(name PortName, value float64) bool {
+func (n *Node) writePinValue(name PortName, value *float64) bool {
 	for _, out := range n.GetOutputs() {
 		if name == out.Name {
 			out.ValueFloat64.Set(value)
