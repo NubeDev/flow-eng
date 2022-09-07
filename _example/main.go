@@ -29,6 +29,10 @@ func main() {
 	graph := flowctrl.New()
 	for _, n := range nodesParsed {
 		node_, err := nodes.Builder(n)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 		fmt.Println("ADD:", node_.GetName(), node_.GetNodeName(), "ERR", err)
 		graph.AddNode(node_)
 	}

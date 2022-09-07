@@ -34,7 +34,7 @@
     ],
     "info": {
       "nodeID": "a123",
-      "name": "nodeA",
+      "name": "add",
       "nodeName": "name-a123",
       "category": "",
       "description": "",
@@ -74,7 +74,7 @@
     ],
     "info": {
       "nodeID": "b123",
-      "name": "nodeA",
+      "name": "add",
       "nodeName": "name-b123",
       "category": "",
       "description": "",

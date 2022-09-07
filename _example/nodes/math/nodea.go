@@ -1,34 +1,23 @@
-package nodes
+package math
 
 import (
-	"errors"
 	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 )
 
-type NodeA struct {
+type Add struct {
 	*node.BaseNode
 }
 
-func Builder(body *node.BaseNode) (node.Node, error) {
-	switch body.GetName() {
-	case "nodeA":
-		return NewNodeA(body)
-	case "nodeB":
-		//return NewNodeB(body)
-	}
-	return nil, errors.New("node not found")
-}
-
-func NewNodeA(body *node.BaseNode) (node.Node, error) {
+func NewAdd(body *node.BaseNode) (node.Node, error) {
 	body = node.EmptyNode(body)
 	body.Info.NodeID = node.SetUUID(body.Info.NodeID)
 	body.Inputs = node.BuildInputs(node.BuildInput(node.In1, node.TypeFloat, body.Inputs), node.BuildInput(node.In2, node.TypeFloat, body.Inputs))
 	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeFloat, body.Outputs))
-	return &NodeA{body}, nil
+	return &Add{body}, nil
 }
 
-func (n *NodeA) Process() {
+func (n *Add) Process() {
 	_, r := n.ReadPin(node.In1)
 	fmt.Println("READ IN-1", n.GetNodeName(), r)
 
@@ -51,4 +40,4 @@ func (n *NodeA) Process() {
 	}
 }
 
-func (n *NodeA) Cleanup() {}
+func (n *Add) Cleanup() {}
