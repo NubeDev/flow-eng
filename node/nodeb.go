@@ -3,7 +3,15 @@ package node
 import "fmt"
 
 type NodeB struct {
-	*Node
+	*BaseNode
+}
+
+func NewNodeB(body *BaseNode) (Node, error) {
+	body = emptyNode(body)
+	body.Info.NodeID = setUUID(body.Info.NodeID)
+	body.Inputs = buildInputs(buildInput("in1", TypeFloat64, body.Inputs), buildInput("in2", TypeFloat64, body.Inputs))
+	body.Outputs = buildOutputs(buildOutput("out1", TypeFloat64, body.Outputs))
+	return &NodeB{BaseNode: body}, nil
 }
 
 func (n *NodeB) Process() {

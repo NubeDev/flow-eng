@@ -10,10 +10,10 @@ import (
 
 type Flow struct {
 	Graphs []*graph.Ordered
-	nodes  []*node.Node
+	nodes  []node.Node
 }
 
-func New(nodes ...*node.Node) *Flow {
+func New(nodes ...node.Node) *Flow {
 	runners := makeRunners(nodes)
 	ordered := makeGraphs(runners)
 	return &Flow{ordered, nodes}
@@ -23,11 +23,11 @@ func (p *Flow) Get() *Flow {
 	return p
 }
 
-func (p *Flow) GetNodes() []*node.Node {
+func (p *Flow) GetNodes() []node.Node {
 	return p.nodes
 }
 
-func (p *Flow) GetNode(id string) *node.Node {
+func (p *Flow) GetNode(id string) node.Node {
 	for _, n := range p.Get().nodes {
 		if n.GetID() == id {
 			return n
@@ -47,7 +47,7 @@ func (p *Flow) GetNodeRunner(id string) *node.Runner {
 	return nil
 }
 
-func (p *Flow) ReplaceNode(id string, node *node.Node) *node.Node {
+func (p *Flow) ReplaceNode(id string, node node.Node) node.Node {
 	var found bool
 	for _, n := range p.Get().nodes {
 		if n.GetID() == id {
@@ -66,7 +66,7 @@ func (p *Flow) NodeConnector(sourceID string) error {
 	if a == nil {
 		return errors.New("failed to find node by that id")
 	}
-	for _, output := range a.Outputs {
+	for _, output := range a.GetOutputs() {
 		for _, connector := range output.Connections {
 			destID := connector.NodeID
 			if destID == "" {
@@ -98,7 +98,7 @@ func (p *Flow) NodeConnector(sourceID string) error {
 	return nil
 }
 
-func (p *Flow) AddNode(node *node.Node) *Flow {
+func (p *Flow) AddNode(node node.Node) *Flow {
 	flows := p.Get()
 	flows.nodes = append(flows.nodes, node)
 	runners := makeRunners(flows.nodes)
@@ -107,7 +107,7 @@ func (p *Flow) AddNode(node *node.Node) *Flow {
 	return flows
 }
 
-func makeRunners(nodes []*node.Node) []*node.Runner {
+func makeRunners(nodes []node.Node) []*node.Runner {
 	nodesCount := len(nodes)
 	runners := make([]*node.Runner, 0, nodesCount)
 	for i := 0; i < nodesCount; i++ {
@@ -131,7 +131,7 @@ func makeGraphs(runners []*node.Runner) []*graph.Ordered {
 	}
 
 	if len(graphs) == 0 {
-		//panic("circular flows are not supported")
+		// panic("circular flows are not supported")
 	}
 
 	return graphs

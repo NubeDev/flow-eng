@@ -2,7 +2,7 @@ package node
 
 import "reflect"
 
-func Ports(node *Node, direction Direction) []Port {
+func Ports(node Node, direction Direction) []Port {
 	ports := make([]Port, 0, 1)
 	for _, input := range node.GetInputs() {
 		if input.Direction() != direction {
@@ -32,7 +32,7 @@ func Connectors(ports []Port) []*Connector {
 	return connectors
 }
 
-func PortsOld(node Node, direction Direction) []Port {
+func PortsOld(node BaseNode, direction Direction) []Port {
 	ports := make([]Port, 0, 1)
 	portType := reflect.TypeOf((*Port)(nil)).Elem()
 	nodeType := reflect.TypeOf(node).Elem()
