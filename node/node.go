@@ -3,6 +3,8 @@ package node
 import (
 	"github.com/NubeDev/flow-eng/buffer/adapter"
 	"github.com/NubeDev/flow-eng/helpers/float"
+	"github.com/NubeDev/flow-eng/helpers/str"
+	"strconv"
 )
 
 type Node interface {
@@ -46,27 +48,41 @@ func (n *BaseNode) GetOutputs() []*Output {
 	return n.Outputs
 }
 
-func (n *BaseNode) readPinValue(name PortName) (*float64, float64) {
-	for _, out := range n.GetInputs() {
-		if name == out.Name {
-			if !float.IsNil(out.Connection.Value) { // this would be that the user wrote a value to the input directly
-				return out.Connection.Value, float.NonNil(out.Connection.Value)
-			}
-			val := out.ValueFloat64.Get()
-			return val, float.NonNil(val)
-		}
+func (n *BaseNode) readPinNum(name PortName) (*float64, float64, bool) {
+	pinValPointer, _ := n.readPin(name)
+	valPointer, val, err := float.StringFloatErr(pinValPointer)
+	if err != nil {
+		return nil, 0, true
 	}
-	return nil, 0
+	return valPointer, val, float.NotNil(valPointer)
 }
 
-func (n *BaseNode) writePinValue(name PortName, value *float64) bool {
+func (n *BaseNode) readPin(name PortName) (*string, string) {
+	for _, out := range n.GetInputs() {
+		if name == out.Name {
+			if !str.IsNil(out.Connection.Value) { // this would be that the user wrote a value to the input directly
+				return out.Connection.Value, str.NonNil(out.Connection.Value)
+			}
+			val := out.Value.Get()
+			return val, str.NonNil(val)
+		}
+	}
+	return nil, ""
+}
+
+func (n *BaseNode) writePin(name PortName, value *string) bool {
 	for _, out := range n.GetOutputs() {
 		if name == out.Name {
-			out.ValueFloat64.Set(value)
+			out.Value.Set(value)
 			return true
 		}
 	}
 	return false
+}
+
+func (n *BaseNode) writePinNum(name PortName, value float64) bool {
+	ok := n.writePin(name, float.ToStrPtr(value))
+	return ok
 }
 
 type Info struct {
@@ -82,22 +98,26 @@ type DataTypes string
 type PortName string
 
 const (
-	TypeAny     DataTypes = "any"
-	TypeString  DataTypes = "string"
-	TypeInt8    DataTypes = "int8"
-	TypeFloat64 DataTypes = "float64"
+	TypeString DataTypes = "string"
+	TypeInt    DataTypes = "int"
+	TypeFloat  DataTypes = "float"
 )
 
 const (
 	In1  PortName = "in1"
 	In2  PortName = "in2"
+	In3  PortName = "in3"
+	In4  PortName = "in4"
 	Out1 PortName = "out1"
+	Out2 PortName = "out2"
+	Out3 PortName = "out3"
+	Out4 PortName = "out4"
 )
 
 type InputConnection struct {
 	NodeID   string   `json:"nodeID"`
 	NodePort PortName `json:"nodePortName"`
-	Value    *float64 `json:"value,omitempty"` // used for when the user has no node connection and writes the value direct
+	Value    *string  `json:"value,omitempty"` // used for when the user has no node connection and writes the value direct
 }
 
 type Connection struct {
@@ -106,14 +126,56 @@ type Connection struct {
 }
 
 type Input struct {
-	// *PortCommon
 	*InputPort
-	ValueFloat64 *adapter.Float64 `json:"-"`
-	ValueString  *adapter.String  `json:"-"`
+	Value *adapter.String `json:"-"`
 }
 
 type Output struct {
 	*OutputPort
-	ValueFloat64 *adapter.Float64 `json:"-"`
-	ValueString  *adapter.String  `json:"-"`
+	Value *adapter.String `json:"-"`
+}
+
+func BoolToInt(b bool) int {
+	if b {
+		return 1
+	}
+	return 0
+}
+
+func toFloat64(v interface{}) float64 {
+	if v == nil {
+		return 0
+	}
+	switch t := v.(type) {
+	case bool:
+		return float64(BoolToInt(t))
+	case int:
+		return float64(t)
+	case int16:
+		return float64(t)
+	case int32:
+		return float64(t)
+	case int64:
+		return float64(t)
+	case uint:
+		return float64(t)
+	case uint8:
+		return float64(t)
+	case uint16:
+		return float64(t)
+	case uint32:
+		return float64(t)
+	case uint64:
+		return float64(t)
+	case float64:
+		return t
+	case float32:
+		return float64(t)
+	case string:
+		if i, err := strconv.ParseFloat(t, 64); err == nil {
+			return i
+		}
+	}
+
+	return 0
 }

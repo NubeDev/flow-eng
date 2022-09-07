@@ -12,6 +12,7 @@ import (
 )
 
 func main() {
+
 	buildJson()
 
 	var nodesParsed []*node.BaseNode
@@ -94,8 +95,7 @@ func buildJson() {
 				},
 				},
 			},
-			ValueFloat64: nil,
-			ValueString:  nil,
+			Value: nil,
 		}},
 	}
 

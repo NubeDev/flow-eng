@@ -1,10 +1,61 @@
 package float
 
 import (
+	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/str"
 	"math"
 	"math/rand"
+	"strconv"
 	"time"
 )
+
+func StringFloatErr(value *string) (*float64, float64, error) {
+	if str.IsNil(value) {
+		return nil, 0, nil
+	}
+	v, err := StrToFloatErr(str.NonNil(value))
+	if err != nil {
+		return nil, 0, err
+	} else {
+		return New(v), v, nil
+	}
+}
+
+func StringFloat(value *string) (*float64, float64) {
+	v, nonNil, _ := StringFloatErr(value)
+	return v, nonNil
+}
+
+func StrToFloat(value string) float64 {
+	v, err := StrToFloatErr(value)
+	if err != nil {
+		return 0
+	} else {
+		return v
+	}
+}
+
+func PtrToStringPtr(value *float64) *string {
+	v := PointerToStr(value)
+	return str.New(v)
+}
+
+func PointerToStr(value *float64) string {
+	return fmt.Sprintf("%f", NonNil(value))
+}
+
+func ToStrPtr(value float64) *string {
+	v := fmt.Sprintf("%f", value)
+	return str.New(v)
+}
+
+func ToStr(value float64) string {
+	return fmt.Sprintf("%f", value)
+}
+
+func StrToFloatErr(value string) (float64, error) {
+	return strconv.ParseFloat(value, 64)
+}
 
 func FirstNotNil(values ...*float64) *float64 {
 	for _, n := range values {
@@ -42,6 +93,14 @@ func NonNil32(b *float32) float32 {
 		return 0
 	}
 	return *b
+}
+
+func NotNil(b *float64) bool {
+	if b == nil {
+		return false
+	} else {
+		return true
+	}
 }
 
 func IsNil(b *float64) bool {

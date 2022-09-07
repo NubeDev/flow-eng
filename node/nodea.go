@@ -2,7 +2,6 @@ package node
 
 import (
 	"fmt"
-	"github.com/NubeDev/flow-eng/helpers/float"
 )
 
 type NodeA struct {
@@ -12,32 +11,30 @@ type NodeA struct {
 func NewNodeA(body *BaseNode) (Node, error) {
 	body = emptyNode(body)
 	body.Info.NodeID = setUUID(body.Info.NodeID)
-	body.Inputs = buildInputs(buildInput(In1, TypeFloat64, body.Inputs), buildInput("in2", TypeFloat64, body.Inputs))
-	body.Outputs = buildOutputs(buildOutput(Out1, TypeFloat64, body.Outputs))
+	body.Inputs = buildInputs(buildInput(In1, TypeFloat, body.Inputs), buildInput(In2, TypeFloat, body.Inputs))
+	body.Outputs = buildOutputs(buildOutput(Out1, TypeFloat, body.Outputs))
 	return &NodeA{BaseNode: body}, nil
 }
 
 func (n *NodeA) Process() {
-	_, r := n.readPinValue(In1)
+	_, r := n.readPin(In1)
 	fmt.Println("READ IN-1", n.GetNodeName(), r)
 
-	in1, in1Val := n.readPinValue(In1)
-	in2, in2Val := n.readPinValue(In2)
+	_, in1Val, in1Not := n.readPinNum(In1)
+	_, in2Val, in2Not := n.readPinNum(In2)
 
-	if !float.IsNil(in1) && !float.IsNil(in2) {
-		val := float.New(in1Val + in2Val)
-		fmt.Println(val, "WRITE----------", n.GetNodeName(), in1Val+in2Val)
-		n.writePinValue(Out1, val)
+	if in1Not && in2Not {
+		add := in1Val + in2Val
+		fmt.Println(add, "WRITE----------", n.GetNodeName(), in1Val+in2Val)
+		n.writePinNum(Out1, add)
 		return
 	}
-	if !float.IsNil(in1) {
-		val := float.New(in1Val)
-		n.writePinValue(Out1, val)
+	if in1Not {
+		n.writePinNum(Out1, in1Val)
 		return
 	}
-	if !float.IsNil(in2) {
-		val := float.New(in2Val)
-		n.writePinValue(Out1, val)
+	if in2Not {
+		n.writePinNum(Out1, in2Val)
 		return
 	}
 }

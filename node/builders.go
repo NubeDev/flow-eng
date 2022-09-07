@@ -12,7 +12,7 @@ func Builder(body *BaseNode) (Node, error) {
 	case nodeA:
 		return NewNodeA(body)
 	case nodeB:
-		return NewNodeB(body)
+		//return NewNodeB(body)
 	}
 	return nil, errors.New("node not found")
 }
@@ -23,13 +23,10 @@ func buildInput(portName PortName, dataType DataTypes, inputs []*Input) *Input {
 		Name:     portName,
 		DataType: dataType,
 	}
-	var _dataType buffer.Type
-	if dataType == TypeFloat64 {
-		_dataType = buffer.Float64
-	}
+	_dataType := buffer.String
 	port = newInputPort(_dataType, port)
 	out.InputPort = port
-	out.ValueFloat64 = adapter.NewFloat64(port)
+	out.Value = adapter.NewString(port)
 	var addConnections bool
 	for _, input := range inputs {
 		if input.Name == portName {
@@ -54,13 +51,10 @@ func buildOutput(portName PortName, dataType DataTypes, outputs []*Output) *Outp
 		DataType:    dataType,
 		Connections: nil,
 	}
-	var _dataType buffer.Type
-	if dataType == TypeFloat64 {
-		_dataType = buffer.Float64
-	}
+	_dataType := buffer.String
 	port = newOutputPort(_dataType, port)
 	out.OutputPort = port
-	out.ValueFloat64 = adapter.NewFloat64(port)
+	out.Value = adapter.NewString(port)
 
 	for _, output := range outputs {
 		if output.Name == portName {

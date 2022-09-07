@@ -7,7 +7,7 @@ import (
 
 type String struct {
 	buff  buffer.TypedReadWriter
-	value string
+	value *string
 	temp  []byte
 }
 
@@ -15,10 +15,10 @@ func NewString(buff buffer.TypedReadWriter) *String {
 	if buff.Type() != buffer.String {
 		panic("unsupported buffer type")
 	}
-	return &String{buff, "", make([]byte, buffer.String)}
+	return &String{buff, nil, make([]byte, buffer.String)}
 }
 
-func (t *String) Set(value string) {
+func (t *String) Set(value *string) {
 	const expectedSize = buffer.String
 
 	t.value = value
@@ -32,11 +32,11 @@ func (t *String) Set(value string) {
 	}
 }
 
-func (t *String) Get() string {
+func (t *String) Get() *string {
 	if _, err := t.buff.Read(t.temp); err != nil {
 		panic(err)
 	}
-	value := *(*string)(unsafe.Pointer(&t.temp[0]))
+	value := *(**string)(unsafe.Pointer(&t.temp[0]))
 	t.value = value
 	return t.value
 }
