@@ -5,46 +5,48 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/float"
 )
 
-//type NodeProcess interface {
-//	Process()
-//	Cleanup()
-//	GetName() string // AND, OR
-//	GetInfo() Info
-//	GetInputs() []*TypeInput
-//	GetOutputs() []*TypeOutput
-//}
+type Node interface {
+	Process()
+	Cleanup()
+	GetName() string // AND, OR
+	GetNodeName() string
+	GetInfo() Info
+	GetID() string
+	GetInputs() []*Input
+	GetOutputs() []*Output
+}
 
-type Node struct {
+type BaseNode struct {
 	Inputs  []*Input  `json:"inputs"`
 	Outputs []*Output `json:"outputs"`
 	Info    Info      `json:"info"`
 }
 
-func (n *Node) GetInfo() Info {
+func (n *BaseNode) GetInfo() Info {
 	return n.Info
 }
 
-func (n *Node) GetID() string {
+func (n *BaseNode) GetID() string {
 	return n.Info.NodeID
 }
 
-func (n *Node) GetName() string {
+func (n *BaseNode) GetName() string {
 	return n.Info.Name
 }
 
-func (n *Node) GetNodeName() string {
+func (n *BaseNode) GetNodeName() string {
 	return n.Info.NodeName
 }
 
-func (n *Node) GetInputs() []*Input {
+func (n *BaseNode) GetInputs() []*Input {
 	return n.Inputs
 }
 
-func (n *Node) GetOutputs() []*Output {
+func (n *BaseNode) GetOutputs() []*Output {
 	return n.Outputs
 }
 
-func (n *Node) readPinValue(name PortName) (*float64, float64) {
+func (n *BaseNode) readPinValue(name PortName) (*float64, float64) {
 	for _, out := range n.GetInputs() {
 		if name == out.Name {
 			if !float.IsNil(out.Connection.Value) { // this would be that the user wrote a value to the input directly
@@ -57,7 +59,7 @@ func (n *Node) readPinValue(name PortName) (*float64, float64) {
 	return nil, 0
 }
 
-func (n *Node) writePinValue(name PortName, value *float64) bool {
+func (n *BaseNode) writePinValue(name PortName, value *float64) bool {
 	for _, out := range n.GetOutputs() {
 		if name == out.Name {
 			out.ValueFloat64.Set(value)
@@ -104,7 +106,7 @@ type Connection struct {
 }
 
 type Input struct {
-	//*PortCommon
+	// *PortCommon
 	*InputPort
 	ValueFloat64 *adapter.Float64 `json:"-"`
 	ValueString  *adapter.String  `json:"-"`

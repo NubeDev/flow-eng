@@ -9,13 +9,13 @@ type Runner struct {
 	uuid       uuid.Value
 	nodeId     string
 	name       string
-	node       *Node
+	node       Node
 	inputs     []Port
 	outputs    []Port
 	connectors []*Connector
 }
 
-func NewRunner(node *Node) *Runner {
+func NewRunner(node Node) *Runner {
 	inputs := Ports(node, DirectionInput)
 	outputs := Ports(node, DirectionOutput)
 	connectors := Connectors(inputs)
@@ -45,13 +45,7 @@ func (runner *Runner) Process() error {
 		return err
 	}
 	// run processing node
-	if runner.node.GetName() == "nodeA" {
-		n := NodeA{Node: runner.node}
-		n.Process()
-	} else if runner.node.GetName() == "nodeB" {
-		n := NodeB{Node: runner.node}
-		n.Process()
-	}
+	runner.node.Process()
 	return nil
 }
 

@@ -6,20 +6,18 @@ import (
 )
 
 type NodeA struct {
-	*Node
+	*BaseNode
 }
 
-func SpecNodeA(body *Node) (*Node, error) {
+func NewNodeA(body *BaseNode) (Node, error) {
 	body = emptyNode(body)
-	body.Info.Name = "nodeA"
 	body.Info.NodeID = setUUID(body.Info.NodeID)
-	body.Inputs = buildInputs(buildInput(In1, TypeFloat64, body.Inputs), buildInput(In2, TypeFloat64, body.Inputs))
+	body.Inputs = buildInputs(buildInput(In1, TypeFloat64, body.Inputs), buildInput("in2", TypeFloat64, body.Inputs))
 	body.Outputs = buildOutputs(buildOutput(Out1, TypeFloat64, body.Outputs))
-	return body, nil
+	return &NodeA{BaseNode: body}, nil
 }
 
 func (n *NodeA) Process() {
-
 	_, r := n.readPinValue(In1)
 	fmt.Println("READ IN-1", n.GetNodeName(), r)
 
@@ -42,7 +40,6 @@ func (n *NodeA) Process() {
 		n.writePinValue(Out1, val)
 		return
 	}
-
 }
 
 func (n *NodeA) Cleanup() {}

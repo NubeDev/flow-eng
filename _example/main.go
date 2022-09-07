@@ -14,7 +14,7 @@ import (
 func main() {
 	buildJson()
 
-	var nodesParsed []*node.Node
+	var nodesParsed []*node.BaseNode
 	jsonFile, err := os.Open("../flow-eng/_example/test.json")
 	if err != nil {
 		fmt.Println(err)
@@ -26,7 +26,7 @@ func main() {
 
 	graph := flowctrl.New()
 	for _, n := range nodesParsed {
-		node_, err := node.Builder(n.GetName(), n)
+		node_, err := node.Builder(n)
 		fmt.Println("ADD:", node_.GetName(), node_.GetNodeName(), "ERR", err)
 		graph.AddNode(node_)
 	}
@@ -70,11 +70,10 @@ func main() {
 }
 
 func buildJson() {
-
-	//var nodeA *node.Node
+	// var nodeA *node.BaseNode
 	var count = []string{"nodeA", "nodeB"}
 	var nodesList []interface{}
-	nodeA := &node.Node{
+	nodeA := &node.BaseNode{
 		Inputs: []*node.Input{&node.Input{
 			InputPort: &node.InputPort{
 				Name:     "in1",
@@ -100,10 +99,10 @@ func buildJson() {
 		}},
 	}
 
-	//pprint.PrintJOSN(a)
+	// pprint.PrintJOSN(a)
 	for _, name := range count {
 
-		var node node.Node
+		var node node.BaseNode
 		node.Info.Name = name
 		node = *nodeA
 

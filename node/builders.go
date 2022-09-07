@@ -7,12 +7,12 @@ import (
 	"github.com/NubeDev/flow-eng/helpers"
 )
 
-func Builder(name string, body *Node) (*Node, error) {
-	switch name {
+func Builder(body *BaseNode) (Node, error) {
+	switch body.GetName() {
 	case nodeA:
-		return SpecNodeA(body)
+		return NewNodeA(body)
 	case nodeB:
-		return SpecNodeA(body)
+		return NewNodeB(body)
 	}
 	return nil, errors.New("node not found")
 }
@@ -91,9 +91,9 @@ func buildOutputs(body ...*Output) []*Output {
 	return out
 }
 
-func emptyNode(body *Node) *Node {
+func emptyNode(body *BaseNode) *BaseNode {
 	if body == nil {
-		body = &Node{
+		body = &BaseNode{
 			Info: Info{
 				NodeID: "",
 			},
