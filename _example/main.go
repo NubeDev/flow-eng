@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	flowctrl "github.com/NubeDev/flow-eng"
+	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"io/ioutil"
 	"log"
@@ -62,7 +63,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		time.Sleep(5000 * time.Millisecond)
+		time.Sleep(3000 * time.Millisecond)
 	}
 }
 
@@ -74,21 +75,21 @@ func buildJson() {
 	nodeA := &node.Node{
 		Inputs: []*node.Input{&node.Input{
 			InputPort: &node.InputPort{
-				Name:     "",
+				Name:     "in1",
 				DataType: "",
 				Connection: &node.Connection{
-					NodeID:   "",
-					NodePort: "",
+					NodeID:   "aa",
+					NodePort: "aaa",
 				},
 			},
 		}},
 		Outputs: []*node.Output{&node.Output{
 			OutputPort: &node.OutputPort{
-				Name:     "",
+				Name:     "out1",
 				DataType: "",
 				Connections: []*node.Connection{&node.Connection{
-					NodeID:   "",
-					NodePort: "",
+					NodeID:   "bbb",
+					NodePort: "34dfg",
 				},
 				},
 			},
@@ -96,8 +97,11 @@ func buildJson() {
 			ValueString:  nil,
 		}},
 	}
+
+	a := node.GetNodeSpec("nodeA", nodeA)
+	pprint.PrintJOSN(a)
 	for _, name := range count {
-		fmt.Println(name)
+
 		var node node.Node
 		node.Info.Name = name
 		node = *nodeA

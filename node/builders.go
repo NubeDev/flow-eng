@@ -1,76 +1,70 @@
 package node
 
 import (
-	"errors"
-	"fmt"
 	"github.com/NubeDev/flow-eng/buffer"
 	"github.com/NubeDev/flow-eng/buffer/adapter"
-	"github.com/NubeDev/flow-eng/helpers"
-)
-
-const (
-	nodeType    = "pass"
-	inputCount  = 1
-	outputCount = 1
 )
 
 func New(body *Node) (*Node, error) {
-	body, err := Check(body, Spec{nodeType, inputCount, outputCount})
-	if err != nil {
-		return nil, err
-	}
-	return &Node{
-		Inputs:  BuildInputs(body),
-		Outputs: BuildOutputs(body),
-		Info: Info{
-			NodeID:      body.Info.NodeID,
-			Name:        body.Info.Name,
-			Description: "desc",
-			Version:     "1",
-		},
-	}, nil
+	//body, err := Check(body, Spec{nodeType, inputCount, outputCount})
+	//if err != nil {
+	//	return nil, err
+	//}
+
+	//return &Node{
+	//	Inputs:  BuildInputs(body, spec),
+	//	Outputs: BuildOutputs(body, spec),
+	//	Info: Info{
+	//		NodeID:      body.Info.NodeID,
+	//		Name:        body.Info.Name,
+	//		Description: "desc",
+	//		Version:     "1",
+	//	},
+	//}, nil
+
+	return nil, nil
 }
 
-type Spec struct {
-	Name        string
-	InputCount  int
-	OutputCount int
-}
+//func Check(body *Node, nodeSpec Spec) (*Node, error) {
+//	if body == nil {
+//		return nil, errors.New("node body can not be empty")
+//	}
+//	if body.Info.Name == "" {
+//		return nil, errors.New("node name can not be empty, try AND, OR")
+//	}
+//	if body.Info.NodeID == "" {
+//		body.Info.NodeID = helpers.ShortUUID(nodeSpec.Name)
+//	}
+//	if len(body.Inputs) != nodeSpec.InputCount {
+//		return nil, errors.New(fmt.Sprintf("input count is incorrect required:%d provided:%d", nodeSpec.InputCount, len(body.Inputs)))
+//	}
+//	if len(body.Outputs) != nodeSpec.OutputCount {
+//		return nil, errors.New(fmt.Sprintf("output count is incorrect required:%d provided:%d", nodeSpec.OutputCount, len(body.Outputs)))
+//	}
+//	return body, nil
+//}
 
-func Check(body *Node, nodeSpec Spec) (*Node, error) {
-	if body == nil {
-		return nil, errors.New("node body can not be empty")
-	}
-	if body.Info.Name == "" {
-		return nil, errors.New("node name can not be empty, try AND, OR")
-	}
-	if body.Info.NodeID == "" {
-		body.Info.NodeID = helpers.ShortUUID(nodeSpec.Name)
-	}
-	if len(body.Inputs) != nodeSpec.InputCount {
-		return nil, errors.New(fmt.Sprintf("input count is incorrect required:%d provided:%d", nodeSpec.InputCount, len(body.Inputs)))
-	}
-	if len(body.Outputs) != nodeSpec.OutputCount {
-		return nil, errors.New(fmt.Sprintf("output count is incorrect required:%d provided:%d", nodeSpec.OutputCount, len(body.Outputs)))
-	}
-	return body, nil
-}
+//func BuildInputs(body *Node, spec *Spec) []*Input {
+//	var out []*Input
+//
+//	for i := 0; i < spec.InputCount; i++ {
+//
+//		//out = append(out, BuildInputFloat(input.Name, input.Connection))
+//	}
+//
+//	for _, input := range body.Inputs {
+//		out = append(out, BuildInputFloat(input.Name, input.Connection))
+//	}
+//	return out
+//}
 
-func BuildInputs(body *Node) []*Input {
-	var out []*Input
-	for _, input := range body.Inputs {
-		out = append(out, BuildInputFloat(input.Name, input.Connection))
-	}
-	return out
-}
-
-func BuildOutputs(body *Node) []*Output {
-	var out []*Output
-	for _, output := range body.Outputs {
-		out = append(out, BuildOutputFloat(output.Name, output.Connections))
-	}
-	return out
-}
+//func BuildOutputs(body *Node, spec *Spec) []*Output {
+//	var out []*Output
+//	for _, output := range body.Outputs {
+//		out = append(out, BuildOutputFloat(output.Name, output.Connections))
+//	}
+//	return out
+//}
 
 func BuildInputFloat(portName PortName, conn *Connection) *Input {
 	out := &Input{}

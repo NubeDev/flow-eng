@@ -41,11 +41,9 @@ func (runner *Runner) UUID() uuid.Value {
 func (runner *Runner) Process() error {
 	// trigger all connectors to input ports
 	err := runner.processConnectors()
-	fmt.Println("runner", runner.node.GetName(), "err", err)
 	if err != nil {
 		return err
 	}
-
 	// run processing node
 	if runner.node.GetName() == "nodeA" {
 		n := NodeA{Node: runner.node}
@@ -54,8 +52,6 @@ func (runner *Runner) Process() error {
 		n := NodeB{Node: runner.node}
 		n.Process()
 	}
-	// np := NodeProcessor{}
-	// np.getProcess(runner.node)
 	return nil
 }
 
