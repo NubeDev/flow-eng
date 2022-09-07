@@ -6,7 +6,8 @@
         "type": "float64",
         "connection": {
           "nodeID": "",
-          "nodePortName": ""
+          "nodePortName": "",
+          "value": 100
         }
       },
       {
@@ -14,7 +15,8 @@
         "type": "float64",
         "connection": {
           "nodeID": "",
-          "nodePortName": ""
+          "nodePortName": "",
+          "value": 22
         }
       }
     ],

@@ -2,6 +2,7 @@ package node
 
 import (
 	"github.com/NubeDev/flow-eng/buffer/adapter"
+	"github.com/NubeDev/flow-eng/helpers/float"
 )
 
 //type NodeProcess interface {
@@ -43,13 +44,17 @@ func (n *Node) GetOutputs() []*Output {
 	return n.Outputs
 }
 
-func (n *Node) readPinValue(name PortName) *float64 {
+func (n *Node) readPinValue(name PortName) (*float64, float64) {
 	for _, out := range n.GetInputs() {
 		if name == out.Name {
-			return out.ValueFloat64.Get()
+			if !float.IsNil(out.Connection.Value) { // this would be that the user wrote a value to the input directly
+				return out.Connection.Value, float.NonNil(out.Connection.Value)
+			}
+			val := out.ValueFloat64.Get()
+			return val, float.NonNil(val)
 		}
 	}
-	return nil
+	return nil, 0
 }
 
 func (n *Node) writePinValue(name PortName, value *float64) bool {
@@ -86,6 +91,12 @@ const (
 	In2  PortName = "in2"
 	Out1 PortName = "out1"
 )
+
+type InputConnection struct {
+	NodeID   string   `json:"nodeID"`
+	NodePort PortName `json:"nodePortName"`
+	Value    *float64 `json:"value,omitempty"` // used for when the user has no node connection and writes the value direct
+}
 
 type Connection struct {
 	NodeID   string   `json:"nodeID"`

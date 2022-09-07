@@ -37,12 +37,12 @@ func buildInput(portName PortName, dataType DataTypes, inputs []*Input) *Input {
 			if input.Connection != nil { // this would be when the flow comes from json
 				out.Connection = input.Connection
 			} else {
-				out.Connection = &Connection{}
+				out.Connection = &InputConnection{}
 			}
 		}
 	}
 	if !addConnections {
-		out.Connection = &Connection{}
+		out.Connection = &InputConnection{}
 	}
 	return out
 }
