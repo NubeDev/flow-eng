@@ -1,6 +1,8 @@
 package flowctrl
 
 import (
+	"errors"
+	"fmt"
 	"github.com/NubeDev/flow-eng/graph"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/uuid"
@@ -8,10 +10,10 @@ import (
 
 type Flow struct {
 	Graphs []*graph.Ordered
-	nodes  []node.Node
+	nodes  []*node.Node
 }
 
-func New(nodes ...node.Node) *Flow {
+func New(nodes ...*node.Node) *Flow {
 	runners := makeRunners(nodes)
 	ordered := makeGraphs(runners)
 	return &Flow{ordered, nodes}
@@ -21,7 +23,11 @@ func (p *Flow) Get() *Flow {
 	return p
 }
 
-func (p *Flow) GetNode(id string) node.Node {
+func (p *Flow) GetNodes() []*node.Node {
+	return p.nodes
+}
+
+func (p *Flow) GetNode(id string) *node.Node {
 	for _, n := range p.Get().nodes {
 		if n.GetID() == id {
 			return n
@@ -41,7 +47,7 @@ func (p *Flow) GetNodeRunner(id string) *node.Runner {
 	return nil
 }
 
-func (p *Flow) ReplaceNode(id string, node node.Node) node.Node {
+func (p *Flow) ReplaceNode(id string, node *node.Node) *node.Node {
 	var found bool
 	for _, n := range p.Get().nodes {
 		if n.GetID() == id {
@@ -55,7 +61,44 @@ func (p *Flow) ReplaceNode(id string, node node.Node) node.Node {
 	return p.GetNode(id)
 }
 
-func (p *Flow) AddNode(node node.Node) *Flow {
+func (p *Flow) NodeConnector(sourceID string) error {
+	a := p.GetNode(sourceID)
+	if a == nil {
+		return errors.New("failed to find node by that id")
+	}
+	for _, output := range a.Outputs {
+		for _, connector := range output.Connections {
+			destID := connector.NodeID
+			if destID == "" {
+				continue
+			}
+			fmt.Println("----------------")
+			fmt.Printf(fmt.Sprintf("source-id:%s  dest-id:%s", sourceID, destID))
+			fmt.Println()
+
+			n := p.GetNode(destID)
+			if n == nil {
+				return errors.New("failed to match ports for node connections")
+			}
+			for _, input := range n.GetInputs() {
+				port := input.Name
+
+				if port == connector.NodePort {
+					fmt.Println("*************************", port, connector.NodePort, sourceID, input.Connection.NodeID)
+					fmt.Printf(fmt.Sprintf("source-id:%s  dest-port-id:%s", sourceID, input.Connection.NodeID))
+					fmt.Println()
+					if sourceID == input.Connection.NodeID {
+						fmt.Println("*************************")
+						output.OutputPort.Connect(input.InputPort)
+					}
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (p *Flow) AddNode(node *node.Node) *Flow {
 	flows := p.Get()
 	flows.nodes = append(flows.nodes, node)
 	runners := makeRunners(flows.nodes)
@@ -64,7 +107,7 @@ func (p *Flow) AddNode(node node.Node) *Flow {
 	return flows
 }
 
-func makeRunners(nodes []node.Node) []*node.Runner {
+func makeRunners(nodes []*node.Node) []*node.Runner {
 	nodesCount := len(nodes)
 	runners := make([]*node.Runner, 0, nodesCount)
 	for i := 0; i < nodesCount; i++ {

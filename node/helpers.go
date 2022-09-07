@@ -2,19 +2,19 @@ package node
 
 import "reflect"
 
-func Ports(node Node, direction Direction) []Port {
+func Ports(node *Node, direction Direction) []Port {
 	ports := make([]Port, 0, 1)
 	for _, input := range node.GetInputs() {
-		if input.InputPort.Direction() != direction {
+		if input.Direction() != direction {
 			continue
 		}
-		ports = append(ports, input.InputPort)
+		ports = append(ports, input)
 	}
 	for _, output := range node.GetOutputs() {
-		if output.OutputPort.Direction() != direction {
+		if output.Direction() != direction {
 			continue
 		}
-		ports = append(ports, output.OutputPort)
+		ports = append(ports, output)
 	}
 	return ports
 }

@@ -2,7 +2,6 @@ package node
 
 import (
 	"fmt"
-
 	"github.com/NubeDev/flow-eng/uuid"
 )
 
@@ -10,20 +9,20 @@ type Runner struct {
 	uuid       uuid.Value
 	nodeId     string
 	name       string
-	node       Node
+	node       *Node
 	inputs     []Port
 	outputs    []Port
 	connectors []*Connector
 }
 
-func NewRunner(node Node) *Runner {
+func NewRunner(node *Node) *Runner {
 	inputs := Ports(node, DirectionInput)
 	outputs := Ports(node, DirectionOutput)
 	connectors := Connectors(inputs)
 	info := node.GetInfo()
 	nodeID := node.GetID()
 	id := uuid.New()
-	name := fmt.Sprintf("%s_%s_%s", info.Name, info.Version, id)
+	name := fmt.Sprintf("%s_%s_%d", info.Name, info.Version, id)
 	return &Runner{id, nodeID, name, node, inputs, outputs, connectors}
 }
 
@@ -42,12 +41,19 @@ func (runner *Runner) UUID() uuid.Value {
 func (runner *Runner) Process() error {
 	// trigger all connectors to input ports
 	err := runner.processConnectors()
+	fmt.Println("RUNNER", runner.node.GetName(), runner.node.GetNodeName(), "ERROR", err)
 	if err != nil {
 		return err
 	}
-
 	// run processing node
-	runner.node.Process()
+
+	if runner.node.GetName() == "nodeA" {
+		n := NodeA{Node: runner.node}
+		n.Process()
+	} else if runner.node.GetName() == "nodeB" {
+		n := NodeB{Node: runner.node}
+		n.Process()
+	}
 	return nil
 }
 

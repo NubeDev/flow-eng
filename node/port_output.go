@@ -6,14 +6,24 @@ import (
 )
 
 type OutputPort struct {
+	Name        PortName      `json:"name"` // out1
+	DataType    DataTypes     `json:"type"` // int8
+	Connections []*Connection `json:"connection"`
 	*buffer.Const
 	uuid       uuid.Value
 	direction  Direction
 	connectors []*Connector
 }
 
-func NewOutputPort(_type buffer.Type) *OutputPort {
-	return &OutputPort{buffer.NewConst(_type), uuid.New(), DirectionOutput, make([]*Connector, 0, 1)}
+func newOutputPort(_type buffer.Type, body *OutputPort) *OutputPort {
+	return &OutputPort{
+		body.Name,
+		body.DataType,
+		body.Connections,
+		buffer.NewConst(_type),
+		uuid.New(),
+		DirectionOutput,
+		make([]*Connector, 0, 1)}
 }
 
 func (p *OutputPort) Write(data []byte) (int, error) {

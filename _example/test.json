@@ -3,62 +3,80 @@
     "inputs": [
       {
         "name": "in1",
-        "type": "int8",
+        "type": "float64",
         "connection": {
           "nodeID": "",
-          "port": ""
+          "nodePortName": ""
+        }
+      },
+      {
+        "name": "in2",
+        "type": "float64",
+        "connection": {
+          "nodeID": "",
+          "nodePortName": ""
         }
       }
     ],
     "outputs": [
       {
         "name": "out1",
-        "type": "int8",
+        "type": "float64",
         "connection": [
           {
-            "nodeID": "pass_c4593a9f",
-            "port": "in1"
+            "nodeID": "b123",
+            "nodePortName": "in1"
           }
         ]
       }
     ],
     "info": {
-      "nodeID": "pass_cc8eebaa",
+      "nodeID": "a123",
       "name": "nodeA",
-      "type": "pass",
-      "description": "desc",
-      "version": "1"
+      "nodeName": "name-a123",
+      "category": "",
+      "description": "",
+      "version": ""
     }
   },
   {
     "inputs": [
       {
         "name": "in1",
-        "type": "int8",
+        "type": "float64",
         "connection": {
-          "nodeID": "pass_cc8eebaa",
-          "port": "out1"
+          "nodeID": "a123",
+          "nodePortName": "out1"
+        }
+      },
+      {
+        "name": "in2",
+        "type": "float64",
+        "connection": {
+          "nodeID": "",
+          "nodePortName": ""
         }
       }
     ],
     "outputs": [
       {
         "name": "out1",
-        "type": "int8",
+        "type": "float64",
         "connection": [
           {
             "nodeID": "",
-            "port": ""
+            "nodePortName": ""
           }
         ]
       }
     ],
     "info": {
-      "nodeID": "pass_c4593a9f",
-      "name": "nodeB",
-      "type": "pass",
-      "description": "desc",
-      "version": "1"
+      "nodeID": "b123",
+      "name": "nodeA",
+      "nodeName": "name-b123",
+      "category": "",
+      "description": "",
+      "version": ""
     }
   }
 ]
