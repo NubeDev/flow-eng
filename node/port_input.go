@@ -15,12 +15,7 @@ type InputPort struct {
 	connector *Connector
 }
 
-//func NewInputPort(_type buffer.Type) *InputPort {
-//	return &InputPort{buffer.NewConst(_type), uuid.New(), DirectionInput, nil}
-//}
-
 func newInputPort(_type buffer.Type, body *InputPort) *InputPort {
-
 	return &InputPort{
 		body.Name,
 		body.DataType,

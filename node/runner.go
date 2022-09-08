@@ -70,7 +70,6 @@ func (runner *Runner) processConnectors() error {
 	if connectorsCount == 0 {
 		return nil
 	}
-
 	for i := 0; i < connectorsCount; i++ {
 		conn := runner.connectors[i]
 		err := conn.Trigger()

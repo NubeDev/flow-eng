@@ -2,7 +2,6 @@ package flowctrl
 
 import (
 	"errors"
-	"fmt"
 	"github.com/NubeDev/flow-eng/graph"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/uuid"
@@ -72,23 +71,14 @@ func (p *Flow) NodeConnector(sourceID string) error {
 			if destID == "" {
 				continue
 			}
-			fmt.Println("----------------")
-			fmt.Printf(fmt.Sprintf("source-id:%s  dest-id:%s", sourceID, destID))
-			fmt.Println()
-
 			n := p.GetNode(destID)
 			if n == nil {
 				return errors.New("failed to match ports for node connections")
 			}
 			for _, input := range n.GetInputs() {
 				port := input.Name
-
 				if port == connector.NodePort {
-					fmt.Println("*************************", port, connector.NodePort, sourceID, input.Connection.NodeID)
-					fmt.Printf(fmt.Sprintf("source-id:%s  dest-port-id:%s", sourceID, input.Connection.NodeID))
-					fmt.Println()
 					if sourceID == input.Connection.NodeID {
-						fmt.Println("*************************")
 						output.OutputPort.Connect(input.InputPort)
 					}
 				}

@@ -4,7 +4,6 @@ import (
 	"github.com/NubeDev/flow-eng/buffer/adapter"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/str"
-	"strconv"
 )
 
 type Node interface {
@@ -46,6 +45,26 @@ func (n *BaseNode) GetInputs() []*Input {
 
 func (n *BaseNode) GetOutputs() []*Output {
 	return n.Outputs
+}
+
+type RedMultiplePins struct {
+	Value *float64
+	Real  float64
+	Found bool
+}
+
+func (n *BaseNode) ReadPinsNum(name ...PortName) []*RedMultiplePins {
+	var out []*RedMultiplePins
+	var resp *RedMultiplePins
+	for _, portName := range name {
+		v, r, f := n.ReadPinNum(portName)
+		resp.Value = v
+		resp.Real = r
+		resp.Found = f
+		out = append(out, resp)
+	}
+	return out
+
 }
 
 func (n *BaseNode) ReadPinNum(name PortName) (*float64, float64, bool) {
@@ -139,43 +158,5 @@ func BoolToInt(b bool) int {
 	if b {
 		return 1
 	}
-	return 0
-}
-
-func toFloat64(v interface{}) float64 {
-	if v == nil {
-		return 0
-	}
-	switch t := v.(type) {
-	case bool:
-		return float64(BoolToInt(t))
-	case int:
-		return float64(t)
-	case int16:
-		return float64(t)
-	case int32:
-		return float64(t)
-	case int64:
-		return float64(t)
-	case uint:
-		return float64(t)
-	case uint8:
-		return float64(t)
-	case uint16:
-		return float64(t)
-	case uint32:
-		return float64(t)
-	case uint64:
-		return float64(t)
-	case float64:
-		return t
-	case float32:
-		return float64(t)
-	case string:
-		if i, err := strconv.ParseFloat(t, 64); err == nil {
-			return i
-		}
-	}
-
 	return 0
 }
