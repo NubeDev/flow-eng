@@ -19,7 +19,7 @@ func NewAdd(body *node.BaseNode) (node.Node, error) {
 }
 
 func (inst *Add) Process() {
-	Process(inst.BaseNode)
+	Process(inst)
 }
 
 func (inst *Add) Cleanup() {}
