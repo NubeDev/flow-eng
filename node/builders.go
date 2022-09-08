@@ -44,16 +44,18 @@ func BuildOutput(portName PortName, dataType DataTypes, outputs []*Output) *Outp
 	port = newOutputPort(_dataType, port)
 	out.OutputPort = port
 	out.Value = adapter.NewString(port)
-
+	var connections []*Connection
 	for _, output := range outputs {
 		if output.Name == portName {
 			for _, connection := range output.Connections {
-				out.Connections = []*Connection{connection}
+				if connection.NodeID != "" && connection.NodePort != "" {
+					connections = append(connections, connection)
+				}
 			}
 		}
 	}
 	if out.Connections == nil {
-		out.Connections = []*Connection{&Connection{}}
+		out.Connections = connections
 	}
 	return out
 }

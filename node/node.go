@@ -67,11 +67,11 @@ func (n *BaseNode) ReadPinsNum(name ...PortName) []*RedMultiplePins {
 
 }
 
-func (n *BaseNode) ReadPinNum(name PortName) (*float64, float64, bool) {
+func (n *BaseNode) ReadPinNum(name PortName) (value *float64, real float64, hasValue bool) {
 	pinValPointer, _ := n.ReadPin(name)
 	valPointer, val, err := float.StringFloatErr(pinValPointer)
 	if err != nil {
-		return nil, 0, true
+		return nil, 0, hasValue
 	}
 	return valPointer, val, float.NotNil(valPointer)
 }
@@ -89,19 +89,18 @@ func (n *BaseNode) ReadPin(name PortName) (*string, string) {
 	return nil, ""
 }
 
-func (n *BaseNode) WritePin(name PortName, value *string) bool {
+func (n *BaseNode) WritePin(name PortName, value *string) {
 	for _, out := range n.GetOutputs() {
 		if name == out.Name {
 			out.Value.Set(value)
-			return true
 		}
 	}
-	return false
+
 }
 
-func (n *BaseNode) WritePinNum(name PortName, value float64) bool {
-	ok := n.WritePin(name, float.ToStrPtr(value))
-	return ok
+func (n *BaseNode) WritePinNum(name PortName, value float64) {
+	n.WritePin(name, float.ToStrPtr(value))
+
 }
 
 type Info struct {

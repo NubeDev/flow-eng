@@ -16,7 +16,7 @@
         "connection": {
           "nodeID": "",
           "nodePortName": "",
-          "value": "22.34567"
+          "value": "100"
         }
       }
     ],
@@ -27,6 +27,10 @@
         "connection": [
           {
             "nodeID": "b123",
+            "nodePortName": "in1"
+          },
+          {
+            "nodeID": "c123",
             "nodePortName": "in1"
           }
         ]
@@ -55,8 +59,8 @@
         "name": "in2",
         "type": "float64",
         "connection": {
-          "nodeID": "",
-          "nodePortName": ""
+          "nodeID": "a123",
+          "nodePortName": "out1"
         }
       }
     ],
@@ -76,6 +80,47 @@
       "nodeID": "b123",
       "name": "add",
       "nodeName": "name-b123",
+      "category": "",
+      "description": "",
+      "version": ""
+    }
+  },
+  {
+    "inputs": [
+      {
+        "name": "in1",
+        "type": "float64",
+        "connection": {
+          "nodeID": "a123",
+          "nodePortName": "out1"
+        }
+      },
+      {
+        "name": "in2",
+        "type": "float64",
+        "connection": {
+          "nodeID": "",
+          "nodePortName": "",
+          "value": "1"
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "out1",
+        "type": "float64",
+        "connection": [
+          {
+            "nodeID": "",
+            "nodePortName": ""
+          }
+        ]
+      }
+    ],
+    "info": {
+      "nodeID": "c123",
+      "name": "sub",
+      "nodeName": "name-c123",
       "category": "",
       "description": "",
       "version": ""

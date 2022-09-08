@@ -1,7 +1,6 @@
 package math
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 )
 
@@ -20,25 +19,7 @@ func NewSub(body *node.BaseNode) (node.Node, error) {
 }
 
 func (inst *Sub) Process() {
-	_, r := inst.ReadPin(node.In1)
-	fmt.Println("READ SUB IN-1", inst.GetNodeName(), r)
-	_, in1Val, in1Not := inst.ReadPinNum(node.In1)
-	_, in2Val, in2Not := inst.ReadPinNum(node.In2)
-
-	if in1Not && in2Not {
-		add := in1Val - in2Val
-		fmt.Println(add, "WRITE SUB----------", inst.GetNodeName(), in1Val+in2Val)
-		inst.WritePinNum(node.Out1, add)
-		return
-	}
-	if in1Not {
-		inst.WritePinNum(node.Out1, in1Val)
-		return
-	}
-	if in2Not {
-		inst.WritePinNum(node.Out1, in2Val)
-		return
-	}
+	Process(inst.BaseNode)
 }
 
 func (inst *Sub) Cleanup() {}
