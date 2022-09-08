@@ -71,7 +71,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		time.Sleep(3000 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 	}
 }
 

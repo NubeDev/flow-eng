@@ -111,8 +111,8 @@
         "type": "float64",
         "connection": [
           {
-            "nodeID": "",
-            "nodePortName": ""
+            "nodeID": "d123",
+            "nodePortName": "in1"
           }
         ]
       }
@@ -121,6 +121,38 @@
       "nodeID": "c123",
       "name": "sub",
       "nodeName": "name-c123",
+      "category": "",
+      "description": "",
+      "version": ""
+    }
+  },
+  {
+    "inputs": [
+      {
+        "name": "in1",
+        "type": "float64",
+        "connection": {
+          "nodeID": "a123",
+          "nodePortName": "out1"
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "out1",
+        "type": "float64",
+        "connection": [
+          {
+            "nodeID": "",
+            "nodePortName": ""
+          }
+        ]
+      }
+    ],
+    "info": {
+      "nodeID": "d123",
+      "name": "delay",
+      "nodeName": "name-d123",
       "category": "",
       "description": "",
       "version": ""
