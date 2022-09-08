@@ -10,6 +10,20 @@ import (
 )
 
 func Builder(body *node.BaseNode) (node.Node, error) {
+
+	n, err := builderMath(body)
+	if n != nil || err != nil {
+		return n, err
+	}
+	n, err = builderTiming(body)
+	if n != nil || err != nil {
+		return n, err
+	}
+
+	return nil, errors.New(fmt.Sprintf("no nodes found with name:%s", body.GetName()))
+}
+
+func builderMath(body *node.BaseNode) (node.Node, error) {
 	switch body.GetName() {
 	case add:
 		return math.NewAdd(body)
@@ -18,6 +32,13 @@ func Builder(body *node.BaseNode) (node.Node, error) {
 	case delay:
 		return timing.NewDelay(body, flowctrl.NewTimer())
 	}
+	return nil, nil
+}
 
-	return nil, errors.New(fmt.Sprintf("no nodes found with name:%s", body.GetName()))
+func builderTiming(body *node.BaseNode) (node.Node, error) {
+	switch body.GetName() {
+	case delay:
+		return timing.NewDelay(body, flowctrl.NewTimer())
+	}
+	return nil, nil
 }

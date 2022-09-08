@@ -47,17 +47,17 @@ func (p *Flow) GetNodeRunner(id string) *node.Runner {
 	return nil
 }
 
+func RemoveIndex(s []node.Node, index int) []node.Node {
+	return append(s[:index], s[index+1:]...)
+}
+
 func (p *Flow) ReplaceNode(id string, node node.Node) node.Node {
-	var found bool
-	for _, n := range p.Get().nodes {
+	for i, n := range p.Get().nodes {
 		if n.GetID() == id {
-			n = nil
-			found = true
+			p.nodes = RemoveIndex(p.nodes, i)
 		}
 	}
-	if found {
-		p.AddNode(node)
-	}
+	p.AddNode(node)
 	return p.GetNode(id)
 }
 

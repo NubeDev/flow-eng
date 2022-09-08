@@ -5,6 +5,7 @@ import (
 	"fmt"
 	flowctrl "github.com/NubeDev/flow-eng"
 	"github.com/NubeDev/flow-eng/_example/nodes"
+	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"io/ioutil"
 	"log"
@@ -36,6 +37,7 @@ func main() {
 		fmt.Println("ADD:", node_.GetName(), node_.GetNodeName(), "ERR", err)
 		graph.AddNode(node_)
 	}
+	fmt.Println(111111111, len(graph.GetNodes()))
 
 	for _, n := range graph.GetNodes() {
 		fmt.Println("build connections:", n.GetName(), n.GetNodeName())
@@ -50,18 +52,7 @@ func main() {
 		fmt.Println("REPLACE", n.GetName(), n.GetNodeName())
 		graph.ReplaceNode(n.GetID(), n)
 	}
-
-	for _, ordered := range graph.Get().Graphs {
-		for _, runner := range ordered.Runners {
-			fmt.Println("RUNNER-1", runner.Name(), len(runner.Outputs()), "LEN", "UUID", runner.UUID())
-			for _, port := range runner.Outputs() {
-				for _, connector := range port.Connectors() {
-					fmt.Println("RUNNER-TO-------------", connector.FromUUID(), connector.ToUUID())
-				}
-			}
-		}
-	}
-
+	pprint.PrintJOSN(graph.GetNodes())
 	runner := flowctrl.NewSerialRunner(graph)
 
 	log.Println("Flow started")
