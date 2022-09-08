@@ -125,15 +125,22 @@ const (
 )
 
 const (
-	In1  PortName = "in1"
-	In2  PortName = "in2"
-	In3  PortName = "in3"
-	In4  PortName = "in4"
-	Out1 PortName = "out1"
-	Out2 PortName = "out2"
-	Out3 PortName = "out3"
-	Out4 PortName = "out4"
+	Topic PortName = "topic"
+	In1   PortName = "in1"
+	In2   PortName = "in2"
+	In3   PortName = "in3"
+	In4   PortName = "in4"
+	Out1  PortName = "out1"
+	Out2  PortName = "out2"
+	Out3  PortName = "out3"
+	Out4  PortName = "out4"
 )
+
+type Properties struct {
+	Value        *string `json:"value,omitempty"` // used for when the user has no node connection and writes the value direct
+	DefaultValue *string `json:"defaultValue,omitempty"`
+	ReadValue    *string `json:"readValue,omitempty"`
+}
 
 type InputConnection struct {
 	NodeID    string   `json:"nodeID"`

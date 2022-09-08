@@ -48,8 +48,8 @@ func builderTiming(body *node.BaseNode) (node.Node, error) {
 
 func builderMQTT(body *node.BaseNode) (node.Node, error) {
 	switch body.GetName() {
-	case mqtt:
-		return broker.NewMqtt(body)
+	case mqttSub:
+		return broker.NewMqttSub(body)
 	}
 	return nil, nil
 }

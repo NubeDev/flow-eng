@@ -2,5 +2,5 @@ package broker
 
 const (
 	category = "mqtt"
-	mqttNode = "mqtt"
+	mqttSub  = "mqtt-subscribe"
 )

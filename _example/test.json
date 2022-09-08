@@ -151,7 +151,7 @@
     ],
     "info": {
       "nodeID": "d123",
-      "name": "mqtt",
+      "name": "mqtt-subscribe",
       "nodeName": "name-d123",
       "category": "",
       "description": "",

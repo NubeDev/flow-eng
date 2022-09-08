@@ -8,7 +8,7 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
-type Mqtt struct {
+type MqttSub struct {
 	*node.BaseNode
 	client     *mqttclient.Client
 	connected  bool
@@ -18,15 +18,16 @@ type Mqtt struct {
 
 var bus cbus.Bus
 
-func NewMqtt(body *node.BaseNode) (node.Node, error) {
+func NewMqttSub(body *node.BaseNode) (node.Node, error) {
 	body = node.EmptyNode(body)
-	body.Info.Name = mqttNode
+	body.Info.Name = mqttSub
 	body.Info.Category = category
 	body.Info.NodeID = node.SetUUID(body.Info.NodeID)
-	body.Inputs = node.BuildInputs(node.BuildInput(node.In1, node.TypeFloat, body.Inputs), node.BuildInput(node.In2, node.TypeFloat, body.Inputs))
-	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeFloat, body.Outputs))
+	body.Inputs = node.BuildInputs(node.BuildInput(node.Topic, node.TypeString, body.Inputs))
+	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeString, body.Outputs))
+	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out2, node.TypeFloat, body.Outputs))
 	bus = cbus.New(1)
-	return &Mqtt{body, nil, false, false, ""}, nil
+	return &MqttSub{body, nil, false, false, ""}, nil
 }
 
 var handle mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
@@ -34,13 +35,13 @@ var handle mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	bus.Send(msg)
 }
 
-func (inst *Mqtt) subscribe() {
+func (inst *MqttSub) subscribe() {
 	c, _ := mqttclient.GetMQTT()
 	c.Subscribe("hello", mqttclient.AtMostOnce, handle)
 	inst.subscribed = true
 }
 
-func (inst *Mqtt) connect() {
+func (inst *MqttSub) connect() {
 	mqttBroker := "tcp://0.0.0.0:1883"
 	_, err := mqttclient.InternalMQTT(mqttBroker)
 	if err != nil {
@@ -51,7 +52,7 @@ func (inst *Mqtt) connect() {
 	inst.client = client
 }
 
-func (inst *Mqtt) Process() {
+func (inst *MqttSub) Process() {
 	if !inst.connected {
 		go inst.connect()
 	}
@@ -71,4 +72,4 @@ func (inst *Mqtt) Process() {
 	fmt.Println("newMessage", inst.newMessage)
 }
 
-func (inst *Mqtt) Cleanup() {}
+func (inst *MqttSub) Cleanup() {}

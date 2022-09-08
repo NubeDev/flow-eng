@@ -5,5 +5,5 @@ const (
 	add      = "add"
 	sub      = "sub"
 	delay    = "delay"
-	mqtt     = "mqtt"
+	mqttSub  = "mqtt-subscribe"
 )
