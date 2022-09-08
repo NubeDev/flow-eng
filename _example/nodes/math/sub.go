@@ -19,7 +19,7 @@ func NewSub(body *node.BaseNode) (node.Node, error) {
 }
 
 func (inst *Sub) Process() {
-	Process(inst.BaseNode)
+	Process(inst)
 }
 
 func (inst *Sub) Cleanup() {}

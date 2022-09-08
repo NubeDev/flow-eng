@@ -13,7 +13,7 @@ const (
 	multiply = "multiply"
 )
 
-func Process(body *node.BaseNode) {
+func Process(body node.Node) {
 	_, in1Val, in1Not := body.ReadPinNum(node.In1)
 	_, in2Val, in2Not := body.ReadPinNum(node.In2)
 	if in1Not && in2Not {

@@ -15,6 +15,11 @@ type Node interface {
 	GetID() string
 	GetInputs() []*Input
 	GetOutputs() []*Output
+	ReadPinsNum(...PortName) []*RedMultiplePins
+	ReadPinNum(PortName) (*float64, float64, bool)
+	ReadPin(PortName) (*string, string)
+	WritePin(PortName, *string)
+	WritePinNum(PortName, float64)
 }
 
 type BaseNode struct {
@@ -95,12 +100,10 @@ func (n *BaseNode) WritePin(name PortName, value *string) {
 			out.Value.Set(value)
 		}
 	}
-
 }
 
 func (n *BaseNode) WritePinNum(name PortName, value float64) {
 	n.WritePin(name, float.ToStrPtr(value))
-
 }
 
 type Info struct {
