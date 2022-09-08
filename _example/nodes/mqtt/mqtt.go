@@ -2,10 +2,10 @@ package broker
 
 import (
 	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/cbus"
 	"github.com/NubeDev/flow-eng/helpers/mqttclient"
 	"github.com/NubeDev/flow-eng/node"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	log "github.com/sirupsen/logrus"
 )
 
 type Mqtt struct {
@@ -13,7 +13,10 @@ type Mqtt struct {
 	client     *mqttclient.Client
 	connected  bool
 	subscribed bool
+	newMessage string
 }
+
+var bus cbus.Bus
 
 func NewMqtt(body *node.BaseNode) (node.Node, error) {
 	body = node.EmptyNode(body)
@@ -22,12 +25,13 @@ func NewMqtt(body *node.BaseNode) (node.Node, error) {
 	body.Info.NodeID = node.SetUUID(body.Info.NodeID)
 	body.Inputs = node.BuildInputs(node.BuildInput(node.In1, node.TypeFloat, body.Inputs), node.BuildInput(node.In2, node.TypeFloat, body.Inputs))
 	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeFloat, body.Outputs))
-	return &Mqtt{body, nil, false, false}, nil
+	bus = cbus.New(1)
+	return &Mqtt{body, nil, false, false, ""}, nil
 }
 
-// used for getting data into the plugins
 var handle mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
-	log.Println("NEW MQTT MES", msg.Topic(), " ", string(msg.Payload()))
+	//log.Println("NEW MQTT MES", msg.Topic(), " ", string(msg.Payload()))
+	bus.Send(msg)
 }
 
 func (inst *Mqtt) subscribe() {
@@ -43,7 +47,6 @@ func (inst *Mqtt) connect() {
 		return
 	}
 	client, connected := mqttclient.GetMQTT()
-	fmt.Println("MQTT client connect****************", connected)
 	inst.connected = connected
 	inst.client = client
 }
@@ -58,6 +61,14 @@ func (inst *Mqtt) Process() {
 		}
 	}
 
+	go func() {
+		msg, ok := bus.Recv()
+		if ok {
+			msg_ := msg.(mqtt.Message)
+			inst.newMessage = string(msg_.Payload())
+		}
+	}()
+	fmt.Println("newMessage", inst.newMessage)
 }
 
 func (inst *Mqtt) Cleanup() {}

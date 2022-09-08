@@ -62,7 +62,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(2000 * time.Millisecond)
 	}
 }
 
