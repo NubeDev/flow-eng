@@ -151,7 +151,7 @@
     ],
     "info": {
       "nodeID": "d123",
-      "name": "delay",
+      "name": "mqtt",
       "nodeName": "name-d123",
       "category": "",
       "description": "",

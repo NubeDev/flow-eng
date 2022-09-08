@@ -7,12 +7,12 @@ import (
 )
 
 type Node interface {
-	Process()
+	Process() // runs the logic of the node
 	Cleanup()
-	GetName() string // AND, OR
-	GetNodeName() string
+	GetID() string       // node_abc123
+	GetName() string     // AND, OR
+	GetNodeName() string // my-node
 	GetInfo() Info
-	GetID() string
 	GetInputs() []*Input
 	GetOutputs() []*Output
 	ReadPinsNum(...PortName) []*RedMultiplePins
@@ -69,7 +69,6 @@ func (n *BaseNode) ReadPinsNum(name ...PortName) []*RedMultiplePins {
 		out = append(out, resp)
 	}
 	return out
-
 }
 
 func (n *BaseNode) ReadPinNum(name PortName) (value *float64, real float64, hasValue bool) {
@@ -90,6 +89,7 @@ func (n *BaseNode) ReadPin(name PortName) (*string, string) {
 			val := out.Value.Get()
 			return val, str.NonNil(val)
 		}
+
 	}
 	return nil, ""
 }
@@ -136,14 +136,16 @@ const (
 )
 
 type InputConnection struct {
-	NodeID   string   `json:"nodeID"`
-	NodePort PortName `json:"nodePortName"`
-	Value    *string  `json:"value,omitempty"` // used for when the user has no node connection and writes the value direct
+	NodeID    string   `json:"nodeID"`
+	NodePort  PortName `json:"nodePortName"`
+	Value     *string  `json:"value,omitempty"` // used for when the user has no node connection and writes the value direct
+	ReadValue *string  `json:"readValue,omitempty"`
 }
 
 type Connection struct {
-	NodeID   string   `json:"nodeID"`
-	NodePort PortName `json:"nodePortName"`
+	NodeID    string   `json:"nodeID"`
+	NodePort  PortName `json:"nodePortName"`
+	ReadValue *string  `json:"readValue,omitempty"`
 }
 
 type Input struct {

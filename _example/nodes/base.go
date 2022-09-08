@@ -5,12 +5,12 @@ import (
 	"fmt"
 	flowctrl "github.com/NubeDev/flow-eng"
 	"github.com/NubeDev/flow-eng/_example/nodes/math"
+	broker "github.com/NubeDev/flow-eng/_example/nodes/mqtt"
 	"github.com/NubeDev/flow-eng/_example/nodes/timing"
 	"github.com/NubeDev/flow-eng/node"
 )
 
 func Builder(body *node.BaseNode) (node.Node, error) {
-
 	n, err := builderMath(body)
 	if n != nil || err != nil {
 		return n, err
@@ -19,7 +19,10 @@ func Builder(body *node.BaseNode) (node.Node, error) {
 	if n != nil || err != nil {
 		return n, err
 	}
-
+	n, err = builderMQTT(body)
+	if n != nil || err != nil {
+		return n, err
+	}
 	return nil, errors.New(fmt.Sprintf("no nodes found with name:%s", body.GetName()))
 }
 
@@ -39,6 +42,14 @@ func builderTiming(body *node.BaseNode) (node.Node, error) {
 	switch body.GetName() {
 	case delay:
 		return timing.NewDelay(body, flowctrl.NewTimer())
+	}
+	return nil, nil
+}
+
+func builderMQTT(body *node.BaseNode) (node.Node, error) {
+	switch body.GetName() {
+	case mqtt:
+		return broker.NewMqtt(body)
 	}
 	return nil, nil
 }
