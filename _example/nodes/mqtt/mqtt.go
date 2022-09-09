@@ -69,7 +69,7 @@ func (inst *MqttSub) Process() {
 			inst.newMessage = string(msg_.Payload())
 		}
 	}()
-	fmt.Println("newMessage", inst.newMessage)
+	fmt.Println("****************newMessage", inst.newMessage)
 }
 
 func (inst *MqttSub) Cleanup() {}

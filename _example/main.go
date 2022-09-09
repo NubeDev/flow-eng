@@ -85,7 +85,7 @@ func buildJson() {
 			OutputPort: &node.OutputPort{
 				Name:     "out1",
 				DataType: "",
-				Connections: []*node.Connection{&node.Connection{
+				Connections: []*node.OutputConnection{&node.OutputConnection{
 					NodeID:   "bbb",
 					NodePort: "34dfg",
 				},

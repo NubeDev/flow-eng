@@ -6,9 +6,9 @@ import (
 )
 
 type OutputPort struct {
-	Name        PortName      `json:"name"` // out1
-	DataType    DataTypes     `json:"type"` // int8
-	Connections []*Connection `json:"connection"`
+	Name        PortName            `json:"name"` // out1
+	DataType    DataTypes           `json:"type"` // int8
+	Connections []*OutputConnection `json:"connection"`
 	*buffer.Const
 	uuid       uuid.Value
 	direction  Direction

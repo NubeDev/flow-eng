@@ -44,7 +44,7 @@ func BuildOutput(portName PortName, dataType DataTypes, outputs []*Output) *Outp
 	port = newOutputPort(_dataType, port)
 	out.OutputPort = port
 	out.Value = adapter.NewString(port)
-	var connections []*Connection
+	var connections []*OutputConnection
 	for _, output := range outputs {
 		if output.Name == portName {
 			for _, connection := range output.Connections {
