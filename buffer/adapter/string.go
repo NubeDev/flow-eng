@@ -7,7 +7,7 @@ import (
 
 type String struct {
 	buff  buffer.TypedReadWriter
-	value *string
+	value interface{}
 	temp  []byte
 }
 
@@ -18,7 +18,7 @@ func NewString(buff buffer.TypedReadWriter) *String {
 	return &String{buff, nil, make([]byte, buffer.String)}
 }
 
-func (t *String) Set(value *string) {
+func (t *String) Set(value interface{}) {
 	const expectedSize = buffer.String
 
 	t.value = value
@@ -32,11 +32,11 @@ func (t *String) Set(value *string) {
 	}
 }
 
-func (t *String) Get() *string {
+func (t *String) Get() interface{} {
 	if _, err := t.buff.Read(t.temp); err != nil {
 		panic(err)
 	}
-	value := *(**string)(unsafe.Pointer(&t.temp[0]))
+	value := *(*interface{})(unsafe.Pointer(&t.temp[0]))
 	t.value = value
 	return t.value
 }
