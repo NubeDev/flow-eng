@@ -41,8 +41,9 @@ func (runner *Runner) UUID() uuid.Value {
 func (runner *Runner) Process() error {
 	// trigger all connectors to input ports
 	err := runner.processConnectors()
-	//fmt.Println("RUNNER ERROR", runner.node.GetNodeName(), "ERR", err)
+
 	if err != nil {
+		fmt.Println("RUNNER ERROR", runner.node.GetNodeName(), "ERR", err)
 		return err
 	}
 	// run processing node

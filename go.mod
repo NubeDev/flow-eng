@@ -6,6 +6,7 @@ require (
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f
 	github.com/eclipse/paho.mqtt.golang v1.4.1
 	github.com/francoispqt/gojay v1.2.13
+	github.com/go-co-op/gocron v1.17.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/stretchr/testify v1.8.0
 	github.com/tidwall/buntdb v1.2.9
@@ -15,6 +16,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/tidwall/btree v1.4.2 // indirect
 	github.com/tidwall/gjson v1.14.3 // indirect
 	github.com/tidwall/grect v0.1.4 // indirect

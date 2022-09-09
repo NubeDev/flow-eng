@@ -3,6 +3,7 @@ package broker
 import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/cbus"
+	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/mqttclient"
 	"github.com/NubeDev/flow-eng/node"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -23,9 +24,8 @@ func NewMqttSub(body *node.BaseNode) (node.Node, error) {
 	body.Info.Name = mqttSub
 	body.Info.Category = category
 	body.Info.NodeID = node.SetUUID(body.Info.NodeID)
-	body.Inputs = node.BuildInputs(node.BuildInput(node.Topic, node.TypeString, body.Inputs))
+	body.Inputs = node.BuildInputs(node.BuildInput(node.In1, node.TypeString, body.Inputs))
 	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeString, body.Outputs))
-	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out2, node.TypeFloat, body.Outputs))
 	bus = cbus.New(1)
 	return &MqttSub{body, nil, false, false, ""}, nil
 }
@@ -69,6 +69,10 @@ func (inst *MqttSub) Process() {
 			inst.newMessage = string(msg_.Payload())
 		}
 	}()
+
+	val := float.StrToFloat(inst.newMessage)
+
+	inst.WritePin(node.Out1, float.ToStrPtr(val))
 	fmt.Println("****************newMessage", inst.newMessage)
 }
 

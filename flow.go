@@ -72,7 +72,6 @@ func (p *Flow) NodeConnector(sourceID string) error {
 			if destID == "" {
 				continue
 			}
-			fmt.Println("--------------", sourceNode.GetNodeName(), len(sourceNode.GetOutputs()))
 			destNode := p.GetNode(destID)
 			if destNode == nil {
 				return errors.New("failed to match ports for node connections")
