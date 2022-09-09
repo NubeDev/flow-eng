@@ -16,14 +16,15 @@ const (
 func Process(body node.Node) {
 	_, in1Val, in1Not := body.ReadPinNum(node.In1)
 	_, in2Val, in2Not := body.ReadPinNum(node.In2)
-	fmt.Println(in1Val, in1Not)
-	fmt.Println(in2Val, in2Not)
+
+	fmt.Println("MATH", in1Val, in1Not, in2Val, in2Not, body.GetName(), body.GetNodeName())
 	if in1Not && in2Not {
 		f, err := mathOperation(body.GetName(), in1Val, in2Val)
+		fmt.Println("MATH", "VALUE", f, body.GetName(), body.GetNodeName())
 		if err != nil {
 			return
 		}
-		fmt.Println("MATH", f, body.GetName())
+
 		body.WritePinNum(node.Out1, f)
 		return
 	}

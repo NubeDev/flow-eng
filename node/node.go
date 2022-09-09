@@ -1,9 +1,9 @@
 package node
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/buffer/adapter"
 	"github.com/NubeDev/flow-eng/helpers/float"
+	"github.com/NubeDev/flow-eng/helpers/str"
 )
 
 type Node interface {
@@ -15,10 +15,10 @@ type Node interface {
 	GetInfo() Info
 	GetInputs() []*Input
 	GetOutputs() []*Output
-	//ReadPinsNum(...PortName) []*RedMultiplePins
-	ReadPinNum(PortName) (interface{}, float64, bool)
-	ReadPin(PortName) interface{}
-	WritePin(PortName, interface{})
+	ReadPinsNum(...PortName) []*RedMultiplePins
+	ReadPinNum(PortName) (*float64, float64, bool)
+	ReadPin(PortName) (*string, string)
+	WritePin(PortName, *string)
 	WritePinNum(PortName, float64)
 }
 
@@ -59,45 +59,43 @@ type RedMultiplePins struct {
 	Found bool
 }
 
-//func (n *BaseNode) ReadPinsNum(name ...PortName) []*RedMultiplePins {
-//	var out []*RedMultiplePins
-//	var resp *RedMultiplePins
-//	for _, portName := range name {
-//		v, r, f := n.ReadPinNum(portName)
-//		resp.Value = v
-//		resp.Real = r
-//		resp.Found = f
-//		out = append(out, resp)
-//	}
-//	return out
-//}
-
-func (n *BaseNode) ReadPinNum(name PortName) (value interface{}, real float64, ok bool) {
-	pinValPointer := n.ReadPin(name)
-	val, ok := pinValPointer.(float64)
-	if !ok {
-		return nil, 0, ok
+func (n *BaseNode) ReadPinsNum(name ...PortName) []*RedMultiplePins {
+	var out []*RedMultiplePins
+	var resp *RedMultiplePins
+	for _, portName := range name {
+		v, r, f := n.ReadPinNum(portName)
+		resp.Value = v
+		resp.Real = r
+		resp.Found = f
+		out = append(out, resp)
 	}
-	return pinValPointer, val, ok
+	return out
 }
 
-func (n *BaseNode) ReadPin(name PortName) interface{} {
+func (n *BaseNode) ReadPinNum(name PortName) (value *float64, real float64, hasValue bool) {
+	pinValPointer, _ := n.ReadPin(name)
+	valPointer, val, err := float.StringFloatErr(pinValPointer)
+	if err != nil {
+		return nil, 0, hasValue
+	}
+	return valPointer, val, float.NotNil(valPointer)
+}
+
+func (n *BaseNode) ReadPin(name PortName) (*string, string) {
 	for _, out := range n.GetInputs() {
 		if name == out.Name {
-			if out.Connection.OverrideValue != nil { // this would be that the user wrote a value to the input directly
-				fmt.Println(4444, out.Connection.OverrideValue)
-				return out.Connection.OverrideValue
+			if !str.IsNil(out.Connection.OverrideValue) { // this would be that the user wrote a value to the input directly
+				return out.Connection.OverrideValue, str.NonNil(out.Connection.OverrideValue)
 			}
 			val := out.Value.Get()
-
-			return val
+			return val, str.NonNil(val)
 		}
 
 	}
-	return nil
+	return nil, ""
 }
 
-func (n *BaseNode) WritePin(name PortName, value interface{}) {
+func (n *BaseNode) WritePin(name PortName, value *string) {
 	for _, out := range n.GetOutputs() {
 		if name == out.Name {
 			out.Value.Set(value)
@@ -140,19 +138,19 @@ const (
 )
 
 type InputConnection struct {
-	NodeID        string      `json:"nodeID"`
-	NodePort      PortName    `json:"nodePortName"`
-	OverrideValue interface{} `json:"value,omitempty"` // used for when the user has no node connection and writes the value direct (or can be used to override a value)
-	CurrentValue  interface{} `json:"readValue,omitempty"`
-	Disable       *bool       `json:"disable"`
+	NodeID        string   `json:"nodeID"`
+	NodePort      PortName `json:"nodePortName"`
+	OverrideValue *string  `json:"value,omitempty"` // used for when the user has no node connection and writes the value direct (or can be used to override a value)
+	CurrentValue  *string  `json:"readValue,omitempty"`
+	Disable       *bool    `json:"disable"`
 }
 
 type OutputConnection struct {
-	NodeID        string      `json:"nodeID"`
-	NodePort      PortName    `json:"nodePortName"`
-	OverrideValue interface{} `json:"value,omitempty"` // used for when the user has no node connection and writes the value direct (or can be used to override a value)
-	CurrentValue  interface{} `json:"readValue,omitempty"`
-	Disable       *bool       `json:"disable"`
+	NodeID        string   `json:"nodeID"`
+	NodePort      PortName `json:"nodePortName"`
+	OverrideValue *string  `json:"value,omitempty"` // used for when the user has no node connection and writes the value direct (or can be used to override a value)
+	CurrentValue  *string  `json:"readValue,omitempty"`
+	Disable       *bool    `json:"disable"`
 }
 
 type Input struct {

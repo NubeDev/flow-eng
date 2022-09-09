@@ -5,7 +5,6 @@ import (
 	"fmt"
 	flowctrl "github.com/NubeDev/flow-eng"
 	"github.com/NubeDev/flow-eng/_example/nodes"
-	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"io/ioutil"
 	"log"
@@ -37,10 +36,9 @@ func main() {
 		fmt.Println("ADD:", node_.GetName(), node_.GetNodeName(), "ERR", err)
 		graph.AddNode(node_)
 	}
-	fmt.Println(111111111, len(graph.GetNodes()))
 
 	for _, n := range graph.GetNodes() {
-		fmt.Println("build connections:", n.GetName(), n.GetNodeName())
+		fmt.Println("*******build connections:", n.GetName(), n.GetNodeName())
 		err := graph.NodeConnector(n.GetID())
 		fmt.Println("build connections", err)
 		if err != nil {
@@ -52,7 +50,7 @@ func main() {
 		fmt.Println("REPLACE", n.GetName(), n.GetNodeName())
 		graph.ReplaceNode(n.GetID(), n)
 	}
-	pprint.PrintJOSN(graph.GetNodes())
+	//pprint.PrintJOSN(graph.GetNodes())
 	runner := flowctrl.NewSerialRunner(graph)
 
 	log.Println("Flow started")
@@ -62,7 +60,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		time.Sleep(2000 * time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
 	}
 }
 
