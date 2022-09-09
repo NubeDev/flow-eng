@@ -23,9 +23,10 @@ type Node interface {
 }
 
 type BaseNode struct {
-	Inputs  []*Input  `json:"inputs"`
-	Outputs []*Output `json:"outputs"`
-	Info    Info      `json:"info"`
+	Inputs   []*Input    `json:"inputs"`
+	Outputs  []*Output   `json:"outputs"`
+	Info     Info        `json:"info"`
+	Settings []*Settings `json:"settings"`
 }
 
 func (n *BaseNode) GetInfo() Info {
@@ -83,8 +84,8 @@ func (n *BaseNode) ReadPinNum(name PortName) (value *float64, real float64, hasV
 func (n *BaseNode) ReadPin(name PortName) (*string, string) {
 	for _, out := range n.GetInputs() {
 		if name == out.Name {
-			if !str.IsNil(out.Connection.Value) { // this would be that the user wrote a value to the input directly
-				return out.Connection.Value, str.NonNil(out.Connection.Value)
+			if !str.IsNil(out.Connection.OverrideValue) { // this would be that the user wrote a value to the input directly
+				return out.Connection.OverrideValue, str.NonNil(out.Connection.OverrideValue)
 			}
 			val := out.Value.Get()
 			return val, str.NonNil(val)
@@ -136,23 +137,20 @@ const (
 	Out4  PortName = "out4"
 )
 
-type Properties struct {
-	Value        *string `json:"value,omitempty"` // used for when the user has no node connection and writes the value direct
-	DefaultValue *string `json:"defaultValue,omitempty"`
-	ReadValue    *string `json:"readValue,omitempty"`
-}
-
 type InputConnection struct {
-	NodeID    string   `json:"nodeID"`
-	NodePort  PortName `json:"nodePortName"`
-	Value     *string  `json:"value,omitempty"` // used for when the user has no node connection and writes the value direct
-	ReadValue *string  `json:"readValue,omitempty"`
+	NodeID        string   `json:"nodeID"`
+	NodePort      PortName `json:"nodePortName"`
+	OverrideValue *string  `json:"value,omitempty"` // used for when the user has no node connection and writes the value direct (or can be used to override a value)
+	CurrentValue  *string  `json:"readValue,omitempty"`
+	Disable       *bool    `json:"disable"`
 }
 
-type Connection struct {
-	NodeID    string   `json:"nodeID"`
-	NodePort  PortName `json:"nodePortName"`
-	ReadValue *string  `json:"readValue,omitempty"`
+type OutputConnection struct {
+	NodeID        string   `json:"nodeID"`
+	NodePort      PortName `json:"nodePortName"`
+	OverrideValue *string  `json:"value,omitempty"` // used for when the user has no node connection and writes the value direct (or can be used to override a value)
+	CurrentValue  *string  `json:"readValue,omitempty"`
+	Disable       *bool    `json:"disable"`
 }
 
 type Input struct {
