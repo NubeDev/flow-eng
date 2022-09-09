@@ -42,6 +42,8 @@ func builderTiming(body *node.BaseNode) (node.Node, error) {
 	switch body.GetName() {
 	case delay:
 		return timing.NewDelay(body, flowctrl.NewTimer())
+	case inject:
+		return timing.NewInject(body)
 	}
 	return nil, nil
 }

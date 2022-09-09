@@ -150,7 +150,7 @@
     ],
     "info": {
       "nodeID": "d123",
-      "name": "mqtt-subscribe",
+      "name": "inject",
       "nodeName": "name-d123",
       "category": "",
       "description": "",
