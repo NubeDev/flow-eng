@@ -6,18 +6,32 @@ import (
 	"github.com/NubeDev/flow-eng/helpers"
 )
 
-func BuildInput(portName PortName, dataType DataTypes, inputs []*Input) *Input {
+func BuildNodes(body ...Node) []Node {
+	var out []Node
+	for _, output := range body {
+		out = append(out, output)
+	}
+	return out
+}
+
+func BuildInput(portName PortName, dataType DataTypes, fallback interface{}, inputs []*Input) *Input {
 	out := &Input{}
 	port := &InputPort{
-		Name:     portName,
-		DataType: dataType,
-	}
+		Name:       portName,
+		DataType:   dataType,
+		Connection: &InputConnection{}}
 	_dataType := buffer.String
 	port = newInputPort(_dataType, port)
 	out.InputPort = port
 	out.Value = adapter.NewString(port)
 	var addConnections bool
+	if len(inputs) == 0 {
+		inputs = []*Input{out}
+	}
 	for _, input := range inputs {
+		if input.Connection.FallbackValue == nil {
+			out.InputPort.Connection.FallbackValue = fallback
+		}
 		if input.Name == portName {
 			addConnections = true
 			if input.Connection != nil { // this would be when the flow comes from json
@@ -35,16 +49,16 @@ func BuildInput(portName PortName, dataType DataTypes, inputs []*Input) *Input {
 
 func BuildOutput(portName PortName, dataType DataTypes, outputs []*Output) *Output {
 	out := &Output{}
+	var connections []*OutputConnection
 	port := &OutputPort{
 		Name:        portName,
 		DataType:    dataType,
-		Connections: nil,
+		Connections: connections,
 	}
 	_dataType := buffer.String
 	port = newOutputPort(_dataType, port)
 	out.OutputPort = port
 	out.Value = adapter.NewString(port)
-	var connections []*OutputConnection
 	for _, output := range outputs {
 		if output.Name == portName {
 			for _, connection := range output.Connections {
@@ -53,9 +67,6 @@ func BuildOutput(portName PortName, dataType DataTypes, outputs []*Output) *Outp
 				}
 			}
 		}
-	}
-	if out.Connections == nil {
-		out.Connections = connections
 	}
 	return out
 }
@@ -76,11 +87,12 @@ func BuildOutputs(body ...*Output) []*Output {
 	return out
 }
 
-func EmptyNode(body *BaseNode) *BaseNode {
+func EmptyNode(body *BaseNode, nodeName string) *BaseNode {
 	if body == nil {
 		body = &BaseNode{
 			Info: Info{
-				NodeID: "",
+				NodeName: helpers.ShortUUID(nodeName),
+				NodeID:   "",
 			},
 		}
 	}

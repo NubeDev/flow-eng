@@ -33,8 +33,9 @@ func TestBaseNode_GetSetting(t *testing.T) {
 		Min:      1,
 		ReadOnly: true,
 	}
+	fmt.Println(top)
 
-	top_, ok := body.GetProperties("topi", top).(*topic)
+	top_, ok := body.GetProperties("topi").(*topic)
 	if ok {
 		fmt.Println(top_.Title)
 	}

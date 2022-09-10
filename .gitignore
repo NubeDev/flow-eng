@@ -9,7 +9,7 @@ frontend/.idea/
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-
+flow.db
 # Binaries for programs and plugins
 *.exe
 *.exe~

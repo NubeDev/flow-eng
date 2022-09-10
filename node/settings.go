@@ -2,6 +2,9 @@ package node
 
 import (
 	"errors"
+	"fmt"
+	"github.com/NubeDev/flow-eng/schema"
+	"github.com/mitchellh/mapstructure"
 )
 
 type Settings struct {
@@ -21,6 +24,27 @@ func (n *BaseNode) GetSetting(name string) *Settings {
 		}
 	}
 	return nil
+}
+
+func (n *BaseNode) GetPropValueStr(name string) (string, error) {
+	data := n.GetProperties(name)
+	if data == nil {
+		return "", errors.New(fmt.Sprintf("failed to to settings properties by name%s", name))
+	}
+	set := &schema.SettingBase{}
+	err := mapstructure.Decode(n.GetProperties(name), set)
+	if err != nil {
+		return "", err
+	}
+	return set.DefaultValue, nil
+}
+
+func (n *BaseNode) DecodeProperties(name string, output interface{}) error {
+	data := n.GetProperties(name)
+	if data == nil {
+		return errors.New(fmt.Sprintf("failed to to settings properties by name%s", name))
+	}
+	return mapstructure.Decode(n.GetProperties(name), output)
 }
 
 func (n *BaseNode) GetProperties(name string) interface{} {

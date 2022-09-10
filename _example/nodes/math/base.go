@@ -7,6 +7,7 @@ import (
 )
 
 const (
+	constNum = "const-num"
 	category = "math"
 	add      = "add"
 	sub      = "subtract"
@@ -16,10 +17,9 @@ const (
 func Process(body node.Node) {
 	_, in1Val, in1Not := body.ReadPinNum(node.In1)
 	_, in2Val, in2Not := body.ReadPinNum(node.In2)
-
-	fmt.Println("MATH", in1Val, in1Not, in2Val, in2Not, body.GetName(), body.GetNodeName())
 	if in1Not && in2Not {
 		f, err := mathOperation(body.GetName(), in1Val, in2Val)
+		fmt.Println("MATH", in1Val, in1Not, in2Val, in2Not, body.GetName(), body.GetNodeName())
 		fmt.Println("MATH", "VALUE", f, body.GetName(), body.GetNodeName())
 		if err != nil {
 			return

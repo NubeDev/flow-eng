@@ -13,11 +13,11 @@ type Delay struct {
 }
 
 func NewDelay(body *node.BaseNode, timer flowctrl.TimedDelay) (node.Node, error) {
-	body = node.EmptyNode(body)
+	body = node.EmptyNode(body, delay)
 	body.Info.Name = delay
 	body.Info.Category = category
 	body.Info.NodeID = node.SetUUID(body.Info.NodeID)
-	body.Inputs = node.BuildInputs(node.BuildInput(node.In1, node.TypeFloat, body.Inputs))
+	body.Inputs = node.BuildInputs(node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs))
 	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeFloat, body.Outputs))
 	return &Delay{body, timer}, nil
 }
