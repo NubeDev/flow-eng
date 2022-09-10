@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	flowctrl "github.com/NubeDev/flow-eng"
 	"github.com/NubeDev/flow-eng/_example/nodes"
@@ -16,10 +17,15 @@ func main() {
 
 	buildJson()
 
+	filePath := flag.String("f", "../flow-eng/_example/test.json", "flo file")
+	flag.Parse()
+	fmt.Println("word:", *filePath)
+
 	var nodesParsed []*node.BaseNode
-	jsonFile, err := os.Open("../flow-eng/_example/test.json")
+	jsonFile, err := os.Open(*filePath)
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 	// defer the closing of our jsonFile so that we can parse it later on
 	defer jsonFile.Close()
@@ -60,7 +66,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(10 * time.Millisecond)
 	}
 }
 
