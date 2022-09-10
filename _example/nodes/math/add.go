@@ -27,7 +27,7 @@ func getPoints() {
 		Get("http://192.168.15.190:1660/api/points")
 	fmt.Println(err)
 	fmt.Println(resp.Status())
-	fmt.Println(resp.String())
+	//fmt.Println(resp.String())
 }
 
 func (inst *Add) Process() {
