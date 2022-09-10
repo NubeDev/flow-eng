@@ -6,6 +6,7 @@ import (
 	"github.com/NubeDev/flow-eng/graph"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/uuid"
+	log "github.com/sirupsen/logrus"
 )
 
 type Flow struct {
@@ -63,6 +64,23 @@ func (p *Flow) ReplaceNode(id string, node node.Node) node.Node {
 	return nil
 }
 
+func (p *Flow) ManualNodeConnector(nodeA, nodeB node.Node, outPort, inPort node.PortName) error {
+
+	for _, output := range nodeA.GetOutputs() {
+		if output.Name == outPort {
+			for _, input := range nodeB.GetInputs() {
+				if input.Name == inPort {
+					output.Connect(input.InputPort)
+					log.Infof("source-node:%s dest-node:%s source-port:%s dest-port:%s", nodeA.GetNodeName(), nodeB.GetNodeName(), outPort, inPort)
+					return nil
+				}
+			}
+		}
+	}
+	return errors.New(fmt.Sprintf("source-node:%s dest-node:%s source-port:%s dest-port:%s", nodeA.GetNodeName(), nodeB.GetNodeName(), outPort, inPort))
+
+}
+
 func (p *Flow) NodeConnector(sourceID string) error {
 	sourceNode := p.GetNode(sourceID)
 	if sourceNode == nil {
@@ -82,8 +100,7 @@ func (p *Flow) NodeConnector(sourceID string) error {
 				port := input.Name
 				if port == connector.NodePort {
 					if sourceID == input.Connection.NodeID {
-						fmt.Printf("source-node:%s dest-node:%s source-port:%s dest-port:%s", sourceNode.GetNodeName(), destNode.GetNodeName(), output.Name, port)
-						fmt.Println()
+						log.Infof("source-node:%s dest-node:%s source-port:%s dest-port:%s", sourceNode.GetNodeName(), destNode.GetNodeName(), output.Name, port)
 						output.OutputPort.Connect(input.InputPort)
 					}
 				}

@@ -2,6 +2,7 @@ package nodes
 
 const (
 	category = "math"
+	constNum = "const-num"
 	add      = "add"
 	sub      = "subtract"
 	multiply = "multiply"

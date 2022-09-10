@@ -34,6 +34,8 @@ func Builder(body *node.BaseNode) (node.Node, error) {
 
 func builderMath(body *node.BaseNode) (node.Node, error) {
 	switch body.GetName() {
+	case constNum:
+		return math.NewConst(body)
 	case add:
 		return math.NewAdd(body)
 	case sub:

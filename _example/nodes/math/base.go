@@ -7,6 +7,7 @@ import (
 )
 
 const (
+	constNum = "const-num"
 	category = "math"
 	add      = "add"
 	sub      = "subtract"
