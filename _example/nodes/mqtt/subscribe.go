@@ -6,8 +6,9 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/mqttclient"
 	"github.com/NubeDev/flow-eng/node"
+	"github.com/NubeDev/flow-eng/schema"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/mitchellh/mapstructure"
+	log "github.com/sirupsen/logrus"
 )
 
 type MqttSub struct {
@@ -18,15 +19,11 @@ type MqttSub struct {
 	newMessage string
 }
 
-var bus cbus.Bus
+const (
+	topic = "topic"
+)
 
-type topic struct {
-	Type     string `json:"type" default:"string"`
-	Title    string `json:"title" default:"topic"`
-	Min      int    `json:"minLength" default:"1"`
-	ReadOnly bool   `json:"readOnly" default:"false"`
-	Value    string `json:"value"`
-}
+var bus cbus.Bus
 
 func NewMqttSub(body *node.BaseNode) (node.Node, error) {
 	body = node.EmptyNode(body)
@@ -35,31 +32,20 @@ func NewMqttSub(body *node.BaseNode) (node.Node, error) {
 	body.Info.NodeID = node.SetUUID(body.Info.NodeID)
 	body.Inputs = node.BuildInputs(node.BuildInput(node.In1, node.TypeString, body.Inputs))
 	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeString, body.Outputs))
-
-	topicSetting := &topic{}
-	aaa := body.GetProperties("topic")
-	err := mapstructure.Decode(aaa, topicSetting)
+	decode := schema.NewString(nil)
+	err := body.DecodeProperties(topic, decode)
 	if err != nil {
 		return nil, err
 	}
-
-	settings, err := node.BuildSettings(node.BuildSetting("string", "topic", &topic{
-		Type:     "string",
-		Title:    "topic",
-		Min:      1,
-		ReadOnly: true,
-		Value:    topicSetting.Value,
-	}), node.BuildSetting("string", "topic2", &topic{
-		Type:     "string",
-		Title:    "topic",
-		Min:      1,
-		ReadOnly: true,
-		Value:    "",
-	}))
+	t := schema.NewString(&schema.SettingBase{
+		Title:        topic,
+		Min:          1,
+		DefaultValue: decode.DefaultValue,
+	})
+	settings, err := node.BuildSettings(node.BuildSetting(schema.PropString, topic, t))
 	if err != nil {
 		return nil, err
 	}
-
 	body.Settings = settings
 
 	bus = cbus.New(1)
@@ -71,22 +57,33 @@ var handle mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	bus.Send(msg)
 }
 
-func (inst *MqttSub) subscribe() {
-	topicSetting := &topic{}
-	topicSetting, ok := inst.GetProperties("topic").(*topic)
-	if ok {
-		c, _ := mqttclient.GetMQTT()
-		c.Subscribe(topicSetting.Value, mqttclient.AtMostOnce, handle)
-		inst.subscribed = true
+func (inst *MqttSub) getTopic() string {
+	val, err := inst.GetPropValueStr(topic)
+	if err != nil {
+		return val
 	}
+	return val
 
+}
+
+func (inst *MqttSub) subscribe() {
+	c, _ := mqttclient.GetMQTT()
+	if inst.getTopic() != "" {
+		err := c.Subscribe(inst.getTopic(), mqttclient.AtMostOnce, handle)
+		if err != nil {
+			log.Errorf(fmt.Sprintf("mqtt-subscribe topic:%s err:%s", inst.getTopic(), err.Error()))
+		}
+		inst.subscribed = true
+	} else {
+		log.Errorf(fmt.Sprintf("mqtt-subscribe topic can not be empty"))
+	}
 }
 
 func (inst *MqttSub) connect() {
 	mqttBroker := "tcp://0.0.0.0:1883"
 	_, err := mqttclient.InternalMQTT(mqttBroker)
 	if err != nil {
-		return
+		log.Errorf(fmt.Sprintf("mqtt-subscribe-connect err:%s", err.Error()))
 	}
 	client, connected := mqttclient.GetMQTT()
 	inst.connected = connected
@@ -108,13 +105,14 @@ func (inst *MqttSub) Process() {
 		if ok {
 			msg_ := msg.(mqtt.Message)
 			inst.newMessage = string(msg_.Payload())
+			log.Info("MQTT:newMessage", inst.newMessage)
 		}
 	}()
 
 	val := float.StrToFloat(inst.newMessage)
 
 	inst.WritePin(node.Out1, float.ToStrPtr(val))
-	fmt.Println("****************newMessage", inst.newMessage)
+
 }
 
 func (inst *MqttSub) Cleanup() {}

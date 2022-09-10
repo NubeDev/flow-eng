@@ -8,4 +8,5 @@ const (
 	delay    = "delay"
 	inject   = "inject"
 	mqttSub  = "mqtt-subscribe"
+	mqttPub  = "mqtt-publish"
 )

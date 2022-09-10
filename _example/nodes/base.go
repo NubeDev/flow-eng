@@ -10,6 +10,12 @@ import (
 	"github.com/NubeDev/flow-eng/node"
 )
 
+func All() []node.Node {
+	add, _ := math.NewAdd(nil)
+	sub, _ := math.NewSub(nil)
+	return node.BuildNodes(add, sub)
+}
+
 func Builder(body *node.BaseNode) (node.Node, error) {
 	n, err := builderMath(body)
 	if n != nil || err != nil {
@@ -52,6 +58,8 @@ func builderMQTT(body *node.BaseNode) (node.Node, error) {
 	switch body.GetName() {
 	case mqttSub:
 		return broker.NewMqttSub(body)
+	case mqttPub:
+		return broker.NewMqttPub(body)
 	}
 	return nil, nil
 }

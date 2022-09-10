@@ -84,7 +84,7 @@
           "title": "topic",
           "minLength": 1,
           "readOnly": true,
-          "value": "app"
+          "defaultValue": "app"
         }
       },
       {
@@ -95,7 +95,7 @@
           "title": "topic",
           "minLength": 1,
           "readOnly": true,
-          "value": ""
+          "defaultValue": ""
         }
       }
     ]

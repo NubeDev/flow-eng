@@ -2,6 +2,12 @@ package schema
 
 import pprint "github.com/NubeDev/flow-eng/helpers/print"
 
+const (
+	PropString = "string"
+	PropNum    = "number"
+	PropBool   = "boolean"
+)
+
 type UiOptions struct {
 	Inline bool `json:"inline"`
 }

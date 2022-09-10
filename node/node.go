@@ -21,6 +21,8 @@ type Node interface {
 	ReadPin(PortName) (*string, string)
 	WritePin(PortName, *string)
 	WritePinNum(PortName, float64)
+	SetMetadata(m *Metadata)
+	GetMetadata() *Metadata
 }
 
 type BaseNode struct {
@@ -28,6 +30,7 @@ type BaseNode struct {
 	Outputs  []*Output   `json:"outputs,omitempty"`
 	Info     Info        `json:"info"`
 	Settings []*Settings `json:"settings,omitempty"`
+	Metadata *Metadata   `json:"metadata"`
 }
 
 func (n *BaseNode) GetInfo() Info {
@@ -36,6 +39,14 @@ func (n *BaseNode) GetInfo() Info {
 
 func (n *BaseNode) GetID() string {
 	return n.Info.NodeID
+}
+
+func (n *BaseNode) GetMetadata() *Metadata {
+	return n.Metadata
+}
+
+func (n *BaseNode) SetMetadata(m *Metadata) {
+	n.Metadata = m
 }
 
 func (n *BaseNode) GetName() string {
@@ -92,7 +103,6 @@ func (n *BaseNode) ReadPin(name PortName) (*string, string) {
 			val := out.Value.Get()
 			return val, str.NonNil(val)
 		}
-
 	}
 	return nil, ""
 }
@@ -110,9 +120,9 @@ func (n *BaseNode) WritePinNum(name PortName, value float64) {
 }
 
 type Info struct {
-	NodeID      string `json:"nodeID"`   // a123
-	Name        string `json:"name"`     // add, or
-	NodeName    string `json:"nodeName"` // my-node-abc
+	NodeID      string `json:"nodeID"`             // a123
+	Name        string `json:"name"`               // add, or
+	NodeName    string `json:"nodeName,omitempty"` // my-node-abc
 	Category    string `json:"category,omitempty"`
 	Description string `json:"description,omitempty"`
 	Version     string `json:"version,omitempty"`
@@ -162,8 +172,7 @@ type Metadata struct {
 
 type Input struct {
 	*InputPort
-	Value    *adapter.String `json:"-"`
-	Metadata Metadata        `json:"metadata"`
+	Value *adapter.String `json:"-"`
 }
 
 type Output struct {

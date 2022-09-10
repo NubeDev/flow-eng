@@ -11,7 +11,7 @@ type db struct {
 
 func New(dbFile string) Storage {
 	if dbFile == "" {
-		dbFile = "../flow.db"
+		dbFile = "./flow.db"
 	}
 	newDb, err := buntdb.Open(dbFile)
 	if err != nil {

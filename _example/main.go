@@ -7,6 +7,7 @@ import (
 	flowctrl "github.com/NubeDev/flow-eng"
 	"github.com/NubeDev/flow-eng/_example/nodes"
 	"github.com/NubeDev/flow-eng/node"
+	"github.com/NubeDev/flow-eng/storage"
 	"io/ioutil"
 	"log"
 	"os"
@@ -15,9 +16,20 @@ import (
 
 func main() {
 
+	db := storage.New("")
+	fmt.Println(11111)
+	//aa := nodes.All()
+	//pprint.PrintJOSN(aa)
+	fmt.Println(11111)
+	setting, err := db.GetSetting("")
+	fmt.Println(setting, err)
+	if err != nil {
+
+	}
+
 	buildJson()
 
-	filePath := flag.String("f", "../flow-eng/_example/test.json", "flo file")
+	filePath := flag.String("f", "../flow-eng/_example/mqtt.json", "flow file")
 	flag.Parse()
 	fmt.Println("file:", *filePath)
 
@@ -44,26 +56,36 @@ func main() {
 	}
 
 	for _, n := range graph.GetNodes() {
-		fmt.Println("*******build connections:", n.GetName(), n.GetNodeName())
+		fmt.Println("BUILD connections:", n.GetName(), n.GetNodeName())
 		err := graph.NodeConnector(n.GetID())
-		fmt.Println("build connections", err)
+
 		if err != nil {
+			fmt.Println("build connections ERROR", err)
 			return
 		}
 	}
 
-	for _, n := range graph.GetNodes() {
-		fmt.Println("REPLACE", n.GetName(), n.GetNodeName())
-		graph.ReplaceNode(n.GetID(), n)
-	}
+	//for _, n := range graph.GetNodes() {
+	//	fmt.Println("GET NODES:", n.GetName(), n.GetNodeName())
+	//}
 	//pprint.PrintJOSN(graph.GetNodes())
+	for _, nn := range graph.GetNodes() {
+		fmt.Println("REPLACE", nn.GetName(), nn.GetNodeName(), nn.GetID())
+		graph.ReplaceNode(nn.GetID(), nn)
+
+	}
+
+	for _, n := range graph.GetNodes() {
+		fmt.Println("GET NODES:", n.GetName(), n.GetNodeName())
+	}
+
 	runner := flowctrl.NewSerialRunner(graph)
 
 	log.Println("Flow started")
 	for {
 		err := runner.Process()
-		fmt.Println(err)
 		if err != nil {
+			fmt.Println(err)
 			panic(err)
 		}
 		time.Sleep(1000 * time.Millisecond)

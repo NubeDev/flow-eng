@@ -48,7 +48,9 @@ func (p *Flow) GetNodeRunner(id string) *node.Runner {
 }
 
 func RemoveIndex(s []node.Node, index int) []node.Node {
-	return append(s[:index], s[index+1:]...)
+	ret := make([]node.Node, 0)
+	ret = append(ret, s[:index]...)
+	return append(ret, s[index+1:]...)
 }
 
 func (p *Flow) ReplaceNode(id string, node node.Node) node.Node {
@@ -58,7 +60,7 @@ func (p *Flow) ReplaceNode(id string, node node.Node) node.Node {
 		}
 	}
 	p.AddNode(node)
-	return p.GetNode(id)
+	return nil
 }
 
 func (p *Flow) NodeConnector(sourceID string) error {
