@@ -1,6 +1,7 @@
 package node
 
 import (
+	"fmt"
 	"github.com/NubeDev/flow-eng/buffer/adapter"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/str"
@@ -84,8 +85,9 @@ func (n *BaseNode) ReadPinNum(name PortName) (value *float64, real float64, hasV
 func (n *BaseNode) ReadPin(name PortName) (*string, string) {
 	for _, out := range n.GetInputs() {
 		if name == out.Name {
-			if !str.IsNil(out.Connection.OverrideValue) { // this would be that the user wrote a value to the input directly
-				return out.Connection.OverrideValue, str.NonNil(out.Connection.OverrideValue)
+			if out.Connection.OverrideValue != nil { // this would be that the user wrote a value to the input directly
+				toStr := fmt.Sprintf("%v", out.Connection.OverrideValue)
+				return str.New(toStr), str.NonNil(str.New(toStr))
 			}
 			val := out.Value.Get()
 			return val, str.NonNil(val)
@@ -138,19 +140,19 @@ const (
 )
 
 type InputConnection struct {
-	NodeID        string   `json:"nodeID"`
-	NodePort      PortName `json:"nodePortName"`
-	OverrideValue *string  `json:"value,omitempty"` // used for when the user has no node connection and writes the value direct (or can be used to override a value)
-	CurrentValue  *string  `json:"readValue,omitempty"`
-	Disable       *bool    `json:"disable"`
+	NodeID        string      `json:"nodeID"`
+	NodePort      PortName    `json:"nodePortName"`
+	OverrideValue interface{} `json:"value,omitempty"` // used for when the user has no node connection and writes the value direct (or can be used to override a value)
+	CurrentValue  interface{} `json:"readValue,omitempty"`
+	Disable       *bool       `json:"disable"`
 }
 
 type OutputConnection struct {
-	NodeID        string   `json:"nodeID"`
-	NodePort      PortName `json:"nodePortName"`
-	OverrideValue *string  `json:"value,omitempty"` // used for when the user has no node connection and writes the value direct (or can be used to override a value)
-	CurrentValue  *string  `json:"readValue,omitempty"`
-	Disable       *bool    `json:"disable"`
+	NodeID        string      `json:"nodeID"`
+	NodePort      PortName    `json:"nodePortName"`
+	OverrideValue interface{} `json:"value,omitempty"` // used for when the user has no node connection and writes the value direct (or can be used to override a value)
+	CurrentValue  interface{} `json:"readValue,omitempty"`
+	Disable       *bool       `json:"disable"`
 }
 
 type Input struct {
