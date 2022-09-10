@@ -7,7 +7,7 @@
         "connection": {
           "nodeID": "",
           "nodePortName": "",
-          "value": "100"
+          "value": 100
         }
       },
       {
@@ -16,7 +16,7 @@
         "connection": {
           "nodeID": "",
           "nodePortName": "",
-          "value": "100"
+          "value": 100
         }
       }
     ],
@@ -150,7 +150,7 @@
     ],
     "info": {
       "nodeID": "d123",
-      "name": "inject",
+      "name": "mqtt-subscribe",
       "nodeName": "name-d123",
       "category": "",
       "description": "",
