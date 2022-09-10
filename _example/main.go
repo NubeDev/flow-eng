@@ -66,7 +66,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		time.Sleep(10 * time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
 	}
 }
 
