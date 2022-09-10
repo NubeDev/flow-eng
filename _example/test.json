@@ -3,27 +3,169 @@
     "inputs": [
       {
         "name": "in1",
-        "type": "float64",
+        "type": "float",
         "connection": {
-          "nodeID": "",
-          "nodePortName": "",
-          "value": 100
+          "nodeID": "a123",
+          "nodePortName": "out1"
+        },
+        "metadata": {
+          "positionX": "",
+          "positionY": ""
         }
       },
       {
         "name": "in2",
-        "type": "float64",
+        "type": "float",
         "connection": {
-          "nodeID": "",
-          "nodePortName": "",
-          "value": 100
+          "nodeID": "a123",
+          "nodePortName": "out1"
+        },
+        "metadata": {
+          "positionX": "",
+          "positionY": ""
         }
       }
     ],
     "outputs": [
       {
         "name": "out1",
-        "type": "float64",
+        "type": "float",
+        "connection": [
+          {
+            "nodeID": "c123",
+            "nodePortName": "in1"
+          }
+        ]
+      }
+    ],
+    "info": {
+      "nodeID": "b123",
+      "name": "add",
+      "nodeName": "name-b123",
+      "category": "math"
+    }
+  },
+  {
+    "inputs": [
+      {
+        "name": "in1",
+        "type": "string",
+        "connection": {},
+        "metadata": {
+          "positionX": "",
+          "positionY": ""
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "out1",
+        "type": "string",
+        "connection": [
+          {
+            "nodeID": "c123",
+            "nodePortName": "in2"
+          }
+        ]
+      }
+    ],
+    "info": {
+      "nodeID": "d123",
+      "name": "mqtt-subscribe",
+      "nodeName": "name-d123",
+      "category": "mqtt"
+    },
+    "settings": [
+      {
+        "type": "string",
+        "title": "topic",
+        "properties": {
+          "type": "string",
+          "title": "topic",
+          "minLength": 1,
+          "readOnly": true,
+          "value": "app"
+        }
+      },
+      {
+        "type": "string",
+        "title": "topic2",
+        "properties": {
+          "type": "string",
+          "title": "topic",
+          "minLength": 1,
+          "readOnly": true,
+          "value": ""
+        }
+      }
+    ]
+  },
+  {
+    "inputs": [
+      {
+        "name": "in1",
+        "type": "float",
+        "connection": {
+          "nodeID": "b123",
+          "nodePortName": "out1"
+        },
+        "metadata": {
+          "positionX": "",
+          "positionY": ""
+        }
+      },
+      {
+        "name": "in2",
+        "type": "float",
+        "connection": {
+          "nodeID": "d123",
+          "nodePortName": "out1"
+        },
+        "metadata": {
+          "positionX": "",
+          "positionY": ""
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "out1",
+        "type": "float",
+        "connection": null
+      }
+    ],
+    "info": {
+      "nodeID": "c123",
+      "name": "subtract",
+      "nodeName": "name-c123",
+      "category": "math"
+    }
+  },
+  {
+    "inputs": [
+      {
+        "name": "in1",
+        "type": "float",
+        "connection": {},
+        "metadata": {
+          "positionX": "",
+          "positionY": ""
+        }
+      },
+      {
+        "name": "in2",
+        "type": "float",
+        "connection": {},
+        "metadata": {
+          "positionX": "",
+          "positionY": ""
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "out1",
+        "type": "float",
         "connection": [
           {
             "nodeID": "b123",
@@ -40,121 +182,7 @@
       "nodeID": "a123",
       "name": "add",
       "nodeName": "name-a123",
-      "category": "",
-      "description": "",
-      "version": ""
-    }
-  },
-  {
-    "inputs": [
-      {
-        "name": "in1",
-        "type": "float64",
-        "connection": {
-          "nodeID": "a123",
-          "nodePortName": "out1"
-        }
-      },
-      {
-        "name": "in2",
-        "type": "float64",
-        "connection": {
-          "nodeID": "a123",
-          "nodePortName": "out1"
-        }
-      }
-    ],
-    "outputs": [
-      {
-        "name": "out1",
-        "type": "float64",
-        "connection": [
-          {
-            "nodeID": "c123",
-            "nodePortName": "in1"
-          }
-        ]
-      }
-    ],
-    "info": {
-      "nodeID": "b123",
-      "name": "add",
-      "nodeName": "name-b123",
-      "category": "",
-      "description": "",
-      "version": ""
-    }
-  },
-  {
-    "inputs": [
-      {
-        "name": "in1",
-        "type": "float64",
-        "connection": {
-          "nodeID": "b123",
-          "nodePortName": "out1"
-        }
-      },
-      {
-        "name": "in2",
-        "type": "float64",
-        "connection": {
-          "nodeID": "d123",
-          "nodePortName": "out1"
-        }
-      }
-    ],
-    "outputs": [
-      {
-        "name": "out1",
-        "type": "float64",
-        "connection": [
-          {
-            "nodeID": "",
-            "nodePortName": ""
-          }
-        ]
-      }
-    ],
-    "info": {
-      "nodeID": "c123",
-      "name": "sub",
-      "nodeName": "name-c123",
-      "category": "",
-      "description": "",
-      "version": ""
-    }
-  },
-  {
-    "inputs": [
-      {
-        "name": "in1",
-        "type": "float64",
-        "connection": {
-          "nodeID": "",
-          "nodePortName": ""
-        }
-      }
-    ],
-    "outputs": [
-      {
-        "name": "out1",
-        "type": "float64",
-        "connection": [
-          {
-            "nodeID": "c123",
-            "nodePortName": "in2"
-          }
-        ]
-      }
-    ],
-    "info": {
-      "nodeID": "d123",
-      "name": "mqtt-subscribe",
-      "nodeName": "name-d123",
-      "category": "",
-      "description": "",
-      "version": ""
+      "category": "math"
     }
   }
 ]

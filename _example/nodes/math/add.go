@@ -21,9 +21,9 @@ func NewAdd(body *node.BaseNode) (node.Node, error) {
 }
 
 func getPoints() {
-	//
 	client := resty.New()
 	resp, err := client.R().
+		SetResult(&node.BaseNode{}).
 		Get("http://192.168.15.190:1660/api/points")
 	fmt.Println(err)
 	fmt.Println(resp.Status())
@@ -32,7 +32,7 @@ func getPoints() {
 
 func (inst *Add) Process() {
 	Process(inst)
-	go getPoints()
+	//go getPoints()
 
 }
 

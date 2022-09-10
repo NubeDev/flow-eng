@@ -24,10 +24,10 @@ type Node interface {
 }
 
 type BaseNode struct {
-	Inputs   []*Input    `json:"inputs"`
-	Outputs  []*Output   `json:"outputs"`
+	Inputs   []*Input    `json:"inputs,omitempty"`
+	Outputs  []*Output   `json:"outputs,omitempty"`
 	Info     Info        `json:"info"`
-	Settings []*Settings `json:"settings"`
+	Settings []*Settings `json:"settings,omitempty"`
 }
 
 func (n *BaseNode) GetInfo() Info {
@@ -113,9 +113,9 @@ type Info struct {
 	NodeID      string `json:"nodeID"`   // a123
 	Name        string `json:"name"`     // add, or
 	NodeName    string `json:"nodeName"` // my-node-abc
-	Category    string `json:"category"`
-	Description string `json:"description"`
-	Version     string `json:"version"`
+	Category    string `json:"category,omitempty"`
+	Description string `json:"description,omitempty"`
+	Version     string `json:"version,omitempty"`
 }
 
 type DataTypes string
@@ -140,24 +140,30 @@ const (
 )
 
 type InputConnection struct {
-	NodeID        string      `json:"nodeID"`
-	NodePort      PortName    `json:"nodePortName"`
-	OverrideValue interface{} `json:"value,omitempty"` // used for when the user has no node connection and writes the value direct (or can be used to override a value)
-	CurrentValue  interface{} `json:"readValue,omitempty"`
-	Disable       *bool       `json:"disable"`
+	NodeID        string      `json:"nodeID,omitempty"`
+	NodePort      PortName    `json:"nodePortName,omitempty"`
+	OverrideValue interface{} `json:"overrideValue,omitempty"` // used for when the user has no node connection and writes the value direct (or can be used to override a value)
+	CurrentValue  interface{} `json:"currentValue,omitempty"`
+	Disable       *bool       `json:"disable,omitempty"`
 }
 
 type OutputConnection struct {
-	NodeID        string      `json:"nodeID"`
-	NodePort      PortName    `json:"nodePortName"`
-	OverrideValue interface{} `json:"value,omitempty"` // used for when the user has no node connection and writes the value direct (or can be used to override a value)
-	CurrentValue  interface{} `json:"readValue,omitempty"`
-	Disable       *bool       `json:"disable"`
+	NodeID        string      `json:"nodeID,omitempty"`
+	NodePort      PortName    `json:"nodePortName,omitempty"`
+	OverrideValue interface{} `json:"overrideValue,omitempty"` // used for when the user has no node connection and writes the value direct (or can be used to override a value)
+	CurrentValue  interface{} `json:"currentValue,omitempty"`
+	Disable       *bool       `json:"disable,omitempty"`
+}
+
+type Metadata struct {
+	PositionX string `json:"positionX"`
+	PositionY string `json:"positionY"`
 }
 
 type Input struct {
 	*InputPort
-	Value *adapter.String `json:"-"`
+	Value    *adapter.String `json:"-"`
+	Metadata Metadata        `json:"metadata"`
 }
 
 type Output struct {

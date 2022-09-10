@@ -7,6 +7,7 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/mqttclient"
 	"github.com/NubeDev/flow-eng/node"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/mitchellh/mapstructure"
 )
 
 type MqttSub struct {
@@ -19,6 +20,14 @@ type MqttSub struct {
 
 var bus cbus.Bus
 
+type topic struct {
+	Type     string `json:"type" default:"string"`
+	Title    string `json:"title" default:"topic"`
+	Min      int    `json:"minLength" default:"1"`
+	ReadOnly bool   `json:"readOnly" default:"false"`
+	Value    string `json:"value"`
+}
+
 func NewMqttSub(body *node.BaseNode) (node.Node, error) {
 	body = node.EmptyNode(body)
 	body.Info.Name = mqttSub
@@ -26,6 +35,33 @@ func NewMqttSub(body *node.BaseNode) (node.Node, error) {
 	body.Info.NodeID = node.SetUUID(body.Info.NodeID)
 	body.Inputs = node.BuildInputs(node.BuildInput(node.In1, node.TypeString, body.Inputs))
 	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeString, body.Outputs))
+
+	topicSetting := &topic{}
+	aaa := body.GetProperties("topic")
+	err := mapstructure.Decode(aaa, topicSetting)
+	if err != nil {
+		return nil, err
+	}
+
+	settings, err := node.BuildSettings(node.BuildSetting("string", "topic", &topic{
+		Type:     "string",
+		Title:    "topic",
+		Min:      1,
+		ReadOnly: true,
+		Value:    topicSetting.Value,
+	}), node.BuildSetting("string", "topic2", &topic{
+		Type:     "string",
+		Title:    "topic",
+		Min:      1,
+		ReadOnly: true,
+		Value:    "",
+	}))
+	if err != nil {
+		return nil, err
+	}
+
+	body.Settings = settings
+
 	bus = cbus.New(1)
 	return &MqttSub{body, nil, false, false, ""}, nil
 }
@@ -36,9 +72,14 @@ var handle mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 }
 
 func (inst *MqttSub) subscribe() {
-	c, _ := mqttclient.GetMQTT()
-	c.Subscribe("hello", mqttclient.AtMostOnce, handle)
-	inst.subscribed = true
+	topicSetting := &topic{}
+	topicSetting, ok := inst.GetProperties("topic").(*topic)
+	if ok {
+		c, _ := mqttclient.GetMQTT()
+		c.Subscribe(topicSetting.Value, mqttclient.AtMostOnce, handle)
+		inst.subscribed = true
+	}
+
 }
 
 func (inst *MqttSub) connect() {

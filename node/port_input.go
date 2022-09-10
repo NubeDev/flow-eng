@@ -8,7 +8,7 @@ import (
 type InputPort struct {
 	Name       PortName         `json:"name"` // in1
 	DataType   DataTypes        `json:"type"` // int8
-	Connection *InputConnection `json:"connection"`
+	Connection *InputConnection `json:"connection,omitempty"`
 	*buffer.Const
 	uuid      uuid.Value
 	direction Direction

@@ -19,7 +19,7 @@ func main() {
 
 	filePath := flag.String("f", "../flow-eng/_example/test.json", "flo file")
 	flag.Parse()
-	fmt.Println("word:", *filePath)
+	fmt.Println("file:", *filePath)
 
 	var nodesParsed []*node.BaseNode
 	jsonFile, err := os.Open(*filePath)
@@ -66,7 +66,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(1000 * time.Millisecond)
 	}
 }
 
