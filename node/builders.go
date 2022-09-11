@@ -1,6 +1,7 @@
 package node
 
 import (
+	"fmt"
 	"github.com/NubeDev/flow-eng/buffer"
 	"github.com/NubeDev/flow-eng/buffer/adapter"
 	"github.com/NubeDev/flow-eng/helpers"
@@ -47,7 +48,7 @@ func BuildInput(portName PortName, dataType DataTypes, fallback interface{}, inp
 	return out
 }
 
-func BuildOutput(portName PortName, dataType DataTypes, outputs []*Output) *Output {
+func BuildOutput(portName PortName, dataType DataTypes, fallback interface{}, outputs []*Output) *Output {
 	out := &Output{}
 	var connections []*OutputConnection
 	port := &OutputPort{
@@ -62,10 +63,40 @@ func BuildOutput(portName PortName, dataType DataTypes, outputs []*Output) *Outp
 	for _, output := range outputs {
 		if output.Name == portName {
 			for _, connection := range output.Connections {
+				if connection.FallbackValue == nil {
+					connection.FallbackValue = fallback
+				}
 				if connection.NodeID != "" && connection.NodePort != "" {
 					connections = append(connections, connection)
 				}
 			}
+		}
+	}
+	return out
+}
+
+// DynamicInputs build n number of inputs
+// startOfName eg: in would make in1, in2, in3
+func DynamicInputs(startOfName PortName, dataType DataTypes, fallback interface{}, count, maxAllowed int, inputs []*Input) []*Input {
+	var out []*Input
+	for i := 0; i < count; i++ {
+		name := fmt.Sprintf("%s%d", startOfName, i+1)
+		fmt.Println(11111, name)
+		if i < maxAllowed {
+			out = append(out, BuildInput(PortName(name), dataType, fallback, inputs))
+		}
+	}
+	return out
+}
+
+// DynamicOutputs build n number of outputs
+// startOfName eg: in would make out1, out2, and so on
+func DynamicOutputs(startOfName PortName, dataType DataTypes, fallback interface{}, count, maxAllowed int, outputs []*Output) []*Output {
+	var out []*Output
+	for i := 0; i < count; i++ {
+		name := fmt.Sprintf("%s%d", startOfName, i+1)
+		if i < maxAllowed {
+			out = append(out, BuildOutput(PortName(name), dataType, fallback, outputs))
 		}
 	}
 	return out

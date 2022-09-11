@@ -65,19 +65,18 @@ func (p *Flow) ReplaceNode(id string, node node.Node) node.Node {
 }
 
 func (p *Flow) ManualNodeConnector(nodeA, nodeB node.Node, outPort, inPort node.PortName) error {
-
 	for _, output := range nodeA.GetOutputs() {
 		if output.Name == outPort {
 			for _, input := range nodeB.GetInputs() {
 				if input.Name == inPort {
 					output.Connect(input.InputPort)
 					log.Infof("source-node:%s dest-node:%s source-port:%s dest-port:%s", nodeA.GetNodeName(), nodeB.GetNodeName(), outPort, inPort)
-					return nil
+					return nil // connection was made so return
 				}
 			}
 		}
 	}
-	return errors.New(fmt.Sprintf("source-node:%s dest-node:%s source-port:%s dest-port:%s", nodeA.GetNodeName(), nodeB.GetNodeName(), outPort, inPort))
+	return errors.New(fmt.Sprintf("failed to connect source-node:%s dest-node:%s source-port:%s dest-port:%s", nodeA.GetNodeName(), nodeB.GetNodeName(), outPort, inPort))
 
 }
 

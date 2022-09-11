@@ -34,7 +34,7 @@ type BaseNode struct {
 	Outputs  []*Output   `json:"outputs,omitempty"`
 	Info     Info        `json:"info"`
 	Settings []*Settings `json:"settings,omitempty"`
-	Metadata *Metadata   `json:"metadata"`
+	Metadata *Metadata   `json:"metadata,omitempty"`
 }
 
 func (n *BaseNode) GetInfo() Info {
@@ -130,28 +130,33 @@ func (n *BaseNode) ReadPinNum(name PortName) (value *float64, real float64, hasV
 }
 
 func (n *BaseNode) ReadPin(name PortName) (*string, string) {
-	for _, out := range n.GetInputs() {
-		if name == out.Name {
-			if out.Connection.OverrideValue != nil { // this would be that the user wrote a value to the input directly
-				toStr := fmt.Sprintf("%v", out.Connection.OverrideValue)
-				return str.New(toStr), str.NonNil(str.New(toStr))
-			}
-			if out.Connection.FallbackValue != nil { // this would be that the user wrote a value to the input directly
-				toStr := fmt.Sprintf("%v", out.Connection.FallbackValue)
-				return str.New(toStr), str.NonNil(str.New(toStr))
-			}
-			val := out.Value.Get()
-			return val, str.NonNil(val)
-		}
+	in := n.GetInput(name)
+	if in == nil {
+		return nil, ""
 	}
+	if name == in.Name {
+		if in.Connection.OverrideValue != nil { // this would be that the user wrote a value to the input directly
+			toStr := fmt.Sprintf("%v", in.Connection.OverrideValue)
+			return str.New(toStr), str.NonNil(str.New(toStr))
+		}
+		if in.Connection.FallbackValue != nil { // this would be that the user wrote a value to the input directly
+			toStr := fmt.Sprintf("%v", in.Connection.FallbackValue)
+			return str.New(toStr), str.NonNil(str.New(toStr))
+		}
+		val := in.Value.Get()
+		return val, str.NonNil(val)
+	}
+
 	return nil, ""
 }
 
 func (n *BaseNode) WritePin(name PortName, value *string) {
-	for _, out := range n.GetOutputs() {
-		if name == out.Name {
-			out.Value.Set(value)
-		}
+	out := n.GetOutput(name)
+	if out == nil {
+		return
+	}
+	if name == out.Name {
+		out.Value.Set(value)
 	}
 }
 
@@ -179,10 +184,12 @@ const (
 
 const (
 	Topic PortName = "topic"
+	In    PortName = "in"
 	In1   PortName = "in1"
 	In2   PortName = "in2"
 	In3   PortName = "in3"
 	In4   PortName = "in4"
+	Out   PortName = "out"
 	Out1  PortName = "out1"
 	Out2  PortName = "out2"
 	Out3  PortName = "out3"
@@ -203,6 +210,7 @@ type OutputConnection struct {
 	NodePort      PortName    `json:"nodePortName,omitempty"`
 	OverrideValue interface{} `json:"overrideValue,omitempty"` // used for when the user has no node connection and writes the value direct (or can be used to override a value)
 	CurrentValue  interface{} `json:"currentValue,omitempty"`
+	FallbackValue interface{} `json:"fallbackValue,omitempty"`
 	Disable       *bool       `json:"disable,omitempty"`
 }
 

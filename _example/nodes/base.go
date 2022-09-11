@@ -10,10 +10,26 @@ import (
 	"github.com/NubeDev/flow-eng/node"
 )
 
-func All() []node.Node {
+func All() []node.Node { // get all the nodes, will be used for the UI to list all the nodes
+	// math
+	constNum, _ := math.NewConst(nil)
 	add, _ := math.NewAdd(nil)
 	sub, _ := math.NewSub(nil)
-	return node.BuildNodes(add, sub)
+	// time
+	delay, _ := timing.NewDelay(nil, nil)
+	inject, _ := timing.NewInject(nil)
+	// mqtt
+	mqttSub, _ := broker.NewMqttSub(nil)
+	mqttPub, _ := broker.NewMqttPub(nil)
+	return node.BuildNodes(
+		constNum,
+		add,
+		sub,
+		delay,
+		inject,
+		mqttSub,
+		mqttPub,
+	)
 }
 
 func Builder(body *node.BaseNode) (node.Node, error) {
@@ -40,8 +56,6 @@ func builderMath(body *node.BaseNode) (node.Node, error) {
 		return math.NewAdd(body)
 	case sub:
 		return math.NewSub(body)
-	case delay:
-		return timing.NewDelay(body, flowctrl.NewTimer())
 	}
 	return nil, nil
 }

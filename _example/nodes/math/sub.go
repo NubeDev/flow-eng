@@ -10,11 +10,11 @@ type Sub struct {
 
 func NewSub(body *node.BaseNode) (node.Node, error) {
 	body = node.EmptyNode(body, sub)
-	body.Info.Name = sub
-	body.Info.Category = category
+	body.Info.Name = node.SetName(sub)
+	body.Info.Category = node.SetName(category)
 	body.Info.NodeID = node.SetUUID(body.Info.NodeID)
 	body.Inputs = node.BuildInputs(node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs), node.BuildInput(node.In2, node.TypeFloat, nil, body.Inputs))
-	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeFloat, body.Outputs))
+	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeFloat, nil, body.Outputs))
 	return &Sub{body}, nil
 }
 
