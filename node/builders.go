@@ -104,6 +104,13 @@ func DynamicOutputs(startOfName PortName, dataType DataTypes, fallback interface
 	return out
 }
 
+func BuildNode(body *BaseNode, inputs []*Input, outputs []*Output, settings []*Settings) *BaseNode {
+	body.Settings = settings
+	body.Inputs = inputs
+	body.Outputs = outputs
+	return body
+}
+
 func BuildInputs(body ...*Input) []*Input {
 	var out []*Input
 	for _, input := range body {
@@ -120,7 +127,7 @@ func BuildOutputs(body ...*Output) []*Output {
 	return out
 }
 
-func EmptyNode(body *BaseNode, nodeName string) *BaseNode {
+func Defaults(body *BaseNode, nodeName, category string) *BaseNode {
 	if body == nil {
 		body = &BaseNode{
 			Info: Info{
@@ -129,6 +136,9 @@ func EmptyNode(body *BaseNode, nodeName string) *BaseNode {
 			},
 		}
 	}
+	body.Info.Name = SetName(nodeName)
+	body.Info.Category = SetName(category)
+	body.Info.NodeID = SetUUID(body.Info.NodeID)
 	return body
 }
 

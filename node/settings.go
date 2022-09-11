@@ -5,77 +5,7 @@ import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/boolean"
 	"github.com/mitchellh/mapstructure"
-	log "github.com/sirupsen/logrus"
 )
-
-func NewProperty(property Prop, title string, body *PropertyBase) *PropertyBase {
-	if body == nil {
-		body = &PropertyBase{}
-	}
-	if title == "" {
-		title = body.Title
-	}
-	if body.Type == "" {
-		body.Type = String
-	}
-	if body.Max == 0 {
-		body.Max = 200
-	}
-	if boolean.IsNil(body.ReadOnly) {
-		body.ReadOnly = boolean.NewFalse()
-	}
-	return &PropertyBase{
-		Type:     property,
-		Title:    body.Title,
-		Min:      body.Min,
-		Max:      body.Max,
-		ReadOnly: body.ReadOnly,
-		Value:    body.Value,
-	}
-}
-
-func NewSetting(propType Prop, settingTitle string, body *PropertyBase) (*Settings, error) {
-	return &Settings{
-		Type:       propType,
-		Title:      settingTitle,
-		Properties: body,
-	}, nil
-}
-
-func NewSetting2(propType Prop, settingTitle string, body *BaseNode) (*Settings, error) {
-	var decode *PropertyBase
-	var err error
-	switch propType {
-	case String:
-		decode = NewProperty(propType, settingTitle, &PropertyBase{
-			Title: settingTitle,
-		})
-	case Number:
-		decode = NewProperty(propType, settingTitle, &PropertyBase{
-			Title: settingTitle,
-		})
-	default:
-		return nil, errors.New(fmt.Sprintf("invaild setting type:%s, try string, number", propType))
-	}
-	if err != nil {
-		return nil, err
-	}
-	if len(body.Settings) > 0 { // if there is existing settings then decode
-		getDefaultValue := NewProperty(propType, settingTitle, &PropertyBase{
-			Title: settingTitle,
-		})
-		err = body.DecodeProperties(settingTitle, getDefaultValue)
-		if err != nil {
-			return nil, err
-		}
-		decode.Value = getDefaultValue
-	}
-	return &Settings{
-		Type:       propType,
-		Title:      settingTitle,
-		Properties: decode,
-	}, nil
-}
 
 type PropertyBase struct {
 	Type     Prop        `json:"type" default:""`
@@ -93,6 +23,37 @@ const (
 	Number  Prop = "number"
 	Boolean Prop = "boolean"
 )
+
+func NewProperty(args *PropertyBase) *PropertyBase {
+	if args == nil {
+		args = &PropertyBase{}
+	}
+	if args.Type == "" {
+		args.Type = String
+	}
+	if args.Max == 0 {
+		args.Max = 200
+	}
+	if boolean.IsNil(args.ReadOnly) {
+		args.ReadOnly = boolean.NewFalse()
+	}
+	return &PropertyBase{
+		Type:     args.Type,
+		Title:    args.Title,
+		Min:      args.Min,
+		Max:      args.Max,
+		ReadOnly: args.ReadOnly,
+		Value:    args.Value,
+	}
+}
+
+func NewSetting(propType Prop, settingTitle string, body *PropertyBase) (*Settings, error) {
+	return &Settings{
+		Type:       propType,
+		Title:      settingTitle,
+		Properties: body,
+	}, nil
+}
 
 type Settings struct {
 	Type       Prop        `json:"type"`
@@ -167,42 +128,6 @@ func (n *BaseNode) GetProperties(name string) interface{} {
 		}
 	}
 	return nil
-}
-
-func BuildSetting(propType Prop, settingTitle string, body *BaseNode) (*Settings, error) {
-	var decode *PropertyBase
-	var err error
-	switch propType {
-	case String:
-		decode = NewProperty(propType, settingTitle, &PropertyBase{
-			Title: settingTitle,
-		})
-	case Number:
-		decode = NewProperty(propType, settingTitle, &PropertyBase{
-			Title: settingTitle,
-		})
-	default:
-		return nil, errors.New(fmt.Sprintf("invaild setting type:%s, try string, number", propType))
-	}
-	if err != nil {
-		return nil, err
-	}
-	if len(body.Settings) > 0 { // if there is existing settings then decode
-		log.Errorln("BuildSetting.DecodeProperties() need to fix this if json is incorrect it will override the required setting")
-		getDefaultValue := NewProperty(propType, settingTitle, &PropertyBase{
-			Title: settingTitle,
-		})
-		err = body.DecodeProperties(settingTitle, getDefaultValue)
-		if err != nil {
-			return nil, err
-		}
-		decode.Value = getDefaultValue
-	}
-	return &Settings{
-		Type:       propType,
-		Title:      settingTitle,
-		Properties: decode,
-	}, nil
 }
 
 func BuildSettings(props ...*Settings) ([]*Settings, error) {

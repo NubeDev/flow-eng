@@ -17,11 +17,7 @@ type MqttPub struct {
 }
 
 func NewMqttPub(body *node.BaseNode) (node.Node, error) {
-	body = node.EmptyNode(body, mqttPublish)
-	body.Info.Name = node.SetName(mqttPublish)
-	body.Info.Category = node.SetName(category)
-	body.Info.NodeID = node.SetUUID(body.Info.NodeID)
-
+	body = node.Defaults(body, mqttPublish, category)
 	body.Inputs = node.BuildInputs(node.BuildInput(node.In1, node.TypeString, nil, body.Inputs))
 	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeString, nil, body.Outputs))
 

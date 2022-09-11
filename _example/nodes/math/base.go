@@ -19,6 +19,22 @@ const (
 	inputCount = "Inputs Count"
 )
 
+func inputsCount(body *node.BaseNode) (*node.PropertyBase, *node.Settings, int, error) {
+	const min = 2
+	const max = 20
+	var count = min
+	count = body.GetPropValueInt(inputCount, min)
+	base := &node.PropertyBase{
+		Min: min,
+		Max: max,
+	}
+	setting, err := node.NewSetting(node.Number, inputCount, base)
+	if err != nil {
+		return nil, nil, 0, err
+	}
+	return base, setting, count, err
+}
+
 func Process(body node.Node) {
 	equation := body.GetName()
 	count := body.InputsLen()

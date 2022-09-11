@@ -25,10 +25,7 @@ const (
 var bus cbus.Bus
 
 func NewMqttSub(body *node.BaseNode) (node.Node, error) {
-	body = node.EmptyNode(body, mqttSub)
-	body.Info.Name = node.SetName(mqttSub)
-	body.Info.Category = node.SetName(category)
-	body.Info.NodeID = node.SetUUID(body.Info.NodeID)
+	body = node.Defaults(body, mqttSub, category)
 	//body.Inputs = node.BuildInputs(node.BuildInput(node.In1, node.TypeString, nil, body.Inputs))
 	//body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeString, body.Outputs))
 	//decode := schema.NewString(nil)
