@@ -1,11 +1,7 @@
 package schema
 
-import pprint "github.com/NubeDev/flow-eng/helpers/print"
-
-const (
-	PropString = "string"
-	PropNum    = "number"
-	PropBool   = "boolean"
+import (
+	pprint "github.com/NubeDev/flow-eng/helpers/print"
 )
 
 type UiOptions struct {

@@ -77,11 +77,13 @@ func BuildOutput(portName PortName, dataType DataTypes, fallback interface{}, ou
 
 // DynamicInputs build n number of inputs
 // startOfName eg: in would make in1, in2, in3
-func DynamicInputs(startOfName PortName, dataType DataTypes, fallback interface{}, count, maxAllowed int, inputs []*Input) []*Input {
+func DynamicInputs(startOfName PortName, dataType DataTypes, fallback interface{}, count, minAllowed, maxAllowed int, inputs []*Input) []*Input {
 	var out []*Input
+	if count < minAllowed {
+		count = minAllowed
+	}
 	for i := 0; i < count; i++ {
 		name := fmt.Sprintf("%s%d", startOfName, i+1)
-		fmt.Println(11111, name)
 		if i < maxAllowed {
 			out = append(out, BuildInput(PortName(name), dataType, fallback, inputs))
 		}
