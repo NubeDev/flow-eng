@@ -6,7 +6,6 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/mqttclient"
 	"github.com/NubeDev/flow-eng/node"
-	"github.com/NubeDev/flow-eng/schema"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	log "github.com/sirupsen/logrus"
 )
@@ -27,28 +26,28 @@ var bus cbus.Bus
 
 func NewMqttSub(body *node.BaseNode) (node.Node, error) {
 	body = node.EmptyNode(body, mqttSub)
-	body.Info.Name = mqttSub
-	body.Info.Category = category
+	body.Info.Name = node.SetName(mqttSub)
+	body.Info.Category = node.SetName(category)
 	body.Info.NodeID = node.SetUUID(body.Info.NodeID)
-	body.Inputs = node.BuildInputs(node.BuildInput(node.In1, node.TypeString, nil, body.Inputs))
-	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeString, body.Outputs))
-	decode := schema.NewString(nil)
-	err := body.DecodeProperties(topic, decode)
-	if err != nil {
-		return nil, err
-	}
-	t := schema.NewString(&schema.SettingBase{
-		Title:        topic,
-		Min:          1,
-		DefaultValue: decode.DefaultValue,
-	})
-	settings, err := node.BuildSettings(node.BuildSetting(schema.PropString, topic, t))
-	if err != nil {
-		return nil, err
-	}
-	body.Settings = settings
-
-	bus = cbus.New(1)
+	//body.Inputs = node.BuildInputs(node.BuildInput(node.In1, node.TypeString, nil, body.Inputs))
+	//body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeString, body.Outputs))
+	//decode := schema.NewString(nil)
+	//err := body.DecodeProperties(topic, decode)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//t := schema.NewString(&schema.SettingBase{
+	//	Title:        topic,
+	//	Min:          1,
+	//	DefaultValue: decode.DefaultValue,
+	//})
+	//settings, err := node.BuildSettings(node.BuildSetting(schema.PropString, topic, t))
+	//if err != nil {
+	//	return nil, err
+	//}
+	//body.Settings = settings
+	//
+	//bus = cbus.New(1)
 	return &MqttSub{body, nil, false, false, ""}, nil
 }
 

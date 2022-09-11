@@ -12,11 +12,11 @@ type Add struct {
 
 func NewAdd(body *node.BaseNode) (node.Node, error) {
 	body = node.EmptyNode(body, add)
-	body.Info.Name = add
-	body.Info.Category = category
+	body.Info.Name = node.SetName(add)
+	body.Info.Category = node.SetName(category)
 	body.Info.NodeID = node.SetUUID(body.Info.NodeID)
-	body.Inputs = node.BuildInputs(node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs), node.BuildInput(node.In2, node.TypeFloat, nil, body.Inputs))
-	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeFloat, body.Outputs))
+	body.Inputs = node.BuildInputs(node.DynamicInputs(node.In, node.TypeFloat, nil, 2, 2, body.Inputs)...)
+	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeFloat, nil, body.Outputs))
 	return &Add{body}, nil
 }
 

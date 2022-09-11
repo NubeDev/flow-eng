@@ -56,13 +56,23 @@ func (n *BaseNode) GetProperties(name string) interface{} {
 	return nil
 }
 
-func BuildSetting(propType, title string, schema interface{}) *Settings {
+func BuildSetting(propType, settingTitle string, body *BaseNode) (*Settings, error) {
+	decode := schema.NewString(nil)
+	err := body.DecodeProperties(settingTitle, decode)
+	if err != nil {
+		return nil, err
+	}
+	newSchema := schema.NewString(&schema.SettingBase{
+		Title:        settingTitle,
+		Min:          1,
+		DefaultValue: decode.DefaultValue,
+	})
+
 	return &Settings{
 		Type:       propType,
-		Title:      title,
-		Properties: schema,
-	}
-
+		Title:      settingTitle,
+		Properties: newSchema,
+	}, nil
 }
 
 func BuildSettings(props ...*Settings) ([]*Settings, error) {

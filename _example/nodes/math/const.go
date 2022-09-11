@@ -10,11 +10,11 @@ type Const struct {
 
 func NewConst(body *node.BaseNode) (node.Node, error) {
 	body = node.EmptyNode(body, constNum)
-	body.Info.Name = constNum
-	body.Info.Category = category
+	body.Info.Name = node.SetName(constNum)
+	body.Info.Category = node.SetName(category)
 	body.Info.NodeID = node.SetUUID(body.Info.NodeID)
-	body.Inputs = node.BuildInputs(node.BuildInput(node.In1, node.TypeFloat, 0, body.Inputs))
-	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeFloat, body.Outputs))
+	body.Inputs = node.BuildInputs(node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs))
+	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeFloat, nil, body.Outputs))
 	return &Const{body}, nil
 }
 
