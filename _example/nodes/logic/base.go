@@ -8,11 +8,15 @@ import (
 )
 
 const (
-	constNum = "const-num"
 	category = "math"
-	add      = "add"
-	sub      = "subtract"
-	multiply = "multiply"
+)
+
+const (
+	and     = "and"
+	or      = "or"
+	not     = "not"
+	greater = "greater"
+	less    = "less"
 )
 
 const (
@@ -36,12 +40,29 @@ func operation(operation string, values []float64) (float64, error) {
 		return 0, errors.New("no values where pass in")
 	}
 	switch operation {
-	case add:
-		return array.Add(values), nil
-	case sub:
-		return array.Subtract(values), nil
-	case multiply:
-		return array.Multiply(values), nil
+	case and:
+		if array.AllTrueFloat64(values) {
+			return 1, nil
+		} else {
+			return 0, nil
+		}
+	case or:
+		if array.OneIsTrueFloat64(values) {
+			return 1, nil
+		} else {
+			return 0, nil
+		}
+	case not:
+		if len(values) > 0 {
+			if values[0] == 0 {
+				return 1, nil
+			}
+			if values[0] == 0 {
+				return 1, nil
+			} else {
+				return 0, nil
+			}
+		}
 	}
 	return 0, errors.New("invalid operation")
 }

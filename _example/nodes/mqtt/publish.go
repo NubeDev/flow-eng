@@ -5,7 +5,6 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/mqttclient"
 	"github.com/NubeDev/flow-eng/node"
-	"github.com/NubeDev/flow-eng/schema"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -22,27 +21,20 @@ func NewMqttPub(body *node.BaseNode) (node.Node, error) {
 	body.Info.Name = node.SetName(mqttPublish)
 	body.Info.Category = node.SetName(category)
 	body.Info.NodeID = node.SetUUID(body.Info.NodeID)
+
 	body.Inputs = node.BuildInputs(node.BuildInput(node.In1, node.TypeString, nil, body.Inputs))
 	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeString, nil, body.Outputs))
-	//decode := schema.NewString(nil)
-	//err := body.DecodeProperties(topic, decode)
+
+	//setting, err := node.BuildSetting(schema.PropString, topic, body)
 	//if err != nil {
 	//	return nil, err
 	//}
-	//t := schema.NewString(&schema.SettingBase{
-	//	Title:        topic,
-	//	Min:          1,
-	//	DefaultValue: decode.DefaultValue,
-	//})
-	setting, err := node.BuildSetting(schema.PropString, topic, body)
-	if err != nil {
-		return nil, err
-	}
-	settings, err := node.BuildSettings(setting)
-	if err != nil {
-		return nil, err
-	}
-	body.Settings = settings
+	//settings, err := node.BuildSettings(setting)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//body.Settings = settings
+
 	return &MqttPub{body, nil, false, false, ""}, nil
 }
 
@@ -52,7 +44,6 @@ func (inst *MqttPub) getTopic() string {
 		return val
 	}
 	return val
-
 }
 
 func (inst *MqttPub) publish(value string) {
