@@ -12,13 +12,17 @@ type Add struct {
 
 func NewAdd(body *node.BaseNode) (node.Node, error) {
 	body = node.Defaults(body, add, category)
-	buildCount, setting, count, err := inputsCount(body)
+	buildCount, setting, value, err := node.NewSetting(body, &node.SettingOptions{Type: node.Number, Title: inputCount, Min: 2, Max: 20})
 	if err != nil {
 		return nil, err
 	}
 	settings, err := node.BuildSettings(setting)
 	if err != nil {
 		return nil, err
+	}
+	count, ok := value.(int)
+	if !ok {
+		count = 2
 	}
 	inputs := node.BuildInputs(node.DynamicInputs(node.In, node.TypeFloat, nil, count, buildCount.Min, buildCount.Max, body.Inputs)...)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeFloat, nil, body.Outputs))

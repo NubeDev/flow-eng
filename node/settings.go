@@ -7,6 +7,46 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
+type SettingOptions struct {
+	Type  Prop
+	Title string
+	Min   int
+	Max   int
+}
+
+func NewSetting(body *BaseNode, opts *SettingOptions) (base *PropertyBase, setting *Settings, value interface{}, err error) {
+	if opts == nil {
+		opts = &SettingOptions{}
+	}
+	var min = opts.Min
+	var max = opts.Max
+	var dataType Prop
+	var title = opts.Title
+	if title == "" {
+		return nil, nil, 0, errors.New("title can not be empty")
+	}
+	if min == 0 {
+		min = 1
+	}
+	if max == 0 {
+		max = 1
+	}
+	if opts.Type == "" {
+		opts.Type = dataType
+	}
+	var getValue = min
+	getValue = body.GetPropValueInt(opts.Type, min)
+	base = &PropertyBase{
+		Min: min,
+		Max: max,
+	}
+	setting, err = Setting(dataType, title, base)
+	if err != nil {
+		return nil, nil, 0, err
+	}
+	return base, setting, getValue, err
+}
+
 type PropertyBase struct {
 	Type     Prop        `json:"type" default:""`
 	Title    string      `json:"title" default:""`
@@ -47,7 +87,7 @@ func NewProperty(args *PropertyBase) *PropertyBase {
 	}
 }
 
-func NewSetting(propType Prop, settingTitle string, body *PropertyBase) (*Settings, error) {
+func Setting(propType Prop, settingTitle string, body *PropertyBase) (*Settings, error) {
 	return &Settings{
 		Type:       propType,
 		Title:      settingTitle,
@@ -74,7 +114,7 @@ func (n *BaseNode) GetSetting(name string) *Settings {
 	return nil
 }
 
-func (n *BaseNode) GetPropValue(name string) (interface{}, error) {
+func (n *BaseNode) GetPropValue(name Prop) (interface{}, error) {
 	data := n.GetProperties(name)
 	if data == nil {
 		return "", errors.New(fmt.Sprintf("failed to to settings properties by name%s", name))
@@ -88,7 +128,7 @@ func (n *BaseNode) GetPropValue(name string) (interface{}, error) {
 }
 
 //GetPropValueInt if there was an existing value then try and get it (would be used when node is created from json)
-func (n *BaseNode) GetPropValueInt(name string, fallbackValue int) int {
+func (n *BaseNode) GetPropValueInt(name Prop, fallbackValue int) int {
 	data, err := n.GetPropValue(name)
 	if err != nil {
 		return 0
@@ -100,7 +140,7 @@ func (n *BaseNode) GetPropValueInt(name string, fallbackValue int) int {
 	return i
 }
 
-func (n *BaseNode) GetPropValueStr(name string) (string, error) {
+func (n *BaseNode) GetPropValueStr(name Prop) (string, error) {
 	data, err := n.GetPropValue(name)
 	if err != nil {
 		return "", err
@@ -109,7 +149,7 @@ func (n *BaseNode) GetPropValueStr(name string) (string, error) {
 	return toStr, nil
 }
 
-func (n *BaseNode) DecodeProperties(name string, output interface{}) error {
+func (n *BaseNode) DecodeProperties(name Prop, output interface{}) error {
 	data := n.GetProperties(name)
 	if data == nil {
 		return errors.New(fmt.Sprintf("failed to find settings properties by name:%s", name))
@@ -121,9 +161,9 @@ func (n *BaseNode) DecodeProperties(name string, output interface{}) error {
 	return nil
 }
 
-func (n *BaseNode) GetProperties(name string) interface{} {
+func (n *BaseNode) GetProperties(name Prop) interface{} {
 	for _, setting := range n.Settings {
-		if name == setting.Title {
+		if name == Prop(setting.Title) {
 			return setting.Properties
 		}
 	}

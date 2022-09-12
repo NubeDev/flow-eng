@@ -16,6 +16,7 @@ type MqttSub struct {
 	connected  bool
 	subscribed bool
 	newMessage string
+	mqttTopic  string
 }
 
 const (
@@ -26,26 +27,22 @@ var bus cbus.Bus
 
 func NewMqttSub(body *node.BaseNode) (node.Node, error) {
 	body = node.Defaults(body, mqttSub, category)
-	//body.Inputs = node.BuildInputs(node.BuildInput(node.In1, node.TypeString, nil, body.Inputs))
-	//body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeString, body.Outputs))
-	//decode := schema.NewString(nil)
-	//err := body.DecodeProperties(topic, decode)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//t := schema.NewString(&schema.SettingBase{
-	//	Title:        topic,
-	//	Min:          1,
-	//	DefaultValue: decode.DefaultValue,
-	//})
-	//settings, err := node.BuildSettings(node.BuildSetting(schema.PropString, topic, t))
-	//if err != nil {
-	//	return nil, err
-	//}
-	//body.Settings = settings
-	//
-	//bus = cbus.New(1)
-	return &MqttSub{body, nil, false, false, ""}, nil
+	_, setting, value, err := node.NewSetting(body, &node.SettingOptions{Type: node.String, Title: topic, Min: 1, Max: 200})
+	if err != nil {
+		return nil, err
+	}
+	settings, err := node.BuildSettings(setting)
+	if err != nil {
+		return nil, err
+	}
+	mqttTopic, ok := value.(string)
+	if !ok {
+		mqttTopic = ""
+	}
+	inputs := node.BuildInputs(node.BuildInput(node.In1, node.TypeString, nil, body.Inputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeString, nil, body.Outputs))
+	body = node.BuildNode(body, inputs, outputs, settings)
+	return &MqttSub{body, nil, false, false, "", mqttTopic}, nil
 }
 
 var handle mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
@@ -54,12 +51,7 @@ var handle mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 }
 
 func (inst *MqttSub) getTopic() string {
-	val, err := inst.GetPropValueStr(topic)
-	if err != nil {
-		return val
-	}
-	return val
-
+	return inst.mqttTopic
 }
 
 func (inst *MqttSub) subscribe() {

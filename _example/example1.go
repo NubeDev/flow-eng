@@ -55,10 +55,6 @@ func main1() {
 		}
 	}
 
-	//for _, n := range graph.GetNodes() {
-	//	fmt.Println("GET NODES:", n.GetName(), n.GetNodeName())
-	//}
-	//pprint.PrintJOSN(graph.GetNodes())
 	for _, nn := range graph.GetNodes() {
 		fmt.Println("REPLACE", nn.GetName(), nn.GetNodeName(), nn.GetID())
 		graph.ReplaceNode(nn.GetID(), nn)
