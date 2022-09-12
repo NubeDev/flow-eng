@@ -18,7 +18,7 @@ type Connector struct {
 
 func NewConnector(from *OutputPort, to *InputPort) *Connector {
 	if from.Type() != to.Type() {
-		panic(ErrIncompatiblePorts)
+		panic(ErrIncompatiblePortsTypes)
 	}
 	return &Connector{uuid.New(), from, to, false}
 }

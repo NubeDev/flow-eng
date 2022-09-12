@@ -28,6 +28,28 @@ func (p *Flow) GetNodes() []node.Node {
 	return p.nodes
 }
 
+func (p *Flow) AddNode(node node.Node) *Flow {
+	flows := p.Get()
+	flows.nodes = append(flows.nodes, node)
+	runners := makeRunners(flows.nodes)
+	ordered := makeGraphs(runners)
+	flows.Graphs = ordered
+	return flows
+}
+
+// ReBuildFlow makes all the node connections
+func (p *Flow) ReBuildFlow(makeConnection bool) {
+	for _, n := range p.GetNodes() {
+		err := p.nodeConnector(n.GetID(), makeConnection)
+		if err != nil {
+			log.Errorf(fmt.Sprintf("rebuild-flow: node-id:%s node-name:%s err%s", n.GetID(), n.GetID(), err.Error()))
+		}
+	}
+	for _, n := range p.GetNodes() {
+		p.rebuildNode(n)
+	}
+}
+
 func (p *Flow) GetNode(id string) node.Node {
 	for _, n := range p.Get().nodes {
 		if n.GetID() == id {
@@ -54,40 +76,44 @@ func RemoveIndex(s []node.Node, index int) []node.Node {
 	return append(ret, s[index+1:]...)
 }
 
-func (p *Flow) ReplaceNode(node node.Node) node.Node {
+func (p *Flow) rebuildNode(node node.Node) {
 	for i, n := range p.Get().nodes {
 		if n.GetID() == node.GetID() {
 			p.nodes = RemoveIndex(p.nodes, i)
 		}
 	}
 	p.AddNode(node)
-	return nil
 }
 
-func (p *Flow) ManualNodeConnector(nodeA, nodeB node.Node, outPort, inPort node.PortName) error {
-	for _, output := range nodeA.GetOutputs() {
+// ManualNodeConnector this node is just to really be used at the moment when testing the framework by making building the flow through code and not the json import
+func (p *Flow) ManualNodeConnector(sourceNode, destNode node.Node, outPort, inPort node.PortName) error {
+	for _, output := range sourceNode.GetOutputs() {
 		if output.Name == outPort {
-			for _, input := range nodeB.GetInputs() {
+			for _, input := range destNode.GetInputs() {
 				if input.Name == inPort {
 					output.Connect(input.InputPort)
-					log.Infof("source-node:%s dest-node:%s source-port:%s dest-port:%s", nodeA.GetNodeName(), nodeB.GetNodeName(), outPort, inPort)
+					log.Infof("manual-connection: source-node:%s dest-node:%s source-port:%s dest-port:%s", sourceNode.GetNodeName(), destNode.GetNodeName(), outPort, inPort)
+					input.Connection.NodeID = sourceNode.GetID()
+					input.Connection.NodePort = outPort
 					return nil // connection was made so return
 				}
 			}
 		}
 	}
-	return errors.New(fmt.Sprintf("failed to connect source-node:%s dest-node:%s source-port:%s dest-port:%s", nodeA.GetNodeName(), nodeB.GetNodeName(), outPort, inPort))
+	return errors.New(fmt.Sprintf("failed to connect source-node:%s dest-node:%s source-port:%s dest-port:%s", sourceNode.GetNodeName(), destNode.GetNodeName(), outPort, inPort))
 
 }
 
-func (p *Flow) NodeConnector(sourceID string) error {
+// nodeConnector will make the connections from nodeA to nodeA
+//	-makeConnection if false will not make the connection, this would be set to false only when you want a snapshot of the current flow
+func (p *Flow) nodeConnector(sourceID string, makeConnection bool) error {
 	sourceNode := p.GetNode(sourceID)
 	if sourceNode == nil {
 		return errors.New("failed to find node by that id")
 	}
 	for _, output := range sourceNode.GetOutputs() {
-		for _, connector := range output.Connections {
-			destID := connector.NodeID
+		for _, connection := range output.Connections {
+			destID := connection.NodeID
 			if destID == "" {
 				continue
 			}
@@ -96,11 +122,19 @@ func (p *Flow) NodeConnector(sourceID string) error {
 				return errors.New("failed to match ports for node connections")
 			}
 			for _, input := range destNode.GetInputs() {
-				port := input.Name
-				if port == connector.NodePort {
+				inPort := input.Name
+				if inPort == connection.NodePort {
 					if sourceID == input.Connection.NodeID {
-						log.Infof("source-node:%s dest-node:%s source-port:%s dest-port:%s", sourceNode.GetNodeName(), destNode.GetNodeName(), output.Name, port)
-						output.OutputPort.Connect(input.InputPort)
+						log.Infof("source-node:%s dest-node:%s source-port:%s dest-port:%s", sourceNode.GetNodeName(), destNode.GetNodeName(), output.Name, inPort)
+						if makeConnection {
+							output.OutputPort.Connect(input.InputPort)
+						}
+						input.Connection.NodePort = output.Name
+						input.Connection.NodeID = sourceNode.GetID()
+						for _, connection := range output.Connections {
+							connection.NodeID = destNode.GetID()
+							connection.NodePort = inPort
+						}
 					}
 				}
 			}
@@ -109,20 +143,12 @@ func (p *Flow) NodeConnector(sourceID string) error {
 	return nil
 }
 
-func (p *Flow) AddNode(node node.Node) *Flow {
-	flows := p.Get()
-	flows.nodes = append(flows.nodes, node)
-	runners := makeRunners(flows.nodes)
-	ordered := makeGraphs(runners)
-	flows.Graphs = ordered
-	return flows
-}
-
 func makeRunners(nodes []node.Node) []*node.Runner {
 	nodesCount := len(nodes)
 	runners := make([]*node.Runner, 0, nodesCount)
 	for i := 0; i < nodesCount; i++ {
 		n := nodes[i]
+
 		runner := node.NewRunner(n)
 		runners = append(runners, runner)
 	}

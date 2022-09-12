@@ -1,6 +1,5 @@
 package main
 
-//
 import (
 	"encoding/json"
 	"flag"
@@ -19,7 +18,7 @@ func main() {
 
 	storage.New("")
 
-	filePath := flag.String("f", "../flow-eng/_example/example1/mqtt.json", "flow file")
+	filePath := flag.String("f", "../flow-eng/_example/example1/test.json", "flow file")
 	flag.Parse()
 	fmt.Println("file:", *filePath)
 
@@ -45,27 +44,14 @@ func main() {
 		graph.AddNode(node_)
 	}
 
-	for _, n := range graph.GetNodes() {
-		fmt.Println("BUILD connections:", n.GetName(), n.GetNodeName())
-		err := graph.NodeConnector(n.GetID())
-
-		if err != nil {
-			fmt.Println("build connections ERROR", err)
-			return
-		}
-	}
-
-	for _, nn := range graph.GetNodes() {
-		fmt.Println("REPLACE", nn.GetName(), nn.GetNodeName(), nn.GetID())
-		graph.ReplaceNode(nn.GetID(), nn)
-
-	}
+	graph.ReBuildFlow(true)
 
 	for _, n := range graph.GetNodes() {
 		fmt.Println("GET NODES:", n.GetName(), n.GetNodeName())
 	}
 
 	runner := flowctrl.NewSerialRunner(graph)
+	//pprint.PrintJOSN(graph.GetNodes())
 
 	log.Println("Flow started")
 	for {

@@ -124,17 +124,18 @@ func (n *BaseNode) SetPropValue(name Title, value interface{}) error {
 	if data == nil {
 		return errors.New(fmt.Sprintf("failed to to settings properties by name%s", name))
 	}
+
+	properties := &PropertyBase{}
+	err := n.DecodeProperties(name, properties)
+	if err != nil {
+		return err
+	}
 	setting := n.GetSetting(name)
 	if data == nil {
 		return errors.New(fmt.Sprintf("failed to to setting by name%s", name))
 	}
-	properties := &PropertyBase{
-		Value: value,
-	}
-	err := mapstructure.Decode(data, properties)
-	if err != nil {
-		return err
-	}
+	properties.Value = value
+
 	setting.Properties = properties
 	return nil
 }

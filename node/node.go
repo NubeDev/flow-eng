@@ -16,6 +16,7 @@ type Node interface {
 	GetInput(name PortName) *Input
 	GetOutputs() []*Output
 	GetOutput(name PortName) *Output
+	GetSettings() []*Settings
 	SetPropValue(name Title, value interface{}) error
 	OverrideInputValue(name PortName, value interface{}) error
 	InputsLen() int
@@ -130,17 +131,16 @@ const (
 )
 
 const (
-	Topic PortName = "topic"
-	In    PortName = "in"
-	In1   PortName = "in1"
-	In2   PortName = "in2"
-	In3   PortName = "in3"
-	In4   PortName = "in4"
-	Out   PortName = "out"
-	Out1  PortName = "out1"
-	Out2  PortName = "out2"
-	Out3  PortName = "out3"
-	Out4  PortName = "out4"
+	In   PortName = "in"
+	In1  PortName = "in1"
+	In2  PortName = "in2"
+	In3  PortName = "in3"
+	In4  PortName = "in4"
+	Out  PortName = "out"
+	Out1 PortName = "out1"
+	Out2 PortName = "out2"
+	Out3 PortName = "out3"
+	Out4 PortName = "out4"
 )
 
 type InputConnection struct {

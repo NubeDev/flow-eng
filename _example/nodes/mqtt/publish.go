@@ -29,15 +29,20 @@ func NewMqttPub(body *node.BaseNode) (node.Node, error) {
 	}
 	mqttTopic, ok := value.(string)
 	if !ok {
-		mqttTopic = "pub"
+		mqttTopic = ""
 	}
-	inputs := node.BuildInputs(node.BuildInput(node.In1, node.TypeString, nil, body.Inputs))
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeString, nil, body.Outputs))
+	inputs := node.BuildInputs(node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, settings)
 	return &MqttPub{body, nil, false, false, "", mqttTopic}, nil
 }
 
 func (inst *MqttPub) getTopic() string {
+	str, err := inst.GetPropValueStr(topic)
+	if err != nil {
+		return ""
+	}
+	inst.mqttTopic = str
 	return inst.mqttTopic
 }
 

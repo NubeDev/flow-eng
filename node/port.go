@@ -6,7 +6,8 @@ import (
 )
 
 var (
-	ErrIncompatiblePorts = errors.New("incompatible ports provided")
+	ErrIncompatiblePorts      = errors.New("incompatible ports provided")
+	ErrIncompatiblePortsTypes = errors.New("incompatible ports types provided")
 )
 
 type Direction int

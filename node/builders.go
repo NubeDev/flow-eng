@@ -72,6 +72,7 @@ func BuildOutput(portName PortName, dataType DataTypes, fallback interface{}, ou
 			}
 		}
 	}
+	out.Connections = connections
 	return out
 }
 
