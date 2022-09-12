@@ -54,9 +54,9 @@ func RemoveIndex(s []node.Node, index int) []node.Node {
 	return append(ret, s[index+1:]...)
 }
 
-func (p *Flow) ReplaceNode(id string, node node.Node) node.Node {
+func (p *Flow) ReplaceNode(node node.Node) node.Node {
 	for i, n := range p.Get().nodes {
-		if n.GetID() == id {
+		if n.GetID() == node.GetID() {
 			p.nodes = RemoveIndex(p.nodes, i)
 		}
 	}

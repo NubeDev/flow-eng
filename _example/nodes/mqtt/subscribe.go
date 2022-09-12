@@ -37,7 +37,7 @@ func NewMqttSub(body *node.BaseNode) (node.Node, error) {
 	}
 	mqttTopic, ok := value.(string)
 	if !ok {
-		mqttTopic = "test"
+		mqttTopic = "sub"
 	}
 	inputs := node.BuildInputs(node.BuildInput(node.In1, node.TypeString, nil, body.Inputs))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeString, nil, body.Outputs))

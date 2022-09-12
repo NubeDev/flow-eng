@@ -29,7 +29,7 @@ func NewMqttPub(body *node.BaseNode) (node.Node, error) {
 	}
 	mqttTopic, ok := value.(string)
 	if !ok {
-		mqttTopic = ""
+		mqttTopic = "pub"
 	}
 	inputs := node.BuildInputs(node.BuildInput(node.In1, node.TypeString, nil, body.Inputs))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeString, nil, body.Outputs))
@@ -77,7 +77,6 @@ func (inst *MqttPub) Process() {
 	}
 	val := float.StrToFloat(in1Val)
 	inst.WritePin(node.Out1, float.ToStrPtr(val))
-
 }
 
 func (inst *MqttPub) Cleanup() {}

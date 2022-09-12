@@ -15,10 +15,6 @@ const (
 	multiply = "multiply"
 )
 
-const (
-	inputCount = "Inputs Count"
-)
-
 func Process(body node.Node) {
 	equation := body.GetName()
 	count := body.InputsLen()

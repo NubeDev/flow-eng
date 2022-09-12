@@ -3,6 +3,7 @@ package node
 import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/uuid"
+	log "github.com/sirupsen/logrus"
 )
 
 type Runner struct {
@@ -43,7 +44,7 @@ func (runner *Runner) Process() error {
 	err := runner.processConnectors()
 
 	if err != nil {
-		fmt.Println("RUNNER ERROR", runner.node.GetNodeName(), "ERR", err)
+		log.Errorf("RUNNER node:%s name-name%s err:%s", runner.node.GetNodeName(), runner.node.GetName(), err.Error())
 		return err
 	}
 	// run processing node
@@ -76,6 +77,7 @@ func (runner *Runner) processConnectors() error {
 		conn := runner.connectors[i]
 		err := conn.Trigger()
 		if err != nil {
+			log.Errorf(fmt.Sprintf("err from runner:%s from:%s to:%s", err.Error(), conn.from.Name, conn.to.Name))
 			return err
 		}
 	}

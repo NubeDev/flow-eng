@@ -10,7 +10,7 @@ type Sub struct {
 
 func NewSub(body *node.BaseNode) (node.Node, error) {
 	body = node.Defaults(body, add, category)
-	buildCount, setting, value, err := node.NewSetting(body, &node.SettingOptions{Type: node.Number, Title: inputCount, Min: 2, Max: 20})
+	buildCount, setting, value, err := node.NewSetting(body, &node.SettingOptions{Type: node.Number, Title: node.InputCount, Min: 2, Max: 20})
 	if err != nil {
 		return nil, err
 	}

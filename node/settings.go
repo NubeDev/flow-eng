@@ -7,9 +7,13 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
+const (
+	InputCount = "Inputs Count"
+)
+
 type SettingOptions struct {
-	Type  Prop
-	Title string
+	Type  PropType
+	Title Title
 	Min   int
 	Max   int
 }
@@ -20,7 +24,7 @@ func NewSetting(body *BaseNode, opts *SettingOptions) (base *PropertyBase, setti
 	}
 	var min = opts.Min
 	var max = opts.Max
-	var dataType Prop
+	var dataType PropType
 	var title = opts.Title
 	if title == "" {
 		return nil, nil, 0, errors.New("title can not be empty")
@@ -35,7 +39,7 @@ func NewSetting(body *BaseNode, opts *SettingOptions) (base *PropertyBase, setti
 		opts.Type = dataType
 	}
 	var getValue = min
-	getValue = body.GetPropValueInt(opts.Type, min)
+	getValue = body.GetPropValueInt(opts.Title, min)
 	base = &PropertyBase{
 		Min: min,
 		Max: max,
@@ -48,20 +52,21 @@ func NewSetting(body *BaseNode, opts *SettingOptions) (base *PropertyBase, setti
 }
 
 type PropertyBase struct {
-	Type     Prop        `json:"type" default:""`
-	Title    string      `json:"title" default:""`
+	Type     PropType    `json:"type" default:""`
+	Title    Title       `json:"title" default:""`
 	Min      int         `json:"minLength" default:"0"`
 	Max      int         `json:"maxLength" default:"500"`
 	ReadOnly *bool       `json:"readOnly"`
 	Value    interface{} `json:"value"`
 }
 
-type Prop string
+type Title string
+type PropType string
 
 const (
-	String  Prop = "string"
-	Number  Prop = "number"
-	Boolean Prop = "boolean"
+	String  PropType = "string"
+	Number  PropType = "number"
+	Boolean PropType = "boolean"
 )
 
 func NewProperty(args *PropertyBase) *PropertyBase {
@@ -87,7 +92,7 @@ func NewProperty(args *PropertyBase) *PropertyBase {
 	}
 }
 
-func Setting(propType Prop, settingTitle string, body *PropertyBase) (*Settings, error) {
+func Setting(propType PropType, settingTitle Title, body *PropertyBase) (*Settings, error) {
 	return &Settings{
 		Type:       propType,
 		Title:      settingTitle,
@@ -96,8 +101,8 @@ func Setting(propType Prop, settingTitle string, body *PropertyBase) (*Settings,
 }
 
 type Settings struct {
-	Type       Prop        `json:"type"`
-	Title      string      `json:"title"`
+	Type       PropType    `json:"type"`
+	Title      Title       `json:"title"`
 	Properties interface{} `json:"properties"` // PropertyBase
 }
 
@@ -105,22 +110,42 @@ func (n *BaseNode) GetSettings() []*Settings {
 	return n.Settings
 }
 
-func (n *BaseNode) GetSetting(name string) *Settings {
+func (n *BaseNode) GetSetting(name Title) *Settings {
 	for _, setting := range n.Settings {
-		if name == setting.Title {
+		if name == Title(setting.Title) {
 			return setting
 		}
 	}
 	return nil
 }
 
-func (n *BaseNode) GetPropValue(name Prop) (interface{}, error) {
+func (n *BaseNode) SetPropValue(name Title, value interface{}) error {
+	data := n.GetProperties(name)
+	if data == nil {
+		return errors.New(fmt.Sprintf("failed to to settings properties by name%s", name))
+	}
+	setting := n.GetSetting(name)
+	if data == nil {
+		return errors.New(fmt.Sprintf("failed to to setting by name%s", name))
+	}
+	properties := &PropertyBase{
+		Value: value,
+	}
+	err := mapstructure.Decode(data, properties)
+	if err != nil {
+		return err
+	}
+	setting.Properties = properties
+	return nil
+}
+
+func (n *BaseNode) GetPropValue(name Title) (interface{}, error) {
 	data := n.GetProperties(name)
 	if data == nil {
 		return "", errors.New(fmt.Sprintf("failed to to settings properties by name%s", name))
 	}
 	set := &PropertyBase{}
-	err := mapstructure.Decode(n.GetProperties(name), set)
+	err := mapstructure.Decode(data, set)
 	if err != nil {
 		return "", err
 	}
@@ -128,7 +153,7 @@ func (n *BaseNode) GetPropValue(name Prop) (interface{}, error) {
 }
 
 //GetPropValueInt if there was an existing value then try and get it (would be used when node is created from json)
-func (n *BaseNode) GetPropValueInt(name Prop, fallbackValue int) int {
+func (n *BaseNode) GetPropValueInt(name Title, fallbackValue int) int {
 	data, err := n.GetPropValue(name)
 	if err != nil {
 		return 0
@@ -140,7 +165,7 @@ func (n *BaseNode) GetPropValueInt(name Prop, fallbackValue int) int {
 	return i
 }
 
-func (n *BaseNode) GetPropValueStr(name Prop) (string, error) {
+func (n *BaseNode) GetPropValueStr(name Title) (string, error) {
 	data, err := n.GetPropValue(name)
 	if err != nil {
 		return "", err
@@ -149,7 +174,7 @@ func (n *BaseNode) GetPropValueStr(name Prop) (string, error) {
 	return toStr, nil
 }
 
-func (n *BaseNode) DecodeProperties(name Prop, output interface{}) error {
+func (n *BaseNode) DecodeProperties(name Title, output interface{}) error {
 	data := n.GetProperties(name)
 	if data == nil {
 		return errors.New(fmt.Sprintf("failed to find settings properties by name:%s", name))
@@ -161,9 +186,9 @@ func (n *BaseNode) DecodeProperties(name Prop, output interface{}) error {
 	return nil
 }
 
-func (n *BaseNode) GetProperties(name Prop) interface{} {
+func (n *BaseNode) GetProperties(name Title) interface{} {
 	for _, setting := range n.Settings {
-		if name == Prop(setting.Title) {
+		if name == setting.Title {
 			return setting.Properties
 		}
 	}
@@ -172,7 +197,7 @@ func (n *BaseNode) GetProperties(name Prop) interface{} {
 
 func BuildSettings(props ...*Settings) ([]*Settings, error) {
 	var out []*Settings
-	var names []string
+	var names []Title
 	for _, output := range props {
 		out = append(out, output)
 		names = append(names, output.Title)
@@ -183,7 +208,7 @@ func BuildSettings(props ...*Settings) ([]*Settings, error) {
 	return out, nil
 }
 
-func contains(e []string, c string) bool {
+func contains(e []Title, c Title) bool {
 	for _, s := range e {
 		if s == c {
 			return true
@@ -192,8 +217,8 @@ func contains(e []string, c string) bool {
 	return false
 }
 
-func unique(e []string) []string {
-	var r []string
+func unique(e []Title) []Title {
+	var r []Title
 	for _, s := range e {
 		if !contains(r[:], s) {
 			r = append(r, s)

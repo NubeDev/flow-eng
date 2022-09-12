@@ -16,6 +16,7 @@ type Node interface {
 	GetInput(name PortName) *Input
 	GetOutputs() []*Output
 	GetOutput(name PortName) *Output
+	SetPropValue(name Title, value interface{}) error
 	OverrideInputValue(name PortName, value interface{}) error
 	InputsLen() int
 	OutputsLen() int

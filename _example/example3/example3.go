@@ -5,7 +5,7 @@ import (
 	pprint "github.com/NubeDev/flow-eng/helpers/print"
 )
 
-func main3() {
+func main() {
 	schema := nodes.All()
 	pprint.PrintJOSN(schema)
 }
