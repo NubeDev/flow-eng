@@ -37,11 +37,12 @@ func NewMqttSub(body *node.BaseNode) (node.Node, error) {
 	}
 	mqttTopic, ok := value.(string)
 	if !ok {
-		mqttTopic = ""
+		mqttTopic = "test"
 	}
 	inputs := node.BuildInputs(node.BuildInput(node.In1, node.TypeString, nil, body.Inputs))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, settings)
+	bus = cbus.New(1)
 	return &MqttSub{body, nil, false, false, "", mqttTopic}, nil
 }
 
@@ -79,6 +80,9 @@ func (inst *MqttSub) connect() {
 }
 
 func (inst *MqttSub) Process() {
+	if bus == nil {
+		panic("mqtt-bus can not be empty")
+	}
 	if !inst.connected {
 		go inst.connect()
 	}
@@ -87,19 +91,19 @@ func (inst *MqttSub) Process() {
 			inst.subscribe()
 		}
 	}
+	if inst.connected && inst.subscribed {
+		go func() {
+			msg, ok := bus.Recv()
+			if ok {
+				msg_ := msg.(mqtt.Message)
+				inst.newMessage = string(msg_.Payload())
+				log.Info("MQTT:newMessage", inst.newMessage)
+			}
+		}()
 
-	go func() {
-		msg, ok := bus.Recv()
-		if ok {
-			msg_ := msg.(mqtt.Message)
-			inst.newMessage = string(msg_.Payload())
-			log.Info("MQTT:newMessage", inst.newMessage)
-		}
-	}()
-
-	val := float.StrToFloat(inst.newMessage)
-
-	inst.WritePin(node.Out1, float.ToStrPtr(val))
+		val := float.StrToFloat(inst.newMessage)
+		inst.WritePin(node.Out1, float.ToStrPtr(val))
+	}
 
 }
 

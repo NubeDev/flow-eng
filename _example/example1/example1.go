@@ -15,11 +15,11 @@ import (
 	"time"
 )
 
-func main1() {
+func main() {
 
 	storage.New("")
 
-	filePath := flag.String("f", "../flow-eng/_example/mqtt.json", "flow file")
+	filePath := flag.String("f", "../flow-eng/_example/example1/mqtt.json", "flow file")
 	flag.Parse()
 	fmt.Println("file:", *filePath)
 
