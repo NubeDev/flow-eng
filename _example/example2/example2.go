@@ -2,14 +2,16 @@ package main
 
 import (
 	flowctrl "github.com/NubeDev/flow-eng"
+	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
-	math2 "github.com/NubeDev/flow-eng/nodes/math"
+	"github.com/NubeDev/flow-eng/nodes/math"
 	log "github.com/sirupsen/logrus"
 	"time"
 )
 
 func main() {
-	const1, err := math2.NewConst(nil) // new node
+
+	const1, err := math.NewConst(nil) // new node
 	if err != nil {
 		log.Errorln(err)
 		return
@@ -20,7 +22,7 @@ func main() {
 		log.Errorln(err)
 		return
 	}
-	const2, err := math2.NewConst(nil)
+	const2, err := math.NewConst(nil)
 	if err != nil {
 		log.Errorln(err)
 		return
@@ -30,7 +32,7 @@ func main() {
 		log.Errorln(err)
 		return
 	}
-	add, err := math2.NewAdd(nil) // new math (add) node
+	add, err := math.NewAdd(nil) // new math (add) node
 	if err != nil {
 		log.Errorln(err)
 		return
@@ -69,7 +71,6 @@ func main() {
 
 	graph.ReBuildFlow(true)
 
-	// pprint.PrintJOSN(graph.GetNodes())
 
 	runner := flowctrl.NewSerialRunner(graph) // make the runner for lopping
 
