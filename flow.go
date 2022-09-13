@@ -28,6 +28,32 @@ func (p *Flow) GetNodes() []node.Node {
 	return p.nodes
 }
 
+func (p *Flow) GetNodesBase() []*node.BaseNode {
+	var list []*node.BaseNode
+	for _, n := range p.GetNodes() {
+		n_ := &node.BaseNode{
+			Inputs:   n.GetInputs(),
+			Outputs:  n.GetOutputs(),
+			Info:     n.GetInfo(),
+			Settings: n.GetSettings(),
+			Metadata: n.GetMetadata(),
+		}
+		list = append(list, n_)
+	}
+	return list
+}
+
+func (p *Flow) GetNodeBase(id string) *node.BaseNode {
+	n := p.GetNode(id)
+	return &node.BaseNode{
+		Inputs:   n.GetInputs(),
+		Outputs:  n.GetOutputs(),
+		Info:     n.GetInfo(),
+		Settings: n.GetSettings(),
+		Metadata: n.GetMetadata(),
+	}
+}
+
 func (p *Flow) AddNode(node node.Node) *Flow {
 	flows := p.Get()
 	flows.nodes = append(flows.nodes, node)

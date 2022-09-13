@@ -7,6 +7,14 @@ import (
 	"github.com/NubeDev/flow-eng/helpers"
 )
 
+func BuildBaseNodes(body ...*BaseNode) []*BaseNode {
+	var out []*BaseNode
+	for _, output := range body {
+		out = append(out, output)
+	}
+	return out
+}
+
 func BuildNodes(body ...Node) []Node {
 	var out []Node
 	for _, output := range body {

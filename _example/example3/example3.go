@@ -7,5 +7,13 @@ import (
 
 func main() {
 	schema := nodes.All()
+
+	//for _, n := range schema {
+	//
+	//	//aa, ok := n.(node.BaseNode)
+	//
+	//	fmt.Println(aa, ok)
+	//}
+
 	pprint.PrintJOSN(schema)
 }
