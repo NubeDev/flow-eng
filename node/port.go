@@ -21,4 +21,6 @@ type Port interface {
 	UUID() uuid.Value
 	Direction() Direction
 	Connectors() []*Connector
+	SetValue(interface{})
+	GetValue() interface{}
 }

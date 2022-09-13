@@ -54,9 +54,9 @@ func NewSetting(body *BaseNode, opts *SettingOptions) (base *PropertyBase, setti
 type PropertyBase struct {
 	Type     PropType    `json:"type" default:""`
 	Title    Title       `json:"title" default:""`
-	Min      int         `json:"minLength" default:"0"`
-	Max      int         `json:"maxLength" default:"500"`
-	ReadOnly *bool       `json:"readOnly"`
+	Min      int         `json:"min" default:"0"`
+	Max      int         `json:"max" default:"500"`
+	ReadOnly *bool       `json:"read_only"`
 	Value    interface{} `json:"value"`
 }
 
@@ -112,14 +112,14 @@ func (n *BaseNode) GetSettings() []*Settings {
 
 func (n *BaseNode) GetSetting(name Title) *Settings {
 	for _, setting := range n.Settings {
-		if name == Title(setting.Title) {
+		if name == setting.Title {
 			return setting
 		}
 	}
 	return nil
 }
 
-func (n *BaseNode) SetPropValue(name Title, value interface{}) error {
+func (n *BaseNode) SetPropertiesValue(name Title, value interface{}) error {
 	data := n.GetProperties(name)
 	if data == nil {
 		return errors.New(fmt.Sprintf("failed to to settings properties by name%s", name))
@@ -131,9 +131,6 @@ func (n *BaseNode) SetPropValue(name Title, value interface{}) error {
 		return err
 	}
 	setting := n.GetSetting(name)
-	if data == nil {
-		return errors.New(fmt.Sprintf("failed to to setting by name%s", name))
-	}
 	properties.Value = value
 
 	setting.Properties = properties
@@ -153,7 +150,7 @@ func (n *BaseNode) GetPropValue(name Title) (interface{}, error) {
 	return set.Value, nil
 }
 
-//GetPropValueInt if there was an existing value then try and get it (would be used when node is created from json)
+// GetPropValueInt if there was an existing value then try and get it (would be used when node is created from json)
 func (n *BaseNode) GetPropValueInt(name Title, fallbackValue int) int {
 	data, err := n.GetPropValue(name)
 	if err != nil {

@@ -14,7 +14,7 @@ type Connection struct {
 	Keepalive                     int    `json:"keepalive,omitempty"`
 	Qos                           int    `json:"qos,omitempty"`
 	Retain                        bool   `json:"retain,omitempty"`
-	AttemptReconnectOnUnavailable bool   `json:"attemptReconnectOnUnavailable,omitempty"`
-	AttemptReconnectSecs          int    `json:"attemptReconnectSecs,omitempty"`
+	AttemptReconnectOnUnavailable bool   `json:"attempt_reconnect_on_unavailable,omitempty"`
+	AttemptReconnectSecs          int    `json:"attempt_reconnect_secs,omitempty"`
 	Timeout                       int    `json:"timeout,omitempty"`
 }

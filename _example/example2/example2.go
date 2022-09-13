@@ -17,7 +17,7 @@ func main() {
 		return
 	}
 
-	err = const1.OverrideInputValue(node.In1, 11)
+	err = const1.OverrideInputValue(node.In1, 11.0)
 	if err != nil {
 		log.Errorln(err)
 		return
@@ -27,7 +27,7 @@ func main() {
 		log.Errorln(err)
 		return
 	}
-	err = const2.OverrideInputValue(node.In1, 11)
+	err = const2.OverrideInputValue(node.In1, 11.0)
 	if err != nil {
 		log.Errorln(err)
 		return
@@ -37,25 +37,25 @@ func main() {
 		log.Errorln(err)
 		return
 	}
-	//mqttSub, err := broker.NewMqttSub(nil) // new math (add) node
-	//if err != nil {
+	// mqttSub, err := broker.NewMqttSub(nil) // new math (add) node
+	// if err != nil {
 	//	log.Errorln(err)
 	//	return
-	//}
+	// }
 
-	//mqttPub, err := broker.NewMqttPub(nil) // new math (add) node
-	//if err != nil {
+	// mqttPub, err := broker.NewMqttPub(nil) // new math (add) node
+	// if err != nil {
 	//	log.Errorln(err)
 	//	return
-	//}
+	// }
 
 	graph := flowctrl.New() // init the flow engine
 
 	graph.AddNode(const1) // add the nodes to the runtime
 	graph.AddNode(const2)
 	graph.AddNode(add)
-	//graph.AddNode(mqttSub)
-	//graph.AddNode(mqttPub)
+	// graph.AddNode(mqttSub)
+	// graph.AddNode(mqttPub)
 
 	err = graph.ManualNodeConnector(const1, add, node.Out1, node.In1) // connect const-1 and 2 to the add node
 	if err != nil {
@@ -71,14 +71,13 @@ func main() {
 
 	graph.ReBuildFlow(true)
 
-	pprint.PrintJOSN(graph.GetNodesBase())
 
 	runner := flowctrl.NewSerialRunner(graph) // make the runner for lopping
 
 	for {
 		err := runner.Process()
-		//random := float.RandFloat(0, 1)
-		//err = const2.OverrideInputValue(node.In1, random)
+		// random := float.RandFloat(0, 1)
+		// err = const2.OverrideInputValue(node.In1, random)
 		if err != nil {
 			log.Errorln(err)
 			return

@@ -47,7 +47,7 @@ func NewMqttSub(body *node.BaseNode) (node.Node, error) {
 }
 
 var handle mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
-	//log.Println("NEW MQTT MES", msg.Topic(), " ", string(msg.Payload()))
+	// log.Println("NEW MQTT MES", msg.Topic(), " ", string(msg.Payload()))
 	bus.Send(msg)
 }
 
@@ -104,7 +104,6 @@ func (inst *MqttSub) Process() {
 		val := float.StrToFloat(inst.newMessage)
 		inst.WritePin(node.Out1, float.ToStrPtr(val))
 	}
-
 }
 
 func (inst *MqttSub) Cleanup() {}
