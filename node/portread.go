@@ -19,8 +19,8 @@ func (n *BaseNode) ReadMultipleNums(count int) []float64 {
 	return out
 }
 
-func (n *BaseNode) ReadMultiple(count int) []*InputPort {
-	var out []*InputPort
+func (n *BaseNode) ReadMultiple(count int) []*Input {
+	var out []*Input
 	for i, input := range n.GetInputs() {
 		if i < count {
 			out = append(out, input)

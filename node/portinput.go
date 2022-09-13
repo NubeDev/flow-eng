@@ -4,7 +4,7 @@ import (
 	"github.com/NubeDev/flow-eng/uuid"
 )
 
-type InputPort struct {
+type Input struct {
 	Name       PortName         `json:"name"` // in1
 	DataType   DataTypes        `json:"type"` // int8
 	Connection *InputConnection `json:"connection,omitempty"`
@@ -14,26 +14,27 @@ type InputPort struct {
 	connector  *Connector
 }
 
-func newInputPort(body *InputPort) *InputPort {
-	return &InputPort{
+func newInput(body *Input) *Input {
+	return &Input{
 		body.Name,
 		body.DataType,
 		body.Connection,
 		nil,
 		uuid.New(),
 		DirectionInput,
-		nil}
+		nil,
+	}
 }
 
-func (p *InputPort) UUID() uuid.Value {
+func (p *Input) UUID() uuid.Value {
 	return p.uuid
 }
 
-func (p *InputPort) Direction() Direction {
+func (p *Input) Direction() Direction {
 	return p.direction
 }
 
-func (p *InputPort) Connectors() []*Connector {
+func (p *Input) Connectors() []*Connector {
 	if p.connector == nil {
 		return []*Connector{}
 	}

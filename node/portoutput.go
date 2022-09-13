@@ -7,7 +7,7 @@ import (
 
 var ErrTypesMismatch = errors.New("provided buffers types are different")
 
-type OutputPort struct {
+type Output struct {
 	Name        PortName            `json:"name"` // out1
 	DataType    DataTypes           `json:"type"` // int8
 	Connections []*OutputConnection `json:"connections"`
@@ -17,18 +17,19 @@ type OutputPort struct {
 	connectors  []*Connector
 }
 
-func newOutputPort(body *OutputPort) *OutputPort {
-	return &OutputPort{
+func newOutput(body *Output) *Output {
+	return &Output{
 		body.Name,
 		body.DataType,
 		body.Connections,
 		nil,
 		uuid.New(),
 		DirectionOutput,
-		make([]*Connector, 0, 1)}
+		make([]*Connector, 0, 1),
+	}
 }
 
-func (p *OutputPort) Write(value interface{}) {
+func (p *Output) Write(value interface{}) {
 	p.Value = value
 	for i := 0; i < len(p.connectors); i++ {
 		conn := p.connectors[i]
@@ -36,19 +37,19 @@ func (p *OutputPort) Write(value interface{}) {
 	}
 }
 
-func (p *OutputPort) UUID() uuid.Value {
+func (p *Output) UUID() uuid.Value {
 	return p.uuid
 }
 
-func (p *OutputPort) Direction() Direction {
+func (p *Output) Direction() Direction {
 	return p.direction
 }
 
-func (p *OutputPort) Connectors() []*Connector {
+func (p *Output) Connectors() []*Connector {
 	return p.connectors
 }
 
-func (p *OutputPort) Copy(other *InputPort) error {
+func (p *Output) Copy(other *Input) error {
 	if p.DataType != other.DataType {
 		return ErrTypesMismatch
 	}
@@ -56,7 +57,7 @@ func (p *OutputPort) Copy(other *InputPort) error {
 	return nil
 }
 
-func (p *OutputPort) Connect(inputs ...*InputPort) {
+func (p *Output) Connect(inputs ...*Input) {
 	for i := 0; i < len(inputs); i++ {
 		input := inputs[i]
 		if err := p.connectInput(input); err != nil {
@@ -65,7 +66,7 @@ func (p *OutputPort) Connect(inputs ...*InputPort) {
 	}
 }
 
-func (p *OutputPort) connectInput(input *InputPort) error {
+func (p *Output) connectInput(input *Input) error {
 	if input.connector != nil {
 		return ErrIncompatiblePorts
 	}

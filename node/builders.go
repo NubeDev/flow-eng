@@ -13,15 +13,15 @@ func BuildNodes(body ...Node) []Node {
 	return out
 }
 
-func BuildInput(portName PortName, dataType DataTypes, fallback interface{}, inputs []*InputPort) *InputPort {
-	port := &InputPort{
+func BuildInput(portName PortName, dataType DataTypes, fallback interface{}, inputs []*Input) *Input {
+	port := &Input{
 		Name:       portName,
 		DataType:   dataType,
 		Connection: &InputConnection{}}
-	port = newInputPort(port)
+	port = newInput(port)
 	var addConnections bool
 	if len(inputs) == 0 {
-		inputs = []*InputPort{port}
+		inputs = []*Input{port}
 	}
 	for _, input := range inputs {
 		if input.Connection.FallbackValue == nil {
@@ -42,14 +42,14 @@ func BuildInput(portName PortName, dataType DataTypes, fallback interface{}, inp
 	return port
 }
 
-func BuildOutput(portName PortName, dataType DataTypes, fallback interface{}, outputs []*OutputPort) *OutputPort {
+func BuildOutput(portName PortName, dataType DataTypes, fallback interface{}, outputs []*Output) *Output {
 	var connections []*OutputConnection
-	port := &OutputPort{
+	port := &Output{
 		Name:        portName,
 		DataType:    dataType,
 		Connections: connections,
 	}
-	port = newOutputPort(port)
+	port = newOutput(port)
 	for _, output := range outputs {
 		if output.Name == portName {
 			for _, connection := range output.Connections {
@@ -68,8 +68,8 @@ func BuildOutput(portName PortName, dataType DataTypes, fallback interface{}, ou
 
 // DynamicInputs build n number of inputs
 // startOfName eg: in would make in1, in2, in3
-func DynamicInputs(startOfName PortName, dataType DataTypes, fallback interface{}, count, minAllowed, maxAllowed int, inputs []*InputPort) []*InputPort {
-	var out []*InputPort
+func DynamicInputs(startOfName PortName, dataType DataTypes, fallback interface{}, count, minAllowed, maxAllowed int, inputs []*Input) []*Input {
+	var out []*Input
 	if count < minAllowed {
 		count = minAllowed
 	}
@@ -84,8 +84,8 @@ func DynamicInputs(startOfName PortName, dataType DataTypes, fallback interface{
 
 // DynamicOutputs build n number of outputs
 // startOfName eg: in would make out1, out2, and so on
-func DynamicOutputs(startOfName PortName, dataType DataTypes, fallback interface{}, count, maxAllowed int, outputs []*OutputPort) []*OutputPort {
-	var out []*OutputPort
+func DynamicOutputs(startOfName PortName, dataType DataTypes, fallback interface{}, count, maxAllowed int, outputs []*Output) []*Output {
+	var out []*Output
 	for i := 0; i < count; i++ {
 		name := fmt.Sprintf("%s%d", startOfName, i+1)
 		if i < maxAllowed {
@@ -95,23 +95,23 @@ func DynamicOutputs(startOfName PortName, dataType DataTypes, fallback interface
 	return out
 }
 
-func BuildNode(body *BaseNode, inputs []*InputPort, outputs []*OutputPort, settings []*Settings) *BaseNode {
+func BuildNode(body *BaseNode, inputs []*Input, outputs []*Output, settings []*Settings) *BaseNode {
 	body.Settings = settings
 	body.Inputs = inputs
 	body.Outputs = outputs
 	return body
 }
 
-func BuildInputs(body ...*InputPort) []*InputPort {
-	var out []*InputPort
+func BuildInputs(body ...*Input) []*Input {
+	var out []*Input
 	for _, input := range body {
 		out = append(out, input)
 	}
 	return out
 }
 
-func BuildOutputs(body ...*OutputPort) []*OutputPort {
-	var out []*OutputPort
+func BuildOutputs(body ...*Output) []*Output {
+	var out []*Output
 	for _, output := range body {
 		out = append(out, output)
 	}

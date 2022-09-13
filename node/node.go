@@ -7,17 +7,17 @@ type Node interface {
 	GetName() string     // AND, OR
 	GetNodeName() string // my-node
 	GetInfo() Info
-	GetInputs() []*InputPort
-	GetInput(name PortName) *InputPort
-	GetOutputs() []*OutputPort
-	GetOutput(name PortName) *OutputPort
+	GetInputs() []*Input
+	GetInput(name PortName) *Input
+	GetOutputs() []*Output
+	GetOutput(name PortName) *Output
 	GetSettings() []*Settings
 	SetPropValue(name Title, value interface{}) error
 	OverrideInputValue(name PortName, value interface{}) error
 	InputsLen() int
 	OutputsLen() int
 	ReadMultipleNums(count int) []float64
-	ReadMultiple(count int) []*InputPort
+	ReadMultiple(count int) []*Input
 	ReadPinsNum(...PortName) []*RedMultiplePins
 	ReadPinNum(PortName) (*float64, float64, bool)
 	ReadPin(PortName) (*string, string)
@@ -28,11 +28,11 @@ type Node interface {
 }
 
 type BaseNode struct {
-	Inputs   []*InputPort  `json:"inputs,omitempty"`
-	Outputs  []*OutputPort `json:"outputs,omitempty"`
-	Info     Info          `json:"info"`
-	Settings []*Settings   `json:"settings,omitempty"`
-	Metadata *Metadata     `json:"metadata,omitempty"`
+	Inputs   []*Input    `json:"inputs,omitempty"`
+	Outputs  []*Output   `json:"outputs,omitempty"`
+	Info     Info        `json:"info"`
+	Settings []*Settings `json:"settings,omitempty"`
+	Metadata *Metadata   `json:"metadata,omitempty"`
 }
 
 func (n *BaseNode) GetInfo() Info {
@@ -63,11 +63,11 @@ func (n *BaseNode) InputsLen() int {
 	return len(n.Inputs)
 }
 
-func (n *BaseNode) GetInputs() []*InputPort {
+func (n *BaseNode) GetInputs() []*Input {
 	return n.Inputs
 }
 
-func (n *BaseNode) GetInput(name PortName) *InputPort {
+func (n *BaseNode) GetInput(name PortName) *Input {
 	for _, input := range n.GetInputs() {
 		if input.Name == name {
 			return input
@@ -80,7 +80,7 @@ func (n *BaseNode) OutputsLen() int {
 	return len(n.Outputs)
 }
 
-func (n *BaseNode) GetOutput(name PortName) *OutputPort {
+func (n *BaseNode) GetOutput(name PortName) *Output {
 	for _, out := range n.GetOutputs() {
 		if out.Name == name {
 			return out
@@ -89,7 +89,7 @@ func (n *BaseNode) GetOutput(name PortName) *OutputPort {
 	return nil
 }
 
-func (n *BaseNode) GetOutputs() []*OutputPort {
+func (n *BaseNode) GetOutputs() []*Output {
 	return n.Outputs
 }
 
@@ -100,9 +100,6 @@ func (n *BaseNode) WritePin(name PortName, value interface{}) {
 	}
 	if name == out.Name {
 		out.Write(value)
-		// out.Value = value
-		// TODO
-		// out.Value.Set(value)
 	}
 }
 

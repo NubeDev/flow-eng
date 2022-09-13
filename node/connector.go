@@ -11,12 +11,12 @@ var (
 
 type Connector struct {
 	uuid    uuid.Value
-	from    *OutputPort
-	to      *InputPort
+	from    *Output
+	to      *Input
 	written bool
 }
 
-func NewConnector(from *OutputPort, to *InputPort) *Connector {
+func NewConnector(from *Output, to *Input) *Connector {
 	if from.DataType != to.DataType {
 		panic(ErrIncompatiblePortsTypes)
 	}
