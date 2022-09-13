@@ -13,7 +13,7 @@
       {
         "name": "out1",
         "type": "float",
-        "connection": [
+        "connections": [
           {
             "nodeID": "c123",
             "nodePortName": "in1"
@@ -42,7 +42,7 @@
       {
         "name": "out1",
         "type": "float",
-        "connection": [
+        "connections": [
           {
             "nodeID": "c123",
             "nodePortName": "in2"
