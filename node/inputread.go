@@ -51,7 +51,7 @@ func (n *BaseNode) ReadPin(name InputName) (*string, string) {
 			toStr := fmt.Sprintf("%v", in.Connection.FallbackValue)
 			return str.New(toStr), str.NonNil(str.New(toStr))
 		}
-		val := fmt.Sprintf("%v", in.Value)
+		val := fmt.Sprintf("%v", in.GetValue())
 		return str.New(val), val
 	}
 

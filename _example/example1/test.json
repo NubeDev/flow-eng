@@ -5,7 +5,7 @@
         "name": "in1",
         "type": "float",
         "connection": {
-          "overrideValue": 89
+          "override_value": 89
         }
       }
     ],
@@ -15,16 +15,16 @@
         "type": "float",
         "connections": [
           {
-            "nodeID": "c123",
-            "nodePortName": "in1"
+            "node_id": "c123",
+            "node_port_name": "in1"
           }
         ]
       }
     ],
     "info": {
-      "nodeID": "a123",
+      "node_id": "a123",
       "name": "const-num",
-      "nodeName": "const-a123",
+      "node_name": "const-a123",
       "category": "math"
     }
   },
@@ -34,7 +34,7 @@
         "name": "in1",
         "type": "float",
         "connection": {
-          "overrideValue": 55
+          "override_value": 55
         }
       }
     ],
@@ -44,16 +44,16 @@
         "type": "float",
         "connections": [
           {
-            "nodeID": "c123",
-            "nodePortName": "in2"
+            "node_id": "c123",
+            "node_port_name": "in2"
           }
         ]
       }
     ],
     "info": {
-      "nodeID": "b123",
+      "node_id": "b123",
       "name": "const-num",
-      "nodeName": "const-b123",
+      "node_name": "const-b123",
       "category": "math"
     }
   },
@@ -63,16 +63,16 @@
         "name": "in1",
         "type": "float",
         "connection": {
-          "nodeID": "a123",
-          "nodePortName": "out1"
+          "node_id": "a123",
+          "node_port_name": "out1"
         }
       },
       {
         "name": "in2",
         "type": "float",
         "connection": {
-          "nodeID": "b123",
-          "nodePortName": "out1"
+          "node_id": "b123",
+          "node_port_name": "out1"
         }
       },
       {
@@ -89,9 +89,9 @@
       }
     ],
     "info": {
-      "nodeID": "c123",
+      "node_id": "c123",
       "name": "add",
-      "nodeName": "c123",
+      "node_name": "c123",
       "category": "math"
     },
     "settings": [
@@ -101,9 +101,9 @@
         "properties": {
           "type": "",
           "title": "",
-          "minLength": 3,
-          "maxLength": 20,
-          "readOnly": null,
+          "min": 3,
+          "max": 20,
+          "read_only": null,
           "value": null
         }
       }

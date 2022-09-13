@@ -93,9 +93,9 @@ func (n *BaseNode) SetMetadata(m *Metadata) {
 }
 
 type Info struct {
-	NodeID      string `json:"nodeID"`             // a123
-	Name        string `json:"name"`               // add, or
-	NodeName    string `json:"nodeName,omitempty"` // my-node-abc
+	NodeID      string `json:"node_id"`             // a123
+	Name        string `json:"name"`                // add, or
+	NodeName    string `json:"node_name,omitempty"` // my-node-abc
 	Category    string `json:"category,omitempty"`
 	Description string `json:"description,omitempty"`
 	Version     string `json:"version,omitempty"`
@@ -131,24 +131,24 @@ const (
 )
 
 type InputConnection struct {
-	NodeID        string      `json:"nodeID,omitempty"`
-	NodePort      OutputName  `json:"nodePortName,omitempty"`
-	OverrideValue interface{} `json:"overrideValue,omitempty"` // used for when the user has no node connection and writes the value direct (or can be used to override a value)
-	CurrentValue  interface{} `json:"currentValue,omitempty"`
-	FallbackValue interface{} `json:"fallbackValue,omitempty"`
+	NodeID        string      `json:"node_id,omitempty"`
+	NodePort      OutputName  `json:"node_port_name,omitempty"`
+	OverrideValue interface{} `json:"override_value,omitempty"` // used for when the user has no node connection and writes the value direct (or can be used to override a value)
+	CurrentValue  interface{} `json:"current_value,omitempty"`
+	FallbackValue interface{} `json:"fallback_value,omitempty"`
 	Disable       *bool       `json:"disable,omitempty"`
 }
 
 type OutputConnection struct {
-	NodeID        string      `json:"nodeID,omitempty"`
-	NodePort      InputName   `json:"nodePortName,omitempty"`
-	OverrideValue interface{} `json:"overrideValue,omitempty"` // used for when the user has no node connection and writes the value direct (or can be used to override a value)
-	CurrentValue  interface{} `json:"currentValue,omitempty"`
-	FallbackValue interface{} `json:"fallbackValue,omitempty"`
+	NodeID        string      `json:"node_id,omitempty"`
+	NodePort      InputName   `json:"node_port_name,omitempty"`
+	OverrideValue interface{} `json:"override_value,omitempty"` // used for when the user has no node connection and writes the value direct (or can be used to override a value)
+	CurrentValue  interface{} `json:"current_value,omitempty"`
+	FallbackValue interface{} `json:"fallback_value,omitempty"`
 	Disable       *bool       `json:"disable,omitempty"`
 }
 
 type Metadata struct {
-	PositionX string `json:"positionX"`
-	PositionY string `json:"positionY"`
+	PositionX string `json:"position_x"`
+	PositionY string `json:"position_y"`
 }

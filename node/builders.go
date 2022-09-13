@@ -17,7 +17,8 @@ func BuildInput(portName InputName, dataType DataTypes, fallback interface{}, in
 	port := &Input{
 		Name:       portName,
 		DataType:   dataType,
-		Connection: &InputConnection{}}
+		Connection: &InputConnection{},
+	}
 	port = newInput(port)
 	var addConnections bool
 	if len(inputs) == 0 {

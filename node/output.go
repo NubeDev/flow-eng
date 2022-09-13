@@ -11,7 +11,7 @@ type Output struct {
 	Name        OutputName          `json:"name"` // out1
 	DataType    DataTypes           `json:"type"` // int8
 	Connections []*OutputConnection `json:"connections"`
-	Value       interface{}
+	value       interface{}
 	uuid        uuid.Value
 	direction   Direction
 	connectors  []*Connector
@@ -30,7 +30,7 @@ func newOutput(body *Output) *Output {
 }
 
 func (p *Output) Write(value interface{}) {
-	p.Value = value
+	p.SetValue(value)
 	for i := 0; i < len(p.connectors); i++ {
 		conn := p.connectors[i]
 		conn.Notify()
@@ -49,11 +49,19 @@ func (p *Output) Connectors() []*Connector {
 	return p.connectors
 }
 
+func (p *Output) GetValue() interface{} {
+	return p.value
+}
+
+func (p *Output) SetValue(value interface{}) {
+	p.value = value
+}
+
 func (p *Output) Copy(other *Input) error {
 	if p.DataType != other.DataType {
 		return ErrTypesMismatch
 	}
-	other.Value = p.Value
+	other.SetValue(p.GetValue())
 	return nil
 }
 

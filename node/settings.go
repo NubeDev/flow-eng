@@ -54,9 +54,9 @@ func NewSetting(body *BaseNode, opts *SettingOptions) (base *PropertyBase, setti
 type PropertyBase struct {
 	Type     PropType    `json:"type" default:""`
 	Title    Title       `json:"title" default:""`
-	Min      int         `json:"minLength" default:"0"`
-	Max      int         `json:"maxLength" default:"500"`
-	ReadOnly *bool       `json:"readOnly"`
+	Min      int         `json:"min" default:"0"`
+	Max      int         `json:"max" default:"500"`
+	ReadOnly *bool       `json:"read_only"`
 	Value    interface{} `json:"value"`
 }
 

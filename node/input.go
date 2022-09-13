@@ -8,7 +8,7 @@ type Input struct {
 	Name       InputName        `json:"name"` // in1
 	DataType   DataTypes        `json:"type"` // int
 	Connection *InputConnection `json:"connection,omitempty"`
-	Value      interface{}
+	value      interface{}
 	uuid       uuid.Value
 	direction  Direction
 	connector  *Connector
@@ -39,4 +39,12 @@ func (p *Input) Connectors() []*Connector {
 		return []*Connector{}
 	}
 	return []*Connector{p.connector}
+}
+
+func (p *Input) GetValue() interface{} {
+	return p.value
+}
+
+func (p *Input) SetValue(value interface{}) {
+	p.value = value
 }
