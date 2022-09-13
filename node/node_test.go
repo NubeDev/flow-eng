@@ -9,23 +9,58 @@ type NodesList struct {
 	Nodes interface{} `json:"nodes"`
 }
 
-func TestBaseNode_GetInfo(t *testing.T) {
+func TestBaseNode_NodeConnection(t *testing.T) {
 
 	var list []*Schema
+	var (
+		value = map[string]map[string][]Links{"flow": map[string][]Links{"links": []Links{
+			Links{
+				NodeId: "2",
+				Socket: "flow",
+			},
+		}}}
+	)
 
-	var links = map[string]Links{"a": Links{
-		Value: 222,
-	}}
 	s1 := &Schema{
-		Id:   "111",
-		Type: "logic/numberConstant",
+		Id:   "1",
+		Type: "time/delay",
 		Metadata: &Metadata{
-			PositionX: "123",
-			PositionY: "1235",
+			PositionX: "271.5",
+			PositionY: "-69",
 		},
-		Inputs: &Inputs{
-			Links: links,
+		Inputs: value,
+	}
+
+	s2 := &Schema{
+		Id:   "2",
+		Type: "time/delay",
+		Metadata: &Metadata{
+			PositionX: "271.5",
+			PositionY: "-69",
 		},
+	}
+
+	list = append(list, s1)
+	list = append(list, s2)
+	a := NodesList{
+		Nodes: list,
+	}
+
+	pprint.PrintJOSN(a)
+
+}
+
+func TestBaseNode_NodeNonConnection(t *testing.T) {
+	var list []*Schema
+	var value = map[string]map[string]string{"duration": map[string]string{"value": "22"}}
+	s1 := &Schema{
+		Id:   "2",
+		Type: "time/delay",
+		Metadata: &Metadata{
+			PositionX: "271.5",
+			PositionY: "-69",
+		},
+		Inputs: value,
 	}
 
 	list = append(list, s1)

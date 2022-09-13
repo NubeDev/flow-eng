@@ -2,10 +2,10 @@ package node
 
 // Schema is needed for the flow-ui
 type Schema struct {
-	Id       string     `json:"id"`                 // node uuid
-	Type     string     `json:"type"`               // math/add
-	Metadata *Metadata  `json:"metadata,omitempty"` // positions on the editor
-	Inputs   *InputsMap `json:"inputs,omitempty"`
+	Id       string      `json:"id"`                 // node uuid
+	Type     string      `json:"type"`               // math/add
+	Metadata *Metadata   `json:"metadata,omitempty"` // positions on the editor
+	Inputs   interface{} `json:"inputs"`
 }
 
 // Links node links
@@ -15,6 +15,7 @@ type Links struct {
 	Value  interface{} `json:"value,omitempty"`  // when there is no link but a value is set by the user
 }
 
-type InputsMap struct {
+type InputsMap2 struct {
 	Links map[string]Links `json:"links,omitempty"`
+	Value interface{}      `json:"value,omitempty"`
 }

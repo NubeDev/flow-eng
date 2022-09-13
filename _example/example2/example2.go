@@ -36,17 +36,6 @@ func main() {
 		log.Errorln(err)
 		return
 	}
-	// mqttSub, err := broker.NewMqttSub(nil) // new math (add) node
-	// if err != nil {
-	//	log.Errorln(err)
-	//	return
-	// }
-
-	// mqttPub, err := broker.NewMqttPub(nil) // new math (add) node
-	// if err != nil {
-	//	log.Errorln(err)
-	//	return
-	// }
 
 	graph := flowctrl.New() // init the flow engine
 
