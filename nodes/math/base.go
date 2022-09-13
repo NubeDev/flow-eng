@@ -1,8 +1,8 @@
 package math
 
 import (
-	"errors"
 	"github.com/NubeDev/flow-eng/helpers/array"
+	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/node"
 	log "github.com/sirupsen/logrus"
 )
@@ -18,26 +18,34 @@ const (
 func Process(body node.Node) {
 	equation := body.GetName()
 	count := body.InputsLen()
-	f, err := operation(equation, body.ReadMultipleNums(count))
-	if err != nil {
-		body.WritePin(node.Out1, nil)
-		return
+	inputs := float.ConvertInterfaceToFloatMultiple(body.ReadMultiple(count))
+	output := operation(equation, inputs)
+	if output == nil {
+		log.Infof("equation: %s, result: %v", equation, output)
+	} else {
+		log.Infof("equation: %s, result: %v", equation, *output)
 	}
-	log.Infof("equation:%s result:%f", equation, f)
-	body.WritePinNum(node.Out1, f)
+	body.WritePin(node.Out1, output)
 }
 
-func operation(operation string, values []float64) (float64, error) {
-	if len(values) == 0 {
-		return 0, errors.New("no values where pass in")
+func operation(operation string, values []*float64) *float64 {
+	var nonNilValues []float64
+	for _, value := range values {
+		if value != nil {
+			nonNilValues = append(nonNilValues, *value)
+		}
 	}
+	if len(nonNilValues) == 0 {
+		return nil
+	}
+	output := 0.0
 	switch operation {
 	case add:
-		return array.Add(values), nil
+		output = array.Add(nonNilValues)
 	case sub:
-		return array.Subtract(values), nil
+		output = array.Subtract(nonNilValues)
 	case multiply:
-		return array.Multiply(values), nil
+		output = array.Multiply(nonNilValues)
 	}
-	return 0, errors.New("invalid operation")
+	return &output
 }

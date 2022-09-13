@@ -9,7 +9,3 @@ func (n *BaseNode) WritePin(name OutputName, value interface{}) {
 		out.Write(value)
 	}
 }
-
-func (n *BaseNode) WritePinNum(name OutputName, value float64) {
-	n.WritePin(name, value)
-}

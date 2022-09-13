@@ -13,13 +13,10 @@ type Node interface {
 	GetOutput(name OutputName) *Output
 	InputsLen() int
 	OutputsLen() int
-	ReadMultipleNums(count int) []float64
-	ReadMultiple(count int) []*Input
-	ReadPinNum(InputName) (*float64, float64, bool)
-	ReadPin(InputName) (*string, string)
-	OverrideInputValue(name InputName, value interface{}) error
+	ReadPin(InputName) interface{}
+	ReadMultiple(count int) []interface{}
 	WritePin(OutputName, interface{})
-	WritePinNum(OutputName, float64)
+	OverrideInputValue(name InputName, value interface{}) error
 	GetMetadata() *Metadata
 	SetMetadata(m *Metadata)
 	GetSettings() []*Settings

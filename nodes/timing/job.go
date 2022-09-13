@@ -54,8 +54,8 @@ func (inst *Inject) Process() {
 
 	inst.check()
 
-	_, in1Val, _ := inst.ReadPinNum(node.In1)
-	inst.WritePinNum(node.Out1, in1Val)
+	in1 := inst.ReadPin(node.In1)
+	inst.WritePin(node.Out1, in1)
 
 	fmt.Println("job count", count)
 	fmt.Println("job trigger odd", count%2 == 0)

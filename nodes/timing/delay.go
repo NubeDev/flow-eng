@@ -25,9 +25,8 @@ func (inst *Delay) Process() {
 		return
 	}
 	log.Println("Delayed triggered")
-	_, in1Val, _ := inst.ReadPinNum(node.In1)
-	inst.WritePinNum(node.Out1, in1Val)
-
+	in1 := inst.ReadPin(node.In1)
+	inst.WritePin(node.Out1, in1)
 }
 
 func (inst *Delay) Cleanup() {}

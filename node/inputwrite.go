@@ -6,12 +6,12 @@ import (
 )
 
 func (n *BaseNode) OverrideInputValue(name InputName, value interface{}) error {
-	in := n.GetInput(name)
-	if in == nil {
-		return errors.New(fmt.Sprintf("failed to find port%s", name))
+	input := n.GetInput(name)
+	if input == nil {
+		return errors.New(fmt.Sprintf("failed to find port %s", name))
 	}
-	if in.Connection != nil {
-		in.Connection.OverrideValue = value
+	if input.Connection != nil {
+		input.Connection.OverrideValue = value
 	} else {
 		return errors.New(fmt.Sprintf("this node has no inputs"))
 	}

@@ -2,7 +2,6 @@ package broker
 
 import (
 	"fmt"
-	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/mqttclient"
 	"github.com/NubeDev/flow-eng/node"
 	log "github.com/sirupsen/logrus"
@@ -46,10 +45,11 @@ func (inst *MqttPub) getTopic() string {
 	return inst.mqttTopic
 }
 
-func (inst *MqttPub) publish(value string) {
+func (inst *MqttPub) publish(value interface{}) {
 	c, _ := mqttclient.GetMQTT()
 	if inst.getTopic() != "" {
-		err := c.Publish(inst.getTopic(), mqttclient.AtMostOnce, true, value)
+		v := fmt.Sprintf("%v", value)
+		err := c.Publish(inst.getTopic(), mqttclient.AtMostOnce, true, v)
 		if err != nil {
 			log.Errorf(fmt.Sprintf("mqtt-publish topic:%s err:%s", inst.getTopic(), err.Error()))
 		}
@@ -70,18 +70,17 @@ func (inst *MqttPub) connect() {
 }
 
 func (inst *MqttPub) Process() {
-	in1Pointer, in1Val := inst.ReadPin(node.In1)
-	if in1Pointer == nil {
+	val := inst.ReadPin(node.In1)
+	if val == nil {
 		return
 	}
 	if !inst.connected {
 		go inst.connect()
 	}
 	if inst.connected {
-		go inst.publish(in1Val)
+		go inst.publish(val)
 	}
-	val := float.StrToFloat(in1Val)
-	inst.WritePin(node.Out1, float.ToStrPtr(val))
+	inst.WritePin(node.Out1, val)
 }
 
 func (inst *MqttPub) Cleanup() {}

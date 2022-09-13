@@ -104,7 +104,6 @@ func (inst *MqttSub) Process() {
 		val := float.StrToFloat(inst.newMessage)
 		inst.WritePin(node.Out1, float.ToStrPtr(val))
 	}
-
 }
 
 func (inst *MqttSub) Cleanup() {}

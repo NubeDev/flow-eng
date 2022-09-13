@@ -17,11 +17,8 @@ func NewConst(body *node.BaseNode) (node.Node, error) {
 }
 
 func (inst *Const) Process() {
-	_, in1Val, in1Not := inst.ReadPinNum(node.In1)
-	if in1Not {
-		inst.WritePinNum(node.Out1, in1Val)
-	}
-
+	in1 := inst.ReadPin(node.In1)
+	inst.WritePin(node.Out1, in1)
 }
 
 func (inst *Const) Cleanup() {}
