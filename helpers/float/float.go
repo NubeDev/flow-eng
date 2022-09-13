@@ -163,3 +163,22 @@ func RandFloat(range1, range2 float64) float64 {
 	rand.Seed(time.Now().UnixNano())
 	return min + rand.Float64()*(max-min)
 }
+
+func ConvertInterfaceToFloat(value interface{}) *float64 {
+	if value == nil {
+		return nil
+	}
+	output, ok := value.(float64)
+	if ok {
+		return &output
+	}
+	return nil
+}
+
+func ConvertInterfaceToFloatMultiple(values []interface{}) []*float64 {
+	var output []*float64
+	for _, value := range values {
+		output = append(output, ConvertInterfaceToFloat(value))
+	}
+	return output
+}

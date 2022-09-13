@@ -1,8 +1,8 @@
 package math
 
 import (
-	"errors"
 	"github.com/NubeDev/flow-eng/helpers/array"
+	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/node"
 	log "github.com/sirupsen/logrus"
 )
@@ -26,43 +26,45 @@ const (
 func Process(body node.Node) {
 	equation := body.GetName()
 	count := body.InputsLen()
-	f, err := operation(equation, body.ReadMultipleNums(count))
-	if err != nil {
-		body.WritePin(node.Out1, nil)
-		return
+	inputs := float.ConvertInterfaceToFloatMultiple(body.ReadMultiple(count))
+	output := operation(equation, inputs)
+	if output == nil {
+		log.Infof("equation: %s, result: %v", equation, output)
+	} else {
+		log.Infof("equation: %s, result: %v", equation, *output)
 	}
-	log.Infof("equation:%s result:%f", equation, f)
-	body.WritePinNum(node.Out1, f)
+	body.WritePin(node.Out1, output)
 }
 
-func operation(operation string, values []float64) (float64, error) {
-	if len(values) == 0 {
-		return 0, errors.New("no values where pass in")
+func operation(operation string, values []*float64) *float64 {
+	var nonNilValues []float64
+	for _, value := range values {
+		if value != nil {
+			nonNilValues = append(nonNilValues, *value)
+		}
+	}
+	if len(nonNilValues) == 0 {
+		return nil
 	}
 	switch operation {
 	case and:
-		if array.AllTrueFloat64(values) {
-			return 1, nil
+		if array.AllTrueFloat64(nonNilValues) {
+			return float.New(1)
 		} else {
-			return 0, nil
+			return float.New(0)
 		}
 	case or:
-		if array.OneIsTrueFloat64(values) {
-			return 1, nil
+		if array.OneIsTrueFloat64(nonNilValues) {
+			return float.New(1)
 		} else {
-			return 0, nil
+			return float.New(0)
 		}
 	case not:
-		if len(values) > 0 {
-			if values[0] == 0 {
-				return 1, nil
-			}
-			if values[0] == 0 {
-				return 1, nil
-			} else {
-				return 0, nil
-			}
+		if nonNilValues[0] == 0 {
+			return float.New(1)
+		} else {
+			return float.New(0)
 		}
 	}
-	return 0, errors.New("invalid operation")
+	return float.New(0)
 }

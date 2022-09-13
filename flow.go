@@ -86,12 +86,12 @@ func (p *Flow) rebuildNode(node node.Node) {
 }
 
 // ManualNodeConnector this node is just to really be used at the moment when testing the framework by making building the flow through code and not the json import
-func (p *Flow) ManualNodeConnector(sourceNode, destNode node.Node, outPort, inPort node.PortName) error {
+func (p *Flow) ManualNodeConnector(sourceNode, destNode node.Node, outPort node.OutputName, inPort node.InputName) error {
 	for _, output := range sourceNode.GetOutputs() {
 		if output.Name == outPort {
 			for _, input := range destNode.GetInputs() {
 				if input.Name == inPort {
-					output.Connect(input.InputPort)
+					output.Connect(input)
 					log.Infof("manual-connection: source-node:%s dest-node:%s source-port:%s dest-port:%s", sourceNode.GetNodeName(), destNode.GetNodeName(), outPort, inPort)
 					input.Connection.NodeID = sourceNode.GetID()
 					input.Connection.NodePort = outPort
@@ -127,7 +127,7 @@ func (p *Flow) nodeConnector(sourceID string, makeConnection bool) error {
 					if sourceID == input.Connection.NodeID {
 						log.Infof("source-node:%s dest-node:%s source-port:%s dest-port:%s", sourceNode.GetNodeName(), destNode.GetNodeName(), output.Name, inPort)
 						if makeConnection {
-							output.OutputPort.Connect(input.InputPort)
+							output.Connect(input)
 						}
 						input.Connection.NodePort = output.Name
 						input.Connection.NodeID = sourceNode.GetID()
