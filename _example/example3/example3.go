@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/NubeDev/flow-eng/_example/nodes"
 	pprint "github.com/NubeDev/flow-eng/helpers/print"
+	"github.com/NubeDev/flow-eng/nodes"
 )
 
 func main() {

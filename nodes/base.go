@@ -4,23 +4,23 @@ import (
 	"errors"
 	"fmt"
 	flowctrl "github.com/NubeDev/flow-eng"
-	"github.com/NubeDev/flow-eng/_example/nodes/math"
-	broker "github.com/NubeDev/flow-eng/_example/nodes/mqtt"
-	"github.com/NubeDev/flow-eng/_example/nodes/timing"
 	"github.com/NubeDev/flow-eng/node"
+	math2 "github.com/NubeDev/flow-eng/nodes/math"
+	broker2 "github.com/NubeDev/flow-eng/nodes/mqtt"
+	timing2 "github.com/NubeDev/flow-eng/nodes/timing"
 )
 
 func All() []node.Node { // get all the nodes, will be used for the UI to list all the nodes
 	// math
-	constNum, _ := math.NewConst(nil)
-	add, _ := math.NewAdd(nil)
-	sub, _ := math.NewSub(nil)
+	constNum, _ := math2.NewConst(nil)
+	add, _ := math2.NewAdd(nil)
+	sub, _ := math2.NewSub(nil)
 	// time
-	delay, _ := timing.NewDelay(nil, nil)
-	inject, _ := timing.NewInject(nil)
+	delay, _ := timing2.NewDelay(nil, nil)
+	inject, _ := timing2.NewInject(nil)
 	// mqtt
-	mqttSub, _ := broker.NewMqttSub(nil)
-	mqttPub, _ := broker.NewMqttPub(nil)
+	mqttSub, _ := broker2.NewMqttSub(nil)
+	mqttPub, _ := broker2.NewMqttPub(nil)
 	return node.BuildNodes(
 		constNum,
 		add,
@@ -51,11 +51,11 @@ func Builder(body *node.BaseNode) (node.Node, error) {
 func builderMath(body *node.BaseNode) (node.Node, error) {
 	switch body.GetName() {
 	case constNum:
-		return math.NewConst(body)
+		return math2.NewConst(body)
 	case add:
-		return math.NewAdd(body)
+		return math2.NewAdd(body)
 	case sub:
-		return math.NewSub(body)
+		return math2.NewSub(body)
 	}
 	return nil, nil
 }
@@ -63,9 +63,9 @@ func builderMath(body *node.BaseNode) (node.Node, error) {
 func builderTiming(body *node.BaseNode) (node.Node, error) {
 	switch body.GetName() {
 	case delay:
-		return timing.NewDelay(body, flowctrl.NewTimer())
+		return timing2.NewDelay(body, flowctrl.NewTimer())
 	case inject:
-		return timing.NewInject(body)
+		return timing2.NewInject(body)
 	}
 	return nil, nil
 }
@@ -73,9 +73,9 @@ func builderTiming(body *node.BaseNode) (node.Node, error) {
 func builderMQTT(body *node.BaseNode) (node.Node, error) {
 	switch body.GetName() {
 	case mqttSub:
-		return broker.NewMqttSub(body)
+		return broker2.NewMqttSub(body)
 	case mqttPub:
-		return broker.NewMqttPub(body)
+		return broker2.NewMqttPub(body)
 	}
 	return nil, nil
 }
