@@ -8,21 +8,21 @@ type Node interface {
 	GetNodeName() string // my-node
 	GetInfo() Info
 	GetInputs() []*Input
-	GetInput(name PortName) *Input
+	GetInput(name InputName) *Input
 	GetOutputs() []*Output
-	GetOutput(name PortName) *Output
+	GetOutput(name OutputName) *Output
 	GetSettings() []*Settings
 	SetPropValue(name Title, value interface{}) error
-	OverrideInputValue(name PortName, value interface{}) error
+	OverrideInputValue(name InputName, value interface{}) error
 	InputsLen() int
 	OutputsLen() int
 	ReadMultipleNums(count int) []float64
 	ReadMultiple(count int) []*Input
-	ReadPinsNum(...PortName) []*RedMultiplePins
-	ReadPinNum(PortName) (*float64, float64, bool)
-	ReadPin(PortName) (*string, string)
-	WritePin(PortName, interface{})
-	WritePinNum(PortName, float64)
+	ReadPinsNum(...InputName) []*RedMultiplePins
+	ReadPinNum(InputName) (*float64, float64, bool)
+	ReadPin(InputName) (*string, string)
+	WritePin(OutputName, interface{})
+	WritePinNum(OutputName, float64)
 	SetMetadata(m *Metadata)
 	GetMetadata() *Metadata
 }
@@ -67,7 +67,7 @@ func (n *BaseNode) GetInputs() []*Input {
 	return n.Inputs
 }
 
-func (n *BaseNode) GetInput(name PortName) *Input {
+func (n *BaseNode) GetInput(name InputName) *Input {
 	for _, input := range n.GetInputs() {
 		if input.Name == name {
 			return input
@@ -80,7 +80,7 @@ func (n *BaseNode) OutputsLen() int {
 	return len(n.Outputs)
 }
 
-func (n *BaseNode) GetOutput(name PortName) *Output {
+func (n *BaseNode) GetOutput(name OutputName) *Output {
 	for _, out := range n.GetOutputs() {
 		if out.Name == name {
 			return out
@@ -93,7 +93,7 @@ func (n *BaseNode) GetOutputs() []*Output {
 	return n.Outputs
 }
 
-func (n *BaseNode) WritePin(name PortName, value interface{}) {
+func (n *BaseNode) WritePin(name OutputName, value interface{}) {
 	out := n.GetOutput(name)
 	if out == nil {
 		return
@@ -103,7 +103,7 @@ func (n *BaseNode) WritePin(name PortName, value interface{}) {
 	}
 }
 
-func (n *BaseNode) WritePinNum(name PortName, value float64) {
+func (n *BaseNode) WritePinNum(name OutputName, value float64) {
 	n.WritePin(name, value)
 }
 
@@ -117,7 +117,8 @@ type Info struct {
 }
 
 type DataTypes string
-type PortName string
+type InputName string
+type OutputName string
 
 const (
 	TypeString DataTypes = "string"
@@ -126,21 +127,27 @@ const (
 )
 
 const (
-	In   PortName = "in"
-	In1  PortName = "in1"
-	In2  PortName = "in2"
-	In3  PortName = "in3"
-	In4  PortName = "in4"
-	Out  PortName = "out"
-	Out1 PortName = "out1"
-	Out2 PortName = "out2"
-	Out3 PortName = "out3"
-	Out4 PortName = "out4"
+	InputNamePrefix  string = "in"
+	OutputNamePrefix string = "out"
+)
+
+const (
+	In1 InputName = "in1"
+	In2 InputName = "in2"
+	In3 InputName = "in3"
+	In4 InputName = "in4"
+)
+
+const (
+	Out1 OutputName = "out1"
+	Out2 OutputName = "out2"
+	Out3 OutputName = "out3"
+	Out4 OutputName = "out4"
 )
 
 type InputConnection struct {
 	NodeID        string      `json:"nodeID,omitempty"`
-	NodePort      PortName    `json:"nodePortName,omitempty"`
+	NodePort      OutputName  `json:"nodePortName,omitempty"`
 	OverrideValue interface{} `json:"overrideValue,omitempty"` // used for when the user has no node connection and writes the value direct (or can be used to override a value)
 	CurrentValue  interface{} `json:"currentValue,omitempty"`
 	FallbackValue interface{} `json:"fallbackValue,omitempty"`
@@ -149,7 +156,7 @@ type InputConnection struct {
 
 type OutputConnection struct {
 	NodeID        string      `json:"nodeID,omitempty"`
-	NodePort      PortName    `json:"nodePortName,omitempty"`
+	NodePort      InputName   `json:"nodePortName,omitempty"`
 	OverrideValue interface{} `json:"overrideValue,omitempty"` // used for when the user has no node connection and writes the value direct (or can be used to override a value)
 	CurrentValue  interface{} `json:"currentValue,omitempty"`
 	FallbackValue interface{} `json:"fallbackValue,omitempty"`
@@ -159,11 +166,4 @@ type OutputConnection struct {
 type Metadata struct {
 	PositionX string `json:"positionX"`
 	PositionY string `json:"positionY"`
-}
-
-func BoolToInt(b bool) int {
-	if b {
-		return 1
-	}
-	return 0
 }

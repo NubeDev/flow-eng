@@ -13,7 +13,7 @@ func BuildNodes(body ...Node) []Node {
 	return out
 }
 
-func BuildInput(portName PortName, dataType DataTypes, fallback interface{}, inputs []*Input) *Input {
+func BuildInput(portName InputName, dataType DataTypes, fallback interface{}, inputs []*Input) *Input {
 	port := &Input{
 		Name:       portName,
 		DataType:   dataType,
@@ -42,7 +42,7 @@ func BuildInput(portName PortName, dataType DataTypes, fallback interface{}, inp
 	return port
 }
 
-func BuildOutput(portName PortName, dataType DataTypes, fallback interface{}, outputs []*Output) *Output {
+func BuildOutput(portName OutputName, dataType DataTypes, fallback interface{}, outputs []*Output) *Output {
 	var connections []*OutputConnection
 	port := &Output{
 		Name:        portName,
@@ -66,30 +66,28 @@ func BuildOutput(portName PortName, dataType DataTypes, fallback interface{}, ou
 	return port
 }
 
-// DynamicInputs build n number of inputs
-// startOfName eg: in would make in1, in2, in3
-func DynamicInputs(startOfName PortName, dataType DataTypes, fallback interface{}, count, minAllowed, maxAllowed int, inputs []*Input) []*Input {
+// DynamicInputs build n number of inputs -- in1, in2, in3, ..., inN
+func DynamicInputs(dataType DataTypes, fallback interface{}, n, minAllowed, maxAllowed int, inputs []*Input) []*Input {
 	var out []*Input
-	if count < minAllowed {
-		count = minAllowed
+	if n < minAllowed {
+		n = minAllowed
 	}
-	for i := 0; i < count; i++ {
-		name := fmt.Sprintf("%s%d", startOfName, i+1)
+	for i := 1; i <= n; i++ {
+		name := fmt.Sprintf("%s%d", InputNamePrefix, i)
 		if i < maxAllowed {
-			out = append(out, BuildInput(PortName(name), dataType, fallback, inputs))
+			out = append(out, BuildInput(InputName(name), dataType, fallback, inputs))
 		}
 	}
 	return out
 }
 
-// DynamicOutputs build n number of outputs
-// startOfName eg: in would make out1, out2, and so on
-func DynamicOutputs(startOfName PortName, dataType DataTypes, fallback interface{}, count, maxAllowed int, outputs []*Output) []*Output {
+// DynamicOutputs build n number of outputs -- out1, out2, out3, ..., outN
+func DynamicOutputs(dataType DataTypes, fallback interface{}, n, maxAllowed int, outputs []*Output) []*Output {
 	var out []*Output
-	for i := 0; i < count; i++ {
-		name := fmt.Sprintf("%s%d", startOfName, i+1)
+	for i := 1; i <= n; i++ {
+		name := fmt.Sprintf("%s%d", OutputNamePrefix, i+1)
 		if i < maxAllowed {
-			out = append(out, BuildOutput(PortName(name), dataType, fallback, outputs))
+			out = append(out, BuildOutput(OutputName(name), dataType, fallback, outputs))
 		}
 	}
 	return out

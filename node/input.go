@@ -5,8 +5,8 @@ import (
 )
 
 type Input struct {
-	Name       PortName         `json:"name"` // in1
-	DataType   DataTypes        `json:"type"` // int8
+	Name       InputName        `json:"name"` // in1
+	DataType   DataTypes        `json:"type"` // int
 	Connection *InputConnection `json:"connection,omitempty"`
 	Value      interface{}
 	uuid       uuid.Value

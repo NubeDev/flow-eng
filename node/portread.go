@@ -35,7 +35,7 @@ type RedMultiplePins struct {
 	Found bool
 }
 
-func (n *BaseNode) ReadPinsNum(name ...PortName) []*RedMultiplePins {
+func (n *BaseNode) ReadPinsNum(name ...InputName) []*RedMultiplePins {
 	var out []*RedMultiplePins
 	var resp *RedMultiplePins
 	for _, portName := range name {
@@ -48,7 +48,7 @@ func (n *BaseNode) ReadPinsNum(name ...PortName) []*RedMultiplePins {
 	return out
 }
 
-func (n *BaseNode) OverrideInputValue(name PortName, value interface{}) error {
+func (n *BaseNode) OverrideInputValue(name InputName, value interface{}) error {
 	in := n.GetInput(name)
 	if in == nil {
 		return errors.New(fmt.Sprintf("failed to find port%s", name))
@@ -62,7 +62,7 @@ func (n *BaseNode) OverrideInputValue(name PortName, value interface{}) error {
 
 }
 
-func (n *BaseNode) ReadPinNum(name PortName) (value *float64, real float64, hasValue bool) {
+func (n *BaseNode) ReadPinNum(name InputName) (value *float64, real float64, hasValue bool) {
 	pinValPointer, _ := n.ReadPin(name)
 	valPointer, val, err := float.StringFloatErr(pinValPointer)
 	if err != nil {
@@ -71,7 +71,7 @@ func (n *BaseNode) ReadPinNum(name PortName) (value *float64, real float64, hasV
 	return valPointer, val, float.NotNil(valPointer)
 }
 
-func (n *BaseNode) ReadPin(name PortName) (*string, string) {
+func (n *BaseNode) ReadPin(name InputName) (*string, string) {
 	in := n.GetInput(name)
 	if in == nil {
 		return nil, ""

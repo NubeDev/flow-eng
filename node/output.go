@@ -8,7 +8,7 @@ import (
 var ErrTypesMismatch = errors.New("provided buffers types are different")
 
 type Output struct {
-	Name        PortName            `json:"name"` // out1
+	Name        OutputName          `json:"name"` // out1
 	DataType    DataTypes           `json:"type"` // int8
 	Connections []*OutputConnection `json:"connections"`
 	Value       interface{}
