@@ -1,7 +1,6 @@
 package node
 
 import (
-	"errors"
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/str"
@@ -27,39 +26,6 @@ func (n *BaseNode) ReadMultiple(count int) []*Input {
 		}
 	}
 	return out
-}
-
-type RedMultiplePins struct {
-	Value *float64
-	Real  float64
-	Found bool
-}
-
-func (n *BaseNode) ReadPinsNum(name ...InputName) []*RedMultiplePins {
-	var out []*RedMultiplePins
-	var resp *RedMultiplePins
-	for _, portName := range name {
-		v, r, f := n.ReadPinNum(portName)
-		resp.Value = v
-		resp.Real = r
-		resp.Found = f
-		out = append(out, resp)
-	}
-	return out
-}
-
-func (n *BaseNode) OverrideInputValue(name InputName, value interface{}) error {
-	in := n.GetInput(name)
-	if in == nil {
-		return errors.New(fmt.Sprintf("failed to find port%s", name))
-	}
-	if in.Connection != nil {
-		in.Connection.OverrideValue = value
-	} else {
-		return errors.New(fmt.Sprintf("this node has no inputs"))
-	}
-	return nil
-
 }
 
 func (n *BaseNode) ReadPinNum(name InputName) (value *float64, real float64, hasValue bool) {

@@ -3,28 +3,27 @@ package node
 type Node interface {
 	Process() // runs the logic of the node
 	Cleanup()
+	GetInfo() Info
 	GetID() string       // node_abc123
 	GetName() string     // AND, OR
 	GetNodeName() string // my-node
-	GetInfo() Info
 	GetInputs() []*Input
 	GetInput(name InputName) *Input
 	GetOutputs() []*Output
 	GetOutput(name OutputName) *Output
-	GetSettings() []*Settings
-	SetPropValue(name Title, value interface{}) error
-	OverrideInputValue(name InputName, value interface{}) error
 	InputsLen() int
 	OutputsLen() int
 	ReadMultipleNums(count int) []float64
 	ReadMultiple(count int) []*Input
-	ReadPinsNum(...InputName) []*RedMultiplePins
 	ReadPinNum(InputName) (*float64, float64, bool)
 	ReadPin(InputName) (*string, string)
+	OverrideInputValue(name InputName, value interface{}) error
 	WritePin(OutputName, interface{})
 	WritePinNum(OutputName, float64)
-	SetMetadata(m *Metadata)
 	GetMetadata() *Metadata
+	SetMetadata(m *Metadata)
+	GetSettings() []*Settings
+	SetPropertiesValue(name Title, value interface{}) error
 }
 
 type BaseNode struct {
@@ -43,24 +42,12 @@ func (n *BaseNode) GetID() string {
 	return n.Info.NodeID
 }
 
-func (n *BaseNode) GetMetadata() *Metadata {
-	return n.Metadata
-}
-
-func (n *BaseNode) SetMetadata(m *Metadata) {
-	n.Metadata = m
-}
-
 func (n *BaseNode) GetName() string {
 	return n.Info.Name
 }
 
 func (n *BaseNode) GetNodeName() string {
 	return n.Info.NodeName
-}
-
-func (n *BaseNode) InputsLen() int {
-	return len(n.Inputs)
 }
 
 func (n *BaseNode) GetInputs() []*Input {
@@ -76,8 +63,8 @@ func (n *BaseNode) GetInput(name InputName) *Input {
 	return nil
 }
 
-func (n *BaseNode) OutputsLen() int {
-	return len(n.Outputs)
+func (n *BaseNode) GetOutputs() []*Output {
+	return n.Outputs
 }
 
 func (n *BaseNode) GetOutput(name OutputName) *Output {
@@ -89,22 +76,20 @@ func (n *BaseNode) GetOutput(name OutputName) *Output {
 	return nil
 }
 
-func (n *BaseNode) GetOutputs() []*Output {
-	return n.Outputs
+func (n *BaseNode) InputsLen() int {
+	return len(n.Inputs)
 }
 
-func (n *BaseNode) WritePin(name OutputName, value interface{}) {
-	out := n.GetOutput(name)
-	if out == nil {
-		return
-	}
-	if name == out.Name {
-		out.Write(value)
-	}
+func (n *BaseNode) OutputsLen() int {
+	return len(n.Outputs)
 }
 
-func (n *BaseNode) WritePinNum(name OutputName, value float64) {
-	n.WritePin(name, value)
+func (n *BaseNode) GetMetadata() *Metadata {
+	return n.Metadata
+}
+
+func (n *BaseNode) SetMetadata(m *Metadata) {
+	n.Metadata = m
 }
 
 type Info struct {
