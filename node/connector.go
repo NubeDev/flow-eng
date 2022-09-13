@@ -17,7 +17,7 @@ type Connector struct {
 }
 
 func NewConnector(from *OutputPort, to *InputPort) *Connector {
-	if from.Type() != to.Type() {
+	if from.DataType != to.DataType {
 		panic(ErrIncompatiblePortsTypes)
 	}
 	return &Connector{uuid.New(), from, to, false}
@@ -38,7 +38,7 @@ func (connector *Connector) Trigger() error {
 	}
 
 	// move data to destination port
-	_, err := connector.from.Copy(connector.to)
+	err := connector.from.Copy(connector.to)
 	return err
 }
 

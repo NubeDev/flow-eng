@@ -19,8 +19,8 @@ func (n *BaseNode) ReadMultipleNums(count int) []float64 {
 	return out
 }
 
-func (n *BaseNode) ReadMultiple(count int) []*Input {
-	var out []*Input
+func (n *BaseNode) ReadMultiple(count int) []*InputPort {
+	var out []*InputPort
 	for i, input := range n.GetInputs() {
 		if i < count {
 			out = append(out, input)
@@ -85,8 +85,8 @@ func (n *BaseNode) ReadPin(name PortName) (*string, string) {
 			toStr := fmt.Sprintf("%v", in.Connection.FallbackValue)
 			return str.New(toStr), str.NonNil(str.New(toStr))
 		}
-		val := in.Value.Get()
-		return val, str.NonNil(val)
+		val := fmt.Sprintf("%v", in.Value)
+		return str.New(val), val
 	}
 
 	return nil, ""

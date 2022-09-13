@@ -1,10 +1,5 @@
 package node
 
-import (
-	"github.com/NubeDev/flow-eng/buffer/adapter"
-	"github.com/NubeDev/flow-eng/helpers/float"
-)
-
 type Node interface {
 	Process() // runs the logic of the node
 	Cleanup()
@@ -12,32 +7,32 @@ type Node interface {
 	GetName() string     // AND, OR
 	GetNodeName() string // my-node
 	GetInfo() Info
-	GetInputs() []*Input
-	GetInput(name PortName) *Input
-	GetOutputs() []*Output
-	GetOutput(name PortName) *Output
+	GetInputs() []*InputPort
+	GetInput(name PortName) *InputPort
+	GetOutputs() []*OutputPort
+	GetOutput(name PortName) *OutputPort
 	GetSettings() []*Settings
 	SetPropValue(name Title, value interface{}) error
 	OverrideInputValue(name PortName, value interface{}) error
 	InputsLen() int
 	OutputsLen() int
 	ReadMultipleNums(count int) []float64
-	ReadMultiple(count int) []*Input
+	ReadMultiple(count int) []*InputPort
 	ReadPinsNum(...PortName) []*RedMultiplePins
 	ReadPinNum(PortName) (*float64, float64, bool)
 	ReadPin(PortName) (*string, string)
-	WritePin(PortName, *string)
+	WritePin(PortName, interface{})
 	WritePinNum(PortName, float64)
 	SetMetadata(m *Metadata)
 	GetMetadata() *Metadata
 }
 
 type BaseNode struct {
-	Inputs   []*Input    `json:"inputs,omitempty"`
-	Outputs  []*Output   `json:"outputs,omitempty"`
-	Info     Info        `json:"info"`
-	Settings []*Settings `json:"settings,omitempty"`
-	Metadata *Metadata   `json:"metadata,omitempty"`
+	Inputs   []*InputPort  `json:"inputs,omitempty"`
+	Outputs  []*OutputPort `json:"outputs,omitempty"`
+	Info     Info          `json:"info"`
+	Settings []*Settings   `json:"settings,omitempty"`
+	Metadata *Metadata     `json:"metadata,omitempty"`
 }
 
 func (n *BaseNode) GetInfo() Info {
@@ -68,11 +63,11 @@ func (n *BaseNode) InputsLen() int {
 	return len(n.Inputs)
 }
 
-func (n *BaseNode) GetInputs() []*Input {
+func (n *BaseNode) GetInputs() []*InputPort {
 	return n.Inputs
 }
 
-func (n *BaseNode) GetInput(name PortName) *Input {
+func (n *BaseNode) GetInput(name PortName) *InputPort {
 	for _, input := range n.GetInputs() {
 		if input.Name == name {
 			return input
@@ -85,7 +80,7 @@ func (n *BaseNode) OutputsLen() int {
 	return len(n.Outputs)
 }
 
-func (n *BaseNode) GetOutput(name PortName) *Output {
+func (n *BaseNode) GetOutput(name PortName) *OutputPort {
 	for _, out := range n.GetOutputs() {
 		if out.Name == name {
 			return out
@@ -94,22 +89,25 @@ func (n *BaseNode) GetOutput(name PortName) *Output {
 	return nil
 }
 
-func (n *BaseNode) GetOutputs() []*Output {
+func (n *BaseNode) GetOutputs() []*OutputPort {
 	return n.Outputs
 }
 
-func (n *BaseNode) WritePin(name PortName, value *string) {
+func (n *BaseNode) WritePin(name PortName, value interface{}) {
 	out := n.GetOutput(name)
 	if out == nil {
 		return
 	}
 	if name == out.Name {
-		out.Value.Set(value)
+		out.Write(value)
+		// out.Value = value
+		// TODO
+		// out.Value.Set(value)
 	}
 }
 
 func (n *BaseNode) WritePinNum(name PortName, value float64) {
-	n.WritePin(name, float.ToStrPtr(value))
+	n.WritePin(name, value)
 }
 
 type Info struct {
@@ -164,16 +162,6 @@ type OutputConnection struct {
 type Metadata struct {
 	PositionX string `json:"positionX"`
 	PositionY string `json:"positionY"`
-}
-
-type Input struct {
-	*InputPort
-	Value *adapter.String `json:"-"`
-}
-
-type Output struct {
-	*OutputPort
-	Value *adapter.String `json:"-"`
 }
 
 func BoolToInt(b bool) int {

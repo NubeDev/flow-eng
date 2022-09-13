@@ -1,7 +1,6 @@
 package node
 
 import (
-	"github.com/NubeDev/flow-eng/buffer"
 	"github.com/NubeDev/flow-eng/uuid"
 )
 
@@ -9,18 +8,18 @@ type InputPort struct {
 	Name       PortName         `json:"name"` // in1
 	DataType   DataTypes        `json:"type"` // int8
 	Connection *InputConnection `json:"connection,omitempty"`
-	*buffer.Const
-	uuid      uuid.Value
-	direction Direction
-	connector *Connector
+	Value      interface{}
+	uuid       uuid.Value
+	direction  Direction
+	connector  *Connector
 }
 
-func newInputPort(_type buffer.Type, body *InputPort) *InputPort {
+func newInputPort(body *InputPort) *InputPort {
 	return &InputPort{
 		body.Name,
 		body.DataType,
 		body.Connection,
-		buffer.NewConst(_type),
+		nil,
 		uuid.New(),
 		DirectionInput,
 		nil}

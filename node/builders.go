@@ -2,8 +2,6 @@ package node
 
 import (
 	"fmt"
-	"github.com/NubeDev/flow-eng/buffer"
-	"github.com/NubeDev/flow-eng/buffer/adapter"
 	"github.com/NubeDev/flow-eng/helpers"
 )
 
@@ -15,51 +13,43 @@ func BuildNodes(body ...Node) []Node {
 	return out
 }
 
-func BuildInput(portName PortName, dataType DataTypes, fallback interface{}, inputs []*Input) *Input {
-	out := &Input{}
+func BuildInput(portName PortName, dataType DataTypes, fallback interface{}, inputs []*InputPort) *InputPort {
 	port := &InputPort{
 		Name:       portName,
 		DataType:   dataType,
 		Connection: &InputConnection{}}
-	_dataType := buffer.String
-	port = newInputPort(_dataType, port)
-	out.InputPort = port
-	out.Value = adapter.NewString(port)
+	port = newInputPort(port)
 	var addConnections bool
 	if len(inputs) == 0 {
-		inputs = []*Input{out}
+		inputs = []*InputPort{port}
 	}
 	for _, input := range inputs {
 		if input.Connection.FallbackValue == nil {
-			out.InputPort.Connection.FallbackValue = fallback
+			port.Connection.FallbackValue = fallback
 		}
 		if input.Name == portName {
 			addConnections = true
 			if input.Connection != nil { // this would be when the flow comes from json
-				out.Connection = input.Connection
+				port.Connection = input.Connection
 			} else {
-				out.Connection = &InputConnection{}
+				port.Connection = &InputConnection{}
 			}
 		}
 	}
 	if !addConnections {
-		out.Connection = &InputConnection{}
+		port.Connection = &InputConnection{}
 	}
-	return out
+	return port
 }
 
-func BuildOutput(portName PortName, dataType DataTypes, fallback interface{}, outputs []*Output) *Output {
-	out := &Output{}
+func BuildOutput(portName PortName, dataType DataTypes, fallback interface{}, outputs []*OutputPort) *OutputPort {
 	var connections []*OutputConnection
 	port := &OutputPort{
 		Name:        portName,
 		DataType:    dataType,
 		Connections: connections,
 	}
-	_dataType := buffer.String
-	port = newOutputPort(_dataType, port)
-	out.OutputPort = port
-	out.Value = adapter.NewString(port)
+	port = newOutputPort(port)
 	for _, output := range outputs {
 		if output.Name == portName {
 			for _, connection := range output.Connections {
@@ -72,14 +62,14 @@ func BuildOutput(portName PortName, dataType DataTypes, fallback interface{}, ou
 			}
 		}
 	}
-	out.Connections = connections
-	return out
+	port.Connections = connections
+	return port
 }
 
 // DynamicInputs build n number of inputs
 // startOfName eg: in would make in1, in2, in3
-func DynamicInputs(startOfName PortName, dataType DataTypes, fallback interface{}, count, minAllowed, maxAllowed int, inputs []*Input) []*Input {
-	var out []*Input
+func DynamicInputs(startOfName PortName, dataType DataTypes, fallback interface{}, count, minAllowed, maxAllowed int, inputs []*InputPort) []*InputPort {
+	var out []*InputPort
 	if count < minAllowed {
 		count = minAllowed
 	}
@@ -94,8 +84,8 @@ func DynamicInputs(startOfName PortName, dataType DataTypes, fallback interface{
 
 // DynamicOutputs build n number of outputs
 // startOfName eg: in would make out1, out2, and so on
-func DynamicOutputs(startOfName PortName, dataType DataTypes, fallback interface{}, count, maxAllowed int, outputs []*Output) []*Output {
-	var out []*Output
+func DynamicOutputs(startOfName PortName, dataType DataTypes, fallback interface{}, count, maxAllowed int, outputs []*OutputPort) []*OutputPort {
+	var out []*OutputPort
 	for i := 0; i < count; i++ {
 		name := fmt.Sprintf("%s%d", startOfName, i+1)
 		if i < maxAllowed {
@@ -105,23 +95,23 @@ func DynamicOutputs(startOfName PortName, dataType DataTypes, fallback interface
 	return out
 }
 
-func BuildNode(body *BaseNode, inputs []*Input, outputs []*Output, settings []*Settings) *BaseNode {
+func BuildNode(body *BaseNode, inputs []*InputPort, outputs []*OutputPort, settings []*Settings) *BaseNode {
 	body.Settings = settings
 	body.Inputs = inputs
 	body.Outputs = outputs
 	return body
 }
 
-func BuildInputs(body ...*Input) []*Input {
-	var out []*Input
+func BuildInputs(body ...*InputPort) []*InputPort {
+	var out []*InputPort
 	for _, input := range body {
 		out = append(out, input)
 	}
 	return out
 }
 
-func BuildOutputs(body ...*Output) []*Output {
-	var out []*Output
+func BuildOutputs(body ...*OutputPort) []*OutputPort {
+	var out []*OutputPort
 	for _, output := range body {
 		out = append(out, output)
 	}

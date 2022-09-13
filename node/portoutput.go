@@ -1,41 +1,39 @@
 package node
 
 import (
-	"github.com/NubeDev/flow-eng/buffer"
+	"errors"
 	"github.com/NubeDev/flow-eng/uuid"
 )
+
+var ErrTypesMismatch = errors.New("provided buffers types are different")
 
 type OutputPort struct {
 	Name        PortName            `json:"name"` // out1
 	DataType    DataTypes           `json:"type"` // int8
-	Connections []*OutputConnection `json:"connection"`
-	*buffer.Const
-	uuid       uuid.Value
-	direction  Direction
-	connectors []*Connector
+	Connections []*OutputConnection `json:"connections"`
+	Value       interface{}
+	uuid        uuid.Value
+	direction   Direction
+	connectors  []*Connector
 }
 
-func newOutputPort(_type buffer.Type, body *OutputPort) *OutputPort {
+func newOutputPort(body *OutputPort) *OutputPort {
 	return &OutputPort{
 		body.Name,
 		body.DataType,
 		body.Connections,
-		buffer.NewConst(_type),
+		nil,
 		uuid.New(),
 		DirectionOutput,
 		make([]*Connector, 0, 1)}
 }
 
-func (p *OutputPort) Write(data []byte) (int, error) {
-	written, err := p.Const.Write(data)
-	if err != nil {
-		return written, err
-	}
+func (p *OutputPort) Write(value interface{}) {
+	p.Value = value
 	for i := 0; i < len(p.connectors); i++ {
 		conn := p.connectors[i]
 		conn.Notify()
 	}
-	return written, nil
 }
 
 func (p *OutputPort) UUID() uuid.Value {
@@ -50,8 +48,12 @@ func (p *OutputPort) Connectors() []*Connector {
 	return p.connectors
 }
 
-func (p *OutputPort) Copy(other *InputPort) (int, error) {
-	return p.Const.Copy(other.Const)
+func (p *OutputPort) Copy(other *InputPort) error {
+	if p.DataType != other.DataType {
+		return ErrTypesMismatch
+	}
+	other.Value = p.Value
+	return nil
 }
 
 func (p *OutputPort) Connect(inputs ...*InputPort) {
