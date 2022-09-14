@@ -23,6 +23,20 @@ type Node interface {
 	SetPropertiesValue(name Title, value interface{}) error
 }
 
+func New(id, name, nodeName string, meta *Metadata) *BaseNode {
+	return &BaseNode{
+		Inputs:  nil,
+		Outputs: nil,
+		Info: Info{
+			NodeID:   id,
+			Name:     name,
+			NodeName: nodeName,
+		},
+		Metadata: meta,
+	}
+
+}
+
 type BaseNode struct {
 	Inputs   []*Input    `json:"inputs,omitempty"`
 	Outputs  []*Output   `json:"outputs,omitempty"`

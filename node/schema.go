@@ -8,13 +8,13 @@ type Schema struct {
 	Inputs   interface{} `json:"inputs"`
 }
 
-type Inputs struct {
-	Links map[string]Links `json:"links,omitempty"`
+type SchemaInputs struct {
+	Links map[string]SchemaLinks `json:"links,omitempty"`
 }
 
-// Links node links
-type Links struct {
+// SchemaLinks node links
+type SchemaLinks struct {
 	NodeId string      `json:"nodeId,omitempty"` // from node uuid
-	Socket string      `json:"socket,omitempty"` // this is the port/pin name
+	Socket OutputName  `json:"socket,omitempty"` // this is the port/pin name
 	Value  interface{} `json:"value"`
 }

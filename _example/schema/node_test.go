@@ -1,18 +1,25 @@
 package node
 
 import (
+	"errors"
 	"fmt"
 	flowctrl "github.com/NubeDev/flow-eng"
+	"github.com/NubeDev/flow-eng/helpers/float"
 	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
+	"github.com/NubeDev/flow-eng/nodes"
 	"github.com/NubeDev/flow-eng/nodes/math"
+	"github.com/mitchellh/mapstructure"
 	log "github.com/sirupsen/logrus"
+	"strings"
 	"testing"
 )
 
 type NodesList struct {
-	Nodes interface{} `json:"nodes"`
+	Nodes []*node.Schema `json:"nodes"`
 }
+
+var encodedNodes NodesList
 
 func TestBaseNode_NodeConnectionEncode(t *testing.T) {
 
@@ -84,12 +91,17 @@ func TestBaseNode_NodeConnectionEncode(t *testing.T) {
 	nodeSchema := &node.Schema{}
 
 	for _, baseNode := range graph.GetNodesBase() { // we need to add each node that has one connection
+		nodeType, err := setType(baseNode)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 		nodeSchema = &node.Schema{
 			Id:   baseNode.GetID(),
-			Type: setType(baseNode),
+			Type: nodeType,
 		}
 		if len(baseNode.GetInputs()) > 0 {
-			links := map[string]node.Links{}
+			links := map[string]node.SchemaLinks{}
 			// for a node we need its input and see if it has a connection, if so we need the uuid of the node its connection to
 			for _, input := range baseNode.GetInputs() {
 				// check the input has connection
@@ -100,9 +112,9 @@ func TestBaseNode_NodeConnectionEncode(t *testing.T) {
 					sourceNode := graph.GetNode(destNodeId)
 					for _, output := range sourceNode.GetOutputs() {
 						if output.Name == destOutputName {
-							links[string(inputName)] = node.Links{
+							links[string(inputName)] = node.SchemaLinks{
 								NodeId: destNodeId,
-								Socket: string(destOutputName),
+								Socket: destOutputName,
 							}
 						}
 					}
@@ -110,7 +122,7 @@ func TestBaseNode_NodeConnectionEncode(t *testing.T) {
 					if input.Connection.OverrideValue != nil {
 						str := fmt.Sprintf("%v", input.Connection.OverrideValue)
 						//linkValue = map[string]map[string]string{string(inputName): {"value": str}}
-						links[string(input.Name)] = node.Links{
+						links[string(input.Name)] = node.SchemaLinks{
 							Value: str,
 						}
 					}
@@ -123,7 +135,7 @@ func TestBaseNode_NodeConnectionEncode(t *testing.T) {
 			}
 
 			//nodeSchema.Inputs = linkValue                 // as a value when no input is connected
-			nodeSchema.Inputs = node.Inputs{Links: links} // when a connection is made
+			nodeSchema.Inputs = node.SchemaInputs{Links: links} // when a connection is made
 			listSchema = append(listSchema, nodeSchema)
 		} else { // if a node has no input then add it here
 			nodeSchema.Metadata = &node.Metadata{
@@ -132,42 +144,95 @@ func TestBaseNode_NodeConnectionEncode(t *testing.T) {
 			}
 			listSchema = append(listSchema, nodeSchema)
 		}
-
 	}
-	a := NodesList{
+	encodedNodes = NodesList{
 		Nodes: listSchema,
 	}
 
-	pprint.PrintJOSN(a)
-
 }
 
-func setType(n *node.BaseNode) string {
+func setType(n *node.BaseNode) (string, error) {
 	if n == nil {
-		return ""
+		return "", errors.New("node info can not be empty")
 	}
-	return fmt.Sprintf("%s/%s", n.Info.Category, n.Info.Name)
+	if n.Info.Name == "" {
+		return "", errors.New("node name can not be empty")
+	}
+	if n.Info.Category == "" {
+		return "", errors.New("node category can not be empty")
+	}
+	return fmt.Sprintf("%s/%s", n.Info.Category, n.Info.Name), nil
 
 }
 
-func TestBaseNode_NodeNonConnection(t *testing.T) {
-	var list []*node.Schema
-	var value = map[string]map[string]string{"duration": map[string]string{"value": "22"}}
-	s1 := &node.Schema{
-		Id:   "2",
-		Type: "time/delay",
-		Metadata: &node.Metadata{
-			PositionX: "271.5",
-			PositionY: "-69",
-		},
-		Inputs: value,
+func decodeType(n *node.Schema) (category, name string, err error) {
+	if n == nil {
+		return "", "", errors.New("node schema can not be empty")
 	}
-
-	list = append(list, s1)
-	a := NodesList{
-		Nodes: list,
+	if n.Type == "" {
+		return "", "", errors.New("node type can not be empty")
 	}
-
-	pprint.PrintJOSN(a)
+	parts := strings.Split(n.Type, "/")
+	if len(parts) > 1 {
+		return parts[0], parts[1], nil
+	}
+	return "", "", errors.New("failed to get category and name from node-type")
 
 }
+
+func TestBaseNode_Decode(t *testing.T) {
+	var decodedNodes []*node.BaseNode
+	var decodedNode *node.BaseNode
+	for _, encodedNode := range encodedNodes.Nodes {
+		ins := &node.SchemaInputs{}
+		err := mapstructure.Decode(encodedNode.Inputs, ins)
+		if err != nil {
+			fmt.Println(err)
+			//return
+		}
+		_, getName, _ := decodeType(encodedNode)
+		id := encodedNode.Id
+		name := getName
+		decodedNode = node.New(id, name, "", encodedNode.Metadata) // create a blank node
+		newNode, err := nodes.Builder(decodedNode)                 // make the new node as per its type
+		for _, input := range newNode.GetInputs() {                // add the input connections as required
+			for inputName, links := range ins.Links { // these would be the input connections
+				if input.Name == node.InputName(inputName) {
+					if links.Value != nil { // user has set a value and no input is connected
+						str := fmt.Sprintf("%v", links.Value)
+						input.Connection.OverrideValue = float.StrToFloat(str) // TODO add in dataTypes later
+					} else {
+						input.Connection.NodeID = links.NodeId
+						input.Connection.NodePort = links.Socket
+					}
+				}
+			}
+		}
+		decodedNodes = append(decodedNodes, decodedNode)
+
+	}
+	pprint.PrintJOSN(decodedNodes)
+
+}
+
+//func TestBaseNode_NodeNonConnection(t *testing.T) {
+//	var list []*node.Schema
+//	var value = map[string]map[string]string{"duration": map[string]string{"value": "22"}}
+//	s1 := &node.Schema{
+//		Id:   "2",
+//		Type: "time/delay",
+//		Metadata: &node.Metadata{
+//			PositionX: "271.5",
+//			PositionY: "-69",
+//		},
+//		Inputs: value,
+//	}
+//
+//	list = append(list, s1)
+//	a := NodesList{
+//		Nodes: list,
+//	}
+//
+//	pprint.PrintJOSN(a)
+//
+//}
