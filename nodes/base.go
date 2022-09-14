@@ -10,20 +10,10 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/timing"
 )
 
-func convert(n node.Node) *node.BaseNode {
-	return &node.BaseNode{
-		Inputs:   n.GetInputs(),
-		Outputs:  n.GetOutputs(),
-		Info:     n.GetInfo(),
-		Settings: n.GetSettings(),
-		Metadata: n.GetMetadata(),
-	}
-}
-
 func All() []*node.BaseNode { // get all the nodes, will be used for the UI to list all the nodes
 	// math
 	a, _ := math.NewConst(nil)
-	constNum := convert(a)
+	constNum := node.ConvertToBase(a)
 	//add, _ := math.NewAdd(nil)
 	//sub, _ := math.NewSub(nil)
 	//// time
