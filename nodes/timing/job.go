@@ -9,14 +9,14 @@ import (
 )
 
 type Inject struct {
-	*node.BaseNode
+	*node.Spec
 	cron        *gocron.Scheduler
 	triggered   bool
 	lastTrigger string
 	lastTime    time.Time
 }
 
-func NewInject(body *node.BaseNode) (node.Node, error) {
+func NewInject(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, inject, category)
 	body.Inputs = node.BuildInputs(node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs))
 	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeFloat, nil, body.Outputs))

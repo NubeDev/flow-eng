@@ -5,10 +5,10 @@ import (
 )
 
 type Const struct {
-	*node.BaseNode
+	*node.Spec
 }
 
-func NewConst(body *node.BaseNode) (node.Node, error) {
+func NewConst(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, constNum, category)
 	inputs := node.BuildInputs(node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeFloat, nil, body.Outputs))

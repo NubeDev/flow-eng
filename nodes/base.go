@@ -10,10 +10,10 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/timing"
 )
 
-func All() []*node.BaseNode { // get all the nodes, will be used for the UI to list all the nodes
+func All() []*node.Spec { // get all the nodes, will be used for the UI to list all the nodes
 	// math
 	a, _ := math.NewConst(nil)
-	constNum := node.ConvertToBase(a)
+	constNum := node.ConvertToSpec(a)
 	//add, _ := math.NewAdd(nil)
 	//sub, _ := math.NewSub(nil)
 	//// time
@@ -22,12 +22,12 @@ func All() []*node.BaseNode { // get all the nodes, will be used for the UI to l
 	//// mqtt
 	//mqttSub, _ := broker.NewMqttSub(nil)
 	//mqttPub, _ := broker.NewMqttPub(nil)
-	return node.BuildBaseNodes(
+	return node.BuildSpecs(
 		constNum,
 	)
 }
 
-func Builder(body *node.BaseNode) (node.Node, error) {
+func Builder(body *node.Spec) (node.Node, error) {
 	n, err := builderMath(body)
 	if n != nil || err != nil {
 		return n, err
@@ -43,7 +43,7 @@ func Builder(body *node.BaseNode) (node.Node, error) {
 	return nil, errors.New(fmt.Sprintf("no nodes found with name:%s", body.GetName()))
 }
 
-func builderMath(body *node.BaseNode) (node.Node, error) {
+func builderMath(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case constNum:
 		return math.NewConst(body)
@@ -55,7 +55,7 @@ func builderMath(body *node.BaseNode) (node.Node, error) {
 	return nil, nil
 }
 
-func builderTiming(body *node.BaseNode) (node.Node, error) {
+func builderTiming(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case delay:
 		return timing.NewDelay(body, flowctrl.NewTimer())
@@ -65,7 +65,7 @@ func builderTiming(body *node.BaseNode) (node.Node, error) {
 	return nil, nil
 }
 
-func builderMQTT(body *node.BaseNode) (node.Node, error) {
+func builderMQTT(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case mqttSub:
 		return broker.NewMqttSub(body)

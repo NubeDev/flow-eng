@@ -9,7 +9,7 @@ type NodesList struct {
 	Nodes interface{} `json:"nodes"`
 }
 
-func TestBaseNode_NodeConnection(t *testing.T) {
+func TestSpec_NodeConnection(t *testing.T) {
 
 	var list []*Schema
 	var (
@@ -50,7 +50,7 @@ func TestBaseNode_NodeConnection(t *testing.T) {
 
 }
 
-func TestBaseNode_NodeNonConnection(t *testing.T) {
+func TestSpec_NodeNonConnection(t *testing.T) {
 	var list []*Schema
 	var value = map[string]map[string]string{"duration": map[string]string{"value": "22"}}
 	s1 := &Schema{

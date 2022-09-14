@@ -5,8 +5,8 @@ func SetName(name string) string {
 	return name
 }
 
-func ConvertToBase(n Node) *BaseNode {
-	return &BaseNode{
+func ConvertToSpec(n Node) *Spec {
+	return &Spec{
 		Inputs:   n.GetInputs(),
 		Outputs:  n.GetOutputs(),
 		Info:     n.GetInfo(),

@@ -23,8 +23,8 @@ type Node interface {
 	SetPropertiesValue(name Title, value interface{}) error
 }
 
-func New(id, name, nodeName string, meta *Metadata) *BaseNode {
-	return &BaseNode{
+func New(id, name, nodeName string, meta *Metadata) *Spec {
+	return &Spec{
 		Inputs:  nil,
 		Outputs: nil,
 		Info: Info{
@@ -37,7 +37,7 @@ func New(id, name, nodeName string, meta *Metadata) *BaseNode {
 
 }
 
-type BaseNode struct {
+type Spec struct {
 	Inputs   []*Input    `json:"inputs,omitempty"`
 	Outputs  []*Output   `json:"outputs,omitempty"`
 	Info     Info        `json:"info"`
@@ -45,27 +45,27 @@ type BaseNode struct {
 	Metadata *Metadata   `json:"metadata,omitempty"`
 }
 
-func (n *BaseNode) GetInfo() Info {
+func (n *Spec) GetInfo() Info {
 	return n.Info
 }
 
-func (n *BaseNode) GetID() string {
+func (n *Spec) GetID() string {
 	return n.Info.NodeID
 }
 
-func (n *BaseNode) GetName() string {
+func (n *Spec) GetName() string {
 	return n.Info.Name
 }
 
-func (n *BaseNode) GetNodeName() string {
+func (n *Spec) GetNodeName() string {
 	return n.Info.NodeName
 }
 
-func (n *BaseNode) GetInputs() []*Input {
+func (n *Spec) GetInputs() []*Input {
 	return n.Inputs
 }
 
-func (n *BaseNode) GetInput(name InputName) *Input {
+func (n *Spec) GetInput(name InputName) *Input {
 	for _, input := range n.GetInputs() {
 		if input.Name == name {
 			return input
@@ -74,11 +74,11 @@ func (n *BaseNode) GetInput(name InputName) *Input {
 	return nil
 }
 
-func (n *BaseNode) GetOutputs() []*Output {
+func (n *Spec) GetOutputs() []*Output {
 	return n.Outputs
 }
 
-func (n *BaseNode) GetOutput(name OutputName) *Output {
+func (n *Spec) GetOutput(name OutputName) *Output {
 	for _, out := range n.GetOutputs() {
 		if out.Name == name {
 			return out
@@ -87,19 +87,19 @@ func (n *BaseNode) GetOutput(name OutputName) *Output {
 	return nil
 }
 
-func (n *BaseNode) InputsLen() int {
+func (n *Spec) InputsLen() int {
 	return len(n.Inputs)
 }
 
-func (n *BaseNode) OutputsLen() int {
+func (n *Spec) OutputsLen() int {
 	return len(n.Outputs)
 }
 
-func (n *BaseNode) GetMetadata() *Metadata {
+func (n *Spec) GetMetadata() *Metadata {
 	return n.Metadata
 }
 
-func (n *BaseNode) SetMetadata(m *Metadata) {
+func (n *Spec) SetMetadata(m *Metadata) {
 	n.Metadata = m
 }
 

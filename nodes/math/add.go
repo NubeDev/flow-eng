@@ -7,10 +7,10 @@ import (
 )
 
 type Add struct {
-	*node.BaseNode
+	*node.Spec
 }
 
-func NewAdd(body *node.BaseNode) (node.Node, error) {
+func NewAdd(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, add, category)
 	buildCount, setting, value, err := node.NewSetting(body, &node.SettingOptions{Type: node.Number, Title: node.InputCount, Min: 3, Max: 20})
 	if err != nil {
@@ -33,7 +33,7 @@ func NewAdd(body *node.BaseNode) (node.Node, error) {
 func getPoints() {
 	client := resty.New()
 	resp, err := client.R().
-		SetResult(&node.BaseNode{}).
+		SetResult(&node.Spec{}).
 		Get("http://192.168.15.190:1660/api/points")
 	fmt.Println(err)
 	fmt.Println(resp.Status())

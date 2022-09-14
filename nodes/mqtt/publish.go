@@ -8,7 +8,7 @@ import (
 )
 
 type MqttPub struct {
-	*node.BaseNode
+	*node.Spec
 	client     *mqttclient.Client
 	connected  bool
 	subscribed bool
@@ -16,7 +16,7 @@ type MqttPub struct {
 	mqttTopic  string
 }
 
-func NewMqttPub(body *node.BaseNode) (node.Node, error) {
+func NewMqttPub(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, mqttPublish, category)
 	_, setting, value, err := node.NewSetting(body, &node.SettingOptions{Type: node.String, Title: topic, Min: 1, Max: 200})
 	if err != nil {

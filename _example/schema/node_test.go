@@ -21,7 +21,7 @@ type NodesList struct {
 
 var encodedNodes NodesList
 
-func TestBaseNode_NodeConnectionEncode(t *testing.T) {
+func TestSpec_NodeConnectionEncode(t *testing.T) {
 
 	const1, err := math.NewConst(nil) // new node
 	if err != nil {
@@ -90,20 +90,20 @@ func TestBaseNode_NodeConnectionEncode(t *testing.T) {
 	var listSchema []*node.Schema
 	nodeSchema := &node.Schema{}
 
-	for _, baseNode := range graph.GetNodesBase() { // we need to add each node that has one connection
-		nodeType, err := setType(baseNode)
+	for _, Spec := range graph.GetNodesBase() { // we need to add each node that has one connection
+		nodeType, err := setType(Spec)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 		nodeSchema = &node.Schema{
-			Id:   baseNode.GetID(),
+			Id:   Spec.GetID(),
 			Type: nodeType,
 		}
-		if len(baseNode.GetInputs()) > 0 {
+		if len(Spec.GetInputs()) > 0 {
 			links := map[string]node.SchemaLinks{}
 			// for a node we need its input and see if it has a connection, if so we need the uuid of the node its connection to
-			for _, input := range baseNode.GetInputs() {
+			for _, input := range Spec.GetInputs() {
 				// check the input has connection
 				destOutputName := input.Connection.NodePort
 				if destOutputName != "" {
@@ -151,7 +151,7 @@ func TestBaseNode_NodeConnectionEncode(t *testing.T) {
 
 }
 
-func setType(n *node.BaseNode) (string, error) {
+func setType(n *node.Spec) (string, error) {
 	if n == nil {
 		return "", errors.New("node info can not be empty")
 	}
@@ -180,9 +180,9 @@ func decodeType(n *node.Schema) (category, name string, err error) {
 
 }
 
-func TestBaseNode_Decode(t *testing.T) {
-	var decodedNodes []*node.BaseNode
-	var decodedNode *node.BaseNode
+func TestSpec_Decode(t *testing.T) {
+	var decodedNodes []*node.Spec
+	var decodedNode *node.Spec
 	for _, encodedNode := range encodedNodes.Nodes {
 		ins := &node.SchemaInputs{}
 		err := mapstructure.Decode(encodedNode.Inputs, ins)
@@ -215,7 +215,7 @@ func TestBaseNode_Decode(t *testing.T) {
 
 }
 
-//func TestBaseNode_NodeNonConnection(t *testing.T) {
+//func TestSpec_NodeNonConnection(t *testing.T) {
 //	var list []*node.Schema
 //	var value = map[string]map[string]string{"duration": map[string]string{"value": "22"}}
 //	s1 := &node.Schema{

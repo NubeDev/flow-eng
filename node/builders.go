@@ -5,8 +5,8 @@ import (
 	"github.com/NubeDev/flow-eng/helpers"
 )
 
-func BuildBaseNodes(body ...*BaseNode) []*BaseNode {
-	var out []*BaseNode
+func BuildSpecs(body ...*Spec) []*Spec {
+	var out []*Spec
 	for _, output := range body {
 		out = append(out, output)
 	}
@@ -102,7 +102,7 @@ func DynamicOutputs(dataType DataTypes, fallback interface{}, n, maxAllowed int,
 	return out
 }
 
-func BuildNode(body *BaseNode, inputs []*Input, outputs []*Output, settings []*Settings) *BaseNode {
+func BuildNode(body *Spec, inputs []*Input, outputs []*Output, settings []*Settings) *Spec {
 	body.Settings = settings
 	body.Inputs = inputs
 	body.Outputs = outputs
@@ -125,9 +125,9 @@ func BuildOutputs(body ...*Output) []*Output {
 	return out
 }
 
-func Defaults(body *BaseNode, nodeName, category string) *BaseNode {
+func Defaults(body *Spec, nodeName, category string) *Spec {
 	if body == nil {
-		body = &BaseNode{
+		body = &Spec{
 			Info: Info{
 				NodeName: helpers.ShortUUID(nodeName),
 				NodeID:   "",

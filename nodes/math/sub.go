@@ -5,10 +5,10 @@ import (
 )
 
 type Sub struct {
-	*node.BaseNode
+	*node.Spec
 }
 
-func NewSub(body *node.BaseNode) (node.Node, error) {
+func NewSub(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, add, category)
 	buildCount, setting, value, err := node.NewSetting(body, &node.SettingOptions{Type: node.Number, Title: node.InputCount, Min: 2, Max: 20})
 	if err != nil {

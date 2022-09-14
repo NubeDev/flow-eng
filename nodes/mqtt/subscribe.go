@@ -11,7 +11,7 @@ import (
 )
 
 type MqttSub struct {
-	*node.BaseNode
+	*node.Spec
 	client     *mqttclient.Client
 	connected  bool
 	subscribed bool
@@ -25,7 +25,7 @@ const (
 
 var bus cbus.Bus
 
-func NewMqttSub(body *node.BaseNode) (node.Node, error) {
+func NewMqttSub(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, mqttSub, category)
 	_, setting, value, err := node.NewSetting(body, &node.SettingOptions{Type: node.String, Title: topic, Min: 1, Max: 200})
 	if err != nil {

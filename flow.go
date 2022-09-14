@@ -28,10 +28,10 @@ func (p *Flow) GetNodes() []node.Node {
 	return p.nodes
 }
 
-func (p *Flow) GetNodesBase() []*node.BaseNode {
-	var list []*node.BaseNode
+func (p *Flow) GetNodesBase() []*node.Spec {
+	var list []*node.Spec
 	for _, n := range p.GetNodes() {
-		n_ := &node.BaseNode{
+		n_ := &node.Spec{
 			Inputs:   n.GetInputs(),
 			Outputs:  n.GetOutputs(),
 			Info:     n.GetInfo(),
@@ -43,9 +43,9 @@ func (p *Flow) GetNodesBase() []*node.BaseNode {
 	return list
 }
 
-func (p *Flow) GetNodeBase(id string) *node.BaseNode {
+func (p *Flow) GetNodeBase(id string) *node.Spec {
 	n := p.GetNode(id)
-	return &node.BaseNode{
+	return &node.Spec{
 		Inputs:   n.GetInputs(),
 		Outputs:  n.GetOutputs(),
 		Info:     n.GetInfo(),

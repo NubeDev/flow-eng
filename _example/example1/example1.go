@@ -22,7 +22,7 @@ func main() {
 	flag.Parse()
 	fmt.Println("file:", *filePath)
 
-	var nodesParsed []*node.BaseNode
+	var nodesParsed []*node.Spec
 	jsonFile, err := os.Open(*filePath)
 	if err != nil {
 		fmt.Println(err)
