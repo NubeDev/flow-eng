@@ -8,14 +8,13 @@ type Schema struct {
 	Inputs   interface{} `json:"inputs"`
 }
 
+type Inputs struct {
+	Links map[string]Links `json:"links,omitempty"`
+}
+
 // Links node links
 type Links struct {
 	NodeId string      `json:"nodeId,omitempty"` // from node uuid
 	Socket string      `json:"socket,omitempty"` // this is the port/pin name
-	Value  interface{} `json:"value,omitempty"`  // when there is no link but a value is set by the user
-}
-
-type InputsMap2 struct {
-	Links map[string]Links `json:"links,omitempty"`
-	Value interface{}      `json:"value,omitempty"`
+	Value  interface{} `json:"value"`
 }
