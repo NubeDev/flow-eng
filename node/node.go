@@ -128,17 +128,23 @@ const (
 )
 
 const (
-	In1 InputName = "in1"
-	In2 InputName = "in2"
-	In3 InputName = "in3"
-	In4 InputName = "in4"
+	In1    InputName = "in1"
+	In2    InputName = "in2"
+	In3    InputName = "in3"
+	In4    InputName = "in4"
+	InputA InputName = "a"
+	InputB InputName = "b"
+	InputC InputName = "c"
+	InputD InputName = "d"
 )
 
 const (
-	Out1 OutputName = "out1"
-	Out2 OutputName = "out2"
-	Out3 OutputName = "out3"
-	Out4 OutputName = "out4"
+	Result OutputName = "result"
+	Out    OutputName = "out"
+	Out1   OutputName = "out1"
+	Out2   OutputName = "out2"
+	Out3   OutputName = "out3"
+	Out4   OutputName = "out4"
 )
 
 type InputConnection struct {

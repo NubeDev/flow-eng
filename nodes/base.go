@@ -10,6 +10,8 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/timing"
 )
 
+var ABCs = []string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"}
+
 func All() []*node.Spec { // get all the nodes, will be used for the UI to list all the nodes
 	// math
 	a, _ := math.NewConst(nil)
@@ -22,7 +24,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	//// mqtt
 	//mqttSub, _ := broker.NewMqttSub(nil)
 	//mqttPub, _ := broker.NewMqttPub(nil)
-	return node.BuildSpecs(
+	return node.BuildNodes(
 		constNum,
 	)
 }
