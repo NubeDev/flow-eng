@@ -22,8 +22,8 @@ func NewSub(body *node.Spec) (node.Node, error) {
 	if !ok {
 		count = 2
 	}
-	inputs := node.BuildInputs(node.DynamicInputs(node.TypeFloat, nil, count, buildCount.Min, buildCount.Max, body.Inputs)...)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeFloat, nil, body.Outputs))
+	inputs := node.BuildInputs(node.DynamicInputs(node.TypeFloat, nil, count, buildCount.Min, buildCount.Max, body.Inputs, node.ABCs)...)
+	outputs := node.BuildOutputs(node.BuildOutput(node.Result, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, settings)
 	return &Sub{body}, nil
 }

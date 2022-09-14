@@ -100,56 +100,52 @@ func (p *Flow) rebuildNode(node node.Node) {
 }
 
 // ManualNodeConnector this node is just to really be used at the moment when testing the framework by making building the flow through code and not the json import
-func (p *Flow) ManualNodeConnector(sourceNode, destNode node.Node, outPort node.OutputName, inPort node.InputName) error {
-	for _, output := range sourceNode.GetOutputs() {
-		if output.Name == outPort {
-			for _, input := range destNode.GetInputs() {
-				if input.Name == inPort {
+func (p *Flow) ManualNodeConnector(outputNode node.Node, outPort node.OutputName, inputNode node.Node, inPort node.InputName) error {
+	for _, input := range inputNode.GetInputs() {
+		if input.Name == inPort {
+			for _, output := range outputNode.GetOutputs() {
+				if output.Name == outPort {
 					output.Connect(input)
-					log.Infof("manual-connection: source-node:%s dest-node:%s source-port:%s dest-port:%s", sourceNode.GetNodeName(), destNode.GetNodeName(), outPort, inPort)
-					input.Connection.NodeID = sourceNode.GetID()
+					log.Infof("manual-connection: source-node:%s dest-node:%s source-port:%s dest-port:%s", inputNode.GetNodeName(), outputNode.GetNodeName(), outPort, inPort)
+					input.Connection.NodeID = outputNode.GetID()
 					input.Connection.NodePort = outPort
 					return nil // connection was made so return
 				}
 			}
 		}
 	}
-	return errors.New(fmt.Sprintf("failed to connect source-node:%s dest-node:%s source-port:%s dest-port:%s", sourceNode.GetNodeName(), destNode.GetNodeName(), outPort, inPort))
-
+	return errors.New(fmt.Sprintf("failed to connect source-node:%s dest-node:%s source-port:%s dest-port:%s", inputNode.GetNodeName(), outputNode.GetNodeName(), outPort, inPort))
 }
 
+// we need the output name and the connection output name from the node with the input connection
+
 // nodeConnector will make the connections from nodeA to nodeA
+// for example we will make a connection from the math-const node to the math add-node
 //	-makeConnection if false will not make the connection, this would be set to false only when you want a snapshot of the current flow
-func (p *Flow) nodeConnector(sourceID string, makeConnection bool) error {
-	sourceNode := p.GetNode(sourceID)
-	if sourceNode == nil {
-		return errors.New("failed to find node by that id")
+func (p *Flow) nodeConnector(nodeId string, makeConnection bool) error {
+	getNode := p.GetNode(nodeId) // this is the add node
+	if getNode == nil {
+		return errors.New(fmt.Sprintf("node-connector: failed to find node id:%s", nodeId))
 	}
-	for _, output := range sourceNode.GetOutputs() {
-		for _, connection := range output.Connections {
-			destID := connection.NodeID
-			if destID == "" {
-				continue
-			}
-			destNode := p.GetNode(destID)
-			if destNode == nil {
-				return errors.New("failed to match ports for node connections")
-			}
-			for _, input := range destNode.GetInputs() {
-				inPort := input.Name
-				if inPort == connection.NodePort {
-					if sourceID == input.Connection.NodeID {
-						log.Infof("source-node:%s dest-node:%s source-port:%s dest-port:%s", sourceNode.GetNodeName(), destNode.GetNodeName(), output.Name, inPort)
+	if len(getNode.GetInputs()) > 0 {
+		// for a node we need its input and see if it has a connection, if so we need the uuid of the node its connection to
+		for _, input := range getNode.GetInputs() { // this is the inputs from the add node
+			// check the input has connection
+			connectionOutputName := input.Connection.NodePort // on const node will be named:out
+			connectionOutputId := input.Connection.NodeID     // const node nodeId
+			if connectionOutputName != "" {
+				outputNode := p.GetNode(connectionOutputId) //this is the const node
+				fmt.Println(getNode.GetNodeName(), outputNode.GetNodeName())
+				for _, output := range outputNode.GetOutputs() {
+					if output.Name == connectionOutputName {
+
 						if makeConnection {
 							output.Connect(input)
 						}
-						input.Connection.NodePort = output.Name
-						input.Connection.NodeID = sourceNode.GetID()
-						for _, connection := range output.Connections {
-							connection.NodeID = destNode.GetID()
-							connection.NodePort = inPort
-						}
+						log.Infof("make node connections: node-%s:%s -> node-%s:%s", outputNode.GetNodeName(), output.Name, getNode.GetNodeName(), input.Name)
+
 					}
+
 				}
 			}
 		}

@@ -2,6 +2,7 @@ package main
 
 import (
 	flowctrl "github.com/NubeDev/flow-eng"
+	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/math"
 	log "github.com/sirupsen/logrus"
@@ -16,7 +17,7 @@ func main() {
 		return
 	}
 
-	err = const1.OverrideInputValue(node.In1, 11.0)
+	err = const1.OverrideInputValue(node.In, 11.0)
 	if err != nil {
 		log.Errorln(err)
 		return
@@ -26,7 +27,7 @@ func main() {
 		log.Errorln(err)
 		return
 	}
-	err = const2.OverrideInputValue(node.In1, 11.0)
+	err = const2.OverrideInputValue(node.In, 33.3)
 	if err != nil {
 		log.Errorln(err)
 		return
@@ -42,16 +43,17 @@ func main() {
 	graph.AddNode(const1) // add the nodes to the runtime
 	graph.AddNode(const2)
 	graph.AddNode(add)
+
 	// graph.AddNode(mqttSub)
 	// graph.AddNode(mqttPub)
 
-	err = graph.ManualNodeConnector(const1, add, node.Out1, node.In1) // connect const-1 and 2 to the add node
+	err = graph.ManualNodeConnector(const1, node.Out, add, node.InputA) // connect const-1 and 2 to the add node
 	if err != nil {
 		log.Errorln(err)
 		return
 	}
 
-	err = graph.ManualNodeConnector(const2, add, node.Out1, node.In2)
+	err = graph.ManualNodeConnector(const2, node.Out, add, node.InputB)
 	if err != nil {
 		log.Errorln(err)
 		return
@@ -60,6 +62,7 @@ func main() {
 	graph.ReBuildFlow(true)
 
 	runner := flowctrl.NewSerialRunner(graph) // make the runner for lopping
+	pprint.PrintJOSN(graph.GetNodesSpec())
 
 	for {
 		err := runner.Process()

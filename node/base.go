@@ -2,6 +2,8 @@ package node
 
 import "github.com/NubeDev/flow-eng/helpers"
 
+var ABCs = []string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"}
+
 // SetName so we can easily set all names as upper or lower when needed
 func SetName(name string) string {
 	return name

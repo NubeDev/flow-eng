@@ -90,7 +90,7 @@ func TestSpec_NodeConnectionEncode(t *testing.T) {
 	var listSchema []*node.Schema
 	nodeSchema := &node.Schema{}
 
-	for _, Spec := range graph.GetNodesBase() { // we need to add each node that has one connection
+	for _, Spec := range graph.GetNodesSpec() { // we need to add each node that has one connection
 		nodeType, err := setType(Spec)
 		if err != nil {
 			fmt.Println(err)

@@ -128,6 +128,7 @@ const (
 )
 
 const (
+	In     InputName = "in"
 	In1    InputName = "in1"
 	In2    InputName = "in2"
 	In3    InputName = "in3"
@@ -157,8 +158,6 @@ type InputConnection struct {
 }
 
 type OutputConnection struct {
-	NodeID        string      `json:"nodeID,omitempty"`
-	NodePort      InputName   `json:"nodePort,omitempty"`
 	OverrideValue interface{} `json:"overrideValue,omitempty"` // used for when the user has no node connection and writes the value direct (or can be used to override a value)
 	CurrentValue  interface{} `json:"currentValue,omitempty"`
 	FallbackValue interface{} `json:"fallbackValue,omitempty"`

@@ -16,9 +16,9 @@ func BuildOutput(portName OutputName, dataType DataTypes, fallback interface{}, 
 				if connection.FallbackValue == nil {
 					connection.FallbackValue = fallback
 				}
-				if connection.NodeID != "" && connection.NodePort != "" {
-					connections = append(connections, connection)
-				}
+				//if connection.NodeID != "" && connection.NodePort != "" {
+				//	connections = append(connections, connection)
+				//}
 			}
 		}
 	}
