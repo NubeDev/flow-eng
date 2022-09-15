@@ -26,8 +26,8 @@ type PalletNode struct {
 
 func convertOutputs(node *node.Spec) []*PalletOutputs {
 	var all []*PalletOutputs
-	one := &PalletOutputs{}
 	for _, output := range node.GetOutputs() {
+		one := &PalletOutputs{}
 		one.Name = string(output.Name)
 		one.ValueType = string(output.DataType)
 		all = append(all, one)
@@ -36,8 +36,8 @@ func convertOutputs(node *node.Spec) []*PalletOutputs {
 }
 func convertInputs(node *node.Spec) []*PalletInputs {
 	var all []*PalletInputs
-	one := &PalletInputs{}
 	for _, input := range node.GetInputs() {
+		one := &PalletInputs{}
 		one.Name = string(input.Name)
 		one.ValueType = string(input.DataType)
 		all = append(all, one)
@@ -47,8 +47,8 @@ func convertInputs(node *node.Spec) []*PalletInputs {
 
 func EncodePallet() ([]*PalletNode, error) {
 	var all []*PalletNode
-	one := &PalletNode{}
 	for _, spec := range All() {
+		one := &PalletNode{}
 		pprint.Print(spec)
 		nodeType, err := setType(spec)
 		if err != nil {

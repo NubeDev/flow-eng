@@ -10,6 +10,7 @@ import (
 const (
 	constNum = "const-num"
 	category = "math"
+	divide   = "divide"
 	add      = "add"
 	sub      = "subtract"
 	multiply = "multiply"
@@ -46,6 +47,8 @@ func operation(operation string, values []*float64) *float64 {
 		output = array.Subtract(nonNilValues)
 	case multiply:
 		output = array.Multiply(nonNilValues)
+	case divide:
+		output = array.Divide(nonNilValues)
 	}
 	return &output
 }

@@ -18,8 +18,8 @@ type Inject struct {
 
 func NewInject(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, inject, category)
-	body.Inputs = node.BuildInputs(node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs))
-	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeFloat, nil, body.Outputs))
+	body.Inputs = node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs))
+	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	j := jobs.New().Get()
 	j.StartAsync()
 	return &Inject{body, j, false, "", time.Now()}, nil
@@ -54,8 +54,8 @@ func (inst *Inject) Process() {
 
 	inst.check()
 
-	in1 := inst.ReadPin(node.In1)
-	inst.WritePin(node.Out1, in1)
+	in1 := inst.ReadPin(node.In)
+	inst.WritePin(node.Out, in1)
 
 	fmt.Println("job count", count)
 	fmt.Println("job trigger odd", count%2 == 0)

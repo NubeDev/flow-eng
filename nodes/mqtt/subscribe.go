@@ -39,8 +39,8 @@ func NewMqttSub(body *node.Spec) (node.Node, error) {
 	if !ok {
 		mqttTopic = "sub"
 	}
-	inputs := node.BuildInputs(node.BuildInput(node.In1, node.TypeString, nil, body.Inputs))
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeString, nil, body.Outputs))
+	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeString, nil, body.Inputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, settings)
 	bus = cbus.New(1)
 	return &MqttSub{body, nil, false, false, "", mqttTopic}, nil
@@ -102,7 +102,7 @@ func (inst *MqttSub) Process() {
 		}()
 
 		val := float.StrToFloat(inst.newMessage)
-		inst.WritePin(node.Out1, float.ToStrPtr(val))
+		inst.WritePin(node.Out, float.ToStrPtr(val))
 	}
 }
 

@@ -3,7 +3,6 @@ package nodes
 import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/float"
-	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/mitchellh/mapstructure"
 )
@@ -11,8 +10,8 @@ import (
 // Decode the flow from the UI in to the node.Spec
 func Decode(encodedNodes *NodesList) ([]*node.Spec, error) {
 	var decodedNodes []*node.Spec
-	var decodedNode *node.Spec
 	for _, encodedNode := range encodedNodes.Nodes {
+		var decodedNode *node.Spec
 		ins := &node.SchemaInputs{}
 		err := mapstructure.Decode(encodedNode.Inputs, ins)
 		if err != nil {
@@ -38,9 +37,7 @@ func Decode(encodedNodes *NodesList) ([]*node.Spec, error) {
 			}
 		}
 		decodedNodes = append(decodedNodes, decodedNode)
-
 	}
-	pprint.PrintJOSN(decodedNodes)
 	return decodedNodes, nil
 
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	flowctrl "github.com/NubeDev/flow-eng"
 	"github.com/NubeDev/flow-eng/node"
+	"github.com/NubeDev/flow-eng/nodes/logic"
 	"github.com/NubeDev/flow-eng/nodes/math"
 	broker "github.com/NubeDev/flow-eng/nodes/mqtt"
 	"github.com/NubeDev/flow-eng/nodes/timing"
@@ -12,27 +13,45 @@ import (
 
 func All() []*node.Spec { // get all the nodes, will be used for the UI to list all the nodes
 	// math
-	newNode, _ := math.NewConst(nil)
-	constNum := node.ConvertToSpec(newNode)
-	newNode, _ = math.NewAdd(nil)
-	add := node.ConvertToSpec(newNode)
-	newNode, _ = math.NewSub(nil)
-	sub := node.ConvertToSpec(newNode)
-	//// time
-	//delay, _ := timing.NewDelay(nil, nil)
-	//inject, _ := timing.NewInject(nil)
-	//// mqtt
-	//mqttSub, _ := broker.NewMqttSub(nil)
-	//mqttPub, _ := broker.NewMqttPub(nil)
+	constNum, _ := math.NewConst(nil)
+	add, _ := math.NewAdd(nil)
+	sub, _ := math.NewSub(nil)
+	multiply, _ := math.NewMultiply(nil)
+	divide, _ := math.NewDivide(nil)
+
+	// bool
+	and, _ := logic.NewAnd(nil)
+	or, _ := logic.NewOr(nil)
+
+	// time
+	delay, _ := timing.NewDelay(nil, nil)
+	inject, _ := timing.NewInject(nil)
+	// mqtt
+	mqttSub, _ := broker.NewMqttSub(nil)
+	mqttPub, _ := broker.NewMqttPub(nil)
 	return node.BuildNodes(
-		constNum,
-		add,
-		sub,
+		node.ConvertToSpec(constNum),
+		node.ConvertToSpec(add),
+		node.ConvertToSpec(sub),
+		node.ConvertToSpec(multiply),
+		node.ConvertToSpec(divide),
+
+		node.ConvertToSpec(and),
+		node.ConvertToSpec(or),
+
+		node.ConvertToSpec(delay),
+		node.ConvertToSpec(inject),
+		node.ConvertToSpec(mqttSub),
+		node.ConvertToSpec(mqttPub),
 	)
 }
 
 func Builder(body *node.Spec) (node.Node, error) {
 	n, err := builderMath(body)
+	if n != nil || err != nil {
+		return n, err
+	}
+	n, err = builderLogic(body)
 	if n != nil || err != nil {
 		return n, err
 	}
@@ -55,6 +74,20 @@ func builderMath(body *node.Spec) (node.Node, error) {
 		return math.NewAdd(body)
 	case sub:
 		return math.NewSub(body)
+	case multiply:
+		return math.NewMultiply(body)
+	case divide:
+		return math.NewDivide(body)
+	}
+	return nil, nil
+}
+
+func builderLogic(body *node.Spec) (node.Node, error) {
+	switch body.GetName() {
+	case and:
+		return logic.NewAnd(body)
+	case or:
+		return logic.NewOr(body)
 	}
 	return nil, nil
 }

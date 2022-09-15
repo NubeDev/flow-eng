@@ -1,4 +1,4 @@
-package math
+package logic
 
 import (
 	"github.com/NubeDev/flow-eng/helpers/array"

@@ -1,17 +1,15 @@
-package math
+package logic
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/node"
-	"github.com/go-resty/resty/v2"
 )
 
-type Add struct {
+type Or struct {
 	*node.Spec
 }
 
-func NewAdd(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, add, category)
+func NewOr(body *node.Spec) (node.Node, error) {
+	body = node.Defaults(body, or, category)
 	buildCount, setting, value, err := node.NewSetting(body, &node.SettingOptions{Type: node.Number, Title: node.InputCount, Min: 2, Max: 20})
 	if err != nil {
 		return nil, err
@@ -27,22 +25,11 @@ func NewAdd(body *node.Spec) (node.Node, error) {
 	inputs := node.BuildInputs(node.DynamicInputs(node.TypeFloat, nil, count, buildCount.Min, buildCount.Max, body.Inputs, node.ABCs)...)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Result, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, settings)
-	return &Add{body}, nil
+	return &Or{body}, nil
 }
 
-func getPoints() {
-	client := resty.New()
-	resp, err := client.R().
-		SetResult(&node.Spec{}).
-		Get("http://192.168.15.190:1660/api/points")
-	fmt.Println(err)
-	fmt.Println(resp.Status())
-	// fmt.Println(resp.String())
-}
-
-func (inst *Add) Process() {
+func (inst *Or) Process() {
 	Process(inst)
-	// go getPoints()
 }
 
-func (inst *Add) Cleanup() {}
+func (inst *Or) Cleanup() {}

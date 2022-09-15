@@ -14,8 +14,8 @@ type Delay struct {
 
 func NewDelay(body *node.Spec, timer flowctrl.TimedDelay) (node.Node, error) {
 	body = node.Defaults(body, delay, category)
-	body.Inputs = node.BuildInputs(node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs))
-	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeFloat, nil, body.Outputs))
+	body.Inputs = node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs))
+	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	return &Delay{body, timer}, nil
 }
 
@@ -25,8 +25,8 @@ func (inst *Delay) Process() {
 		return
 	}
 	log.Println("Delayed triggered")
-	in1 := inst.ReadPin(node.In1)
-	inst.WritePin(node.Out1, in1)
+	in1 := inst.ReadPin(node.In)
+	inst.WritePin(node.Out, in1)
 }
 
 func (inst *Delay) Cleanup() {}

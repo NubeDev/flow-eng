@@ -15,8 +15,8 @@ type NodesList struct {
 // Encode the flow from the flow-eng in correct formaat for react-flow
 func Encode(graph *flowctrl.Flow) (*NodesList, error) {
 	var listSchema []*node.Schema
-	nodeSchema := &node.Schema{}
 	for _, _node := range graph.GetNodesSpec() { // we need to add each node that has one connection
+		nodeSchema := &node.Schema{}
 		nodeType, err := setType(_node)
 		if err != nil {
 			fmt.Println(err)
