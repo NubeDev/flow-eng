@@ -25,7 +25,7 @@ func Process(body node.Node) {
 	} else {
 		log.Infof("equation: %s, result: %v", equation, *output)
 	}
-	body.WritePin(node.Out1, output)
+	body.WritePin(node.Result, output)
 }
 
 func operation(operation string, values []*float64) *float64 {

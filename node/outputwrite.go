@@ -1,6 +1,6 @@
 package node
 
-func (n *BaseNode) WritePin(name OutputName, value interface{}) {
+func (n *Spec) WritePin(name OutputName, value interface{}) {
 	out := n.GetOutput(name)
 	if out == nil {
 		return

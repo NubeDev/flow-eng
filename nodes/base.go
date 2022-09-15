@@ -10,34 +10,28 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/timing"
 )
 
-func convert(n node.Node) *node.BaseNode {
-	return &node.BaseNode{
-		Inputs:   n.GetInputs(),
-		Outputs:  n.GetOutputs(),
-		Info:     n.GetInfo(),
-		Settings: n.GetSettings(),
-		Metadata: n.GetMetadata(),
-	}
-}
-
-func All() []*node.BaseNode { // get all the nodes, will be used for the UI to list all the nodes
+func All() []*node.Spec { // get all the nodes, will be used for the UI to list all the nodes
 	// math
-	a, _ := math.NewConst(nil)
-	constNum := convert(a)
-	//add, _ := math.NewAdd(nil)
-	//sub, _ := math.NewSub(nil)
+	newNode, _ := math.NewConst(nil)
+	constNum := node.ConvertToSpec(newNode)
+	newNode, _ = math.NewAdd(nil)
+	add := node.ConvertToSpec(newNode)
+	newNode, _ = math.NewSub(nil)
+	sub := node.ConvertToSpec(newNode)
 	//// time
 	//delay, _ := timing.NewDelay(nil, nil)
 	//inject, _ := timing.NewInject(nil)
 	//// mqtt
 	//mqttSub, _ := broker.NewMqttSub(nil)
 	//mqttPub, _ := broker.NewMqttPub(nil)
-	return node.BuildBaseNodes(
+	return node.BuildNodes(
 		constNum,
+		add,
+		sub,
 	)
 }
 
-func Builder(body *node.BaseNode) (node.Node, error) {
+func Builder(body *node.Spec) (node.Node, error) {
 	n, err := builderMath(body)
 	if n != nil || err != nil {
 		return n, err
@@ -53,7 +47,7 @@ func Builder(body *node.BaseNode) (node.Node, error) {
 	return nil, errors.New(fmt.Sprintf("no nodes found with name:%s", body.GetName()))
 }
 
-func builderMath(body *node.BaseNode) (node.Node, error) {
+func builderMath(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case constNum:
 		return math.NewConst(body)
@@ -65,7 +59,7 @@ func builderMath(body *node.BaseNode) (node.Node, error) {
 	return nil, nil
 }
 
-func builderTiming(body *node.BaseNode) (node.Node, error) {
+func builderTiming(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case delay:
 		return timing.NewDelay(body, flowctrl.NewTimer())
@@ -75,7 +69,7 @@ func builderTiming(body *node.BaseNode) (node.Node, error) {
 	return nil, nil
 }
 
-func builderMQTT(body *node.BaseNode) (node.Node, error) {
+func builderMQTT(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case mqttSub:
 		return broker.NewMqttSub(body)

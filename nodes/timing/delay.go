@@ -8,11 +8,11 @@ import (
 )
 
 type Delay struct {
-	*node.BaseNode
+	*node.Spec
 	timer flowctrl.TimedDelay
 }
 
-func NewDelay(body *node.BaseNode, timer flowctrl.TimedDelay) (node.Node, error) {
+func NewDelay(body *node.Spec, timer flowctrl.TimedDelay) (node.Node, error) {
 	body = node.Defaults(body, delay, category)
 	body.Inputs = node.BuildInputs(node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs))
 	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeFloat, nil, body.Outputs))

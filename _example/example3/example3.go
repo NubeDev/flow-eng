@@ -10,7 +10,7 @@ func main() {
 
 	//for _, n := range schema {
 	//
-	//	//aa, ok := n.(node.BaseNode)
+	//	//aa, ok := n.(node.Spec)
 	//
 	//	fmt.Println(aa, ok)
 	//}

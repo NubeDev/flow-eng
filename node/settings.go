@@ -18,7 +18,7 @@ type SettingOptions struct {
 	Max   int
 }
 
-func NewSetting(body *BaseNode, opts *SettingOptions) (base *PropertyBase, setting *Settings, value interface{}, err error) {
+func NewSetting(body *Spec, opts *SettingOptions) (base *PropertyBase, setting *Settings, value interface{}, err error) {
 	if opts == nil {
 		opts = &SettingOptions{}
 	}
@@ -106,11 +106,11 @@ type Settings struct {
 	Properties interface{} `json:"properties"` // PropertyBase
 }
 
-func (n *BaseNode) GetSettings() []*Settings {
+func (n *Spec) GetSettings() []*Settings {
 	return n.Settings
 }
 
-func (n *BaseNode) GetSetting(name Title) *Settings {
+func (n *Spec) GetSetting(name Title) *Settings {
 	for _, setting := range n.Settings {
 		if name == setting.Title {
 			return setting
@@ -119,7 +119,7 @@ func (n *BaseNode) GetSetting(name Title) *Settings {
 	return nil
 }
 
-func (n *BaseNode) SetPropertiesValue(name Title, value interface{}) error {
+func (n *Spec) SetPropertiesValue(name Title, value interface{}) error {
 	data := n.GetProperties(name)
 	if data == nil {
 		return errors.New(fmt.Sprintf("failed to to settings properties by name%s", name))
@@ -137,7 +137,7 @@ func (n *BaseNode) SetPropertiesValue(name Title, value interface{}) error {
 	return nil
 }
 
-func (n *BaseNode) GetPropValue(name Title) (interface{}, error) {
+func (n *Spec) GetPropValue(name Title) (interface{}, error) {
 	data := n.GetProperties(name)
 	if data == nil {
 		return "", errors.New(fmt.Sprintf("failed to to settings properties by name%s", name))
@@ -151,7 +151,7 @@ func (n *BaseNode) GetPropValue(name Title) (interface{}, error) {
 }
 
 // GetPropValueInt if there was an existing value then try and get it (would be used when node is created from json)
-func (n *BaseNode) GetPropValueInt(name Title, fallbackValue int) int {
+func (n *Spec) GetPropValueInt(name Title, fallbackValue int) int {
 	data, err := n.GetPropValue(name)
 	if err != nil {
 		return 0
@@ -163,7 +163,7 @@ func (n *BaseNode) GetPropValueInt(name Title, fallbackValue int) int {
 	return i
 }
 
-func (n *BaseNode) GetPropValueStr(name Title) (string, error) {
+func (n *Spec) GetPropValueStr(name Title) (string, error) {
 	data, err := n.GetPropValue(name)
 	if err != nil {
 		return "", err
@@ -172,7 +172,7 @@ func (n *BaseNode) GetPropValueStr(name Title) (string, error) {
 	return toStr, nil
 }
 
-func (n *BaseNode) DecodeProperties(name Title, output interface{}) error {
+func (n *Spec) DecodeProperties(name Title, output interface{}) error {
 	data := n.GetProperties(name)
 	if data == nil {
 		return errors.New(fmt.Sprintf("failed to find settings properties by name:%s", name))
@@ -184,7 +184,7 @@ func (n *BaseNode) DecodeProperties(name Title, output interface{}) error {
 	return nil
 }
 
-func (n *BaseNode) GetProperties(name Title) interface{} {
+func (n *Spec) GetProperties(name Title) interface{} {
 	for _, setting := range n.Settings {
 		if name == setting.Title {
 			return setting.Properties

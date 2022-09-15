@@ -7,10 +7,10 @@ import (
 )
 
 type Add struct {
-	*node.BaseNode
+	*node.Spec
 }
 
-func NewAdd(body *node.BaseNode) (node.Node, error) {
+func NewAdd(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, add, category)
 	buildCount, setting, value, err := node.NewSetting(body, &node.SettingOptions{Type: node.Number, Title: node.InputCount, Min: 3, Max: 20})
 	if err != nil {
@@ -24,8 +24,8 @@ func NewAdd(body *node.BaseNode) (node.Node, error) {
 	if !ok {
 		count = 2
 	}
-	inputs := node.BuildInputs(node.DynamicInputs(node.TypeFloat, nil, count, buildCount.Min, buildCount.Max, body.Inputs)...)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeFloat, nil, body.Outputs))
+	inputs := node.BuildInputs(node.DynamicInputs(node.TypeFloat, nil, count, buildCount.Min, buildCount.Max, body.Inputs, node.ABCs)...)
+	outputs := node.BuildOutputs(node.BuildOutput(node.Result, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, settings)
 	return &Add{body}, nil
 }
@@ -33,7 +33,7 @@ func NewAdd(body *node.BaseNode) (node.Node, error) {
 func getPoints() {
 	client := resty.New()
 	resp, err := client.R().
-		SetResult(&node.BaseNode{}).
+		SetResult(&node.Spec{}).
 		Get("http://192.168.15.190:1660/api/points")
 	fmt.Println(err)
 	fmt.Println(resp.Status())

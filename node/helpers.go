@@ -32,7 +32,7 @@ func Connectors(ports []Port) []*Connector {
 	return connectors
 }
 
-func PortsOld(node BaseNode, direction Direction) []Port {
+func PortsOld(node Spec, direction Direction) []Port {
 	ports := make([]Port, 0, 1)
 	portType := reflect.TypeOf((*Port)(nil)).Elem()
 	nodeType := reflect.TypeOf(node).Elem()

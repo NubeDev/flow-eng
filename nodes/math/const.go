@@ -5,20 +5,20 @@ import (
 )
 
 type Const struct {
-	*node.BaseNode
+	*node.Spec
 }
 
-func NewConst(body *node.BaseNode) (node.Node, error) {
+func NewConst(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, constNum, category)
-	inputs := node.BuildInputs(node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs))
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeFloat, nil, body.Outputs))
+	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
 	return &Const{body}, nil
 }
 
 func (inst *Const) Process() {
-	in1 := inst.ReadPin(node.In1)
-	inst.WritePin(node.Out1, in1)
+	in1 := inst.ReadPin(node.In)
+	inst.WritePin(node.Out, in1)
 }
 
 func (inst *Const) Cleanup() {}

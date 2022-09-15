@@ -1,6 +1,6 @@
 package node
 
-func (n *BaseNode) ReadPin(name InputName) interface{} {
+func (n *Spec) ReadPin(name InputName) interface{} {
 	input := n.GetInput(name)
 	if input == nil {
 		return nil
@@ -14,7 +14,7 @@ func (n *BaseNode) ReadPin(name InputName) interface{} {
 	return input.GetValue()
 }
 
-func (n *BaseNode) ReadMultiple(count int) []interface{} {
+func (n *Spec) ReadMultiple(count int) []interface{} {
 	var out []interface{}
 	for i, input := range n.GetInputs() {
 		if i < count {
