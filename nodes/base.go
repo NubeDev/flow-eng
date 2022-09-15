@@ -12,10 +12,12 @@ import (
 
 func All() []*node.Spec { // get all the nodes, will be used for the UI to list all the nodes
 	// math
-	a, _ := math.NewConst(nil)
-	constNum := node.ConvertToSpec(a)
-	//add, _ := math.NewAdd(nil)
-	//sub, _ := math.NewSub(nil)
+	newNode, _ := math.NewConst(nil)
+	constNum := node.ConvertToSpec(newNode)
+	newNode, _ = math.NewAdd(nil)
+	add := node.ConvertToSpec(newNode)
+	newNode, _ = math.NewSub(nil)
+	sub := node.ConvertToSpec(newNode)
 	//// time
 	//delay, _ := timing.NewDelay(nil, nil)
 	//inject, _ := timing.NewInject(nil)
@@ -24,6 +26,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	//mqttPub, _ := broker.NewMqttPub(nil)
 	return node.BuildNodes(
 		constNum,
+		add,
+		sub,
 	)
 }
 

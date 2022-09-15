@@ -12,6 +12,7 @@ type NodesList struct {
 	Nodes []*node.Schema `json:"nodes"`
 }
 
+// Encode the flow from the flow-eng in correct formaat for react-flow
 func Encode(graph *flowctrl.Flow) (*NodesList, error) {
 	var listSchema []*node.Schema
 	nodeSchema := &node.Schema{}

@@ -64,6 +64,12 @@ func (p *Flow) ReBuildFlow(makeConnection bool) {
 	}
 }
 
+func (p *Flow) WipeFlow() *Flow {
+	p.nodes = nil
+	p.Graphs = nil
+	return p
+}
+
 func (p *Flow) GetNode(id string) node.Node {
 	for _, n := range p.Get().nodes {
 		if n.GetID() == id {
@@ -135,15 +141,12 @@ func (p *Flow) nodeConnector(nodeId string, makeConnection bool) error {
 			connectionOutputId := input.Connection.NodeID     // const node nodeId
 			if connectionOutputName != "" {
 				outputNode := p.GetNode(connectionOutputId) //this is the const node
-				fmt.Println(getNode.GetNodeName(), outputNode.GetNodeName())
 				for _, output := range outputNode.GetOutputs() {
 					if output.Name == connectionOutputName {
-
 						if makeConnection {
 							output.Connect(input)
 						}
 						log.Infof("make node connections: node-%s:%s -> node-%s:%s", outputNode.GetNodeName(), output.Name, getNode.GetNodeName(), input.Name)
-
 					}
 
 				}

@@ -73,17 +73,17 @@ func TestSpec_NodeConnectionEncode(t *testing.T) {
 	graph.AddNode(const2)
 	graph.AddNode(add)
 	graph.AddNode(add2)
-	err = graph.ManualNodeConnector(const1, add, node.Out1, node.In1) // connect const-1 and 2 to the add node
-	if err != nil {
-		log.Errorln(err)
-		return
-	}
-
-	err = graph.ManualNodeConnector(const2, add, node.Out1, node.In2)
-	if err != nil {
-		log.Errorln(err)
-		return
-	}
+	//err = graph.ManualNodeConnector(const1, add, node.Out1, node.In1) // connect const-1 and 2 to the add node
+	//if err != nil {
+	//	log.Errorln(err)
+	//	return
+	//}
+	//
+	//err = graph.ManualNodeConnector(const2, add, node.Out1, node.In2)
+	//if err != nil {
+	//	log.Errorln(err)
+	//	return
+	//}
 
 	graph.ReBuildFlow(true)
 

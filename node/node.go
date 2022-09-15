@@ -119,7 +119,7 @@ type OutputName string
 const (
 	TypeString DataTypes = "string"
 	TypeInt    DataTypes = "int"
-	TypeFloat  DataTypes = "float"
+	TypeFloat  DataTypes = "number"
 )
 
 const (

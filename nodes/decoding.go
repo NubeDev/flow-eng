@@ -8,6 +8,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
+// Decode the flow from the UI in to the node.Spec
 func Decode(encodedNodes *NodesList) ([]*node.Spec, error) {
 	var decodedNodes []*node.Spec
 	var decodedNode *node.Spec
