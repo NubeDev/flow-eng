@@ -1,0 +1,96 @@
+{
+  "nodes": [
+    {
+      "id": "e2ff96c0-8b56-4581-a342-885fcfdbf3cd",
+      "type": "math/const-num",
+      "metadata": {
+        "positionX": "-1369.453847169707",
+        "positionY": "-452.350068966036"
+      }
+    },
+    {
+      "id": "7d6918ba-c101-4a13-99f3-56c6094887dd",
+      "type": "math/const-num",
+      "metadata": {
+        "positionX": "-1356.453847169707",
+        "positionY": "-558.850068966036"
+      },
+      "inputs": {
+        "in": {
+          "value": "111111"
+        }
+      }
+    },
+    {
+      "id": "18ac7d93-c6ec-482f-81a6-aa58c0a13236",
+      "type": "math/add",
+      "metadata": {
+        "positionX": "-1115.953847169707",
+        "positionY": "-549.350068966036"
+      },
+      "inputs": {
+        "b": {
+          "value": "22222222"
+        },
+        "a": {
+          "links": [
+            {
+              "nodeId": "c3cb2c6f-df7f-4009-b225-3d144f5266df",
+              "socket": "result"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "34ca8607-4f91-4587-91a0-8df1389f8620",
+      "type": "math/add",
+      "metadata": {
+        "positionX": "-1120.453847169707",
+        "positionY": "-415.350068966036"
+      },
+      "inputs": {
+        "a": {
+          "value": "3333"
+        },
+        "b": {
+          "value": "44444"
+        }
+      }
+    },
+    {
+      "id": "c3cb2c6f-df7f-4009-b225-3d144f5266df",
+      "type": "math/const-num",
+      "metadata": {
+        "positionX": "-1357.0170321512746",
+        "positionY": "-673.2450007965459"
+      }
+    },
+    {
+      "id": "275fe963-1597-4d4e-abbf-beccbf4d46ff",
+      "type": "math/add",
+      "metadata": {
+        "positionX": "-1106.9163632352736",
+        "positionY": "-688.4726313666329"
+      },
+      "inputs": {
+        "a": {
+          "links": [
+            {
+              "nodeId": "c3cb2c6f-df7f-4009-b225-3d144f5266df",
+              "socket": "result"
+            }
+          ]
+        },
+        "b": {
+          "links": [
+            {
+              "nodeId": "c3cb2c6f-df7f-4009-b225-3d144f5266df",
+              "socket": "result"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

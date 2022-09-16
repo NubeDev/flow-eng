@@ -12,7 +12,7 @@ type NodesList struct {
 	Nodes []*node.Schema `json:"nodes"`
 }
 
-// Encode the flow from the flow-eng in correct formaat for react-flow
+// Encode the flow from the flow-eng in correct format for react-flow
 func Encode(graph *flowctrl.Flow) (*NodesList, error) {
 	var listSchema []*node.Schema
 	for _, _node := range graph.GetNodesSpec() { // we need to add each node that has one connection
@@ -58,7 +58,7 @@ func Encode(graph *flowctrl.Flow) (*NodesList, error) {
 				PositionX: "271.5",
 				PositionY: "-69",
 			}
-			nodeSchema.Inputs = node.SchemaInputs{Links: links} // when a connection is made
+			//nodeSchema.Inputs = node.SchemaInputs{Links: links} // when a connection is made
 			listSchema = append(listSchema, nodeSchema)
 		} else { // if a node has no input then add it here
 			nodeSchema.Metadata = &node.Metadata{
