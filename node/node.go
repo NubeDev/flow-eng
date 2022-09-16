@@ -128,24 +128,39 @@ const (
 )
 
 const (
-	In     InputName = "in"
-	In1    InputName = "in1"
-	In2    InputName = "in2"
-	In3    InputName = "in3"
-	In4    InputName = "in4"
+	In  InputName = "in"
+	In1 InputName = "in1"
+	In2 InputName = "in2"
+	In3 InputName = "in3"
+	In4 InputName = "in4"
+
+	Input_ InputName = "input"
 	InputA InputName = "a"
 	InputB InputName = "b"
 	InputC InputName = "c"
 	InputD InputName = "d"
+
+	From InputName = "from"
+	To   InputName = "to"
 )
 
 const (
 	Result OutputName = "result"
+
 	Out    OutputName = "out"
-	Out1   OutputName = "out1"
-	Out2   OutputName = "out2"
-	Out3   OutputName = "out3"
-	Out4   OutputName = "out4"
+	OutNot OutputName = "out not"
+
+	Out1 OutputName = "out1"
+	Out2 OutputName = "out2"
+	Out3 OutputName = "out3"
+	Out4 OutputName = "out4"
+
+	Above OutputName = "above"
+	Below OutputName = "below"
+
+	GraterThan OutputName = "grater"
+	LessThan   OutputName = "less"
+	Equal      OutputName = "equal"
 )
 
 type InputConnection struct {

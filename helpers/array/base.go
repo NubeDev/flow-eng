@@ -1,5 +1,36 @@
 package array
 
+func Between(x, min, max float64) (between, below, above bool) {
+	if (x >= min) && (x <= max) {
+		between = true
+	}
+	if x < min {
+		below = true
+	}
+	if x > max {
+		above = true
+	}
+	return between, below, above
+}
+
+func Compare(array []float64) (greater, less, equal bool) {
+	if len(array) < 1 {
+		return false, false, false
+	}
+	val1 := array[0]
+	val2 := array[1]
+	if val1 > val2 {
+		greater = true
+	}
+	if val1 < val2 {
+		less = true
+	}
+	if val1 == val2 {
+		equal = true
+	}
+	return greater, less, equal
+}
+
 func AllTrueFloat64(array []float64) bool {
 	if len(array) == 0 {
 		return false

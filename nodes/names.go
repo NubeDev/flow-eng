@@ -13,6 +13,13 @@ const (
 	greater = "greater"
 	less    = "less"
 
+	logicCompare = "compare"
+	between      = "between"
+
+	max = "min"
+	min = "max"
+	avg = "avg"
+
 	delay   = "delay"
 	inject  = "inject"
 	mqttSub = "mqtt-subscribe"

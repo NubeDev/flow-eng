@@ -1,4 +1,4 @@
-package logic
+package statistics
 
 import (
 	"github.com/NubeDev/flow-eng/helpers/array"
@@ -8,19 +8,11 @@ import (
 )
 
 const (
-	category = "logic"
-)
+	category = "statistics"
 
-const (
-	and     = "and"
-	or      = "or"
-	not     = "not"
-	greater = "greater"
-	less    = "less"
-)
-
-const (
-	inputCount = "Inputs Count"
+	max = "min"
+	min = "max"
+	avg = "avg"
 )
 
 func Process(body node.Node) {
@@ -29,11 +21,11 @@ func Process(body node.Node) {
 	inputs := float.ConvertInterfaceToFloatMultiple(body.ReadMultiple(count))
 	output := operation(equation, inputs)
 	if output == nil {
-		log.Infof("logic: %s, result: %v", equation, output)
+		log.Infof("statistics: %s, result: %v", equation, output)
 	} else {
-		log.Infof("logic: %s, result: %v", equation, *output)
+		log.Infof("statistics: %s, result: %v", equation, *output)
 	}
-	body.WritePin(node.Out1, output)
+	body.WritePin(node.Result, output)
 }
 
 func operation(operation string, values []*float64) *float64 {
@@ -46,25 +38,12 @@ func operation(operation string, values []*float64) *float64 {
 	if len(nonNilValues) == 0 {
 		return nil
 	}
+	output := 0.0
 	switch operation {
-	case and:
-		if array.AllTrueFloat64(nonNilValues) {
-			return float.New(1)
-		} else {
-			return float.New(0)
-		}
-	case or:
-		if array.OneIsTrueFloat64(nonNilValues) {
-			return float.New(1)
-		} else {
-			return float.New(0)
-		}
-	case not:
-		if nonNilValues[0] == 0 {
-			return float.New(1)
-		} else {
-			return float.New(0)
-		}
+	case min:
+		output = array.MinFloat64(nonNilValues)
+	case max:
+		output = array.MaxFloat64(nonNilValues)
 	}
-	return float.New(0)
+	return &output
 }

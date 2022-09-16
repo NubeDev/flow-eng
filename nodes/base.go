@@ -5,9 +5,11 @@ import (
 	"fmt"
 	flowctrl "github.com/NubeDev/flow-eng"
 	"github.com/NubeDev/flow-eng/node"
+	"github.com/NubeDev/flow-eng/nodes/compare"
 	"github.com/NubeDev/flow-eng/nodes/logic"
 	"github.com/NubeDev/flow-eng/nodes/math"
 	broker "github.com/NubeDev/flow-eng/nodes/mqtt"
+	"github.com/NubeDev/flow-eng/nodes/statistics"
 	"github.com/NubeDev/flow-eng/nodes/timing"
 )
 
@@ -22,6 +24,14 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	// bool
 	and, _ := logic.NewAnd(nil)
 	or, _ := logic.NewOr(nil)
+
+	// compare
+	comp, _ := compare.NewCompare(nil)
+	between, _ := compare.NewBetween(nil)
+
+	// compare
+	min, _ := statistics.NewMin(nil)
+	max, _ := statistics.NewMax(nil)
 
 	// time
 	delay, _ := timing.NewDelay(nil, nil)
@@ -39,6 +49,12 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(and),
 		node.ConvertToSpec(or),
 
+		node.ConvertToSpec(comp),
+		node.ConvertToSpec(between),
+
+		node.ConvertToSpec(min),
+		node.ConvertToSpec(max),
+
 		node.ConvertToSpec(delay),
 		node.ConvertToSpec(inject),
 		node.ConvertToSpec(mqttSub),
@@ -52,6 +68,14 @@ func Builder(body *node.Spec) (node.Node, error) {
 		return n, err
 	}
 	n, err = builderLogic(body)
+	if n != nil || err != nil {
+		return n, err
+	}
+	n, err = builderCompare(body)
+	if n != nil || err != nil {
+		return n, err
+	}
+	n, err = builderStatistics(body)
 	if n != nil || err != nil {
 		return n, err
 	}
@@ -88,6 +112,26 @@ func builderLogic(body *node.Spec) (node.Node, error) {
 		return logic.NewAnd(body)
 	case or:
 		return logic.NewOr(body)
+	}
+	return nil, nil
+}
+
+func builderCompare(body *node.Spec) (node.Node, error) {
+	switch body.GetName() {
+	case logicCompare:
+		return compare.NewCompare(body)
+	case between:
+		return compare.NewCompare(body)
+	}
+	return nil, nil
+}
+
+func builderStatistics(body *node.Spec) (node.Node, error) {
+	switch body.GetName() {
+	case min:
+		return statistics.NewMin(body)
+	case max:
+		return statistics.NewMax(body)
 	}
 	return nil, nil
 }
