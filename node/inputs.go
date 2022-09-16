@@ -70,32 +70,4 @@ func DynamicInputs(dataType DataTypes, fallback interface{}, count, minAllowed, 
 		}
 	}
 	return out
-
-	//var out []*Input
-	//if count < minAllowed {
-	//	count = minAllowed
-	//}
-	//for i := 1; i <= count; i++ {
-	//	name := fmt.Sprintf("%s%d", InputNamePrefix, i)
-	//	if len(overrideNames) > 0 { // for example, we can pass in [a,b,c,d] or [temp, humidity]
-	//		var n string
-	//		overrideName := overrideNames[0]
-	//		if len(overrideName) >= i {
-	//			n = overrideName[i-1]
-	//		}
-	//		if n == "" { // if count in wrong then use in1, in2 and so on
-	//			n = name
-	//		}
-	//		if i < maxAllowed {
-	//			out = append(out, BuildInput(InputName(n), dataType, fallback, inputs))
-	//		}
-	//
-	//	} else {
-	//		if i < maxAllowed {
-	//			out = append(out, BuildInput(InputName(name), dataType, fallback, inputs))
-	//		}
-	//	}
-	//
-	//}
-	return out
 }

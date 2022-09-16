@@ -42,7 +42,7 @@ func getPoints() {
 
 func (inst *Add) Process() {
 	Process(inst)
-	go getPoints()
+	//go getPoints()
 }
 
 func (inst *Add) Cleanup() {}
