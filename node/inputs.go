@@ -43,31 +43,59 @@ func BuildInputs(body ...*Input) []*Input {
 // DynamicInputs build n number of inputs -- in1, in2, in3, ..., inN
 //	-p overrideNames[]string -> for example, we can pass in [a,b,c,d] or [temp, humidity]
 func DynamicInputs(dataType DataTypes, fallback interface{}, count, minAllowed, maxAllowed int, inputs []*Input, overrideNames ...[]string) []*Input {
+	if len(overrideNames) > 0 {
+		if len(overrideNames[0]) < count {
+			panic("build dynamic-inputs name length must match the count length of the required inputs")
+		}
+	}
 	var out []*Input
 	if count < minAllowed {
 		count = minAllowed
 	}
-	for i := 1; i <= count; i++ {
-		name := fmt.Sprintf("%s%d", InputNamePrefix, i)
-		if len(overrideNames) > 0 { // for example, we can pass in [a,b,c,d] or [temp, humidity]
-			var n string
-			overrideName := overrideNames[0]
-			if len(overrideName) >= i {
-				n = overrideName[i-1]
-			}
-			if n == "" { // if count in wrong then use in1, in2 and so on
-				n = name
-			}
-			if i < maxAllowed {
-				out = append(out, BuildInput(InputName(n), dataType, fallback, inputs))
-			}
+	if len(overrideNames) > 0 {
+		for _, names := range overrideNames {
+			for i, name := range names {
+				if i < count {
+					out = append(out, BuildInput(InputName(name), dataType, fallback, inputs))
+				}
 
-		} else {
+			}
+		}
+	} else {
+		for i := 1; i <= count; i++ {
+			name := fmt.Sprintf("%s%d", InputNamePrefix, i)
 			if i < maxAllowed {
 				out = append(out, BuildInput(InputName(name), dataType, fallback, inputs))
 			}
 		}
-
 	}
+	return out
+
+	//var out []*Input
+	//if count < minAllowed {
+	//	count = minAllowed
+	//}
+	//for i := 1; i <= count; i++ {
+	//	name := fmt.Sprintf("%s%d", InputNamePrefix, i)
+	//	if len(overrideNames) > 0 { // for example, we can pass in [a,b,c,d] or [temp, humidity]
+	//		var n string
+	//		overrideName := overrideNames[0]
+	//		if len(overrideName) >= i {
+	//			n = overrideName[i-1]
+	//		}
+	//		if n == "" { // if count in wrong then use in1, in2 and so on
+	//			n = name
+	//		}
+	//		if i < maxAllowed {
+	//			out = append(out, BuildInput(InputName(n), dataType, fallback, inputs))
+	//		}
+	//
+	//	} else {
+	//		if i < maxAllowed {
+	//			out = append(out, BuildInput(InputName(name), dataType, fallback, inputs))
+	//		}
+	//	}
+	//
+	//}
 	return out
 }

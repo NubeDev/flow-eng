@@ -121,7 +121,7 @@ func builderCompare(body *node.Spec) (node.Node, error) {
 	case logicCompare:
 		return compare.NewCompare(body)
 	case between:
-		return compare.NewCompare(body)
+		return compare.NewBetween(body)
 	}
 	return nil, nil
 }
