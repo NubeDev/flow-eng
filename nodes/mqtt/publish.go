@@ -51,10 +51,10 @@ func (inst *MqttPub) publish(value interface{}) {
 		v := fmt.Sprintf("%v", value)
 		err := c.Publish(inst.getTopic(), mqttclient.AtMostOnce, true, v)
 		if err != nil {
-			log.Errorf(fmt.Sprintf("mqtt-publish topic:%s err:%s", inst.getTopic(), err.Error()))
+			log.Errorf(fmt.Sprintf("mqttbase-publish topic:%s err:%s", inst.getTopic(), err.Error()))
 		}
 	} else {
-		log.Errorf(fmt.Sprintf("mqtt-publish topic can not be empty"))
+		log.Errorf(fmt.Sprintf("mqttbase-publish topic can not be empty"))
 	}
 }
 
@@ -62,7 +62,7 @@ func (inst *MqttPub) connect() {
 	mqttBroker := "tcp://0.0.0.0:1883"
 	_, err := mqttclient.InternalMQTT(mqttBroker)
 	if err != nil {
-		log.Errorf(fmt.Sprintf("mqtt-publish-connect err:%s", err.Error()))
+		log.Errorf(fmt.Sprintf("mqttbase-publish-connect err:%s", err.Error()))
 	}
 	client, connected := mqttclient.GetMQTT()
 	inst.connected = connected

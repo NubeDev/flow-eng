@@ -120,6 +120,7 @@ const (
 	TypeString DataTypes = "string"
 	TypeInt    DataTypes = "int"
 	TypeFloat  DataTypes = "number"
+	TypeNumber DataTypes = "number"
 )
 
 const (
@@ -142,6 +143,10 @@ const (
 
 	From InputName = "from"
 	To   InputName = "to"
+
+	Name          InputName = "name"
+	ObjectId      InputName = "object-id"
+	OverrideInput InputName = "override-value"
 )
 
 const (

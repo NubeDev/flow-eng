@@ -7,7 +7,9 @@ import (
 func BuildNodes(body ...*Spec) []*Spec {
 	var out []*Spec
 	for _, output := range body {
-		out = append(out, output)
+		if output != nil {
+			out = append(out, output)
+		}
 	}
 	return out
 }

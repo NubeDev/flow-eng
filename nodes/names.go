@@ -20,8 +20,14 @@ const (
 	min = "max"
 	avg = "avg"
 
-	delay   = "delay"
-	inject  = "inject"
-	mqttSub = "mqtt-subscribe"
-	mqttPub = "mqtt-publish"
+	delay  = "delay"
+	inject = "inject"
+
+	bacnetReadBV  = "binary-variable-read"
+	bacnetWriteBV = "binary-variable-write"
+	bacnetReadAV  = "analog-variable-read"
+	bacnetWriteAV = "analog-variable-write"
+
+	mqttSub = "mqttbase-subscribe"
+	mqttPub = "mqttbase-publish"
 )

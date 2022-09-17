@@ -60,11 +60,11 @@ func (inst *MqttSub) subscribe() {
 	if inst.getTopic() != "" {
 		err := c.Subscribe(inst.getTopic(), mqttclient.AtMostOnce, handle)
 		if err != nil {
-			log.Errorf(fmt.Sprintf("mqtt-subscribe topic:%s err:%s", inst.getTopic(), err.Error()))
+			log.Errorf(fmt.Sprintf("mqttbase-subscribe topic:%s err:%s", inst.getTopic(), err.Error()))
 		}
 		inst.subscribed = true
 	} else {
-		log.Errorf(fmt.Sprintf("mqtt-subscribe topic can not be empty"))
+		log.Errorf(fmt.Sprintf("mqttbase-subscribe topic can not be empty"))
 	}
 }
 
@@ -72,7 +72,7 @@ func (inst *MqttSub) connect() {
 	mqttBroker := "tcp://0.0.0.0:1883"
 	_, err := mqttclient.InternalMQTT(mqttBroker)
 	if err != nil {
-		log.Errorf(fmt.Sprintf("mqtt-subscribe-connect err:%s", err.Error()))
+		log.Errorf(fmt.Sprintf("mqttbase-subscribe-connect err:%s", err.Error()))
 	}
 	client, connected := mqttclient.GetMQTT()
 	inst.connected = connected
@@ -81,7 +81,7 @@ func (inst *MqttSub) connect() {
 
 func (inst *MqttSub) Process() {
 	if bus == nil {
-		panic("mqtt-bus can not be empty")
+		panic("mqttbase-bus can not be empty")
 	}
 	if !inst.connected {
 		go inst.connect()

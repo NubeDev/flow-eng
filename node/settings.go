@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/boolean"
+	"github.com/NubeDev/flow-eng/helpers/integer"
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -16,6 +17,7 @@ type SettingOptions struct {
 	Title Title
 	Min   int
 	Max   int
+	Value interface{}
 }
 
 func NewSetting(body *Spec, opts *SettingOptions) (base *PropertyBase, setting *Settings, value interface{}, err error) {
@@ -36,34 +38,55 @@ func NewSetting(body *Spec, opts *SettingOptions) (base *PropertyBase, setting *
 		max = 1
 	}
 	if opts.Type == "" {
-		opts.Type = dataType
+		panic("new-setting: dataType can not be empty")
+	} else {
+		dataType = opts.Type
 	}
-	var getValue = min
-	getValue = body.GetPropValueInt(opts.Title, min)
-	base = &PropertyBase{
-		Min: min,
-		Max: max,
+	if dataType == String {
+
+	} else if dataType == Number {
+		var getValue = min
+		getValue = body.GetPropValueInt(opts.Title, min)
+		base = &PropertyBase{
+			Min: integer.New(min),
+			Max: integer.New(max),
+		}
+		setting, err = Setting(dataType, title, base)
+		if err != nil {
+			return nil, nil, 0, err
+		}
+		return base, setting, getValue, err
+	} else if dataType == Array {
+		getArray, err := body.GetPropValue(opts.Title)
+		base = &PropertyBase{}
+		setting, err = Setting(dataType, title, base)
+		if err != nil {
+			return nil, nil, 0, err
+		}
+		return base, setting, getArray, err
 	}
-	setting, err = Setting(dataType, title, base)
-	if err != nil {
-		return nil, nil, 0, err
-	}
-	return base, setting, getValue, err
+
+	return nil, nil, 0, errors.New("new-setting: no valid settings type")
 }
 
 type PropertyBase struct {
 	Type     PropType    `json:"type" default:""`
 	Title    Title       `json:"title" default:""`
-	Min      int         `json:"min" default:"0"`
-	Max      int         `json:"max" default:"500"`
-	ReadOnly *bool       `json:"read_only"`
+	Min      *int        `json:"min,omitempty" default:"0"`
+	Max      *int        `json:"max,omitempty" default:"500"`
+	ReadOnly *bool       `json:"readOnly,omitempty"`
 	Value    interface{} `json:"value"`
+}
+
+func settingInt() {
+
 }
 
 type Title string
 type PropType string
 
 const (
+	Array   PropType = "array"
 	String  PropType = "string"
 	Number  PropType = "number"
 	Boolean PropType = "boolean"
@@ -76,9 +99,9 @@ func NewProperty(args *PropertyBase) *PropertyBase {
 	if args.Type == "" {
 		args.Type = String
 	}
-	if args.Max == 0 {
-		args.Max = 200
-	}
+	//if args.Max == 0 {
+	//	args.Max = 200
+	//}
 	if boolean.IsNil(args.ReadOnly) {
 		args.ReadOnly = boolean.NewFalse()
 	}

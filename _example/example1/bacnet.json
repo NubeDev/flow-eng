@@ -1,0 +1,57 @@
+[  {
+  "inputs": [
+    {
+      "name": "in",
+      "type": "float",
+      "connection": {
+        "overrideValue": 11
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "name": "out",
+      "type": "float",
+      "connections": null
+    }
+  ],
+  "info": {
+    "nodeID": "a123",
+    "name": "const-num",
+    "nodeName": "const-num_10fb8a4e",
+    "category": "math"
+  }
+},
+  {
+    "inputs": [
+      {
+        "name": "in",
+        "type": "string",
+        "connection": {}
+      },
+      {
+        "name": "object-id",
+        "type": "number",
+        "connection": {}
+      },
+      {
+        "name": "override-value",
+        "type": "number",
+        "connection": {}
+      }
+    ],
+    "outputs": [
+      {
+        "name": "out",
+        "type": "number",
+        "connections": null
+      }
+    ],
+    "info": {
+      "nodeID": "b123",
+      "name": "binary-variable-read",
+      "nodeName": "binary-variable-read_b848280b",
+      "category": "bacnet"
+    }
+  }
+]
