@@ -1,6 +1,7 @@
 package math
 
 import (
+	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/integer"
@@ -46,8 +47,10 @@ func process(body node.Node) {
 		log.Infof("equation: %s, result: %v", equation, output)
 	} else {
 		log.Infof("equation: %s, result: %v", equation, *output)
+		body.WritePin(node.Result, *output)
 	}
-	body.WritePin(node.Result, output)
+	fmt.Println()
+
 }
 
 func operation(operation string, values []*float64) *float64 {
