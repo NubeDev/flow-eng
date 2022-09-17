@@ -6,6 +6,7 @@ import (
 	flowctrl "github.com/NubeDev/flow-eng"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/compare"
+	debugging "github.com/NubeDev/flow-eng/nodes/debug"
 	"github.com/NubeDev/flow-eng/nodes/logic"
 	"github.com/NubeDev/flow-eng/nodes/math"
 	broker "github.com/NubeDev/flow-eng/nodes/mqtt"
@@ -44,6 +45,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	// mqttbase
 	mqttSub, _ := broker.NewMqttSub(nil)
 	mqttPub, _ := broker.NewMqttPub(nil)
+
+	logNode, _ := debugging.NewLog(nil)
+
 	if disableMQTT {
 		mqttSub = nil
 		mqttPub = nil
@@ -69,6 +73,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(inject),
 		node.ConvertToSpec(mqttSub),
 		node.ConvertToSpec(mqttPub),
+		node.ConvertToSpec(logNode),
 	)
 }
 
@@ -93,6 +98,10 @@ func Builder(body *node.Spec, opts ...interface{}) (node.Node, error) {
 	if n != nil || err != nil {
 		return n, err
 	}
+	n, err = builderMisc(body)
+	if n != nil || err != nil {
+		return n, err
+	}
 	if len(opts) > 0 { // get the mqtt client
 		n, err = builderProtocols(body, opts[0])
 		if n != nil || err != nil {
@@ -105,6 +114,14 @@ func Builder(body *node.Spec, opts ...interface{}) (node.Node, error) {
 		return n, err
 	}
 	return nil, errors.New(fmt.Sprintf("no nodes found with name:%s", body.GetName()))
+}
+
+func builderMisc(body *node.Spec) (node.Node, error) {
+	switch body.GetName() {
+	case logNode:
+		return debugging.NewLog(body)
+	}
+	return nil, nil
 }
 
 func builderMath(body *node.Spec) (node.Node, error) {

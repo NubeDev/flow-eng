@@ -5,7 +5,6 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/integer"
 	"github.com/NubeDev/flow-eng/node"
-	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -50,11 +49,11 @@ func Process(body node.Node) {
 	inputs := float.ConvertInterfaceToFloatMultiple(body.ReadMultiple(count))
 	output := operation(equation, inputs)
 	if output == nil {
-		log.Infof("logic: %s, result: %v", equation, output)
 	} else {
-		log.Infof("logic: %s, result: %v", equation, *output)
+		//log.Infof("logic: %s, result: %v", equation, *output)
+		body.WritePin(node.Result, float.NonNil(output))
 	}
-	body.WritePin(node.Out1, output)
+
 }
 
 func operation(operation string, values []*float64) *float64 {

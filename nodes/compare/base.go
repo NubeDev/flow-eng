@@ -4,7 +4,6 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/node"
-	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -36,25 +35,15 @@ func Process(body node.Node) {
 	inputs := float.ConvertInterfaceToFloatMultiple(body.ReadMultiple(count))
 	val1, val2, val3, val4 := operation(equation, inputs)
 	if equation == logicCompare {
-		body.WritePin(node.GraterThan, val1)
-		body.WritePin(node.LessThan, val2)
-		body.WritePin(node.Equal, val3)
-		if val1 == nil {
-			log.Infof("compare: %s, result-%s: %v", equation, logicCompare, val1)
-		} else {
-			log.Infof("compare: %s, result-%s: %v", equation, logicCompare, *val1)
-		}
+		body.WritePin(node.GraterThan, float.NonNil(val1))
+		body.WritePin(node.LessThan, float.NonNil(val2))
+		body.WritePin(node.Equal, float.NonNil(val3))
 	}
 	if equation == between {
-		body.WritePin(node.Out, val1)
-		body.WritePin(node.OutNot, val2)
-		body.WritePin(node.Above, val3)
-		body.WritePin(node.Below, val4)
-		if val1 == nil {
-			log.Infof("compare: %s, result-%s: %v", equation, between, val1)
-		} else {
-			log.Infof("compare: %s, result-%s: %v", equation, between, *val1)
-		}
+		body.WritePin(node.Out, float.NonNil(val1))
+		body.WritePin(node.OutNot, float.NonNil(val2))
+		body.WritePin(node.Above, float.NonNil(val3))
+		body.WritePin(node.Below, float.NonNil(val4))
 	}
 
 }

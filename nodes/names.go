@@ -30,4 +30,6 @@ const (
 
 	mqttSub = "mqttbase-subscribe"
 	mqttPub = "mqttbase-publish"
+
+	logNode = "log"
 )
