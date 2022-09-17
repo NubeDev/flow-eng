@@ -5,7 +5,7 @@ import (
 	"flag"
 	"fmt"
 	flowctrl "github.com/NubeDev/flow-eng"
-	"github.com/NubeDev/flow-eng/mqttbase"
+	"github.com/NubeDev/flow-eng/helpers/mqttbase"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes"
 	"github.com/NubeDev/flow-eng/storage"

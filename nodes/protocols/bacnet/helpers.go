@@ -1,4 +1,4 @@
-package bac
+package bacnet
 
 import (
 	"github.com/NubeDev/flow-eng/helpers/float"

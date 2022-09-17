@@ -23,6 +23,7 @@ const (
 	delay  = "delay"
 	inject = "inject"
 
+	bacnetServer  = "server"
 	bacnetReadBV  = "binary-variable-read"
 	bacnetWriteBV = "binary-variable-write"
 	bacnetReadAV  = "analog-variable-read"

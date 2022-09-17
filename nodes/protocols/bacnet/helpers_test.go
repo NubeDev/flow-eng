@@ -1,4 +1,4 @@
-package bac
+package bacnet
 
 import (
 	"fmt"

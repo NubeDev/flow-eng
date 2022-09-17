@@ -34,15 +34,16 @@ func New(id, name, nodeName string, meta *Metadata) *Spec {
 		},
 		Metadata: meta,
 	}
-
 }
 
 type Spec struct {
-	Inputs   []*Input    `json:"inputs,omitempty"`
-	Outputs  []*Output   `json:"outputs,omitempty"`
-	Info     Info        `json:"info"`
-	Settings []*Settings `json:"settings,omitempty"`
-	Metadata *Metadata   `json:"metadata,omitempty"`
+	Inputs     []*Input    `json:"inputs,omitempty"`
+	Outputs    []*Output   `json:"outputs,omitempty"`
+	Info       Info        `json:"info"`
+	Settings   []*Settings `json:"settings,omitempty"`
+	Metadata   *Metadata   `json:"metadata,omitempty"`
+	Parameters *Parameters `json:"parameters,omitempty"`
+	SubFlow    *SubFlow    `json:"subFlow,omitempty"`
 }
 
 func (n *Spec) GetInfo() Info {
@@ -115,6 +116,7 @@ type Info struct {
 type DataTypes string
 type InputName string
 type OutputName string
+type ApplicationName string // bacnet, mqtt
 
 const (
 	TypeString DataTypes = "string"
@@ -152,6 +154,9 @@ const (
 const (
 	Result OutputName = "result"
 
+	ErrMsg OutputName = "error"
+	Msg    OutputName = "message"
+
 	Out    OutputName = "out"
 	OutNot OutputName = "out not"
 
@@ -187,4 +192,13 @@ type OutputConnection struct {
 type Metadata struct {
 	PositionX string `json:"positionX"`
 	PositionY string `json:"positionY"`
+}
+
+type SubFlow struct {
+	Name string `json:"name,omitempty"` // https://reactflow.dev/docs/guides/sub-flows/
+}
+
+type Parameters struct {
+	Application  ApplicationName `json:"application,omitempty"`  // eg: bacnet-point belongs to bacnet-server
+	MaxNodeCount int             `json:"maxNodeCount,omitempty"` // eg: bacnet-server node can only be added once
 }

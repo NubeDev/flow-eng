@@ -10,7 +10,7 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/logic"
 	"github.com/NubeDev/flow-eng/nodes/math"
 	broker "github.com/NubeDev/flow-eng/nodes/mqtt"
-	bac "github.com/NubeDev/flow-eng/nodes/protocols/bacnet"
+	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet"
 	"github.com/NubeDev/flow-eng/nodes/statistics"
 	"github.com/NubeDev/flow-eng/nodes/timing"
 )
@@ -42,6 +42,11 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	// time
 	delay, _ := timing.NewDelay(nil, nil)
 	inject, _ := timing.NewInject(nil)
+
+	// bacnet
+	bacServer, _ := bacnet.NewServer(nil)
+	bacPointBV, _ := bacnet.NewBacnetBVRead(nil, nil)
+
 	// mqttbase
 	mqttSub, _ := broker.NewMqttSub(nil)
 	mqttPub, _ := broker.NewMqttPub(nil)
@@ -71,8 +76,13 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(delay),
 		node.ConvertToSpec(inject),
+
+		node.ConvertToSpec(bacServer),
+		node.ConvertToSpec(bacPointBV),
+
 		node.ConvertToSpec(mqttSub),
 		node.ConvertToSpec(mqttPub),
+
 		node.ConvertToSpec(logNode),
 	)
 }
@@ -182,8 +192,10 @@ func builderTiming(body *node.Spec) (node.Node, error) {
 
 func builderProtocols(body *node.Spec, opts interface{}) (node.Node, error) {
 	switch body.GetName() {
+	case bacnetServer:
+		return bacnet.NewServer(body)
 	case bacnetReadBV:
-		return bac.NewBacnetBVRead(body, opts)
+		return bacnet.NewBacnetBVRead(body, opts)
 	}
 	return nil, nil
 }

@@ -1,20 +1,21 @@
-package bac
+package bacnet
 
 import (
 	"fmt"
-	"github.com/NubeDev/flow-eng/mqttbase"
+	"github.com/NubeDev/flow-eng/helpers/mqttbase"
 	"github.com/NubeDev/flow-eng/node"
 )
 
 const (
 	category      = "bacnet"
+	server        = "server"
 	bacnetReadBV  = "binary-variable-read"
 	bacnetWriteBV = "binary-variable-write"
 	bacnetReadAV  = "analog-variable-read"
 	bacnetWriteAV = "analog-variable-write"
 
-	bv = "bv"
-	av = "av"
+	typeBV = "bv"
+	typeAV = "av"
 )
 
 func nodeDefault(body *node.Spec, nodeName, category string, opts interface{}) (*node.Spec, *mqttbase.Mqtt, error) {
