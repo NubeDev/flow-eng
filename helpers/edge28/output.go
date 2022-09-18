@@ -1,4 +1,4 @@
-package edge28
+package edge28lib
 
 import "github.com/NubeDev/flow-eng/helpers/float"
 

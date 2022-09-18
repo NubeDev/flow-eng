@@ -42,6 +42,11 @@ func (p *Input) Connectors() []*Connector {
 }
 
 func (p *Input) GetValue() interface{} {
+	if p.value == nil {
+		if p.Connection.FallbackValue != nil {
+			return p.Connection.FallbackValue
+		}
+	}
 	return p.value
 }
 

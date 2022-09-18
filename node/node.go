@@ -18,6 +18,10 @@ type Node interface {
 	WritePin(OutputName, interface{})
 	OverrideInputValue(name InputName, value interface{}) error
 	GetMetadata() *Metadata
+	GetParameters() *Parameters
+	GetSubFlow() *SubFlow
+	GetSubFlowNodes() []*Spec
+	DeleteSubFlowNodes()
 	SetMetadata(m *Metadata)
 	GetSettings() []*Settings
 	SetPropertiesValue(name Title, value interface{}) error
@@ -88,12 +92,28 @@ func (n *Spec) GetOutput(name OutputName) *Output {
 	return nil
 }
 
+func (n *Spec) GetParameters() *Parameters {
+	return n.Parameters
+}
+
 func (n *Spec) InputsLen() int {
 	return len(n.Inputs)
 }
 
 func (n *Spec) OutputsLen() int {
 	return len(n.Outputs)
+}
+
+func (n *Spec) GetSubFlow() *SubFlow {
+	return n.SubFlow
+}
+
+func (n *Spec) GetSubFlowNodes() []*Spec {
+	return n.SubFlow.Nodes
+}
+
+func (n *Spec) DeleteSubFlowNodes() {
+	n.SubFlow.Nodes = nil
 }
 
 func (n *Spec) GetMetadata() *Metadata {
@@ -148,6 +168,7 @@ const (
 
 	Name          InputName = "name"
 	ObjectId      InputName = "object-id"
+	ObjectType    InputName = "object-type"
 	OverrideInput InputName = "override-value"
 )
 
@@ -195,10 +216,16 @@ type Metadata struct {
 }
 
 type SubFlow struct {
-	Name string `json:"name,omitempty"` // https://reactflow.dev/docs/guides/sub-flows/
+	ParentID string  `json:"parentID,omitempty"` // nodeID eg: bacnet-server node
+	Nodes    []*Spec `json:"nodes,omitempty"`    // bacnet-point
+}
+
+type Application struct {
+	Application ApplicationName `json:"application,omitempty"` // eg: bacnet-point belongs to bacnet-server
+	IsChild     bool            `json:"isChild"`
 }
 
 type Parameters struct {
-	Application  ApplicationName `json:"application,omitempty"`  // eg: bacnet-point belongs to bacnet-server
-	MaxNodeCount int             `json:"maxNodeCount,omitempty"` // eg: bacnet-server node can only be added once
+	Application  *Application `json:"application"`
+	MaxNodeCount int          `json:"maxNodeCount,omitempty"` // eg: bacnet-server node can only be added once
 }

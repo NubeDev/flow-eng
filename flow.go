@@ -42,6 +42,12 @@ func (p *Flow) GetNodeSpec(id string) *node.Spec {
 	return node.ConvertToSpec(n)
 }
 
+func (p *Flow) AddNodes(node ...node.Node) {
+	for _, n := range node {
+		p.AddNode(n)
+	}
+}
+
 func (p *Flow) AddNode(node node.Node) *Flow {
 	flows := p.Get()
 	flows.nodes = append(flows.nodes, node)

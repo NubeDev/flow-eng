@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"sort"
 	"time"
 )
 
@@ -19,7 +20,7 @@ func main() {
 
 	storage.New("")
 
-	filePath := flag.String("f", "../flow-eng/_example/example1/bacnet.json", "flow file")
+	filePath := flag.String("f", "../flow-eng/_example/json/bacnet.json", "flow file")
 	flag.Parse()
 	fmt.Println("file:", *filePath)
 
@@ -29,6 +30,9 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+	sort.Slice(nodesParsed, func(i, j int) bool {
+		return false
+	})
 	// defer the closing of our jsonFile so that we can parse it later on
 	defer jsonFile.Close()
 	byteValue, _ := ioutil.ReadAll(jsonFile)

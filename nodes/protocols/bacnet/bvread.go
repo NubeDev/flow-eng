@@ -5,9 +5,11 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/cbus"
 	"github.com/NubeDev/flow-eng/helpers/mqttbase"
 	"github.com/NubeDev/flow-eng/node"
+	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
+	"github.com/NubeDev/flow-eng/nodes/protocols/bstore"
 )
 
-type BacnetRead struct {
+type Read struct {
 	*node.Spec
 	client         *mqttbase.Mqtt
 	connected      bool
@@ -34,34 +36,39 @@ var objects = []string{"analog_value", "binary_value"}
 func NewBacnetBVRead(body *node.Spec, opts interface{}) (node.Node, error) {
 	var err error
 	var client *mqttbase.Mqtt
-	body, client, err = nodeDefault(body, bacnetReadBV, category, opts)
+	var point *bstore.Point
+	//store := GetStore()
+	body, client, err, point = nodeDefault(body, bacnetReadBV, category, applications.BACnet, opts)
 	if err != nil {
 		return nil, err
 	}
 	if client == nil {
-
 	}
-	bacnet := &BacnetRead{body, client, false, false, nil, nil, "", ""}
+	fmt.Println(point)
+
+	//err = GetStore().AddPoint(point)
+
+	bacnet := &Read{body, client, false, false, nil, nil, "", ""}
 	return bacnet, nil
 }
 
-func (inst *BacnetRead) subscribePresentValue(address float64) {
+func (inst *Read) subscribePresentValue(address float64) {
 	//inst.topicPv = TopicPresentValue(bv, GetObjectId(address))
 	// bacnet/ao/1/pv
 	inst.client.Subscribe("bacnet/ao/1/pv")
 }
 
-func (inst *BacnetRead) subscribePriority(address float64) {
+func (inst *Read) subscribePriority(address float64) {
 
-	inst.topicPriority = TopicPriority(bv, GetObjectId(address))
+	inst.topicPriority = TopicPriority(typeBV, GetObjectId(address))
 	inst.client.Subscribe(inst.topicPriority)
 }
 
-func (inst *BacnetRead) bus() cbus.Bus {
+func (inst *Read) bus() cbus.Bus {
 	return inst.client.BACnetBus()
 }
 
-func (inst *BacnetRead) processMessage() {
+func (inst *Read) processMessage() {
 	go func() {
 		msg, ok := inst.bus().Recv()
 		if ok {
@@ -77,17 +84,17 @@ func (inst *BacnetRead) processMessage() {
 
 }
 
-func (inst *BacnetRead) setConnected() {
+func (inst *Read) setConnected() {
 	inst.connected = true
 }
 
-func (inst *BacnetRead) setDisconnected() {
+func (inst *Read) setDisconnected() {
 	inst.connected = false
 }
 
 var loopCount uint64
 
-func (inst *BacnetRead) Process() {
+func (inst *Read) Process() {
 	loopCount++
 	if !inst.connected {
 		inst.client.Connected()
@@ -102,4 +109,4 @@ func (inst *BacnetRead) Process() {
 
 }
 
-func (inst *BacnetRead) Cleanup() {}
+func (inst *Read) Cleanup() {}

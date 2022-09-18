@@ -1,4 +1,4 @@
-package bacnet
+package bstore
 
 import (
 	"fmt"
@@ -8,9 +8,10 @@ import (
 )
 
 func TestNewStore(t *testing.T) {
-	NewStore(applications.Edge, nil)
+	bs := New(applications.Edge, nil)
 
 	var st []*Point
+	pprint.PrintJOSN(bs)
 
 	ai1 := &Point{
 		Application: applications.Edge,
@@ -19,11 +20,24 @@ func TestNewStore(t *testing.T) {
 	}
 	ai2 := &Point{
 		Application: applications.Edge,
-		ObjectType:  AnalogOutput,
-		ObjectID:    1,
+		ObjectType:  AnalogInput,
+		ObjectID:    2,
 	}
-	st = append(st, ai1)
-	fmt.Println(CheckExistingPoint(st, ai2))
+	err := bs.AddPoint(ai1)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	err = bs.AddPoint(ai2)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	//err = bs.AddPoint(ai1)
+	//if err != nil {
+	//	fmt.Println(err)
+	//	return
+	//}
 
 	pprint.PrintJOSN(st)
 

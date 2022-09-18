@@ -1,4 +1,4 @@
-package edge28
+package edge28lib
 
 import (
 	"errors"

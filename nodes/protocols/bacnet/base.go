@@ -1,9 +1,12 @@
 package bacnet
 
 import (
+	"errors"
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/mqttbase"
 	"github.com/NubeDev/flow-eng/node"
+	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
+	"github.com/NubeDev/flow-eng/nodes/protocols/bstore"
 )
 
 const (
@@ -18,38 +21,51 @@ const (
 	typeAV = "av"
 )
 
-func nodeDefault(body *node.Spec, nodeName, category string, opts interface{}) (*node.Spec, *mqttbase.Mqtt, error) {
+func getBacnetType(nodeName string) (bstore.ObjectType, error) {
+	switch nodeName {
+	case bacnetReadBV:
+		return bstore.BinaryVariable, nil
+	}
+	return "", errors.New(fmt.Sprintf("bacnet add new point object type not found node: %s", nodeName))
+}
+
+func nodeDefault(body *node.Spec, nodeName, category string, application node.ApplicationName, opts interface{}) (*node.Spec, *mqttbase.Mqtt, error, *bstore.Point) {
+	var err error
 	body = node.Defaults(body, nodeName, category)
-	var inNames = []string{node.SetInputName(node.ObjectId), node.SetInputName(node.OverrideInput)}
-	var inputsList []*node.Input
-	pointName := node.BuildInput(node.In, node.TypeString, nil, body.Inputs)
-	inputsList = append(inputsList, pointName)
-	inputsList = append(inputsList, node.DynamicInputs(node.TypeFloat, nil, 2, 0, 0, body.Inputs, inNames)...)
-	inputs := node.BuildInputs(inputsList...)
+
+	objectType, err := getBacnetType(nodeName)
+
+	pointName := node.BuildInput(node.Name, node.TypeString, nil, body.Inputs)
+	objectID := node.BuildInput(node.ObjectId, node.TypeFloat, 1, body.Inputs)
+	overrideInput := node.BuildInput(node.OverrideInput, node.TypeFloat, nil, body.Inputs)
+	inputs := node.BuildInputs(pointName, objectID, overrideInput)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
+
+	parameters := &node.Parameters{
+		Application: &node.Application{
+			Application: applications.BACnet,
+			IsChild:     true,
+		},
+	}
+	body.Parameters = node.BuildParameters(parameters)
 	body = node.BuildNode(body, inputs, outputs, nil)
 	client := &mqttbase.Mqtt{}
 	var ok bool
 	client, ok = opts.(*mqttbase.Mqtt)
-	fmt.Println(ok, 9999999)
+	fmt.Println(ok, 77777)
 
-	//if len(opts) > 0 {
-	//	for index, val := range opts {
-	//		fmt.Println(index, val)
-	//		client, ok = val.(*mqttbase.Mqtt)
-	//		if !ok {
-	//			fmt.Println("FUCK failed to make mqtt client")
-	//		}
-	//
-	//	}
-	//	//
-	//	//client, ok = opts[0].(*mqttbase.Mqtt)
-	//	//if !ok {
-	//	//	fmt.Println("FUCK failed to make mqtt client")
-	//	//}
-	//}
+	objId, ok := objectID.GetValue().(float64)
+	fmt.Println(objId, ok, 888888)
 
-	return body, client, nil
+	point := &bstore.Point{
+		Application: application,
+		ObjectType:  objectType,
+		ObjectID:    int(objId),
+		IoType:      "",
+		IoNumber:    0,
+	}
+
+	return body, client, err, point
 }
 
 //func process(body node.Node) {
