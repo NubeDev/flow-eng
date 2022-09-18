@@ -18,6 +18,7 @@ type Node interface {
 	WritePin(OutputName, interface{})
 	OverrideInputValue(name InputName, value interface{}) error
 	GetMetadata() *Metadata
+	GetIsParent() bool
 	GetParameters() *Parameters
 	GetSubFlow() *SubFlow
 	GetSubFlowNodes() []*Spec
@@ -47,6 +48,7 @@ type Spec struct {
 	Settings   []*Settings `json:"settings,omitempty"`
 	Metadata   *Metadata   `json:"metadata,omitempty"`
 	Parameters *Parameters `json:"parameters,omitempty"`
+	IsParent   bool        `json:"isParent,omitempty"`
 	SubFlow    *SubFlow    `json:"subFlow,omitempty"`
 }
 
@@ -60,6 +62,10 @@ func (n *Spec) GetID() string {
 
 func (n *Spec) GetName() string {
 	return n.Info.Name
+}
+
+func (n *Spec) GetIsParent() bool {
+	return n.IsParent
 }
 
 func (n *Spec) GetNodeName() string {
@@ -151,11 +157,12 @@ const (
 )
 
 const (
-	In  InputName = "in"
-	In1 InputName = "in1"
-	In2 InputName = "in2"
-	In3 InputName = "in3"
-	In4 InputName = "in4"
+	In   InputName = "in"
+	In1  InputName = "in1"
+	In2  InputName = "in2"
+	In3  InputName = "in3"
+	In4  InputName = "in4"
+	In16 InputName = "in16"
 
 	Input_ InputName = "input"
 	InputA InputName = "a"

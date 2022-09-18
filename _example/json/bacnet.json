@@ -1,38 +1,137 @@
-[  {
-  "inputs": [
-    {
-      "name": "in",
-      "type": "float",
-      "connection": {
-        "overrideValue": 11
+[
+  {
+    "outputs": [
+      {
+        "name": "message",
+        "type": "string",
+        "connections": null
+      },
+      {
+        "name": "message",
+        "type": "string",
+        "connections": null
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "connections": null
       }
+    ],
+    "info": {
+      "nodeID": "a123",
+      "name": "server",
+      "category": "bacnet"
+    },
+    "parameters": {
+      "application": {
+        "application": "bacnet",
+        "isChild": false
+      },
+      "maxNodeCount": 1
+    },
+    "isParent": true,
+    "subFlow": {
+      "nodes": [
+        {
+          "inputs": [
+            {
+              "name": "name",
+              "type": "string",
+              "connection": {}
+            },
+            {
+              "name": "object-id",
+              "type": "number",
+              "connection": {
+                "fallbackValue": 1
+              }
+            },
+            {
+              "name": "override-value",
+              "type": "number",
+              "connection": {}
+            }
+          ],
+          "outputs": [
+            {
+              "name": "out",
+              "type": "number",
+              "connections": null
+            }
+          ],
+          "info": {
+            "nodeID": "read111111",
+            "name": "binary-variable-read",
+            "category": "bacnet"
+          },
+          "parameters": {
+            "application": {
+              "application": "bacnet",
+              "isChild": true
+            }
+          },
+          "subFlow": {
+            "parentID": "a123"
+          }
+        },
+        {
+          "inputs": [
+            {
+              "name": "name",
+              "type": "string",
+              "connection": {}
+            },
+            {
+              "name": "object-id",
+              "type": "number",
+              "connection": {
+                "fallbackValue": 1
+              }
+            },
+            {
+              "name": "override-value",
+              "type": "number",
+              "connection": {}
+            }
+          ],
+          "outputs": [
+            {
+              "name": "out",
+              "type": "number",
+              "connections": null
+            }
+          ],
+          "info": {
+            "nodeID": "read22222",
+            "name": "binary-variable-read",
+            "category": "bacnet"
+          },
+          "parameters": {
+            "application": {
+              "application": "bacnet",
+              "isChild": true
+            }
+          },
+          "subFlow": {
+            "parentID": "a123"
+          }
+        }
+      ]
     }
-  ],
-  "outputs": [
-    {
-      "name": "out",
-      "type": "float",
-      "connections": null
-    }
-  ],
-  "info": {
-    "nodeID": "a123",
-    "name": "const-num",
-    "nodeName": "const-num_10fb8a4e",
-    "category": "math"
-  }
-},
+  },
   {
     "inputs": [
       {
-        "name": "in",
+        "name": "name",
         "type": "string",
         "connection": {}
       },
       {
         "name": "object-id",
         "type": "number",
-        "connection": {}
+        "connection": {
+          "fallbackValue": 1
+        }
       },
       {
         "name": "override-value",
@@ -48,10 +147,60 @@
       }
     ],
     "info": {
-      "nodeID": "b123",
+      "nodeID": "read111111",
       "name": "binary-variable-read",
-      "nodeName": "binary-variable-read_b848280b",
       "category": "bacnet"
+    },
+    "parameters": {
+      "application": {
+        "application": "bacnet",
+        "isChild": true
+      }
+    },
+    "subFlow": {
+      "parentID": "a123"
+    }
+  },
+  {
+    "inputs": [
+      {
+        "name": "name",
+        "type": "string",
+        "connection": {}
+      },
+      {
+        "name": "object-id",
+        "type": "number",
+        "connection": {
+          "fallbackValue": 1
+        }
+      },
+      {
+        "name": "override-value",
+        "type": "number",
+        "connection": {}
+      }
+    ],
+    "outputs": [
+      {
+        "name": "out",
+        "type": "number",
+        "connections": null
+      }
+    ],
+    "info": {
+      "nodeID": "read22222",
+      "name": "binary-variable-read",
+      "category": "bacnet"
+    },
+    "parameters": {
+      "application": {
+        "application": "bacnet",
+        "isChild": true
+      }
+    },
+    "subFlow": {
+      "parentID": "a123"
     }
   }
 ]

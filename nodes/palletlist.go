@@ -45,7 +45,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	// bacnet
 	bacServer, _ := bacnet.NewServer(nil)
-	bacPointBV, _ := bacnet.NewBacnetBVRead(nil, nil)
+	bacPointBV, _ := bacnet.NewBacnetBV(nil)
 
 	// mqttbase
 	mqttSub, _ := broker.NewMqttSub(nil)
@@ -112,13 +112,10 @@ func Builder(body *node.Spec, opts ...interface{}) (node.Node, error) {
 	if n != nil || err != nil {
 		return n, err
 	}
-	if len(opts) > 0 { // get the mqtt client
-		n, err = builderProtocols(body, opts[0])
-		if n != nil || err != nil {
-			return n, err
-		}
+	n, err = builderProtocols(body)
+	if n != nil || err != nil {
+		return n, err
 	}
-
 	n, err = builderMQTT(body)
 	if n != nil || err != nil {
 		return n, err
@@ -190,12 +187,12 @@ func builderTiming(body *node.Spec) (node.Node, error) {
 	return nil, nil
 }
 
-func builderProtocols(body *node.Spec, opts interface{}) (node.Node, error) {
+func builderProtocols(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case bacnetServer:
 		return bacnet.NewServer(body)
-	case bacnetReadBV:
-		return bacnet.NewBacnetBVRead(body, opts)
+	case bacnetBV:
+		return bacnet.NewBacnetBV(body)
 	}
 	return nil, nil
 }

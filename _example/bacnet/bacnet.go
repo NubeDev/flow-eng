@@ -68,7 +68,7 @@ func main() {
 		graph.AddNode(node_)
 	}
 
-	nodesList := graph.GetNodes()
+	nodesList := graph.GetNodesSpec()
 
 	pprint.PrintJOSN(nodesList)
 

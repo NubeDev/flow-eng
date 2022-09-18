@@ -23,11 +23,9 @@ const (
 	delay  = "delay"
 	inject = "inject"
 
-	bacnetServer  = "server"
-	bacnetReadBV  = "binary-variable-read"
-	bacnetWriteBV = "binary-variable-write"
-	bacnetReadAV  = "analog-variable-read"
-	bacnetWriteAV = "analog-variable-write"
+	bacnetServer = "server"
+	bacnetBV     = "binary-variable"
+	bacnetAV     = "analog-variable"
 
 	mqttSub = "mqttbase-subscribe"
 	mqttPub = "mqttbase-publish"

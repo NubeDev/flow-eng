@@ -23,12 +23,12 @@ func TestNewStore(t *testing.T) {
 		ObjectType:  AnalogInput,
 		ObjectID:    2,
 	}
-	err := bs.AddPoint(ai1)
+	err, _ := bs.AddPoint(ai1)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	err = bs.AddPoint(ai2)
+	err, _ = bs.AddPoint(ai2)
 	if err != nil {
 		fmt.Println(err)
 		return

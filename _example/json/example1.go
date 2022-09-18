@@ -12,7 +12,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"sort"
 	"time"
 )
 
@@ -30,9 +29,6 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	sort.Slice(nodesParsed, func(i, j int) bool {
-		return false
-	})
 	// defer the closing of our jsonFile so that we can parse it later on
 	defer jsonFile.Close()
 	byteValue, _ := ioutil.ReadAll(jsonFile)
@@ -50,16 +46,37 @@ func main() {
 	if m.Connected() {
 		m.Publish("start bacnet", "test")
 	}
-	fmt.Println(4444, m)
 
 	for _, n := range nodesParsed {
-		node_, err := nodes.Builder(n, m)
-		if err != nil {
-			fmt.Println(err)
-			return
+		if n.IsParent { // add parent node
+			node_, err := nodes.Builder(n, m)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			fmt.Println("ADD:", node_.GetName(), node_.GetNodeName(), "ERR", err)
+			graph.AddNode(node_)
+			for _, spec_ := range n.SubFlow.Nodes { // add parent node
+				node_, err := nodes.Builder(spec_, nil)
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+				fmt.Println("ADD:", node_.GetName(), node_.GetNodeName(), "ERR", err)
+				graph.AddNode(node_)
+			}
 		}
-		fmt.Println("ADD:", node_.GetName(), node_.GetNodeName(), "ERR", err)
-		graph.AddNode(node_)
+		if n.SubFlow.ParentID != "" {
+			node_, err := nodes.Builder(n, m)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			fmt.Println("ADD:", node_.GetName(), node_.GetNodeName(), "ERR", err)
+			graph.AddNode(node_)
+
+		}
+
 	}
 
 	graph.ReBuildFlow(true)

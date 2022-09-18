@@ -50,7 +50,6 @@ func getHighest(num int, val *float64) *PriAndValue {
 }
 
 func GetHighest(payload *PriArray) *PriAndValue {
-
 	if payload.P1 != nil {
 		return getHighest(1, payload.P1)
 	}

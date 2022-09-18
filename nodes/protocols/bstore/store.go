@@ -3,6 +3,7 @@ package bstore
 import (
 	"errors"
 	"fmt"
+	"github.com/NubeDev/flow-eng/helpers"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
 )
@@ -43,11 +44,17 @@ type pointAllowance struct {
 }
 
 type Point struct {
-	Application node.ApplicationName `json:"application"`
-	ObjectType  ObjectType           `json:"objectType"`
-	ObjectID    int                  `json:"ObjectID"`
-	IoType      IoType               `json:"ioType"`
-	IoNumber    IoNumber             `json:"ioNumber"`
+	UUID         string               `json:"uuid"`
+	Application  node.ApplicationName `json:"application"`
+	ObjectType   ObjectType           `json:"objectType"`
+	ObjectID     ObjectID             `json:"ObjectID"`
+	presentValue *float64
+	priAndValue  *priAndValue
+	priArray     *priArray
+	//IoType      IoType               `json:"ioType"`
+	//IoNumber    IoNumber             `json:"ioNumber"`
+	//ReadValue   float64              `json:"readValue"`
+	//WriteValue  float64              `json:"writeValue"`
 }
 
 type AIStore struct {
@@ -182,15 +189,16 @@ func (inst *BacnetStore) GetStoreByType(objectType ObjectType) *PointStore {
 	return inst.Store
 }
 
-func (inst *BacnetStore) AddPoint(point *Point) error {
+func (inst *BacnetStore) AddPoint(point *Point) (*Point, error) {
 	var err error
 	if point == nil {
-		return errors.New(fmt.Sprintf("store-add-point: point can not be empty"))
+		return nil, errors.New(fmt.Sprintf("store-add-point: point can not be empty"))
 	}
+	point.UUID = helpers.ShortUUID()
 	objectType := point.ObjectType
 	if point.ObjectType == "" {
 		if point == nil {
-			return errors.New(fmt.Sprintf("store-add-point: point objectType can not be empty"))
+			return nil, errors.New(fmt.Sprintf("store-add-point: point objectType can not be empty"))
 		}
 	}
 	var checked bool
@@ -200,11 +208,11 @@ func (inst *BacnetStore) AddPoint(point *Point) error {
 		p := inst.Store.AI
 		err = errNoObj(p, objectType)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		err = inst.checkExisting(point, p.From, p.Count)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 	if objectType == AnalogOutput {
@@ -212,11 +220,11 @@ func (inst *BacnetStore) AddPoint(point *Point) error {
 		p := inst.Store.AO
 		err = errNoObj(p, objectType)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		err = inst.checkExisting(point, p.From, p.Count)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
@@ -225,19 +233,19 @@ func (inst *BacnetStore) AddPoint(point *Point) error {
 		p := inst.Store.AO
 		err = errNoObj(p, objectType)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		err = inst.checkExisting(point, p.From, p.Count)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
 	if !checked {
-		return errors.New(fmt.Sprintf("store-add-point: not type found for object type:%s", objectType))
+		return nil, errors.New(fmt.Sprintf("store-add-point: not type found for object type:%s", objectType))
 	}
 	inst.Points = append(inst.Points, point)
-	return nil
+	return point, nil
 }
 
 func errNoObj(pnt interface{}, objectType ObjectType) error {
@@ -248,7 +256,7 @@ func errNoObj(pnt interface{}, objectType ObjectType) error {
 }
 
 func (inst *BacnetStore) checkExisting(point *Point, from, to int) error {
-	err := inst.allowableCount(point.ObjectID, from, to)
+	err := inst.allowableCount(int(point.ObjectID), from, to)
 	if err != nil {
 		return err
 	}
@@ -274,6 +282,47 @@ func (inst *BacnetStore) GetApplication() node.ApplicationName {
 
 func (inst *BacnetStore) GetPoints() []*Point {
 	return inst.Points
+}
+
+func (inst *BacnetStore) GetPointByObject(t ObjectType, id ObjectID) *Point {
+	for _, point := range inst.GetPoints() {
+		if point.ObjectType == t {
+			if point.ObjectID == id {
+				return point
+			}
+		}
+	}
+	return nil
+}
+
+func (inst *BacnetStore) GetPoint(uuid string) *Point {
+	for _, point := range inst.GetPoints() {
+		if point.UUID == uuid {
+			return point
+		}
+	}
+	return nil
+}
+
+//presentValue *float64
+//priAndValue  *priAndValue
+//priArray     *priArray
+
+func (inst *BacnetStore) ReadPresentValue(uuid string) (*float64, bool) {
+	p := inst.GetPoint(uuid)
+	if p != nil {
+		return p.presentValue, true
+	}
+	return nil, false
+}
+
+func (inst *BacnetStore) WritePointValue(uuid string, value *float64) bool {
+	p := inst.GetPoint(uuid)
+	if p != nil {
+		p.presentValue = value
+		return true
+	}
+	return false
 }
 
 func (inst *BacnetStore) GetByType(objectType ObjectType) (out []*Point, count int) {
