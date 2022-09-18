@@ -1,4 +1,4 @@
-package modbusclient
+package modbuscli
 
 import (
 	"github.com/NubeIO/nubeio-rubix-lib-modbus-go/modbus"
@@ -38,7 +38,7 @@ func (inst *Modbus) Init(opts *Modbus) (*Modbus, error) {
 	return m, nil
 }
 
-func (inst *Modbus) UpdateSlave(slave int) error {
+func (inst *Modbus) SetSlave(slave int) error {
 	inst.client.TCPClientHandler.SetSlave(byte(slave))
 	return nil
 }

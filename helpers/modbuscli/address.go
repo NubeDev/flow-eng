@@ -1,4 +1,4 @@
-package modbusclient
+package modbuscli
 
 import (
 	"github.com/NubeDev/flow-eng/nodes/protocols/bstore"
@@ -6,17 +6,16 @@ import (
 )
 
 type InputAddr struct {
-	bacnetAddr int
-	deviceAddr int
-	ioPin      int
-	temp       int
-	volt       int
-	current    int
+	BacnetAddr int `json:"bacnetAddr"`
+	DeviceAddr int `json:"deviceAddr"`
+	IoPin      int `json:"ioPin"`
+	Temp       int `json:"temp"`
+	Volt       int `json:"volt"`
+	Current    int `json:"current"`
 }
 
-func (inst *Modbus) BuildOutput(ioType bstore.IoType, id bstore.ObjectID) (OutputAddr, model.ObjectType) {
+func (inst *Modbus) BuildOutput(ioType bstore.IoType, id bstore.ObjectID) (*OutputAddr, model.ObjectType) {
 	_, out := outputAddress(0, int(id))
-
 	return out, typeSelect(ioType, true)
 }
 
@@ -68,12 +67,12 @@ func InputAddress(deviceCount int, filterByBacnet int) ([]*InputAddr, *InputAddr
 		count++
 		for i := range ints {
 			innerCount++
-			address.deviceAddr = count
-			address.ioPin = i + ioNumber
-			address.bacnetAddr = innerCount
-			address.temp = i + temp
-			address.volt = i + volt
-			address.current = i + current
+			address.DeviceAddr = count
+			address.IoPin = i + ioNumber
+			address.BacnetAddr = innerCount
+			address.Temp = i + temp
+			address.Volt = i + volt
+			address.Current = i + current
 			//fmt.Println("device-addr", count, "bacnet address", innerCount, "io-number", i+ioNumber, "point-tmp", i+temp, "point-volt", i+volt)
 			addresses = append(addresses, address)
 		}
@@ -81,7 +80,7 @@ func InputAddress(deviceCount int, filterByBacnet int) ([]*InputAddr, *InputAddr
 	filtered := &InputAddr{}
 	if filterByBacnet != 0 {
 		for _, addr := range addresses {
-			if addr.bacnetAddr == filterByBacnet {
+			if addr.BacnetAddr == filterByBacnet {
 				filtered = addr
 			}
 		}
@@ -90,15 +89,14 @@ func InputAddress(deviceCount int, filterByBacnet int) ([]*InputAddr, *InputAddr
 }
 
 type OutputAddr struct {
-	bacnetAddr int
-	deviceAddr int
-	ioPin      int
-	relay      int
-	volt       int
-	modbusType model.ObjectType
+	BacnetAddr int `json:"bacnetAddr"`
+	DeviceAddr int `json:"deviceAddr"`
+	IoPin      int `json:"ioPin"`
+	Relay      int `json:"relay"`
+	Volt       int `json:"volt"`
 }
 
-func outputAddress(deviceCount int, filterByBacnet int) ([]OutputAddr, OutputAddr) {
+func outputAddress(deviceCount int, filterByBacnet int) ([]*OutputAddr, *OutputAddr) {
 	var ioNumber = 1
 	var relay = 1
 	var volt = 250
@@ -114,24 +112,24 @@ func outputAddress(deviceCount int, filterByBacnet int) ([]OutputAddr, OutputAdd
 		sum++
 		ioList[i] = ioCount
 	}
-	var addresses []OutputAddr
-	address := OutputAddr{}
+	var addresses []*OutputAddr
+	address := &OutputAddr{}
 	for _, ints := range ioList {
 		count++
 		for i := range ints {
 			innerCount++
-			address.deviceAddr = count
-			address.ioPin = i + ioNumber
-			address.bacnetAddr = innerCount
-			address.relay = i + relay
-			address.volt = i + volt
+			address.DeviceAddr = count
+			address.IoPin = i + ioNumber
+			address.BacnetAddr = innerCount
+			address.Relay = i + relay
+			address.Volt = i + volt
 			addresses = append(addresses, address)
 		}
 	}
-	filtered := OutputAddr{}
+	filtered := &OutputAddr{}
 	if filterByBacnet != 0 {
 		for _, addr := range addresses {
-			if addr.bacnetAddr == filterByBacnet {
+			if addr.BacnetAddr == filterByBacnet {
 				filtered = addr
 			}
 		}

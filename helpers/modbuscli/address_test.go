@@ -1,4 +1,4 @@
-package modbusclient
+package modbuscli
 
 import (
 	pprint "github.com/NubeDev/flow-eng/helpers/print"

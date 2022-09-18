@@ -1,11 +1,10 @@
 package bacnet
 
 import (
-	"fmt"
-	"github.com/NubeDev/flow-eng/helpers/modbusclient"
+	"github.com/NubeDev/flow-eng/helpers/float"
+	"github.com/NubeDev/flow-eng/helpers/modbuscli"
 	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bstore"
-	"github.com/NubeIO/nubeio-rubix-lib-modbus-go/modbus"
 )
 
 // processMessage are the messages from the bacnet-server via the mqtt-broker
@@ -21,7 +20,7 @@ func (inst *Server) mqttRunner() {
 			}
 			t, id := payload.GetObject()
 			pnt := inst.db().GetPointByObject(t, id)
-			inst.db().WritePointValue(pnt.UUID, payload.GetPresentValue())
+			inst.db().WritePointValue(pnt.UUID, float.NonNil(payload.GetPresentValue()))
 		}
 	}()
 }
@@ -34,34 +33,63 @@ func (inst *Server) edgeRunner() {
 // modbus will come from polling
 // this is to only work for the IO-16
 func (inst *Server) modbusRunner() {
-
-	cli := modbusclient.New(&modbusclient.Modbus{})
-
-	for _, point := range inst.db().GetPointsByApplication(applications.Modbus) {
-		if point.IsIO && point.IsWriteable {
-			//slaveId := 0
-			addr, t := cli.BuildInput(point.IoType, point.ObjectID)
-			fmt.Println(addr, t)
-
-			//slaveId = addr
-
-		}
-
-	}
-
+	cli := modbuscli.New(&modbuscli.Modbus{})
+	store := inst.db()
+	pointsList := store.GetPointsByApplication(applications.Modbus)
+	inst.modbusInputsRunner(cli, pointsList) // process the inputs
 }
 
-func modbusInit() (*modbus.Client, error) {
-	mbClient := &modbus.Client{
-		HostIP:   "192.168.15.202",
-		HostPort: 502,
+func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*bstore.Point) {
+	var err error
+	var tempList []float64
+	var voltList []float64
+	var completedTemp bool
+	var completedVolt bool
+	store := inst.db()
+	for _, point := range pointsList { // do modbus read
+		if !point.IsWriteable {
+			addr, _ := cli.BuildInput(point.IoType, point.ObjectID)
+			slaveId := addr.DeviceAddr
+			if !completedTemp && point.IoType == bstore.IoTypeTemp {
+				tempList, err = cli.ReadTemps(slaveId)
+				if err != nil {
+					return
+				}
+				completedTemp = true
+			}
+			if !completedVolt && point.IoType == bstore.IoTypeVolts {
+				tempList, err = cli.ReadVolts(slaveId)
+				if err != nil {
+					return
+				}
+				completedVolt = true
+			}
+			if err != nil {
+				continue
+			}
+		}
 	}
-	mbClient, err := mbClient.New()
-	if err != nil {
-		return nil, err
+	for _, point := range pointsList {
+		addr, _ := cli.BuildInput(point.IoType, point.ObjectID)
+		objectId := addr.BacnetAddr
+		var writeValue float64
+		if point.ObjectType == bstore.AnalogInput {
+			if point.ObjectID == bstore.ObjectID(objectId) {
+				p := store.GetPointByObject(bstore.AnalogInput, point.ObjectID)
+				io16Pin := addr.IoPin - 1
+				if point.IoType == bstore.IoTypeTemp || point.IoType == bstore.IoTypeDigital { // update anypoint that is type temp
+					if point.IoType == bstore.IoTypeDigital {
+						writeValue = modbuscli.TempToDI(tempList[io16Pin]) // covert them temp value to a DI value
+					} else {
+						writeValue = tempList[io16Pin]
+					}
+				}
+				if point.IoType == bstore.IoTypeVolts { // update anypoint that is type voltage
+					writeValue = voltList[io16Pin]
+				}
+				store.WritePointValue(p.UUID, writeValue)
+			}
+		}
 	}
-	mbClient.TCPClientHandler.Address = fmt.Sprintf("%s:%d", "192.168.15.202", 502)
-	mbClient.TCPClientHandler.SlaveID = byte(1)
 
-	return mbClient, nil
 }

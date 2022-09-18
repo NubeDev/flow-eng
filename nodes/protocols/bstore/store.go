@@ -55,6 +55,7 @@ type Point struct {
 	ObjectID     ObjectID             `json:"ObjectID"`
 	presentValue *float64
 	priAndValue  *priAndValue
+	writeValue   float64
 	priArray     *priArray
 	IoType       IoType `json:"ioType"` // temp
 	IsIO         bool   // if it's an io-pin for a real device
@@ -334,10 +335,10 @@ func (inst *BacnetStore) ReadPresentValue(uuid string) (*float64, bool) {
 	return nil, false
 }
 
-func (inst *BacnetStore) WritePointValue(uuid string, value *float64) bool {
+func (inst *BacnetStore) WritePointValue(uuid string, value float64) bool {
 	p := inst.GetPoint(uuid)
 	if p != nil {
-		p.presentValue = value
+		p.writeValue = value
 		return true
 	}
 	return false
