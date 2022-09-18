@@ -46,7 +46,8 @@ func NewServer(body *node.Spec, childNodes ...*node.Spec) (node.Node, error) {
 	body.IsParent = true
 	body = node.BuildNode(body, nil, outputs, nil)
 
-	application := applications.Edge // make this a setting eg: if it's an edge-28 it would give the user 8AI, 8AOs and 100 BVs/AVs
+	application := applications.Modbus // make this a setting eg: if it's an edge-28 it would give the user 8AI, 8AOs and 100 BVs/AVs
+
 	//if application == "" {
 	//	application = applications.BACnet
 	//}
@@ -58,8 +59,11 @@ func NewServer(body *node.Spec, childNodes ...*node.Spec) (node.Node, error) {
 	return &Server{body, client}, nil
 }
 
-func GetStore() *bstore.BacnetStore {
+func getStore() *bstore.BacnetStore {
 	return db
+}
+func getRunnerType() node.ApplicationName {
+	return db.GetApplication()
 }
 
 func (inst *Server) db() *bstore.BacnetStore {
@@ -75,6 +79,9 @@ func matchObject(t bstore.ObjectType, id bstore.ObjectID) {
 }
 
 func (inst *Server) processProtocols() {
+	if getRunnerType() == applications.Modbus {
+		inst.modbusRunner()
+	}
 
 }
 

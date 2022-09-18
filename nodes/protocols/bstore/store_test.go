@@ -33,11 +33,6 @@ func TestNewStore(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
-	//err = bs.AddPoint(ai1)
-	//if err != nil {
-	//	fmt.Println(err)
-	//	return
-	//}
 
 	pprint.PrintJOSN(st)
 

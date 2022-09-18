@@ -31,6 +31,11 @@ const BinaryInput ObjectType = "binaryInput"
 const BinaryOutput ObjectType = "binaryInput"
 const BinaryVariable ObjectType = "binaryVariable"
 
+const IoTypeTemp IoType = "thermistor_10k_type_2"
+const IoTypeCurrent IoType = "current"
+const IoTypeVolts IoType = "voltage_dc"
+const IoTypeDigital IoType = "digital"
+
 type BacnetStore struct {
 	Application node.ApplicationName `json:"application"`
 	Store       *PointStore          `json:"store"`
@@ -51,7 +56,10 @@ type Point struct {
 	presentValue *float64
 	priAndValue  *priAndValue
 	priArray     *priArray
-	//IoType      IoType               `json:"ioType"`
+	IoType       IoType `json:"ioType"` // temp
+	IsIO         bool   // if it's an io-pin for a real device
+	IsWriteable  bool
+	Enable       bool
 	//IoNumber    IoNumber             `json:"ioNumber"`
 	//ReadValue   float64              `json:"readValue"`
 	//WriteValue  float64              `json:"writeValue"`
@@ -282,6 +290,16 @@ func (inst *BacnetStore) GetApplication() node.ApplicationName {
 
 func (inst *BacnetStore) GetPoints() []*Point {
 	return inst.Points
+}
+
+func (inst *BacnetStore) GetPointsByApplication(name node.ApplicationName) []*Point {
+	var out []*Point
+	for _, point := range inst.GetPoints() {
+		if point.Application == name {
+			out = append(out, point)
+		}
+	}
+	return out
 }
 
 func (inst *BacnetStore) GetPointByObject(t ObjectType, id ObjectID) *Point {

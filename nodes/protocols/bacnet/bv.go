@@ -25,7 +25,7 @@ var objects = []string{"analog_value", "binary_value"}
 
 func NewBacnetBV(body *node.Spec) (node.Node, error) {
 	var err error
-	store := GetStore()
+	store := getStore()
 	body, err, point := nodeDefault(body, bacnetBV, category, store.GetApplication())
 	if err != nil {
 		log.Error(err)
