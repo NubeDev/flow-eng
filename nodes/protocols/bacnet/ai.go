@@ -7,7 +7,7 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/protocols/bstore"
 )
 
-type BV struct {
+type AI struct {
 	*node.Spec
 	connected  bool
 	subscribed bool
@@ -16,72 +16,64 @@ type BV struct {
 	pointUUID  string
 }
 
-const (
-	object = "object"
-)
-
-var objects = []string{"analog_value", "binary_value"}
-
-func NewBV(body *node.Spec) (node.Node, error) {
+func NewAI(body *node.Spec) (node.Node, error) {
 	var err error
 	store := getStore()
-	body, err, point := nodeDefault(body, bacnetBV, category, store.GetApplication())
+	body, err, point := nodeDefault(body, bacnetAI, category, store.GetApplication())
 	var pointUUID string
 	if point != nil {
 		pointUUID = point.UUID
 	}
-	return &BV{
+	return &AI{
 		body,
 		false,
 		false,
 		0,
-		bstore.BinaryVariable,
+		bstore.AnalogInput,
 		pointUUID,
 	}, err
 }
 
-//func (inst *BV) subscribePresentValue() {
-//	topicPv := TopicPresentValue(typeBV, inst.objectID)
-//	inst.client().Subscribe(topicPv)
-//}
+func (inst *AI) subscribePresentValue() {
+	topicPv := TopicPresentValue(typeAI, inst.objectID)
+	inst.client().Subscribe(topicPv)
+}
 
-func (inst *BV) subscribePriority() {
-	topicPriority := TopicPriority(typeBV, inst.objectID)
+func (inst *AI) subscribePriority() {
+	topicPriority := TopicPriority(typeAI, inst.objectID)
 	inst.client().Subscribe(topicPriority)
 }
 
-func (inst *BV) client() *mqttbase.Mqtt {
+func (inst *AI) client() *mqttbase.Mqtt {
 	return client
 }
 
-func (inst *BV) bus() cbus.Bus {
+func (inst *AI) bus() cbus.Bus {
 	return inst.client().BACnetBus()
 }
 
-func (inst *BV) setObjectId() {
+func (inst *AI) setObjectId() {
 	id, ok := inst.ReadPin(node.ObjectId).(int)
 	if ok {
 		inst.objectID = bstore.ObjectID(id)
 	}
 }
 
-func (inst *BV) setConnected() {
+func (inst *AI) setConnected() {
 	inst.connected = true
 }
 
-func (inst *BV) setDisconnected() {
+func (inst *AI) setDisconnected() {
 	inst.connected = false
 }
 
-var loopCount uint64
-
-func (inst *BV) Process() {
+func (inst *AI) Process() {
 	loopCount++
 	if !inst.connected {
 		inst.setObjectId()
 		inst.client().Connected()
 		inst.setConnected()
-		inst.subscribePriority()
+		inst.subscribePresentValue()
 
 	}
 
@@ -91,4 +83,4 @@ func (inst *BV) Process() {
 
 }
 
-func (inst *BV) Cleanup() {}
+func (inst *AI) Cleanup() {}

@@ -12,7 +12,7 @@ type Payload struct {
 	topic       string
 	value       *float64
 	priAndValue *priAndValue
-	priArray    *priArray
+	priArray    *PriArray
 	objectID    ObjectID
 	objectType  ObjectType
 }
@@ -51,7 +51,7 @@ func (inst *Payload) NewMessage(msg interface{}) error {
 		}
 		if isPri(inst.topic) {
 			inst.priArray = inst.cleanArray(msgString)
-			inst.priAndValue = inst.getHighest()
+			inst.priAndValue = GetHighest(inst.priArray)
 		}
 	} else {
 		return errors.New("bacnet-message: failed to decode message")
@@ -59,7 +59,14 @@ func (inst *Payload) NewMessage(msg interface{}) error {
 	return nil
 }
 
-type priArray struct {
+func NewPriArrayAt15(value float64) *PriArray {
+	return &PriArray{
+		P15: float.New(value),
+	}
+
+}
+
+type PriArray struct {
 	P1  *float64 `json:"_1"`
 	P2  *float64 `json:"_2"`
 	P3  *float64 `json:"_3"`
@@ -114,7 +121,7 @@ func (inst *Payload) GetPresentValue() *float64 {
 	return inst.value
 }
 
-func (inst *Payload) GetFullPriority() *priArray {
+func (inst *Payload) GetFullPriority() *PriArray {
 	return inst.priArray
 }
 
@@ -122,8 +129,10 @@ func (inst *Payload) GetHighestPriority() *priAndValue {
 	return inst.priAndValue
 }
 
-func (inst *Payload) getHighest() *priAndValue {
-	payload := inst.priArray
+func GetHighest(payload *PriArray) *priAndValue {
+	if payload == nil {
+		payload = &PriArray{}
+	}
 	if payload.P1 != nil {
 		return getHighest(1, payload.P1)
 	}
@@ -133,18 +142,57 @@ func (inst *Payload) getHighest() *priAndValue {
 	if payload.P3 != nil {
 		return getHighest(3, payload.P3)
 	}
+	if payload.P4 != nil {
+		return getHighest(4, payload.P4)
+	}
+	if payload.P5 != nil {
+		return getHighest(5, payload.P5)
+	}
+	if payload.P6 != nil {
+		return getHighest(6, payload.P6)
+	}
+	if payload.P7 != nil {
+		return getHighest(7, payload.P7)
+	}
+	if payload.P8 != nil {
+		return getHighest(8, payload.P8)
+	}
+	if payload.P9 != nil {
+		return getHighest(9, payload.P9)
+	}
+	if payload.P10 != nil {
+		return getHighest(10, payload.P10)
+	}
+	if payload.P11 != nil {
+		return getHighest(11, payload.P11)
+	}
+	if payload.P12 != nil {
+		return getHighest(12, payload.P12)
+	}
+	if payload.P13 != nil {
+		return getHighest(13, payload.P13)
+	}
+	if payload.P14 != nil {
+		return getHighest(14, payload.P14)
+	}
+	if payload.P15 != nil {
+		return getHighest(15, payload.P15)
+	}
+	if payload.P16 != nil {
+		return getHighest(16, payload.P16)
+	}
 	return nil
 
 }
 
-func (inst *Payload) cleanArray(payload string) *priArray {
+func (inst *Payload) cleanArray(payload string) *PriArray {
 	payload = strings.ReplaceAll(payload, "{", "")
 	payload = strings.ReplaceAll(payload, "}", "")
 	parts := strings.Split(payload, ",")
 	if len(parts) != 16 {
 		return nil
 	}
-	arr := &priArray{
+	arr := &PriArray{
 		P1:  set(parts[0]),
 		P2:  set(parts[1]),
 		P3:  set(parts[2]),

@@ -43,7 +43,8 @@ func checkBACnet(topic string) (isBacnet bool) { // to try and save spamming ran
 var handle mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	log.Println("NEW MQTT MES", msg.Topic(), " ", string(msg.Payload()))
 	if checkBACnet(msg.Topic()) {
-		bacnetBus.Send(&Message{helpers.ShortUUID("bac"), msg})
+		mes := &Message{helpers.ShortUUID("bac"), msg}
+		bacnetBus.Send(mes)
 	}
 }
 

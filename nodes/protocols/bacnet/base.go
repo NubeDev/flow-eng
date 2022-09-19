@@ -6,6 +6,7 @@ import (
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bstore"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -18,8 +19,10 @@ const (
 	bacnetAO = "analog-output"
 	bacnetAI = "analog-input"
 
-	typeBV = "bv"
+	typeAI = "ai"
+	typeAO = "ao"
 	typeAV = "av"
+	typeBV = "bv"
 )
 
 func getBacnetType(nodeName string) (obj bstore.ObjectType, isWriteable, isIO bool, err error) {
@@ -49,8 +52,8 @@ func nodeDefault(body *node.Spec, nodeName, category string, application node.Ap
 
 	pointName := node.BuildInput(node.Name, node.TypeString, nil, body.Inputs)
 	objectIDInput := node.BuildInput(node.ObjectId, node.TypeFloat, 1, body.Inputs)
-	ioType := bstore.IoTypeDigital // TODO make a setting
-	enable := true                 // TODO make a setting
+	ioType := bstore.IoTypeTemp // TODO make a setting
+	enable := true              // TODO make a setting
 	var inputs []*node.Input
 
 	if isWriteable {
@@ -73,6 +76,10 @@ func nodeDefault(body *node.Spec, nodeName, category string, application node.Ap
 	body = node.BuildNode(body, inputs, outputs, nil)
 
 	objectID, _ := objectIDInput.GetValue().(float64)
+	if objectID == 0 {
+		log.Errorf("bacnet-server object-id must be grater then 0 object-type:%s", objectType)
+		objectID = 1
+	}
 
 	point := addPoint(application, ioType, objectType, bstore.ObjectID(objectID), isWriteable, isIO, enable)
 	store := getStore()
@@ -93,15 +100,6 @@ func addPoint(application node.ApplicationName, ioType bstore.IoType, objectType
 	return point
 
 }
-
-//func process(body node.Node) {
-//	nodeName := body.GetName()
-//
-//	objectId := body.ReadPin(node.ObjectId)
-//	overrideInput := body.ReadPin(node.OverrideInput)
-//
-//	body.WritePin(node.Out, output)
-//}
 
 // topicBuilder bacnet/ao/1
 func topicBuilder(objectType string, address bstore.ObjectID) string {

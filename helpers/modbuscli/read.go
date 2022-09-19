@@ -1,5 +1,10 @@
 package modbuscli
 
+import (
+	"github.com/NubeDev/flow-eng/helpers/float"
+	log "github.com/sirupsen/logrus"
+)
+
 func tempRegs() (start int, finish int) {
 	start = 1
 	return start, start + 8
@@ -31,7 +36,8 @@ func (inst *Modbus) ReadVolts(slave int) (raw []float64, err error) {
 }
 
 func convert(raw []byte) []float64 {
-	return []float64{1, 2, 3, 4, 5, 6, 7, 8}
+	a := float.RandFloat(1, 2)
+	return []float64{122.2, a, 3, 4, 5, 6, 7, 8}
 }
 
 func (inst *Modbus) readRegisters(slave, start, finish int, holding bool) (raw []byte, err error) {
@@ -42,11 +48,13 @@ func (inst *Modbus) readRegisters(slave, start, finish int, holding bool) (raw [
 	if holding {
 		registers, _, err := inst.client.ReadHoldingRegisters(uint16(start), uint16(finish))
 		if err != nil {
+			log.Error(err)
 			return registers, err
 		}
 	} else {
 		registers, _, err := inst.client.ReadInputRegisters(uint16(start), uint16(finish))
 		if err != nil {
+			log.Error(err)
 			return registers, err
 		}
 	}

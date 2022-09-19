@@ -11,10 +11,6 @@ type Modbus struct {
 	client      *modbus.Client
 }
 
-func New(m *Modbus) *Modbus {
-	return &Modbus{}
-}
-
 func (inst *Modbus) Init(opts *Modbus) (*Modbus, error) {
 	if opts.Port == 0 {
 		opts.Port = 502

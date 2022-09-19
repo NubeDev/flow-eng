@@ -6,6 +6,8 @@ import (
 	"github.com/NubeDev/flow-eng/helpers"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
+	log "github.com/sirupsen/logrus"
+	"math"
 )
 
 /*
@@ -48,6 +50,12 @@ type pointAllowance struct {
 	Count  int
 }
 
+type ToBacnet struct {
+	CovEvent    bool
+	ToBacnet    float64
+	ToBacnetPri int
+}
+
 type Point struct {
 	UUID         string               `json:"uuid"`
 	Application  node.ApplicationName `json:"application"`
@@ -56,14 +64,16 @@ type Point struct {
 	presentValue *float64
 	priAndValue  *priAndValue
 	writeValue   float64
-	priArray     *priArray
+	priArray     *PriArray
 	IoType       IoType `json:"ioType"` // temp
 	IsIO         bool   // if it's an io-pin for a real device
 	IsWriteable  bool
 	Enable       bool
-	//IoNumber    IoNumber             `json:"ioNumber"`
-	//ReadValue   float64              `json:"readValue"`
-	//WriteValue  float64              `json:"writeValue"`
+
+	ToBacnetSyncPending bool
+	//ToBacnet            *PriArray
+	ToBacnet    float64
+	ToBacnetCov float64
 }
 
 type AIStore struct {
@@ -121,28 +131,26 @@ func New(app node.ApplicationName, pStore *PointStore) *BacnetStore {
 	bo := pStore.BO
 	bv := pStore.BV
 
-	if app == applications.BACnet { // bacnet-server
-		if av == nil {
-			av = &AVStore{
-				pointAllowance: pointAllowance{
-					Object: AnalogVariable,
-					From:   1,
-					Count:  200,
-				},
-			}
+	if av == nil {
+		av = &AVStore{
+			pointAllowance: pointAllowance{
+				Object: AnalogVariable,
+				From:   1,
+				Count:  200,
+			},
 		}
-		if bv == nil {
-			bv = &BVStore{
-				pointAllowance: pointAllowance{
-					Object: BinaryVariable,
-					From:   1,
-					Count:  200,
-				},
-			}
+	}
+	if bv == nil {
+		bv = &BVStore{
+			pointAllowance: pointAllowance{
+				Object: BinaryVariable,
+				From:   1,
+				Count:  200,
+			},
 		}
 	}
 
-	if app == applications.Edge || app == applications.RubixIO {
+	if app == applications.Edge || app == applications.RubixIO || app == applications.Modbus {
 		if ai == nil {
 			ai = &AIStore{
 				pointAllowance: pointAllowance{
@@ -161,7 +169,7 @@ func New(app node.ApplicationName, pStore *PointStore) *BacnetStore {
 				},
 			}
 		}
-		if app == applications.Edge {
+		if app == applications.Edge || app == applications.Modbus {
 			if bo == nil {
 				bo = &BOStore{
 					pointAllowance: pointAllowance{
@@ -184,7 +192,11 @@ func New(app node.ApplicationName, pStore *PointStore) *BacnetStore {
 	}
 	store := &PointStore{
 		AI: ai,
-		AV: nil,
+		AO: ao,
+		AV: av,
+		BI: bi,
+		BO: bo,
+		BV: bv,
 	}
 	bacnetStore.Store = store
 	return bacnetStore
@@ -240,6 +252,45 @@ func (inst *BacnetStore) AddPoint(point *Point) (*Point, error) {
 	if objectType == AnalogVariable {
 		checked = true
 		p := inst.Store.AO
+		err = errNoObj(p, objectType)
+		if err != nil {
+			return nil, err
+		}
+		err = inst.checkExisting(point, p.From, p.Count)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if objectType == BinaryInput {
+		checked = true
+		p := inst.Store.BI
+		err = errNoObj(p, objectType)
+		if err != nil {
+			return nil, err
+		}
+		err = inst.checkExisting(point, p.From, p.Count)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if objectType == BinaryOutput {
+		checked = true
+		p := inst.Store.BO
+		err = errNoObj(p, objectType)
+		if err != nil {
+			return nil, err
+		}
+		err = inst.checkExisting(point, p.From, p.Count)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if objectType == BinaryVariable {
+		checked = true
+		p := inst.Store.BV
 		err = errNoObj(p, objectType)
 		if err != nil {
 			return nil, err
@@ -323,22 +374,42 @@ func (inst *BacnetStore) GetPoint(uuid string) *Point {
 	return nil
 }
 
-//presentValue *float64
-//priAndValue  *priAndValue
-//priArray     *priArray
-
-func (inst *BacnetStore) ReadPresentValue(uuid string) (*float64, bool) {
+func (inst *BacnetStore) ReadPresentValue(uuid string) (float64, bool) {
 	p := inst.GetPoint(uuid)
 	if p != nil {
-		return p.presentValue, true
+		return p.ToBacnet, true
 	}
-	return nil, false
+	return 0, false
 }
 
+func (inst *BacnetStore) UpdateBacnetSync(uuid string, value bool) {
+	p := inst.GetPoint(uuid)
+	p.ToBacnetSyncPending = value
+}
+
+func (inst *BacnetStore) BacnetSyncPending(uuid string) bool {
+	p := inst.GetPoint(uuid)
+	return p.ToBacnetSyncPending
+}
+
+////GetPointArray get the current priority array
+//func (inst *BacnetStore) GetPointArray(uuid string) *PriArray {
+//	p := inst.GetPoint(uuid)
+//	return p.ToBacnet
+//}
+
+func cov(existing, new, cov float64) bool {
+	v := math.Abs(existing-new) <= cov
+	return !v
+}
+
+//WritePointValue to is to be written to flow modbus or the wire-sheet @ priority 15
 func (inst *BacnetStore) WritePointValue(uuid string, value float64) bool {
 	p := inst.GetPoint(uuid)
+	log.Infof("store write point value type:%s-%d value:%f  uuid:%s", p.ObjectType, p.ObjectID, value, uuid)
 	if p != nil {
-		p.writeValue = value
+		p.ToBacnetSyncPending = cov(p.ToBacnet, value, 0.5)
+		p.ToBacnet = value
 		return true
 	}
 	return false

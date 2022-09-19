@@ -24,8 +24,11 @@ const (
 	inject = "inject"
 
 	bacnetServer = "server"
-	bacnetBV     = "binary-variable"
-	bacnetAV     = "analog-variable"
+
+	bacnetAI = "analog-input"
+	bacnetBI = "binary-input"
+	bacnetBV = "binary-variable"
+	bacnetAV = "analog-variable"
 
 	mqttSub = "mqttbase-subscribe"
 	mqttPub = "mqttbase-publish"

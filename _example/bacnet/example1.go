@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	flowctrl "github.com/NubeDev/flow-eng"
+	"github.com/NubeDev/flow-eng/helpers/mqttbase"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes"
 	"github.com/NubeDev/flow-eng/storage"
@@ -35,14 +36,45 @@ func main() {
 
 	graph := flowctrl.New()
 
+	m, err := mqttbase.NewMqtt()
+	if err != nil {
+		return
+	}
+
+	m.Connect()
+
+	if m.Connected() {
+		m.Publish("start bacnet", "test")
+	}
+
 	for _, n := range nodesParsed {
-		node_, err := nodes.Builder(n, nil)
-		if err != nil {
-			fmt.Println(err)
-			//return
+		if n.IsParent { // add parent node
+			node_, err := nodes.Builder(n, m)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			fmt.Println("ADD:", node_.GetName(), node_.GetNodeName(), "ERR", err)
+			graph.AddNode(node_)
+			for _, spec_ := range n.SubFlow.Nodes { // add parent node
+				node_, err := nodes.Builder(spec_, nil)
+				if err != nil {
+					fmt.Println(err)
+					//return
+				}
+				fmt.Println("ADD:", node_.GetName(), node_.GetNodeName(), "ERR", err)
+				graph.AddNode(node_)
+			}
 		}
-		fmt.Println("ADD:", node_.GetName(), node_.GetNodeName(), "ERR", err)
-		graph.AddNode(node_)
+		if n.SubFlow.ParentID != "" {
+			node_, err := nodes.Builder(n, m)
+			if err != nil {
+				fmt.Println(err)
+				//return
+			}
+			fmt.Println("ADD:", node_.GetName(), node_.GetNodeName(), "ERR", err)
+			graph.AddNode(node_)
+		}
 
 	}
 

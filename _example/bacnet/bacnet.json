@@ -61,7 +61,7 @@
           ],
           "info": {
             "nodeID": "read111111",
-            "name": "binary-variable-read",
+            "name": "binary-variable",
             "category": "bacnet"
           },
           "parameters": {
@@ -103,7 +103,7 @@
           ],
           "info": {
             "nodeID": "read22222",
-            "name": "binary-variable-read",
+            "name": "binary-variable",
             "category": "bacnet"
           },
           "parameters": {
@@ -148,7 +148,7 @@
     ],
     "info": {
       "nodeID": "read111111",
-      "name": "binary-variable-read",
+      "name": "binary-variable",
       "category": "bacnet"
     },
     "parameters": {
@@ -190,7 +190,7 @@
     ],
     "info": {
       "nodeID": "read22222",
-      "name": "binary-variable-read",
+      "name": "binary-variable",
       "category": "bacnet"
     },
     "parameters": {

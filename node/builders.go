@@ -33,6 +33,7 @@ func Defaults(body *Spec, nodeName, category string) *Spec {
 	body.Info.Name = SetName(nodeName)
 	body.Info.Category = SetName(category)
 	body.Info.NodeID = SetUUID(body.Info.NodeID)
+
 	if body.Parameters == nil {
 		body.Parameters = &Parameters{
 			Application:  &Application{},

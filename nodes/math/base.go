@@ -1,11 +1,11 @@
 package math
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/integer"
 	"github.com/NubeDev/flow-eng/node"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -43,12 +43,11 @@ func process(body node.Node) {
 	inputs := float.ConvertInterfaceToFloatMultiple(body.ReadMultiple(count))
 	output := operation(equation, inputs)
 	if output == nil {
-		//log.Infof("equation: %s, result: %v", equation, output)
+		log.Infof("equation: %s, result: %v", equation, output)
 	} else {
-		//log.Infof("equation: %s, result: %v", equation, *output)
+		log.Infof("equation: %s, result: %v", equation, *output)
 		body.WritePin(node.Result, float.NonNil(output))
 	}
-	fmt.Println()
 
 }
 

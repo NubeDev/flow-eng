@@ -45,7 +45,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	// bacnet
 	bacServer, _ := bacnet.NewServer(nil)
-	bacPointBV, _ := bacnet.NewBacnetBV(nil)
+	bacPointAI, _ := bacnet.NewAI(nil)
+	bacPointBV, _ := bacnet.NewBV(nil)
 
 	// mqttbase
 	mqttSub, _ := broker.NewMqttSub(nil)
@@ -78,6 +79,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(inject),
 
 		node.ConvertToSpec(bacServer),
+		node.ConvertToSpec(bacPointAI),
 		node.ConvertToSpec(bacPointBV),
 
 		node.ConvertToSpec(mqttSub),
@@ -192,8 +194,12 @@ func builderProtocols(body *node.Spec) (node.Node, error) {
 	case bacnetServer:
 		return bacnet.NewServer(body)
 	case bacnetBV:
-		return bacnet.NewBacnetBV(body)
+		return bacnet.NewBV(body)
+	case bacnetAI:
+		return bacnet.NewAI(body)
+
 	}
+
 	return nil, nil
 }
 

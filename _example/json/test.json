@@ -29,7 +29,7 @@
         "name": "in",
         "type": "float",
         "connection": {
-          "overrideValue": 33.3
+          "overrideValue": 22
         }
       }
     ],

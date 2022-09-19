@@ -1,6 +1,7 @@
 package modbuscli
 
 import (
+	"fmt"
 	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"testing"
 )
@@ -11,7 +12,11 @@ func Test_Modbus(t *testing.T) {
 
 func Test_Tests(t *testing.T) {
 
-	list, addr17 := InputAddress(5, 21)
+	list, addr17 := InputAddress(4, 2)
+
+	for _, addr := range list {
+		fmt.Println(addr)
+	}
 
 	pprint.Print(list)
 	pprint.Print(addr17)

@@ -44,7 +44,7 @@ func job() {
 
 func (inst *Inject) check() {
 	if !inst.triggered {
-		inst.cron.Every(20).Second().Do(job)
+		inst.cron.Every(10).Second().Do(job)
 	}
 	inst.triggered = true
 

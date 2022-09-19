@@ -1,7 +1,6 @@
 package bacnet
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/cbus"
 	"github.com/NubeDev/flow-eng/helpers/mqttbase"
 	pprint "github.com/NubeDev/flow-eng/helpers/print"
@@ -48,18 +47,17 @@ func NewServer(body *node.Spec, childNodes ...*node.Spec) (node.Node, error) {
 
 	application := applications.Modbus // make this a setting eg: if it's an edge-28 it would give the user 8AI, 8AOs and 100 BVs/AVs
 
-	//if application == "" {
-	//	application = applications.BACnet
-	//}
-
 	client, err = mqttbase.NewMqtt()
-	fmt.Println(err)
+	client.Connect()
 
 	db = bstore.New(application, nil)
-	return &Server{body, client}, nil
+	return &Server{body, client}, err
 }
 
 func getStore() *bstore.BacnetStore {
+	if db == nil {
+		panic("bacnet-server-node: store can not be empty")
+	}
 	return db
 }
 func getRunnerType() node.ApplicationName {
@@ -74,19 +72,8 @@ func (inst *Server) bus() cbus.Bus {
 	return inst.client.BACnetBus()
 }
 
-func matchObject(t bstore.ObjectType, id bstore.ObjectID) {
-
-}
-
-func (inst *Server) processProtocols() {
-	if getRunnerType() == applications.Modbus {
-		inst.modbusRunner()
-	}
-
-}
-
 func (inst *Server) Process() {
-
+	inst.protocolRunner()
 }
 
 func (inst *Server) Cleanup() {}

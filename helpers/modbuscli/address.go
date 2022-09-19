@@ -14,12 +14,12 @@ type InputAddr struct {
 	Current    int `json:"current"`
 }
 
-func (inst *Modbus) BuildOutput(ioType bstore.IoType, id bstore.ObjectID) (*OutputAddr, model.ObjectType) {
+func (inst *Modbus) BuildOutput(ioType bstore.IoType, id bstore.ObjectID) (OutputAddr, model.ObjectType) {
 	_, out := outputAddress(0, int(id))
 	return out, typeSelect(ioType, true)
 }
 
-func (inst *Modbus) BuildInput(ioType bstore.IoType, id bstore.ObjectID) (*InputAddr, model.ObjectType) {
+func (inst *Modbus) BuildInput(ioType bstore.IoType, id bstore.ObjectID) (InputAddr, model.ObjectType) {
 	_, out := InputAddress(0, int(id))
 	return out, typeSelect(ioType, true)
 }
@@ -44,7 +44,7 @@ func typeSelect(objectType bstore.IoType, write bool) model.ObjectType {
 
 }
 
-func InputAddress(deviceCount int, filterByBacnet int) ([]*InputAddr, *InputAddr) {
+func InputAddress(deviceCount int, filterByBacnet int) ([]InputAddr, InputAddr) {
 	var ioNumber = 1
 	var temp = 1
 	var volt = 250
@@ -61,8 +61,8 @@ func InputAddress(deviceCount int, filterByBacnet int) ([]*InputAddr, *InputAddr
 		sum++
 		ioList[i] = ioCount
 	}
-	var addresses []*InputAddr
-	address := &InputAddr{}
+	var addresses []InputAddr
+	address := InputAddr{}
 	for _, ints := range ioList {
 		count++
 		for i := range ints {
@@ -77,7 +77,7 @@ func InputAddress(deviceCount int, filterByBacnet int) ([]*InputAddr, *InputAddr
 			addresses = append(addresses, address)
 		}
 	}
-	filtered := &InputAddr{}
+	filtered := InputAddr{}
 	if filterByBacnet != 0 {
 		for _, addr := range addresses {
 			if addr.BacnetAddr == filterByBacnet {
@@ -96,7 +96,7 @@ type OutputAddr struct {
 	Volt       int `json:"volt"`
 }
 
-func outputAddress(deviceCount int, filterByBacnet int) ([]*OutputAddr, *OutputAddr) {
+func outputAddress(deviceCount int, filterByBacnet int) ([]OutputAddr, OutputAddr) {
 	var ioNumber = 1
 	var relay = 1
 	var volt = 250
@@ -112,8 +112,8 @@ func outputAddress(deviceCount int, filterByBacnet int) ([]*OutputAddr, *OutputA
 		sum++
 		ioList[i] = ioCount
 	}
-	var addresses []*OutputAddr
-	address := &OutputAddr{}
+	var addresses []OutputAddr
+	address := OutputAddr{}
 	for _, ints := range ioList {
 		count++
 		for i := range ints {
@@ -126,7 +126,7 @@ func outputAddress(deviceCount int, filterByBacnet int) ([]*OutputAddr, *OutputA
 			addresses = append(addresses, address)
 		}
 	}
-	filtered := &OutputAddr{}
+	filtered := OutputAddr{}
 	if filterByBacnet != 0 {
 		for _, addr := range addresses {
 			if addr.BacnetAddr == filterByBacnet {
