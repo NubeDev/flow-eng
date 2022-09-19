@@ -1,4 +1,4 @@
-package bstore
+package points
 
 import (
 	"fmt"

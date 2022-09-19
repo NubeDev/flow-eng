@@ -2,17 +2,15 @@ package bacnet
 
 import (
 	"github.com/NubeDev/flow-eng/helpers/cbus"
-	"github.com/NubeDev/flow-eng/helpers/mqttbase"
 	"github.com/NubeDev/flow-eng/node"
-	"github.com/NubeDev/flow-eng/nodes/protocols/bstore"
+	"github.com/NubeDev/flow-eng/nodes/protocols/points"
 )
 
 type AI struct {
 	*node.Spec
 	connected  bool
-	subscribed bool
-	objectID   bstore.ObjectID
-	objectType bstore.ObjectType
+	objectID   points.ObjectID
+	objectType points.ObjectType
 	pointUUID  string
 }
 
@@ -27,58 +25,42 @@ func NewAI(body *node.Spec) (node.Node, error) {
 	return &AI{
 		body,
 		false,
-		false,
 		0,
-		bstore.AnalogInput,
+		points.AnalogInput,
 		pointUUID,
 	}, err
 }
 
 func (inst *AI) subscribePresentValue() {
 	topicPv := TopicPresentValue(typeAI, inst.objectID)
-	inst.client().Subscribe(topicPv)
+	getClient().Subscribe(topicPv)
 }
 
 func (inst *AI) subscribePriority() {
 	topicPriority := TopicPriority(typeAI, inst.objectID)
-	inst.client().Subscribe(topicPriority)
-}
-
-func (inst *AI) client() *mqttbase.Mqtt {
-	return client
+	getClient().Subscribe(topicPriority)
 }
 
 func (inst *AI) bus() cbus.Bus {
-	return inst.client().BACnetBus()
+	return getClient().BACnetBus()
 }
 
 func (inst *AI) setObjectId() {
 	id, ok := inst.ReadPin(node.ObjectId).(int)
 	if ok {
-		inst.objectID = bstore.ObjectID(id)
+		inst.objectID = points.ObjectID(id)
 	}
-}
-
-func (inst *AI) setConnected() {
-	inst.connected = true
-}
-
-func (inst *AI) setDisconnected() {
-	inst.connected = false
 }
 
 func (inst *AI) Process() {
 	loopCount++
-	if !inst.connected {
+	if !getClient().Connected() || !inst.connected {
 		inst.setObjectId()
-		inst.client().Connected()
-		inst.setConnected()
-		inst.subscribePresentValue()
-
+		inst.subscribePriority()
+		inst.connected = true
 	}
-
-	if inst.connected {
-		//inst.processMessage()
+	if !getClient().Connected() {
+		inst.connected = false
 	}
 
 }

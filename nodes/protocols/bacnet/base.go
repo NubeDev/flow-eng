@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
-	"github.com/NubeDev/flow-eng/nodes/protocols/bstore"
+	"github.com/NubeDev/flow-eng/nodes/protocols/points"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -25,26 +25,26 @@ const (
 	typeBV = "bv"
 )
 
-func getBacnetType(nodeName string) (obj bstore.ObjectType, isWriteable, isIO bool, err error) {
+func getBacnetType(nodeName string) (obj points.ObjectType, isWriteable, isIO bool, err error) {
 	switch nodeName {
 	case bacnetAI:
-		return bstore.AnalogInput, false, true, nil
+		return points.AnalogInput, false, true, nil
 	case bacnetAO:
-		return bstore.AnalogOutput, true, true, nil
+		return points.AnalogOutput, true, true, nil
 	case bacnetAV:
-		return bstore.AnalogVariable, true, false, nil
+		return points.AnalogVariable, true, false, nil
 	case bacnetBI:
-		return bstore.BinaryInput, false, true, nil
+		return points.BinaryInput, false, true, nil
 	case bacnetBO:
-		return bstore.BinaryOutput, true, true, nil
+		return points.BinaryOutput, true, true, nil
 	case bacnetBV:
-		return bstore.BinaryVariable, true, false, nil
+		return points.BinaryVariable, true, false, nil
 
 	}
 	return "", false, false, errors.New(fmt.Sprintf("bacnet add new point object type not found node: %s", nodeName))
 }
 
-func nodeDefault(body *node.Spec, nodeName, category string, application node.ApplicationName) (*node.Spec, error, *bstore.Point) {
+func nodeDefault(body *node.Spec, nodeName, category string, application node.ApplicationName) (*node.Spec, error, *points.Point) {
 	var err error
 	body = node.Defaults(body, nodeName, category)
 
@@ -52,7 +52,7 @@ func nodeDefault(body *node.Spec, nodeName, category string, application node.Ap
 
 	pointName := node.BuildInput(node.Name, node.TypeString, nil, body.Inputs)
 	objectIDInput := node.BuildInput(node.ObjectId, node.TypeFloat, 1, body.Inputs)
-	ioType := bstore.IoTypeTemp // TODO make a setting
+	ioType := points.IoTypeTemp // TODO make a setting
 	enable := true              // TODO make a setting
 	var inputs []*node.Input
 
@@ -81,14 +81,15 @@ func nodeDefault(body *node.Spec, nodeName, category string, application node.Ap
 		objectID = 1
 	}
 
-	point := addPoint(application, ioType, objectType, bstore.ObjectID(objectID), isWriteable, isIO, enable)
+	point := addPoint(application, ioType, objectType, points.ObjectID(objectID), isWriteable, isIO, enable)
 	store := getStore()
 	point, err = store.AddPoint(point)
+	log.Infof("bacnet-server add new point type:%s-%d", point.ObjectType, point.ObjectID)
 	return body, err, point
 }
 
-func addPoint(application node.ApplicationName, ioType bstore.IoType, objectType bstore.ObjectType, id bstore.ObjectID, isWriteable, isIO, enable bool) *bstore.Point {
-	point := &bstore.Point{
+func addPoint(application node.ApplicationName, ioType points.IoType, objectType points.ObjectType, id points.ObjectID, isWriteable, isIO, enable bool) *points.Point {
+	point := &points.Point{
 		Application: application,
 		ObjectType:  objectType,
 		ObjectID:    id,
@@ -102,16 +103,16 @@ func addPoint(application node.ApplicationName, ioType bstore.IoType, objectType
 }
 
 // topicBuilder bacnet/ao/1
-func topicBuilder(objectType string, address bstore.ObjectID) string {
+func topicBuilder(objectType string, address points.ObjectID) string {
 	return fmt.Sprintf("bacnet/%s/%d", objectType, address)
 }
 
 // TopicPresentValue bacnet/ao/1/pv
-func TopicPresentValue(objectType string, address bstore.ObjectID) string {
+func TopicPresentValue(objectType string, address points.ObjectID) string {
 	return fmt.Sprintf("%s/pv", topicBuilder(objectType, address))
 }
 
 // TopicPriority bacnet/ao/1/pri
-func TopicPriority(objectType string, address bstore.ObjectID) string {
+func TopicPriority(objectType string, address points.ObjectID) string {
 	return fmt.Sprintf("%s/pri", topicBuilder(objectType, address))
 }

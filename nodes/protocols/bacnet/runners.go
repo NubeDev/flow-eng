@@ -22,7 +22,7 @@ func (inst *Server) protocolRunner() {
 	}
 	if !modbusLoop {
 		if getRunnerType() == applications.Modbus {
-			go inst.modbusRunner()
+			//go inst.modbusRunner()
 			modbusLoop = true
 		}
 	} else {

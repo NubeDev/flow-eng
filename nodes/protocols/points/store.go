@@ -1,4 +1,4 @@
-package bstore
+package points
 
 import (
 	"errors"
@@ -6,41 +6,11 @@ import (
 	"github.com/NubeDev/flow-eng/helpers"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
-	log "github.com/sirupsen/logrus"
-	"math"
 )
 
-/*
-| Store      |         |       |         |       |
-| ---------- | ------- | ----- | ------- | ----- |
-| application| AI from | AI to | AV from | AV to |
-| bacnet     | 0       | 0     | 1       | 100   |
-| edge       | 1       | 8     | 0       | 0     |
-| rubix-io   | 1       | 8     | 0       | 0     |
-*/
-
-type ObjectID int
-type ObjectType string
-type IoNumber int  // 1, 2
-type IoPort string // UI, UO eg: IoType:IoNumber -> UI1, UI2
-type IoType string // digital
-
-const AnalogInput ObjectType = "analogInput"
-const AnalogOutput ObjectType = "analogOutput"
-const AnalogVariable ObjectType = "analogVariable"
-
-const BinaryInput ObjectType = "binaryInput"
-const BinaryOutput ObjectType = "binaryInput"
-const BinaryVariable ObjectType = "binaryVariable"
-
-const IoTypeTemp IoType = "thermistor_10k_type_2"
-const IoTypeCurrent IoType = "current"
-const IoTypeVolts IoType = "voltage_dc"
-const IoTypeDigital IoType = "digital"
-
-type BacnetStore struct {
+type Store struct {
 	Application node.ApplicationName `json:"application"`
-	Store       *PointStore          `json:"store"`
+	Store       *ObjectStore         `json:"store"`
 	Points      []*Point             `json:"points"`
 }
 
@@ -100,7 +70,7 @@ type BVStore struct {
 	pointAllowance
 }
 
-type PointStore struct {
+type ObjectStore struct {
 	AI *AIStore `json:"ai"`
 	AO *AOStore `json:"ao"`
 	AV *AVStore `json:"av"`
@@ -116,12 +86,12 @@ var (
 	edgeDOCount = 8 // 6DOs and r1, r2
 )
 
-func New(app node.ApplicationName, pStore *PointStore) *BacnetStore {
-	bacnetStore := &BacnetStore{
+func New(app node.ApplicationName, pStore *ObjectStore) *Store {
+	bacnetStore := &Store{
 		Application: app,
 	}
 	if pStore == nil {
-		pStore = &PointStore{}
+		pStore = &ObjectStore{}
 	}
 
 	ai := pStore.AI
@@ -190,7 +160,7 @@ func New(app node.ApplicationName, pStore *PointStore) *BacnetStore {
 			}
 		}
 	}
-	store := &PointStore{
+	store := &ObjectStore{
 		AI: ai,
 		AO: ao,
 		AV: av,
@@ -202,15 +172,15 @@ func New(app node.ApplicationName, pStore *PointStore) *BacnetStore {
 	return bacnetStore
 }
 
-func (inst *BacnetStore) GetStore() *PointStore {
+func (inst *Store) GetStore() *ObjectStore {
 	return inst.Store
 }
 
-func (inst *BacnetStore) GetStoreByType(objectType ObjectType) *PointStore {
+func (inst *Store) GetStoreByType(objectType ObjectType) *ObjectStore {
 	return inst.Store
 }
 
-func (inst *BacnetStore) AddPoint(point *Point) (*Point, error) {
+func (inst *Store) AddPoint(point *Point) (*Point, error) {
 	var err error
 	if point == nil {
 		return nil, errors.New(fmt.Sprintf("store-add-point: point can not be empty"))
@@ -315,7 +285,7 @@ func errNoObj(pnt interface{}, objectType ObjectType) error {
 	return nil
 }
 
-func (inst *BacnetStore) checkExisting(point *Point, from, to int) error {
+func (inst *Store) checkExisting(point *Point, from, to int) error {
 	err := inst.allowableCount(int(point.ObjectID), from, to)
 	if err != nil {
 		return err
@@ -328,7 +298,7 @@ func (inst *BacnetStore) checkExisting(point *Point, from, to int) error {
 	return nil
 }
 
-func (inst *BacnetStore) allowableCount(objectID, from, count int) error {
+func (inst *Store) allowableCount(objectID, from, count int) error {
 	to := from + count - 1
 	if objectID > to { // is above what is allowed
 		return errors.New(fmt.Sprintf("store-add-point: the allwoable max object-id is:%d and the current is:%d", to, objectID))
@@ -336,109 +306,6 @@ func (inst *BacnetStore) allowableCount(objectID, from, count int) error {
 	return nil
 }
 
-func (inst *BacnetStore) GetApplication() node.ApplicationName {
+func (inst *Store) GetApplication() node.ApplicationName {
 	return inst.Application
-}
-
-func (inst *BacnetStore) GetPoints() []*Point {
-	return inst.Points
-}
-
-func (inst *BacnetStore) GetPointsByApplication(name node.ApplicationName) []*Point {
-	var out []*Point
-	for _, point := range inst.GetPoints() {
-		if point.Application == name {
-			out = append(out, point)
-		}
-	}
-	return out
-}
-
-func (inst *BacnetStore) GetPointByObject(t ObjectType, id ObjectID) *Point {
-	for _, point := range inst.GetPoints() {
-		if point.ObjectType == t {
-			if point.ObjectID == id {
-				return point
-			}
-		}
-	}
-	return nil
-}
-
-func (inst *BacnetStore) GetPoint(uuid string) *Point {
-	for _, point := range inst.GetPoints() {
-		if point.UUID == uuid {
-			return point
-		}
-	}
-	return nil
-}
-
-func (inst *BacnetStore) ReadPresentValue(uuid string) (float64, bool) {
-	p := inst.GetPoint(uuid)
-	if p != nil {
-		return p.ToBacnet, true
-	}
-	return 0, false
-}
-
-func (inst *BacnetStore) UpdateBacnetSync(uuid string, value bool) {
-	p := inst.GetPoint(uuid)
-	p.ToBacnetSyncPending = value
-}
-
-func (inst *BacnetStore) BacnetSyncPending(uuid string) bool {
-	p := inst.GetPoint(uuid)
-	return p.ToBacnetSyncPending
-}
-
-////GetPointArray get the current priority array
-//func (inst *BacnetStore) GetPointArray(uuid string) *PriArray {
-//	p := inst.GetPoint(uuid)
-//	return p.ToBacnet
-//}
-
-func cov(existing, new, cov float64) bool {
-	v := math.Abs(existing-new) <= cov
-	return !v
-}
-
-//WritePointValue to is to be written to flow modbus or the wire-sheet @ priority 15
-func (inst *BacnetStore) WritePointValue(uuid string, value float64) bool {
-	p := inst.GetPoint(uuid)
-	log.Infof("store write point value type:%s-%d value:%f  uuid:%s", p.ObjectType, p.ObjectID, value, uuid)
-	if p != nil {
-		p.ToBacnetSyncPending = cov(p.ToBacnet, value, 0.5)
-		p.ToBacnet = value
-		return true
-	}
-	return false
-}
-
-func (inst *BacnetStore) GetByType(objectType ObjectType) (out []*Point, count int) {
-	out = []*Point{}
-	for _, pnt := range inst.GetPoints() {
-		if pnt.ObjectType == objectType {
-			out = append(out, pnt)
-		}
-	}
-	return out, len(out)
-}
-
-func (inst *BacnetStore) CheckExistingPointErr(point *Point) error {
-	if inst.CheckExistingPoint(point) {
-		return errors.New(fmt.Sprintf("store-add-point: point is existing object-type:%s:%d", point.ObjectType, point.ObjectID))
-	}
-	return nil
-}
-
-func (inst *BacnetStore) CheckExistingPoint(point *Point) bool {
-	for _, pnt := range inst.GetPoints() {
-		if pnt.ObjectType == point.ObjectType {
-			if pnt.ObjectID == point.ObjectID {
-				return true
-			}
-		}
-	}
-	return false
 }

@@ -1,7 +1,7 @@
 package modbuscli
 
 import (
-	"github.com/NubeDev/flow-eng/nodes/protocols/bstore"
+	"github.com/NubeDev/flow-eng/nodes/protocols/points"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
 )
 
@@ -14,30 +14,30 @@ type InputAddr struct {
 	Current    int `json:"current"`
 }
 
-func (inst *Modbus) BuildOutput(ioType bstore.IoType, id bstore.ObjectID) (OutputAddr, model.ObjectType) {
+func (inst *Modbus) BuildOutput(ioType points.IoType, id points.ObjectID) (OutputAddr, model.ObjectType) {
 	_, out := outputAddress(0, int(id))
 	return out, typeSelect(ioType, true)
 }
 
-func (inst *Modbus) BuildInput(ioType bstore.IoType, id bstore.ObjectID) (InputAddr, model.ObjectType) {
+func (inst *Modbus) BuildInput(ioType points.IoType, id points.ObjectID) (InputAddr, model.ObjectType) {
 	_, out := InputAddress(0, int(id))
 	return out, typeSelect(ioType, true)
 }
 
-func typeSelect(objectType bstore.IoType, write bool) model.ObjectType {
-	if objectType == bstore.IoTypeVolts {
+func typeSelect(objectType points.IoType, write bool) model.ObjectType {
+	if objectType == points.IoTypeVolts {
 		if write {
 			return model.ObjTypeWriteHolding
 		}
 		return model.ObjTypeReadRegister
 	}
-	if objectType == bstore.IoTypeDigital {
+	if objectType == points.IoTypeDigital {
 		if write {
 			return model.ObjTypeWriteCoil
 		}
 		return model.ObjTypeReadCoil
 	}
-	if objectType == bstore.IoTypeTemp {
+	if objectType == points.IoTypeTemp {
 		return model.ObjTypeReadRegister
 	}
 	return ""

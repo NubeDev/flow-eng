@@ -1,4 +1,4 @@
-package bstore
+package points
 
 import (
 	"errors"
@@ -43,13 +43,13 @@ func (inst *Payload) NewMessage(msg interface{}) error {
 		}
 		inst.objectID = ObjectID(id)
 		inst.objectType = object(topic)
-		if isPV(inst.topic) {
+		if IsPV(inst.topic) {
 			v, err := strconv.ParseFloat(msgString, 64)
 			if err != nil {
 				inst.value = float.New(v)
 			}
 		}
-		if isPri(inst.topic) {
+		if IsPri(inst.topic) {
 			inst.priArray = inst.cleanArray(msgString)
 			inst.priAndValue = GetHighest(inst.priArray)
 		}
@@ -109,7 +109,7 @@ func getHighest(num int, val *float64) *priAndValue {
 	}
 }
 
-func (inst *Payload) GetObject() (ObjectType, ObjectID) {
+func (inst *Payload) GetObjectID() (ObjectType, ObjectID) {
 	return inst.objectType, inst.objectID
 }
 
@@ -255,7 +255,7 @@ func objectId(topic string) (int, error) {
 	return 0, errors.New("bacnet-message: failed to get bacnet object-id")
 }
 
-func isPV(topic string) (isBacnet bool) {
+func IsPV(topic string) (isBacnet bool) {
 	parts := strings.Split(topic, "/")
 	if len(parts) >= 3 {
 		if parts[0] == "bacnet" {
@@ -267,7 +267,7 @@ func isPV(topic string) (isBacnet bool) {
 	return isBacnet
 }
 
-func isPri(topic string) (isBacnet bool) {
+func IsPri(topic string) (isBacnet bool) {
 	parts := strings.Split(topic, "/")
 	if len(parts) >= 3 {
 		if parts[0] == "bacnet" {
