@@ -1,7 +1,7 @@
 package rubixcli
 
 import (
-	"github.com/NubeDev/flow-eng/services/clients/nresty"
+	"github.com/NubeDev/flow-eng/services/clients/rubixcli/nresty"
 )
 
 type Ping struct {

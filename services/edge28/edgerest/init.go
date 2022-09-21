@@ -2,7 +2,7 @@ package edgerest
 
 import (
 	"fmt"
-	"github.com/NubeDev/flow-eng/services/clients/nresty"
+	"github.com/NubeDev/flow-eng/services/clients/ffclient/nresty"
 	"github.com/go-resty/resty/v2"
 	log "github.com/sirupsen/logrus"
 )

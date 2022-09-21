@@ -3,7 +3,7 @@ package rubixcli
 import (
 	"context"
 	"fmt"
-	"github.com/NubeDev/flow-eng/services/clients/nresty"
+	"github.com/NubeDev/flow-eng/services/clients/rubixcli/nresty"
 	"github.com/go-resty/resty/v2"
 	"net"
 	"net/http"

@@ -2,7 +2,6 @@ package broker
 
 import (
 	"fmt"
-	"github.com/NubeDev/flow-eng/helpers/cbus"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/node"
 	mqttclient2 "github.com/NubeDev/flow-eng/services/mqttclient"
@@ -23,7 +22,7 @@ const (
 	topic = "topic"
 )
 
-var bus cbus.Bus
+//var bus cbus.Bus
 
 func NewMqttSub(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, mqttSub, category)
@@ -42,13 +41,13 @@ func NewMqttSub(body *node.Spec) (node.Node, error) {
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeString, nil, body.Inputs))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, settings)
-	bus = cbus.New(1)
+	//bus = cbus.New(1)
 	return &MqttSub{body, nil, false, false, "", mqttTopic}, nil
 }
 
 var handle mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	// log.Println("NEW MQTT MES", msg.Topic(), " ", string(msg.Payload()))
-	bus.Send(msg)
+	//bus.Send(msg)
 }
 
 func (inst *MqttSub) getTopic() string {
@@ -80,9 +79,9 @@ func (inst *MqttSub) connect() {
 }
 
 func (inst *MqttSub) Process() {
-	if bus == nil {
-		panic("pointbus-bus can not be empty")
-	}
+	//if bus == nil {
+	//	panic("pointbus-bus can not be empty")
+	//}
 	if !inst.connected {
 		go inst.connect()
 	}
@@ -93,12 +92,12 @@ func (inst *MqttSub) Process() {
 	}
 	if inst.connected && inst.subscribed {
 		go func() {
-			msg, ok := bus.Recv()
-			if ok {
-				msg_ := msg.(mqtt.Message)
-				inst.newMessage = string(msg_.Payload())
-				log.Info("MQTT:newMessage", inst.newMessage)
-			}
+			//msg, ok := bus.Recv()
+			//if ok {
+			//	msg_ := msg.(mqtt.Message)
+			//	inst.newMessage = string(msg_.Payload())
+			//	log.Info("MQTT:newMessage", inst.newMessage)
+			//}
 		}()
 
 		val := float.StrToFloat(inst.newMessage)
