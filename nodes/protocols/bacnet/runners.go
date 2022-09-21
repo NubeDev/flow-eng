@@ -16,12 +16,8 @@ var modbusLoop runnerStatus
 var rubixIOLoop runnerStatus
 
 func (inst *Server) protocolRunner() {
-	if !mqttSubLoop {
-		go inst.mqttSubRunner()
-		mqttSubLoop = true
-	}
 	if !mqttPubLoop {
-		go inst.mqttPubRunner()
+		go inst.writeRunner()
 		mqttPubLoop = true
 	}
 	if !modbusLoop {
@@ -41,10 +37,5 @@ func (inst *Server) protocolRunner() {
 			rubixIOLoop = true
 		}
 	}
-
-}
-
-// edge28 & rubix-io input values will come from rest
-func (inst *Server) edgeRunner() {
 
 }

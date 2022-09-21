@@ -13,11 +13,18 @@ import (
 func (inst *Server) rubixOutputsRunner() {
 	log.Info("start rubix-io-outputs-runner")
 	for {
-		for _, point := range getStore().GetPointsByApplication(applications.RubixIO) {
-			if point.ToBacnetSyncPending {
-
+		var pointsToWrite []*points.Point
+		for _, point := range getStore().GetWriteablePointsByApplication(applications.RubixIO) { //get the list of the points to update
+			if point.IOWriteSyncPending {
+				pointsToWrite = append(pointsToWrite, point)
 			} else {
 				//log.Infof("mqtt-runner-publish point skip as non cov type:%s-%d", point.ObjectType, point.ObjectID)
+			}
+		}
+		if len(pointsToWrite) > 0 {
+			err := inst.rio.BulkWrite(pointsToWrite)
+			if err != nil {
+				log.Error(err)
 			}
 		}
 		time.Sleep(runnerDelay * time.Millisecond)

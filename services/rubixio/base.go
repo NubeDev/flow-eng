@@ -37,7 +37,7 @@ func (inst *RubixIO) bulkWrite(point []*points.Point) []*rubixcli.Output {
 		ioName, err := inst.uoIoNum(p)
 		out := &rubixcli.Output{
 			IoNumber: ioName,
-			Value:    0,
+			Value:    int(p.WriteValue),
 		}
 		if p.Enable && p.IsWriteable && err == nil {
 			outs = append(outs, out)

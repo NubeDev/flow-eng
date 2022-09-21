@@ -6,14 +6,16 @@ import (
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
-	eventbus2 "github.com/NubeDev/flow-eng/services/eventbus"
+	eventbus "github.com/NubeDev/flow-eng/services/eventbus"
 	"github.com/NubeDev/flow-eng/services/mqttclient"
+	rubixIO "github.com/NubeDev/flow-eng/services/rubixio"
 	log "github.com/sirupsen/logrus"
 )
 
 type Server struct {
 	*node.Spec
 	client        *mqttclient.Client
+	rio           *rubixIO.RubixIO
 	firstLoop     bool
 	pingFailed    bool
 	reconnectedOk bool
@@ -60,14 +62,14 @@ func NewServer(body *node.Spec, childNodes ...*node.Spec) (node.Node, error) {
 	if err != nil {
 		return nil, err
 	}
-	eventbus2.New()
+	eventbus.New()
+	rio := rubixIO.New()
 	db = points.New(application, nil)
-	return &Server{body, client, false, false, false}, err
+	return &Server{body, client, rio, false, false, false}, err
 }
 
 func (inst *Server) intBus() {
 	go inst.priorityBus()
-	go inst.presetValueBus()
 	go inst.rubixIOBus()
 }
 
@@ -82,6 +84,7 @@ func (inst *Server) Process() {
 		go inst.subscribeToRubixIO()
 	}
 	go inst.mqttReconnect()
+	go inst.protocolRunner()
 
 }
 
@@ -118,7 +121,7 @@ func getRunnerType() node.ApplicationName {
 }
 
 func (inst *Server) subscribeBroker(topic string) {
-	err := getMqtt().Subscribe(topic, mqttclient.AtLeastOnce, eventbus2.PointsHandler)
+	err := getMqtt().Subscribe(topic, mqttclient.AtLeastOnce, eventbus.PointsHandler)
 	if err != nil {
 		log.Errorf("bacnet-server mqtt:%s", err.Error())
 		inst.pingFailed = false
