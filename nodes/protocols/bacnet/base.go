@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
-	"github.com/NubeDev/flow-eng/nodes/protocols/points"
+	points "github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -53,7 +53,11 @@ func nodeDefault(body *node.Spec, nodeName, category string, application node.Ap
 	pointName := node.BuildInput(node.Name, node.TypeString, nil, body.Inputs)
 	objectIDInput := node.BuildInput(node.ObjectId, node.TypeFloat, 1, body.Inputs)
 	ioType := points.IoTypeTemp // TODO make a setting
-	enable := true              // TODO make a setting
+	if isWriteable {
+		ioType = points.IoTypeVolts
+	}
+
+	enable := true // TODO make a setting
 	var inputs []*node.Input
 
 	if isWriteable {
@@ -80,7 +84,6 @@ func nodeDefault(body *node.Spec, nodeName, category string, application node.Ap
 		log.Errorf("bacnet-server object-id must be grater then 0 object-type:%s", objectType)
 		objectID = 1
 	}
-
 	point := addPoint(application, ioType, objectType, points.ObjectID(objectID), isWriteable, isIO, enable)
 	store := getStore()
 	point, err = store.AddPoint(point)
@@ -100,6 +103,11 @@ func addPoint(application node.ApplicationName, ioType points.IoType, objectType
 	}
 	return point
 
+}
+
+// topicBuilder bacnet/ObjectType
+func topicObjectBuilder(objectType string) string {
+	return fmt.Sprintf("bacnet/%s", objectType)
 }
 
 // topicBuilder bacnet/ao/1

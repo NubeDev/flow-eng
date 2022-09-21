@@ -5,47 +5,42 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 )
 
-type BV struct {
+type AO struct {
 	*node.Spec
+	connected  bool
 	objectID   points.ObjectID
 	objectType points.ObjectType
 	pointUUID  string
 }
 
-const (
-	object = "object"
-)
-
-func NewBV(body *node.Spec) (node.Node, error) {
+func NewAO(body *node.Spec) (node.Node, error) {
 	var err error
 	store := getStore()
-	body, err, point := nodeDefault(body, bacnetBV, category, store.GetApplication())
+	body, err, point := nodeDefault(body, bacnetAO, category, store.GetApplication())
 	var pointUUID string
 	if point != nil {
 		pointUUID = point.UUID
 	}
-	return &BV{
+	return &AO{
 		body,
+		false,
 		0,
-		points.BinaryVariable,
+		points.AnalogOutput,
 		pointUUID,
 	}, err
 }
 
-func (inst *BV) setObjectId() {
+func (inst *AO) setObjectId() {
 	id, ok := inst.ReadPin(node.ObjectId).(int)
 	if ok {
 		inst.objectID = points.ObjectID(id)
 	}
 }
 
-var loopCount uint64
+func (inst *AO) Process() {
 
-func (inst *BV) Process() {
-	loopCount++
 	//if !getMqtt().Connected() || !inst.connected {
 	//	inst.setObjectId()
-	//	inst.subscribePriority()
 	//	inst.connected = true
 	//}
 	//if !getMqtt().Connected() {
@@ -54,4 +49,4 @@ func (inst *BV) Process() {
 
 }
 
-func (inst *BV) Cleanup() {}
+func (inst *AO) Cleanup() {}

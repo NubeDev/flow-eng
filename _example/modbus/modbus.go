@@ -22,7 +22,7 @@ func main() {
 		return
 	}
 
-	b, err := bacnet.NewBV(nil)
+	b, err := bacnet.NewAO(nil)
 	if err != nil {
 		log.Errorln(err)
 		return
@@ -42,7 +42,7 @@ func main() {
 			fmt.Println(err)
 			panic(err)
 		}
-		time.Sleep(1000 * time.Millisecond)
+		time.Sleep(3000 * time.Millisecond)
 	}
 
 }

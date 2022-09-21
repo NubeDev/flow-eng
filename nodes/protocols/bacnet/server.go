@@ -2,21 +2,24 @@ package bacnet
 
 import (
 	"fmt"
-	"github.com/NubeDev/flow-eng/helpers/cbus"
-	"github.com/NubeDev/flow-eng/helpers/mqttbase"
 	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
-	"github.com/NubeDev/flow-eng/nodes/protocols/points"
+	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
+	eventbus "github.com/NubeDev/flow-eng/services/eventbus"
+	"github.com/NubeDev/flow-eng/services/mqttclient"
+	rubixIO "github.com/NubeDev/flow-eng/services/rubixio"
 	log "github.com/sirupsen/logrus"
 )
 
 type Server struct {
 	*node.Spec
-	client *mqttbase.Mqtt
+	client        *mqttclient.Client
+	rio           *rubixIO.RubixIO
+	firstLoop     bool
+	pingFailed    bool
+	reconnectedOk bool
 }
-
-var db *points.Store
 
 func buildSubNodes(body *node.Spec, childNodes []*node.Spec) *node.Spec {
 	for _, childNode := range childNodes {
@@ -26,7 +29,8 @@ func buildSubNodes(body *node.Spec, childNodes []*node.Spec) *node.Spec {
 	return body
 }
 
-var client *mqttbase.Mqtt
+var db *points.Store
+var client *mqttclient.Client
 
 func NewServer(body *node.Spec, childNodes ...*node.Spec) (node.Node, error) {
 	var err error
@@ -46,36 +50,60 @@ func NewServer(body *node.Spec, childNodes ...*node.Spec) (node.Node, error) {
 	body = buildSubNodes(body, childNodes)
 	body.IsParent = true
 	body = node.BuildNode(body, nil, outputs, nil)
-
-	application := applications.Modbus // make this a setting eg: if it's an edge-28 it would give the user 8AI, 8AOs and 100 BVs/AVs
-
-	c, err := mqttbase.NewMqtt()
-	setClient(c)
-	fmt.Println(err)
-	getClient().Connect()
-
+	application := applications.RubixIO // make this a setting eg: if it's an edge-28 it would give the user 8AI, 8AOs and 100 BVs/AVs
+	client, err = mqttclient.NewClient(mqttclient.ClientOptions{
+		Servers: []string{"tcp://0.0.0.0:1883"},
+	})
+	err = client.Connect()
+	if err != nil {
+		return nil, err
+	}
+	eventbus.New()
+	rio := rubixIO.New()
 	db = points.New(application, nil)
-	return &Server{body, client}, err
+	return &Server{body, client, rio, false, false, false}, err
 }
 
-func setClient(c *mqttbase.Mqtt) {
-	client = c
+func (inst *Server) intBus() {
+	go inst.priorityBus()
+	go inst.rubixIOBus()
 }
 
-func getClient() *mqttbase.Mqtt {
-	return client
+func (inst *Server) Process() {
+	inst.intBus()
+
+	if !inst.firstLoop {
+		go inst.subscribeToRubixIO()
+		inst.firstLoop = true
+	}
+	if inst.pingFailed || inst.reconnectedOk { // on failed resubscribe
+		go inst.subscribeToRubixIO()
+	}
+	go inst.mqttReconnect()
+	go inst.protocolRunner()
+
 }
 
 func (inst *Server) mqttReconnect() {
-	err := client.PingBroker()
+	var err error
+	err = client.Ping()
 	if err != nil {
-		getClient().Connect()
-		log.Errorf("bacnet-server failed to reconnect with mqtt broker")
-		getClient().SetConnect(false)
+		log.Errorf("bacnet-server mqtt ping failed")
+		inst.pingFailed = true
+		err = getMqtt().Connect()
+		if err != nil {
+			log.Errorf("bacnet-server failed to reconnect with mqtt broker")
+			inst.reconnectedOk = false
+		} else {
+			inst.reconnectedOk = true
+		}
 	} else {
-		getClient().SetConnect(true)
+		fmt.Println("ping server ok")
 	}
+}
 
+func getMqtt() *mqttclient.Client {
+	return client
 }
 
 func getStore() *points.Store {
@@ -88,22 +116,28 @@ func getRunnerType() node.ApplicationName {
 	return db.GetApplication()
 }
 
-func (inst *Server) db() *points.Store {
-	return db
-}
-
-func (inst *Server) bus() cbus.Bus {
-	return inst.client.BACnetBus()
+func (inst *Server) subscribeBroker(topic string) {
+	err := getMqtt().Subscribe(topic, mqttclient.AtLeastOnce, eventbus.PointsHandler)
+	if err != nil {
+		log.Errorf("bacnet-server mqtt:%s", err.Error())
+		inst.pingFailed = false
+	}
 }
 
 func (inst *Server) subscribeToRubixIO() {
-	getClient().Subscribe("rubixio/inputs/all")
-}
-
-func (inst *Server) Process() {
-	go inst.mqttReconnect()
-	inst.protocolRunner()
-
+	if getRunnerType() == applications.RubixIO {
+		inst.subscribeBroker("rubixcli/inputs/all")
+	}
+	objs := []string{"ai", "ao", "av", "bi", "bo", "bv"}
+	for _, obj := range objs {
+		topic := fmt.Sprintf("%s/+/pv", topicObjectBuilder(obj))
+		inst.subscribeBroker(topic)
+	}
+	objsOuts := []string{"ao", "av", "bo", "bv"}
+	for _, obj := range objsOuts {
+		topic := fmt.Sprintf("%s/+/pri", topicObjectBuilder(obj))
+		inst.subscribeBroker(topic)
+	}
 }
 
 func (inst *Server) Cleanup() {}

@@ -1,9 +1,9 @@
 package bacnet
 
 import (
-	"github.com/NubeDev/flow-eng/helpers/modbuscli"
 	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
-	"github.com/NubeDev/flow-eng/nodes/protocols/points"
+	points "github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
+	modbuscli2 "github.com/NubeDev/flow-eng/services/modbuscli"
 	log "github.com/sirupsen/logrus"
 	"time"
 )
@@ -12,7 +12,7 @@ import (
 // this is to only work for the IO-16
 func (inst *Server) modbusRunner() {
 	log.Info("start modbus-runner")
-	cli := &modbuscli.Modbus{
+	cli := &modbuscli2.Modbus{
 		IsSerial: false,
 		Address:  "192.168.15.202",
 		Port:     502,
@@ -22,7 +22,7 @@ func (inst *Server) modbusRunner() {
 	if err != nil {
 		return
 	}
-	store := inst.db()
+	store := getStore()
 	pointsList := store.GetPointsByApplication(applications.Modbus)
 	inst.modbusInputsRunner(init, pointsList) // process the inputs
 	time.Sleep(4 * time.Second)
@@ -30,13 +30,13 @@ func (inst *Server) modbusRunner() {
 
 }
 
-func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*points.Point) {
+func (inst *Server) modbusInputsRunner(cli *modbuscli2.Modbus, pointsList []*points.Point) {
 	var err error
 	var tempList []float64
 	var voltList []float64
 	var completedTemp bool
 	var completedVolt bool
-	store := inst.db()
+	store := getStore()
 	for _, point := range pointsList { // do modbus read
 		if !point.IsWriteable {
 			addr, _ := cli.BuildInput(point.IoType, point.ObjectID)
@@ -74,7 +74,7 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 				}
 				if point.IoType == points.IoTypeTemp || point.IoType == points.IoTypeDigital { // update anypoint that is type temp
 					if point.IoType == points.IoTypeDigital {
-						writeValue = modbuscli.TempToDI(tempList[io16Pin]) // covert them temp value to a DI value
+						writeValue = modbuscli2.TempToDI(tempList[io16Pin]) // covert them temp value to a DI value
 					} else {
 						writeValue = tempList[io16Pin]
 					}

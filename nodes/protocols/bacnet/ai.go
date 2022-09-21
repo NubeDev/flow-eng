@@ -1,9 +1,8 @@
 package bacnet
 
 import (
-	"github.com/NubeDev/flow-eng/helpers/cbus"
 	"github.com/NubeDev/flow-eng/node"
-	"github.com/NubeDev/flow-eng/nodes/protocols/points"
+	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 )
 
 type AI struct {
@@ -32,17 +31,8 @@ func NewAI(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *AI) subscribePresentValue() {
-	topicPv := TopicPresentValue(typeAI, inst.objectID)
-	getClient().Subscribe(topicPv)
-}
-
-func (inst *AI) subscribePriority() {
-	topicPriority := TopicPriority(typeAI, inst.objectID)
-	getClient().Subscribe(topicPriority)
-}
-
-func (inst *AI) bus() cbus.Bus {
-	return getClient().BACnetBus()
+	//topicPv := TopicPresentValue(typeAI, inst.objectID)
+	//getMqtt().Subscribe(topicPv)
 }
 
 func (inst *AI) setObjectId() {
@@ -53,15 +43,14 @@ func (inst *AI) setObjectId() {
 }
 
 func (inst *AI) Process() {
-	loopCount++
-	if !getClient().Connected() || !inst.connected {
-		inst.setObjectId()
-		inst.subscribePriority()
-		inst.connected = true
-	}
-	if !getClient().Connected() {
-		inst.connected = false
-	}
+
+	//if !getMqtt().Connected() || !inst.connected {
+	//	inst.setObjectId()
+	//	inst.connected = true
+	//}
+	//if !getMqtt().Connected() {
+	//	inst.connected = false
+	//}
 
 }
 

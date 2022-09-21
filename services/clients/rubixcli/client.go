@@ -1,4 +1,4 @@
-package ffclient
+package rubixcli
 
 import (
 	"context"
@@ -13,10 +13,10 @@ import (
 
 var (
 	mutex       = &sync.RWMutex{}
-	flowClients = map[string]*FlowClient{}
+	flowClients = map[string]*Client{}
 )
 
-type FlowClient struct {
+type Client struct {
 	client *resty.Client
 }
 
@@ -38,7 +38,7 @@ type Connection struct {
 	Port int
 }
 
-func New(conn *Connection) *FlowClient {
+func New(conn *Connection) *Client {
 	mutex.Lock()
 	defer mutex.Unlock()
 	ip := conn.Ip
@@ -47,7 +47,7 @@ func New(conn *Connection) *FlowClient {
 		ip = "0.0.0.0"
 	}
 	if port == 0 {
-		port = 1660
+		port = 5001
 	}
 
 	url := fmt.Sprintf("%s://%s:%d", getSchema(port), ip, port)
@@ -59,7 +59,7 @@ func New(conn *Connection) *FlowClient {
 	client.SetBaseURL(url)
 	client.SetError(&nresty.Error{})
 	client.SetTransport(&transport)
-	flowClient := &FlowClient{client: client}
+	flowClient := &Client{client: client}
 	flowClients[url] = flowClient
 	return flowClient
 }

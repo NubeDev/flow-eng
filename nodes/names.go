@@ -26,12 +26,14 @@ const (
 	bacnetServer = "server"
 
 	bacnetAI = "analog-input"
-	bacnetBI = "binary-input"
-	bacnetBV = "binary-variable"
+	bacnetAO = "analog-output"
 	bacnetAV = "analog-variable"
+	bacnetBI = "binary-input"
+	bacnetBO = "binary-output"
+	bacnetBV = "binary-variable"
 
-	mqttSub = "mqttbase-subscribe"
-	mqttPub = "mqttbase-publish"
+	mqttSub = "pointbus-subscribe"
+	mqttPub = "pointbus-publish"
 
 	logNode = "log"
 )

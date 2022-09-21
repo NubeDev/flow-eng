@@ -26,26 +26,6 @@ type ToBacnet struct {
 	ToBacnetPri int
 }
 
-type Point struct {
-	UUID         string               `json:"uuid"`
-	Application  node.ApplicationName `json:"application"`
-	ObjectType   ObjectType           `json:"objectType"`
-	ObjectID     ObjectID             `json:"ObjectID"`
-	presentValue *float64
-	priAndValue  *priAndValue
-	writeValue   float64
-	priArray     *PriArray
-	IoType       IoType `json:"ioType"` // temp
-	IsIO         bool   // if it's an io-pin for a real device
-	IsWriteable  bool
-	Enable       bool
-
-	ToBacnetSyncPending bool
-	//ToBacnet            *PriArray
-	ToBacnet    float64
-	ToBacnetCov float64
-}
-
 type AIStore struct {
 	pointAllowance
 }
@@ -221,7 +201,7 @@ func (inst *Store) AddPoint(point *Point) (*Point, error) {
 
 	if objectType == AnalogVariable {
 		checked = true
-		p := inst.Store.AO
+		p := inst.Store.AV
 		err = errNoObj(p, objectType)
 		if err != nil {
 			return nil, err

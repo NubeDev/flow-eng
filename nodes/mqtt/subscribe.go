@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/cbus"
 	"github.com/NubeDev/flow-eng/helpers/float"
-	"github.com/NubeDev/flow-eng/helpers/mqttclient"
 	"github.com/NubeDev/flow-eng/node"
+	mqttclient2 "github.com/NubeDev/flow-eng/services/mqttclient"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	log "github.com/sirupsen/logrus"
 )
 
 type MqttSub struct {
 	*node.Spec
-	client     *mqttclient.Client
+	client     *mqttclient2.Client
 	connected  bool
 	subscribed bool
 	newMessage string
@@ -56,32 +56,32 @@ func (inst *MqttSub) getTopic() string {
 }
 
 func (inst *MqttSub) subscribe() {
-	c, _ := mqttclient.GetMQTT()
+	c, _ := mqttclient2.GetMQTT()
 	if inst.getTopic() != "" {
-		err := c.Subscribe(inst.getTopic(), mqttclient.AtMostOnce, handle)
+		err := c.Subscribe(inst.getTopic(), mqttclient2.AtMostOnce, handle)
 		if err != nil {
-			log.Errorf(fmt.Sprintf("mqttbase-subscribe topic:%s err:%s", inst.getTopic(), err.Error()))
+			log.Errorf(fmt.Sprintf("pointbus-subscribe topic:%s err:%s", inst.getTopic(), err.Error()))
 		}
 		inst.subscribed = true
 	} else {
-		log.Errorf(fmt.Sprintf("mqttbase-subscribe topic can not be empty"))
+		log.Errorf(fmt.Sprintf("pointbus-subscribe topic can not be empty"))
 	}
 }
 
 func (inst *MqttSub) connect() {
 	mqttBroker := "tcp://0.0.0.0:1883"
-	_, err := mqttclient.InternalMQTT(mqttBroker)
+	_, err := mqttclient2.InternalMQTT(mqttBroker)
 	if err != nil {
-		log.Errorf(fmt.Sprintf("mqttbase-subscribe-connect err:%s", err.Error()))
+		log.Errorf(fmt.Sprintf("pointbus-subscribe-connect err:%s", err.Error()))
 	}
-	client, connected := mqttclient.GetMQTT()
+	client, connected := mqttclient2.GetMQTT()
 	inst.connected = connected
 	inst.client = client
 }
 
 func (inst *MqttSub) Process() {
 	if bus == nil {
-		panic("mqttbase-bus can not be empty")
+		panic("pointbus-bus can not be empty")
 	}
 	if !inst.connected {
 		go inst.connect()

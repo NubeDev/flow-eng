@@ -8,8 +8,42 @@ import (
 	"math"
 )
 
+type Point struct {
+	UUID               string               `json:"uuid"`
+	Application        node.ApplicationName `json:"application"`
+	ObjectType         ObjectType           `json:"objectType"`
+	ObjectID           ObjectID             `json:"ObjectID"`
+	presentValue       *float64
+	priAndValue        *priAndValue
+	writeValue         float64
+	priArray           *PriArray
+	IoType             IoType `json:"ioType"` // temp
+	IsIO               bool   // if it's an io-pin for a real device
+	IsWriteable        bool
+	Enable             bool
+	IOWriteSyncPending bool
+	WriteSyncPending   bool
+	WriteValue         float64
+	WriteCOV           float64
+	Sync               []*writeSync
+	CurrentSyncUUID    string
+}
+
 func (inst *Store) GetPoints() []*Point {
 	return inst.Points
+}
+
+func (inst *Store) GetWriteablePointsByApplication(name node.ApplicationName) []*Point {
+	var out []*Point
+	for _, point := range inst.GetPoints() {
+		if point.Application == name {
+			if point.IsWriteable {
+				out = append(out, point)
+			}
+
+		}
+	}
+	return out
 }
 
 func (inst *Store) GetPointsByApplication(name node.ApplicationName) []*Point {
@@ -45,26 +79,25 @@ func (inst *Store) GetPoint(uuid string) *Point {
 func (inst *Store) ReadPresentValue(uuid string) (float64, bool) {
 	p := inst.GetPoint(uuid)
 	if p != nil {
-		return p.ToBacnet, true
+		return p.WriteValue, true
 	}
 	return 0, false
 }
 
 func (inst *Store) UpdateBacnetSync(uuid string, value bool) {
 	p := inst.GetPoint(uuid)
-	p.ToBacnetSyncPending = value
+	p.WriteSyncPending = value
 }
 
 func (inst *Store) BacnetSyncPending(uuid string) bool {
 	p := inst.GetPoint(uuid)
-	return p.ToBacnetSyncPending
+	return p.WriteSyncPending
 }
 
-////GetPointArray get the current priority array
-//func (inst *Store) GetPointArray(uuid string) *PriArray {
-//	p := inst.GetPoint(uuid)
-//	return p.ToBacnet
-//}
+func (inst *Store) UpdateIOSync(uuid string, value bool) {
+	p := inst.GetPoint(uuid)
+	p.IOWriteSyncPending = value
+}
 
 func cov(existing, new, cov float64) bool {
 	v := math.Abs(existing-new) <= cov
@@ -75,11 +108,12 @@ func cov(existing, new, cov float64) bool {
 func (inst *Store) WritePointValue(uuid string, value float64) bool {
 	p := inst.GetPoint(uuid)
 	if p != nil {
-		c := cov(p.ToBacnet, value, 0.5)
+		c := cov(p.WriteValue, value, 0.5)
 		if c {
 			log.Infof("store write point value type:%s-%d value:%f  uuid:%s", p.ObjectType, p.ObjectID, value, uuid)
-			p.ToBacnetSyncPending = c
-			p.ToBacnet = value
+			p.WriteSyncPending = true
+			p.IOWriteSyncPending = true
+			p.WriteValue = value
 			return true
 		}
 	}

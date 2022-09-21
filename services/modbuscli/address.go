@@ -1,7 +1,7 @@
 package modbuscli
 
 import (
-	"github.com/NubeDev/flow-eng/nodes/protocols/points"
+	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
 )
 

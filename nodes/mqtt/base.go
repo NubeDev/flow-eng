@@ -1,7 +1,7 @@
 package broker
 
 const (
-	category    = "mqttbase"
-	mqttSub     = "mqttbase-subscribe"
-	mqttPublish = "mqttbase-publish"
+	category    = "pointbus"
+	mqttSub     = "pointbus-subscribe"
+	mqttPublish = "pointbus-publish"
 )
