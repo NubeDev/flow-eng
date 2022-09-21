@@ -2,8 +2,8 @@ package bacnet
 
 import (
 	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
-	points "github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
-	modbuscli2 "github.com/NubeDev/flow-eng/services/modbuscli"
+	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
+	"github.com/NubeDev/flow-eng/services/modbuscli"
 	log "github.com/sirupsen/logrus"
 	"time"
 )
@@ -12,7 +12,7 @@ import (
 // this is to only work for the IO-16
 func (inst *Server) modbusRunner() {
 	log.Info("start modbus-runner")
-	cli := &modbuscli2.Modbus{
+	cli := &modbuscli.Modbus{
 		IsSerial: false,
 		Address:  "192.168.15.202",
 		Port:     502,
@@ -30,7 +30,7 @@ func (inst *Server) modbusRunner() {
 
 }
 
-func (inst *Server) modbusInputsRunner(cli *modbuscli2.Modbus, pointsList []*points.Point) {
+func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*points.Point) {
 	var err error
 	var tempList []float64
 	var voltList []float64
@@ -74,7 +74,7 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli2.Modbus, pointsList []*poi
 				}
 				if point.IoType == points.IoTypeTemp || point.IoType == points.IoTypeDigital { // update anypoint that is type temp
 					if point.IoType == points.IoTypeDigital {
-						writeValue = modbuscli2.TempToDI(tempList[io16Pin]) // covert them temp value to a DI value
+						writeValue = modbuscli.TempToDI(tempList[io16Pin]) // covert them temp value to a DI value
 					} else {
 						writeValue = tempList[io16Pin]
 					}

@@ -16,24 +16,25 @@ var modbusLoop runnerStatus
 var rubixIOLoop runnerStatus
 
 func (inst *Server) protocolRunner() {
+	gt := getApplication()
 	if !mqttPubLoop {
 		go inst.writeRunner()
 		mqttPubLoop = true
 	}
 	if !modbusLoop {
-		if getRunnerType() == applications.Modbus {
+		if gt == applications.Modbus {
 			go inst.modbusRunner()
 			modbusLoop = true
 		}
 	} else {
-		if getRunnerType() == applications.Modbus {
+		if gt == applications.Modbus {
 			log.Infof("SKIP Modbus as the current poll is not finished")
 		}
 	}
 
 	if !rubixIOLoop {
-		if getRunnerType() == applications.RubixIO {
-			go inst.rubixOutputsRunner()
+		if gt == applications.RubixIO || gt == applications.RubixIOAndModbus {
+			go inst.rubixDispatch()
 			rubixIOLoop = true
 		}
 	}

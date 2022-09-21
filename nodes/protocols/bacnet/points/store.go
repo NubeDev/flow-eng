@@ -63,7 +63,16 @@ var (
 	edgeUICount = 8
 	edgeUOCount = 8
 	edgeDICount = 8
-	edgeDOCount = 8 // 6DOs and r1, r2
+	edgeDOCount = 8
+)
+
+// if modbus and rubix-io modbus will still start and 1 and then the last modbus addr,
+// is where the rubix addr will start (but if the user add a new modbus device the rubix-io address's will be push back)
+var (
+	rubixUICount = 8
+	rubixUOCount = 6
+	rubixDICount = 0
+	rubixDOCount = 2 // 6DOs and r1, r2
 )
 
 func New(app node.ApplicationName, pStore *ObjectStore) *Store {
@@ -100,7 +109,7 @@ func New(app node.ApplicationName, pStore *ObjectStore) *Store {
 		}
 	}
 
-	if app == applications.Edge || app == applications.RubixIO || app == applications.Modbus {
+	if app == applications.Edge || app == applications.RubixIO || app == applications.Modbus || app == applications.RubixIOAndModbus {
 		if ai == nil {
 			ai = &AIStore{
 				pointAllowance: pointAllowance{

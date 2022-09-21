@@ -61,8 +61,9 @@ func nodeDefault(body *node.Spec, nodeName, category string, application node.Ap
 	var inputs []*node.Input
 
 	if isWriteable {
-		overrideInput := node.BuildInput(node.In16, node.TypeFloat, nil, body.Inputs)
-		inputs = node.BuildInputs(pointName, objectIDInput, overrideInput)
+		in14 := node.BuildInput(node.In14, node.TypeFloat, nil, body.Inputs)
+		in15 := node.BuildInput(node.In15, node.TypeFloat, nil, body.Inputs)
+		inputs = node.BuildInputs(pointName, objectIDInput, in14, in15)
 	} else {
 		overrideInput := node.BuildInput(node.OverrideInput, node.TypeFloat, nil, body.Inputs)
 		inputs = node.BuildInputs(pointName, objectIDInput, overrideInput)

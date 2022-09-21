@@ -162,6 +162,12 @@ const (
 	In2  InputName = "in2"
 	In3  InputName = "in3"
 	In4  InputName = "in4"
+	In10 InputName = "in10"
+	In11 InputName = "in11"
+	In12 InputName = "in12"
+	In13 InputName = "in13"
+	In14 InputName = "in14"
+	In15 InputName = "in15"
 	In16 InputName = "in16"
 
 	Input_ InputName = "input"

@@ -14,13 +14,10 @@ func (inst *Server) writeRunner() {
 	log.Info("start mqtt-pub-runner")
 	for {
 		for _, point := range getStore().GetPoints() {
-			if point.WriteSyncPending {
-				inst.mqttPublish(point)
-				getStore().UpdateBacnetSync(point.UUID, false)
-			} else {
-				//log.Infof("mqtt-runner-publish point skip as non cov type:%s-%d", point.ObjectType, point.ObjectID)
-			}
+
+			inst.mqttPublish(point)
 		}
+
 		time.Sleep(runnerDelay * time.Millisecond)
 	}
 }

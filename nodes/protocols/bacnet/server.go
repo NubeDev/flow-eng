@@ -51,7 +51,7 @@ func NewServer(body *node.Spec, childNodes ...*node.Spec) (node.Node, error) {
 	body = buildSubNodes(body, childNodes)
 	body.IsParent = true
 	body = node.BuildNode(body, inputs, outputs, nil)
-	application := applications.RubixIO // make this a setting eg: if it's an edge-28 it would give the user 8AI, 8AOs and 100 BVs/AVs
+	application := applications.RubixIOAndModbus // make this a setting eg: if it's an edge-28 it would give the user 8AI, 8AOs and 100 BVs/AVs
 	client, err = mqttclient.NewClient(mqttclient.ClientOptions{
 		Servers: []string{"tcp://0.0.0.0:1883"},
 	})
@@ -113,7 +113,7 @@ func getStore() *points.Store {
 	}
 	return db
 }
-func getRunnerType() node.ApplicationName {
+func getApplication() node.ApplicationName {
 	return db.GetApplication()
 }
 
@@ -126,7 +126,7 @@ func (inst *Server) subscribeBroker(topic string) {
 }
 
 func (inst *Server) subscribeToRubixIO() {
-	if getRunnerType() == applications.RubixIO {
+	if getApplication() == applications.RubixIO {
 		inst.subscribeBroker("rubixcli/inputs/all")
 	}
 	objs := []string{"ai", "ao", "av", "bi", "bo", "bv"}

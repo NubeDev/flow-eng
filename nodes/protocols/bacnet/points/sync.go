@@ -2,6 +2,8 @@ package points
 
 import (
 	"github.com/NubeDev/flow-eng/helpers"
+	"github.com/NubeDev/flow-eng/node"
+	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
 	"sort"
 	"time"
 )
@@ -10,7 +12,9 @@ type SyncFrom string // FromMqttPriory, FromFlow, FromRubixIO
 type SyncTo string   // FromMqttPriory, FromFlow, FromRubixIO
 
 const (
-	ToRubixIO SyncTo = "ToRubixIO" // write to rubix-io outputs
+	ToRubixIOModbus SyncTo = "ToRubixIOModbus" // write to rubix-io outputs
+	ToRubixIO       SyncTo = "ToRubixIO"       // write to rubix-io outputs
+	ToModbus        SyncTo = "ToModbus"        // write to rubix-io outputs
 )
 
 const (
@@ -19,20 +23,34 @@ const (
 	FromFlow       SyncFrom = "FromFlow"       // message from the broker, ie: something wrote via bacnet
 )
 
+type SyncList struct {
+	Completed bool
+	SyncTo    SyncTo
+}
+
 type writeSync struct {
 	UUID        string
+	WriteArray  [16]*float64
 	WriteValue  float64
 	SyncPending bool
 	Time        time.Time
 	SyncFrom    SyncFrom
-	SyncTo      SyncTo
+	SyncTo      []*SyncList // modbus, rubix-io
 }
 
-func (inst *Store) AddSync(pointUUID string, writeValue float64, syncFrom SyncFrom, syncTo SyncTo) {
+func (inst *Store) AddSync(pointUUID string, writeValue float64, syncFrom SyncFrom, syncTo SyncTo, application node.ApplicationName) {
 	p := inst.GetPoint(pointUUID)
-	if p != nil {
-		s := inst.addWrite(writeValue, syncFrom, syncTo)
-		p.Sync = append(p.Sync, s)
+	if application == applications.RubixIOAndModbus {
+		if p != nil {
+			modbus := inst.addWrite(writeValue, syncFrom, ToModbus)
+			rubix := inst.addWrite(writeValue, syncFrom, ToRubixIO)
+			p.Sync = append(p.Sync, modbus, rubix)
+		}
+	} else {
+		if p != nil {
+			s := inst.addWrite(writeValue, syncFrom, syncTo)
+			p.Sync = append(p.Sync, s)
+		}
 	}
 }
 
@@ -41,12 +59,15 @@ func (inst *Store) GetLatestSyncValue(pointUUID string, to SyncTo) *writeSync {
 	w := &writeSync{}
 	var found bool
 	for i, sync := range s {
-		if sync.SyncTo == to {
+		for _, list := range sync.SyncTo {
 			if i == 0 {
-				w = sync
+				if list.SyncTo == to {
+					w = sync
+					found = true
+				}
+			} else {
+				//inst.DeleteSyncWrite(pointUUID, sync.UUID)
 			}
-			found = true
-			inst.DeleteSyncWrite(pointUUID, sync.UUID)
 		}
 	}
 	if found {
@@ -66,14 +87,32 @@ func (inst *Store) GetSyncByPoint(pointUUID string) []*writeSync {
 	return nil
 }
 
+func (inst *Store) CompleteProtocolWrite(pointUUID, pointCurrentSyncUUID string) []*writeSync {
+	p := inst.GetSyncByPoint(pointUUID)
+	for _, sync := range p {
+		if sync.UUID == pointCurrentSyncUUID {
+			for _, list := range sync.SyncTo {
+				list.Completed = true
+			}
+		}
+	}
+
+	return nil
+}
+
 func (inst *Store) addWrite(writeValue float64, syncFrom SyncFrom, syncTo SyncTo) *writeSync {
+	to := &SyncList{
+		SyncTo: syncTo,
+	}
 	w := &writeSync{
 		UUID:        helpers.ShortUUID(),
 		WriteValue:  writeValue,
 		SyncPending: false,
 		Time:        time.Now(),
 		SyncFrom:    syncFrom,
-		SyncTo:      syncTo,
+		SyncTo: []*SyncList{
+			to,
+		},
 	}
 	return w
 }

@@ -38,7 +38,7 @@ func (inst *AO) setObjectId() {
 }
 
 func (inst *AO) Process() {
-	process(inst)
+	fromFlow(inst)
 
 	//if !getMqtt().Connected() || !inst.connected {
 	//	inst.setObjectId()
