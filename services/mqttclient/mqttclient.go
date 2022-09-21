@@ -45,6 +45,7 @@ type Client struct {
 	connected  bool
 	terminated bool
 	consumers  []consumer
+	pingFail   bool
 }
 
 // ClientOptions is the list of options used to create c client
@@ -73,7 +74,7 @@ func (c *Client) Close() {
 func (c *Client) Subscribe(topic string, qos QOS, handler mqtt.MessageHandler) (err error) {
 	token := c.client.Subscribe(topic, byte(qos), handler)
 	if token.WaitTimeout(2*time.Second) == false {
-		return errors.New("subscribe timout")
+		return errors.New("mqtt subscribe timout, after 2 seconds")
 	}
 	if token.Error() != nil {
 		return token.Error()
@@ -91,11 +92,32 @@ func (c *Client) Unsubscribe(topic string) error {
 	return token.Error()
 }
 
+// PingFail the broker, true if offline
+func (c *Client) PingFail() (offline bool) {
+	return c.pingFail
+}
+
+// PingOk the broker, false if failed
+func (c *Client) PingOk() (ok bool) {
+	return !c.pingFail
+}
+
+// Ping the broker
+func (c *Client) Ping() (err error) {
+	err = c.Publish("ping/broker", AtMostOnce, false, time.Now().Format(time.RFC850))
+	if err != nil {
+		c.pingFail = true
+	} else {
+		c.pingFail = false
+	}
+	return
+}
+
 // Publish things
-func (c *Client) Publish(topic string, qos QOS, retain bool, payload string) (err error) {
+func (c *Client) Publish(topic string, qos QOS, retain bool, payload interface{}) (err error) {
 	token := c.client.Publish(topic, byte(qos), retain, payload)
 	if token.WaitTimeout(2*time.Second) == false {
-		return errors.New("MQTT publish timout")
+		return errors.New("mqtt publish timout, after 2 seconds")
 	}
 	if token.Error() != nil {
 		return token.Error()

@@ -2,14 +2,14 @@ package broker
 
 import (
 	"fmt"
-	"github.com/NubeDev/flow-eng/helpers/mqttclient"
 	"github.com/NubeDev/flow-eng/node"
+	mqttclient2 "github.com/NubeDev/flow-eng/services/mqttclient"
 	log "github.com/sirupsen/logrus"
 )
 
 type MqttPub struct {
 	*node.Spec
-	client     *mqttclient.Client
+	client     *mqttclient2.Client
 	connected  bool
 	subscribed bool
 	newMessage string
@@ -46,25 +46,25 @@ func (inst *MqttPub) getTopic() string {
 }
 
 func (inst *MqttPub) publish(value interface{}) {
-	c, _ := mqttclient.GetMQTT()
+	c, _ := mqttclient2.GetMQTT()
 	if inst.getTopic() != "" {
 		v := fmt.Sprintf("%v", value)
-		err := c.Publish(inst.getTopic(), mqttclient.AtMostOnce, true, v)
+		err := c.Publish(inst.getTopic(), mqttclient2.AtMostOnce, true, v)
 		if err != nil {
-			log.Errorf(fmt.Sprintf("mqttbase-publish topic:%s err:%s", inst.getTopic(), err.Error()))
+			log.Errorf(fmt.Sprintf("pointbus-publish topic:%s err:%s", inst.getTopic(), err.Error()))
 		}
 	} else {
-		log.Errorf(fmt.Sprintf("mqttbase-publish topic can not be empty"))
+		log.Errorf(fmt.Sprintf("pointbus-publish topic can not be empty"))
 	}
 }
 
 func (inst *MqttPub) connect() {
 	mqttBroker := "tcp://0.0.0.0:1883"
-	_, err := mqttclient.InternalMQTT(mqttBroker)
+	_, err := mqttclient2.InternalMQTT(mqttBroker)
 	if err != nil {
-		log.Errorf(fmt.Sprintf("mqttbase-publish-connect err:%s", err.Error()))
+		log.Errorf(fmt.Sprintf("pointbus-publish-connect err:%s", err.Error()))
 	}
-	client, connected := mqttclient.GetMQTT()
+	client, connected := mqttclient2.GetMQTT()
 	inst.connected = connected
 	inst.client = client
 }

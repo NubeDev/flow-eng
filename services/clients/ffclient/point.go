@@ -1,7 +1,7 @@
 package ffclient
 
 import (
-	"github.com/NubeDev/flow-eng/services/clients/ffclient/nresty"
+	"github.com/NubeDev/flow-eng/services/clients/nresty"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
 )
 

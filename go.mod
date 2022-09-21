@@ -12,6 +12,8 @@ require (
 	github.com/go-co-op/gocron v1.17.0
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/mitchellh/mapstructure v1.5.0
+	github.com/mustafaturan/bus/v3 v3.0.3
+	github.com/mustafaturan/monoton/v2 v2.0.2
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/sirupsen/logrus v1.9.0
 	github.com/stretchr/testify v1.8.0

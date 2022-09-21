@@ -3,7 +3,7 @@ package storage
 type Connection struct {
 	UUID                          string
 	Enabled                       *bool  `json:"enabled,omitempty"`
-	Application                   string `json:"application"` // bacnet nodes or mqttbase nodes
+	Application                   string `json:"application"` // bacnet nodes or pointbus nodes
 	Name                          string `json:"name,omitempty"`
 	Host                          string `json:"host,omitempty"`
 	Port                          int    `json:"port,omitempty"`

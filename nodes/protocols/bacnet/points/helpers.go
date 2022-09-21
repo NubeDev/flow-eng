@@ -3,7 +3,8 @@ package points
 import (
 	"errors"
 	"github.com/NubeDev/flow-eng/helpers/float"
-	"github.com/NubeDev/flow-eng/helpers/mqttbase"
+	"github.com/NubeDev/flow-eng/helpers/topics"
+	"github.com/NubeDev/flow-eng/services/eventbus"
 	"strconv"
 	"strings"
 )
@@ -29,7 +30,7 @@ func NewPayload() *Payload {
 // bacnet/ao/1/pri -> {Null,33.3,Null,Null,Null,Null,Null,Null,Null,Null,Null,Null,Null,Null,Null,11.000000}
 
 func (inst *Payload) NewMessage(msg interface{}) error {
-	m, ok := msg.(*mqttbase.Message)
+	m, ok := msg.(*eventbus.Message)
 	if ok {
 		msgString := string(m.Msg.Payload())
 		topic := m.Msg.Topic()
@@ -43,13 +44,13 @@ func (inst *Payload) NewMessage(msg interface{}) error {
 		}
 		inst.objectID = ObjectID(id)
 		inst.objectType = object(topic)
-		if IsPV(inst.topic) {
+		if topics.IsPV(inst.topic) {
 			v, err := strconv.ParseFloat(msgString, 64)
 			if err != nil {
 				inst.value = float.New(v)
 			}
 		}
-		if IsPri(inst.topic) {
+		if topics.IsPri(inst.topic) {
 			inst.priArray = inst.cleanArray(msgString)
 			inst.priAndValue = GetHighest(inst.priArray)
 		}
@@ -253,28 +254,4 @@ func objectId(topic string) (int, error) {
 		}
 	}
 	return 0, errors.New("bacnet-message: failed to get bacnet object-id")
-}
-
-func IsPV(topic string) (isBacnet bool) {
-	parts := strings.Split(topic, "/")
-	if len(parts) >= 3 {
-		if parts[0] == "bacnet" {
-			if parts[3] == "pv" {
-				return true
-			}
-		}
-	}
-	return isBacnet
-}
-
-func IsPri(topic string) (isBacnet bool) {
-	parts := strings.Split(topic, "/")
-	if len(parts) >= 3 {
-		if parts[0] == "bacnet" {
-			if parts[3] == "pri" {
-				return true
-			}
-		}
-	}
-	return isBacnet
 }

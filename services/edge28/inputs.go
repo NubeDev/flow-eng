@@ -3,7 +3,7 @@ package edge28lib
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/NubeDev/flow-eng/helpers/edge28/edgerest"
+	"github.com/NubeDev/flow-eng/services/edge28/edgerest"
 	"io/ioutil"
 	"os"
 )

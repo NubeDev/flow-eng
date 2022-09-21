@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	flowctrl "github.com/NubeDev/flow-eng"
-	"github.com/NubeDev/flow-eng/helpers/mqttbase"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes"
 	"github.com/NubeDev/flow-eng/storage"
@@ -36,20 +35,9 @@ func main() {
 
 	graph := flowctrl.New()
 
-	m, err := mqttbase.NewMqtt()
-	if err != nil {
-		return
-	}
-
-	m.Connect()
-
-	if m.Connected() {
-		m.Publish("start bacnet", "test")
-	}
-
 	for _, n := range nodesParsed {
 		if n.IsParent { // add parent node
-			node_, err := nodes.Builder(n, m)
+			node_, err := nodes.Builder(n)
 			if err != nil {
 				fmt.Println(err)
 				return
@@ -67,7 +55,7 @@ func main() {
 			}
 		}
 		if n.SubFlow.ParentID != "" {
-			node_, err := nodes.Builder(n, m)
+			node_, err := nodes.Builder(n)
 			if err != nil {
 				fmt.Println(err)
 				//return
