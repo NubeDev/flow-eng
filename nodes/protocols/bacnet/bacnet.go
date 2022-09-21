@@ -33,7 +33,7 @@ func (inst *Server) priorityBus() {
 	priorityBus = true
 }
 
-func (inst *Server) setToSync() points.SyncTo {
+func setToSync() points.SyncTo {
 	app := getRunnerType()
 	switch app {
 	case applications.RubixIO:
@@ -60,7 +60,7 @@ func (inst *Server) handleBacnet(msg interface{}) {
 	if topics.IsPri(topic) {
 		value := payload.GetHighestPriority()
 		log.Infof("mqtt-runner-subscribe point type:%s-%d value:%f", point.ObjectType, point.ObjectID, value.Value)
-		getStore().AddSync(point.UUID, value.Value, points.FromMqttPriory, inst.setToSync())
+		getStore().AddSync(point.UUID, value.Value, points.FromMqttPriory, setToSync())
 		getStore().WritePointValue(point.UUID, value.Value)
 	}
 

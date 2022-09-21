@@ -35,6 +35,7 @@ var client *mqttclient.Client
 func NewServer(body *node.Spec, childNodes ...*node.Spec) (node.Node, error) {
 	var err error
 	body = node.Defaults(body, server, category)
+	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs))
 	outputBroker := node.BuildOutput(node.Msg, node.TypeString, nil, body.Outputs)
 	outputApplication := node.BuildOutput(node.Msg, node.TypeString, nil, body.Outputs)
 	outputErr := node.BuildOutput(node.ErrMsg, node.TypeString, nil, body.Outputs)
@@ -49,7 +50,7 @@ func NewServer(body *node.Spec, childNodes ...*node.Spec) (node.Node, error) {
 	body.Parameters = node.BuildParameters(parameters) // if node is already added then show the user
 	body = buildSubNodes(body, childNodes)
 	body.IsParent = true
-	body = node.BuildNode(body, nil, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, nil)
 	application := applications.RubixIO // make this a setting eg: if it's an edge-28 it would give the user 8AI, 8AOs and 100 BVs/AVs
 	client, err = mqttclient.NewClient(mqttclient.ClientOptions{
 		Servers: []string{"tcp://0.0.0.0:1883"},

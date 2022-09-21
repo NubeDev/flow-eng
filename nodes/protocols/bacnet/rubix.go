@@ -39,8 +39,9 @@ func (inst *Server) rubixOutputsRunner() {
 		var pointsToWrite []*points.Point
 		for _, point := range getStore().GetWriteablePointsByApplication(applications.RubixIO) { //get the list of the points to update
 			sync := getStore().GetLatestSyncValue(point.UUID, points.ToRubixIO)
+			pprint.PrintJOSN(sync)
 			if sync != nil {
-				pprint.PrintJOSN(sync)
+
 				point.CurrentSyncUUID = sync.UUID
 				pointsToWrite = append(pointsToWrite, point)
 			}
