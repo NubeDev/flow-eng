@@ -25,6 +25,8 @@ type Point struct {
 	WriteSyncPending   bool
 	WriteValue         float64
 	WriteCOV           float64
+	Sync               []*writeSync
+	CurrentSyncUUID    string
 }
 
 func (inst *Store) GetPoints() []*Point {
@@ -96,12 +98,6 @@ func (inst *Store) UpdateIOSync(uuid string, value bool) {
 	p := inst.GetPoint(uuid)
 	p.IOWriteSyncPending = value
 }
-
-////GetPointArray get the current priority array
-//func (inst *Store) GetPointArray(uuid string) *PriArray {
-//	p := inst.GetPoint(uuid)
-//	return p.WriteValue
-//}
 
 func cov(existing, new, cov float64) bool {
 	v := math.Abs(existing-new) <= cov

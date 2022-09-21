@@ -20,15 +20,15 @@ func New() *RubixIO {
 	}
 }
 
-func (inst *RubixIO) BulkWrite(point []*points.Point) error {
+func (inst *RubixIO) BulkWrite(point []*points.Point) ([]*points.Point, error) {
 	outs := inst.bulkWrite(point)
 	if len(outs) > 0 {
 		_, err := inst.rest.BulkWrite(inst.rest.BulkWriteBuilder(outs...))
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
-	return nil
+	return point, nil
 }
 
 func (inst *RubixIO) bulkWrite(point []*points.Point) []*rubixcli.Output {

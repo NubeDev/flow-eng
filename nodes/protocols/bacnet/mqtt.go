@@ -1,56 +1,13 @@
 package bacnet
 
 import (
-	"context"
 	"fmt"
-	"github.com/NubeDev/flow-eng/helpers"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/services/eventbus"
 	"github.com/NubeDev/flow-eng/services/mqttclient"
-	"github.com/mustafaturan/bus/v3"
 	log "github.com/sirupsen/logrus"
 	"time"
 )
-
-var priorityBus runnerStatus
-
-func (inst *Server) priorityBus() {
-	if !priorityBus {
-		handlerMQTT := bus.Handler{
-			Handle: func(ctx context.Context, e bus.Event) {
-				go func() {
-					decoded := decode(e.Data)
-					if decoded != nil {
-						inst.handleBacnet(decoded) // this messages will come from 3rd party bacnet devices
-					}
-				}()
-			},
-			Matcher: eventbus.BacnetPri,
-		}
-		key := fmt.Sprintf("key_%s", helpers.UUID())
-		eventbus.GetBus().RegisterHandler(key, handlerMQTT)
-	}
-	priorityBus = true
-}
-
-func (inst *Server) rubixIOBus() {
-	if !priorityBus {
-		handlerMQTT := bus.Handler{
-			Handle: func(ctx context.Context, e bus.Event) {
-				go func() {
-					decoded := decode(e.Data)
-					if decoded != nil {
-						inst.rubixInputsRunner(decoded)
-					}
-				}()
-			},
-			Matcher: eventbus.RubixIOInputs,
-		}
-		key := fmt.Sprintf("key_%s", helpers.UUID())
-		eventbus.GetBus().RegisterHandler(key, handlerMQTT)
-	}
-	priorityBus = true
-}
 
 // mqttPubRunner send messages to the broker, as in read a modbus point and send it to the bacnet server
 func (inst *Server) writeRunner() {

@@ -58,10 +58,6 @@ func NewServer(body *node.Spec, childNodes ...*node.Spec) (node.Node, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	if err != nil {
-		return nil, err
-	}
 	eventbus.New()
 	rio := rubixIO.New()
 	db = points.New(application, nil)
