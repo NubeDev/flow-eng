@@ -1,6 +1,7 @@
 package bacnet
 
 import (
+	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 )
@@ -36,21 +37,25 @@ func (inst *AI) subscribePresentValue() {
 }
 
 func (inst *AI) setObjectId() {
-	id, ok := inst.ReadPin(node.ObjectId).(int)
+
+	id, ok := getInt(inst.ReadPin(node.ObjectId))
 	if ok {
 		inst.objectID = points.ObjectID(id)
 	}
 }
 
-func (inst *AI) Process() {
+func (inst *AI) getObjectId() (int, bool) {
+	return getInt(inst.ReadPin(node.ObjectId))
 
-	//if !getMqtt().Connected() || !inst.connected {
-	//	inst.setObjectId()
-	//	inst.connected = true
-	//}
-	//if !getMqtt().Connected() {
-	//	inst.connected = false
-	//}
+}
+
+func (inst *AI) Process() {
+	id, _ := inst.getObjectId()
+	fmt.Println("ID", id)
+
+	v, _ := getStore().GetValueFromReadByObject(points.AnalogInput, 1)
+	fmt.Println("VALUE", v)
+	inst.WritePin(node.Out, v)
 
 }
 

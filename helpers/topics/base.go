@@ -29,7 +29,7 @@ func IsPri(topic string) (isBacnet bool) {
 func CheckRubixIO(topic string) (isBacnet bool) { // to try and save spamming random message
 	parts := strings.Split(topic, "/")
 	if len(parts) > 0 {
-		if parts[0] == "rubixcli" {
+		if parts[0] == "rubixio" {
 			return true
 		}
 	}

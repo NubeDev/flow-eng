@@ -4,6 +4,7 @@ import (
 	"github.com/NubeDev/flow-eng/helpers"
 	"github.com/NubeDev/flow-eng/helpers/topics"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	log "github.com/sirupsen/logrus"
 )
 
 type Message struct {
@@ -12,6 +13,7 @@ type Message struct {
 }
 
 var PointsHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
+	log.Println("NEW MQTT MES", msg.Topic(), " ")
 	//log.Println("NEW MQTT MES", msg.Topic(), " ", string(msg.Payload()))
 	mes := &Message{helpers.ShortUUID("bus"), msg}
 	topic := msg.Topic()

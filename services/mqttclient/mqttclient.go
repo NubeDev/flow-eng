@@ -72,6 +72,7 @@ func (c *Client) Close() {
 
 // Subscribe to topic
 func (c *Client) Subscribe(topic string, qos QOS, handler mqtt.MessageHandler) (err error) {
+	log.Infof("mqtt-susbcribe %s", topic)
 	token := c.client.Subscribe(topic, byte(qos), handler)
 	if token.WaitTimeout(2*time.Second) == false {
 		return errors.New("mqtt subscribe timout, after 2 seconds")

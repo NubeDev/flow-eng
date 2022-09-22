@@ -3,7 +3,6 @@ package bacnet
 import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/float"
-	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/helpers/topics"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
@@ -105,7 +104,6 @@ func (inst *Server) fromBacnet(msg interface{}) {
 	}
 	if topics.IsPri(topic) {
 		value := payload.GetFullPriority()
-		pprint.PrintJOSN(value)
 		highest := payload.GetHighestPriority()
 		if highest != nil {
 			log.Infof("mqtt-runner-subscribe point type:%s-%d value:%f", point.ObjectType, point.ObjectID, highest.Value)

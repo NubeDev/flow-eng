@@ -10,21 +10,23 @@ import (
 )
 
 type Point struct {
-	UUID            string               `json:"uuid"`
-	Application     node.ApplicationName `json:"application"`
-	ObjectType      ObjectType           `json:"objectType"`
-	ObjectID        ObjectID
-	presentValue    *float64
-	priAndValue     *priAndValue
-	writeValue      float64
-	IoType          IoType
-	IsIO            bool // if it's an io-pin for a real device
-	IsWriteable     bool
-	Enable          bool
-	WriteValue      *PriArray
-	WriteCOV        float64
-	Sync            []*writeSync
-	CurrentSyncUUID string
+	UUID             string               `json:"uuid"`
+	Application      node.ApplicationName `json:"application"`
+	ObjectType       ObjectType           `json:"objectType"`
+	ObjectID         ObjectID
+	presentValue     *float64
+	priAndValue      *priAndValue
+	writeValue       float64
+	IoType           IoType
+	IsIO             bool // if it's an io-pin for a real device
+	IsWriteable      bool
+	Enable           bool
+	ValueFromRead    float64
+	ValueFromReadCOV float64
+	WriteValue       *PriArray
+	WriteCOV         float64
+	Sync             []*writeSync
+	CurrentSyncUUID  string
 }
 
 func (inst *Store) GetPoints() []*Point {
@@ -119,7 +121,34 @@ func (inst *Store) mergePriority(p2 *PriArray, in14, in15 *float64) *PriArray {
 		P16: p2.P16,
 	}
 	return out
+}
 
+//GetValueFromReadByObject get that value that has already been stored
+func (inst *Store) GetValueFromReadByObject(t ObjectType, id ObjectID) (float64, bool) {
+	p := inst.GetPointByObject(t, id)
+	if p != nil {
+		return p.ValueFromRead, true
+	}
+	return 0, false
+}
+
+//GetValueFromRead get that value that has already been stored
+func (inst *Store) GetValueFromRead(uuid string) (float64, bool) {
+	p := inst.GetPoint(uuid)
+	if p != nil {
+		return p.ValueFromRead, true
+	}
+	return 0, false
+}
+
+//WriteValueFromRead this is a value from a modbus input or rubix-io input
+func (inst *Store) WriteValueFromRead(uuid string, value float64) bool {
+	p := inst.GetPoint(uuid)
+	if p != nil {
+		p.ValueFromRead = value
+		return true
+	}
+	return false
 }
 
 //WritePointValue to is to be written to flow modbus or the wire-sheet @ priority 15

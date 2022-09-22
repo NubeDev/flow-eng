@@ -1,7 +1,6 @@
 package bacnet
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	log "github.com/sirupsen/logrus"
 	"time"
@@ -24,7 +23,6 @@ func (inst *Server) rubixDispatch() {
 		for _, point := range getPoints { //get the list of the points to update
 			sync := getStore().GetLatestSyncValue(point.UUID, points.ToRubixIO)
 			if sync != nil {
-				//pprint.PrintJOSN(sync)
 				point.CurrentSyncUUID = sync.UUID
 				pointsToWrite = append(pointsToWrite, point)
 			}
@@ -43,10 +41,9 @@ func (inst *Server) rubixDispatch() {
 						}
 					}
 					//fmt.Println(point.UUID, point.CurrentSyncUUID, updateBacnet)
-					ok := getStore().CompleteProtocolWrite(point.UUID, point.CurrentSyncUUID)
-					fmt.Println("CompleteProtocolWrite", ok)
-					ok = getStore().DeleteSyncWrite(point.UUID, point.CurrentSyncUUID)
-					fmt.Println("DeleteSyncWrite", ok)
+					getStore().CompleteProtocolWrite(point.UUID, point.CurrentSyncUUID)
+					getStore().DeleteSyncWrite(point.UUID, point.CurrentSyncUUID)
+
 					if updateBacnet { // now do it, update bacnet-server
 
 					}

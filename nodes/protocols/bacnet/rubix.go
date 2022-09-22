@@ -45,10 +45,9 @@ func (inst *Server) rubixInputsRunner(msg *eventbus.Message) {
 			if err != nil {
 				return
 			}
-			fmt.Println(value, "value")
+			getStore().WriteValueFromRead(point.UUID, value)
+			fmt.Println(value, "rubix-io-input-value")
 		}
 	}
-
-	//fmt.Println("RUBIX-INPUTS", inputs)
 
 }
