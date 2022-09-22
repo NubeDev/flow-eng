@@ -15,6 +15,11 @@ if fail we keep trying but if a new value arrives to the store we will take the 
 and disregard the existing
 */
 
+func (inst *Server) bacnetDispatch(object points.ObjectType, id points.ObjectID) {
+	point := getStore().GetPointByObject(object, id)
+	inst.mqttPublish(point)
+}
+
 func (inst *Server) rubixDispatch() {
 	log.Info("start rubix-io-outputs-dispatch")
 	for {

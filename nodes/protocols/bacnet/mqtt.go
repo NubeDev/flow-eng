@@ -14,10 +14,8 @@ func (inst *Server) writeRunner() {
 	log.Info("start mqtt-pub-runner")
 	for {
 		for _, point := range getStore().GetPoints() {
-
 			inst.mqttPublish(point)
 		}
-
 		time.Sleep(runnerDelay * time.Millisecond)
 	}
 }
@@ -36,11 +34,16 @@ func (inst *Server) mqttPublish(pnt *points.Point) {
 		log.Error(err)
 		return
 	}
+	v := points.GetHighest(value)
 	topic := fmt.Sprintf("bacnet/%s/%d", obj, objectId)
-	err = inst.client.Publish(topic, mqttclient.AtMostOnce, true, value)
-	if err != nil {
-		return
+	if v != nil {
+		err = inst.client.Publish(topic, mqttclient.AtMostOnce, true, fmt.Sprintf("%f", v.Value))
+		if err != nil {
+			log.Errorf("bacnet-server: mqtt publish err: %s", err.Error())
+			return
+		}
 	}
+
 }
 
 func getTopic(msg interface{}) string {

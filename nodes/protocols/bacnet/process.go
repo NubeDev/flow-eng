@@ -2,7 +2,6 @@ package bacnet
 
 import (
 	"fmt"
-	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/topics"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
@@ -10,52 +9,13 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func getFloatPointer(in interface{}) (val *float64, ok bool) {
-	switch i := in.(type) {
-	case int:
-		val = float.New(float64(i))
-	case float64:
-		val = float.New(i)
-	case float32:
-		val = float.New(float64(i))
-	case int64:
-		val = float.New(float64(i))
-	default:
-		return nil, false
-	}
-	return val, true
-}
+func updateInputs(body node.Node, objectType points.ObjectType, id points.ObjectID) {
+	v, _ := getStore().GetValueFromReadByObject(objectType, id)
+	body.WritePin(node.Out, v)
+	p := getStore().GetPointByObject(objectType, id)
+	fmt.Println(getServer().client.IsConnected())
+	getServer().mqttPublish(p)
 
-func getFloat(in interface{}) (val float64, ok bool) {
-	switch i := in.(type) {
-	case int:
-		val = float64(i)
-	case float64:
-		val = i
-	case float32:
-		val = float64(i)
-	case int64:
-		val = float64(i)
-	default:
-		return 0, false
-	}
-	return val, true
-}
-
-func getInt(in interface{}) (val int, ok bool) {
-	switch i := in.(type) {
-	case int:
-		val = i
-	case float64:
-		val = int(i)
-	case float32:
-		val = int(i)
-	case int64:
-		val = int(i)
-	default:
-		return 0, false
-	}
-	return val, true
 }
 
 func fromFlow(body node.Node) {

@@ -1,14 +1,13 @@
 package bacnet
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 )
 
 type AI struct {
 	*node.Spec
-	connected  bool
+	onStart    bool
 	objectID   points.ObjectID
 	objectType points.ObjectType
 	pointUUID  string
@@ -37,7 +36,6 @@ func (inst *AI) subscribePresentValue() {
 }
 
 func (inst *AI) setObjectId() {
-
 	id, ok := getInt(inst.ReadPin(node.ObjectId))
 	if ok {
 		inst.objectID = points.ObjectID(id)
@@ -46,17 +44,14 @@ func (inst *AI) setObjectId() {
 
 func (inst *AI) getObjectId() (int, bool) {
 	return getInt(inst.ReadPin(node.ObjectId))
-
 }
 
 func (inst *AI) Process() {
-	id, _ := inst.getObjectId()
-	fmt.Println("ID", id)
-
-	v, _ := getStore().GetValueFromReadByObject(points.AnalogInput, 1)
-	fmt.Println("VALUE", v)
-	inst.WritePin(node.Out, v)
-
+	if !inst.onStart {
+		inst.setObjectId()
+	}
+	updateInputs(inst, points.AnalogInput, inst.objectID)
+	inst.onStart = true
 }
 
 func (inst *AI) Cleanup() {}

@@ -31,6 +31,7 @@ func buildSubNodes(body *node.Spec, childNodes []*node.Spec) *node.Spec {
 
 var db *points.Store
 var client *mqttclient.Client
+var inst *Server
 
 func NewServer(body *node.Spec, childNodes ...*node.Spec) (node.Node, error) {
 	var err error
@@ -63,7 +64,13 @@ func NewServer(body *node.Spec, childNodes ...*node.Spec) (node.Node, error) {
 	eventbus.New()
 	rio := rubixIO.New()
 	db = points.New(application, nil)
-	return &Server{body, client, rio, false, false, false}, err
+	s := &Server{body, client, rio, false, false, false}
+	inst = s
+	return s, err
+}
+
+func getServer() *Server {
+	return inst
 }
 
 func (inst *Server) intBus() {
