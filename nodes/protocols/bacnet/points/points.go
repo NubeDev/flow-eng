@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
-	log "github.com/sirupsen/logrus"
 	"math"
+	"reflect"
 )
 
 type Point struct {
@@ -17,12 +17,11 @@ type Point struct {
 	presentValue    *float64
 	priAndValue     *priAndValue
 	writeValue      float64
-	priArray        *PriArray
 	IoType          IoType
 	IsIO            bool // if it's an io-pin for a real device
 	IsWriteable     bool
 	Enable          bool
-	WriteValue      float64
+	WriteValue      *PriArray
 	WriteCOV        float64
 	Sync            []*writeSync
 	CurrentSyncUUID string
@@ -88,29 +87,57 @@ func (inst *Store) GetPoint(uuid string) *Point {
 	return nil
 }
 
-func (inst *Store) ReadPresentValue(uuid string) (float64, bool) {
-	p := inst.GetPoint(uuid)
-	if p != nil {
-		return p.WriteValue, true
-	}
-	return 0, false
-}
-
 func cov(existing, new, cov float64) bool {
 	v := math.Abs(existing-new) <= cov
 	return !v
 }
 
+func (inst *Store) mergePriority(p2 *PriArray, in14, in15 *float64) *PriArray {
+	if p2 == nil {
+		p2 = &PriArray{
+			P14: in14, // these are reversed for the flow
+			P15: in15, // these are reversed for the flow
+		}
+		return p2
+	}
+	out := &PriArray{
+		P1:  p2.P1,
+		P2:  p2.P2,
+		P3:  p2.P3,
+		P4:  p2.P4,
+		P5:  p2.P5,
+		P6:  p2.P6,
+		P7:  p2.P7,
+		P8:  p2.P8,
+		P9:  p2.P9,
+		P10: p2.P10,
+		P11: p2.P11,
+		P12: p2.P12,
+		P13: p2.P13,
+		P14: in14, // these are reversed for the flow
+		P15: in15, // these are reversed for the flow
+		P16: p2.P16,
+	}
+	return out
+
+}
+
 //WritePointValue to is to be written to flow modbus or the wire-sheet @ priority 15
-func (inst *Store) WritePointValue(uuid string, value float64) bool {
+func (inst *Store) WritePointValue(uuid string, value *PriArray, in14, in15 *float64) bool {
 	p := inst.GetPoint(uuid)
 	if p != nil {
-		c := cov(p.WriteValue, value, 0.1)
-		if c {
-			log.Infof("store write point value type:%s-%d value:%f  uuid:%s", p.ObjectType, p.ObjectID, value, uuid)
-			p.WriteValue = value
-			return true
+		if value == nil {
+			c := inst.mergePriority(p.WriteValue, in14, in15)
+			cov := !reflect.DeepEqual(c, p.WriteValue)
+			if !cov {
+				p.WriteValue = c
+			}
+			p.WriteValue = c
+		} else {
+			c := inst.mergePriority(value, in14, in15)
+			p.WriteValue = c
 		}
+	} else {
 	}
 	return false
 }

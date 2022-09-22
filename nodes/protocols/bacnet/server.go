@@ -57,7 +57,8 @@ func NewServer(body *node.Spec, childNodes ...*node.Spec) (node.Node, error) {
 	})
 	err = client.Connect()
 	if err != nil {
-		return nil, err
+		log.Error(err)
+		//return nil, err
 	}
 	eventbus.New()
 	rio := rubixIO.New()

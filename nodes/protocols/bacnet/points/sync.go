@@ -30,15 +30,14 @@ type SyncList struct {
 
 type writeSync struct {
 	UUID        string
-	WriteArray  [16]*float64
-	WriteValue  float64
+	WriteValue  *PriArray
 	SyncPending bool
 	Time        time.Time
 	SyncFrom    SyncFrom
 	SyncTo      []*SyncList // modbus, rubix-io
 }
 
-func (inst *Store) AddSync(pointUUID string, writeValue float64, syncFrom SyncFrom, syncTo SyncTo, application node.ApplicationName) {
+func (inst *Store) AddSync(pointUUID string, writeValue *PriArray, syncFrom SyncFrom, syncTo SyncTo, application node.ApplicationName) {
 	p := inst.GetPoint(pointUUID)
 	if application == applications.RubixIOAndModbus {
 		if p != nil {
@@ -87,20 +86,20 @@ func (inst *Store) GetSyncByPoint(pointUUID string) []*writeSync {
 	return nil
 }
 
-func (inst *Store) CompleteProtocolWrite(pointUUID, pointCurrentSyncUUID string) []*writeSync {
+func (inst *Store) CompleteProtocolWrite(pointUUID, pointCurrentSyncUUID string) bool {
 	p := inst.GetSyncByPoint(pointUUID)
 	for _, sync := range p {
 		if sync.UUID == pointCurrentSyncUUID {
 			for _, list := range sync.SyncTo {
 				list.Completed = true
+				return true
 			}
 		}
 	}
-
-	return nil
+	return false
 }
 
-func (inst *Store) addWrite(writeValue float64, syncFrom SyncFrom, syncTo SyncTo) *writeSync {
+func (inst *Store) addWrite(writeValue *PriArray, syncFrom SyncFrom, syncTo SyncTo) *writeSync {
 	to := &SyncList{
 		SyncTo: syncTo,
 	}

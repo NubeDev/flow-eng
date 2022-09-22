@@ -1,6 +1,7 @@
 package bacnet
 
 import (
+	"fmt"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	log "github.com/sirupsen/logrus"
 	"time"
@@ -42,15 +43,17 @@ func (inst *Server) rubixDispatch() {
 						}
 					}
 					//fmt.Println(point.UUID, point.CurrentSyncUUID, updateBacnet)
-					getStore().CompleteProtocolWrite(point.UUID, point.CurrentSyncUUID)
-					getStore().DeleteSyncWrite(point.UUID, point.CurrentSyncUUID)
+					ok := getStore().CompleteProtocolWrite(point.UUID, point.CurrentSyncUUID)
+					fmt.Println("CompleteProtocolWrite", ok)
+					ok = getStore().DeleteSyncWrite(point.UUID, point.CurrentSyncUUID)
+					fmt.Println("DeleteSyncWrite", ok)
 					if updateBacnet { // now do it, update bacnet-server
 
 					}
 				}
 			}
 		}
-		//time.Sleep(runnerDelay * time.Millisecond)
-		time.Sleep(2000 * time.Millisecond)
+		time.Sleep(runnerDelay * time.Millisecond)
+		//time.Sleep(2000 * time.Millisecond)
 	}
 }

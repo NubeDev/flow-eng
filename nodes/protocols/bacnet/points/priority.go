@@ -64,7 +64,32 @@ func NewPriArrayAt15(value float64) *PriArray {
 	return &PriArray{
 		P15: float.New(value),
 	}
+}
 
+func NewPriArray(in14, in15 *float64) *PriArray {
+	return &PriArray{
+		P14: in14,
+		P15: in15,
+	}
+}
+
+type Priority struct {
+	P1  *float64 `json:"_1,omitempty"`
+	P2  *float64 `json:"_2,omitempty"`
+	P3  *float64 `json:"_3,omitempty"`
+	P4  *float64 `json:"_4,omitempty"`
+	P5  *float64 `json:"_5,omitempty"`
+	P6  *float64 `json:"_6,omitempty"`
+	P7  *float64 `json:"_7,omitempty"`
+	P8  *float64 `json:"_8,omitempty"`
+	P9  *float64 `json:"_9,omitempty"`
+	P10 *float64 `json:"_10,omitempty"`
+	P11 *float64 `json:"_11,omitempty"`
+	P12 *float64 `json:"_12,omitempty"`
+	P13 *float64 `json:"_13,omitempty"`
+	P14 *float64 `json:"_14,omitempty"`
+	P15 *float64 `json:"_15,omitempty"`
+	P16 *float64 `json:"_16,omitempty"`
 }
 
 type PriArray struct {
@@ -128,6 +153,21 @@ func (inst *Payload) GetFullPriority() *PriArray {
 
 func (inst *Payload) GetHighestPriority() *priAndValue {
 	return inst.priAndValue
+}
+
+// GetWriteArrayValues get 1n14, 1n15
+func GetWriteArrayValues(payload *PriArray) (in14, in15 *float64) {
+	if payload == nil {
+		payload = &PriArray{}
+	}
+	if payload.P14 != nil {
+		in14 = payload.P4
+	}
+	if payload.P15 != nil {
+		in15 = payload.P15
+	}
+	return in14, in15
+
 }
 
 func GetHighest(payload *PriArray) *priAndValue {

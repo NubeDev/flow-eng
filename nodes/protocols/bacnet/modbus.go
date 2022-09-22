@@ -1,6 +1,7 @@
 package bacnet
 
 import (
+	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/services/modbuscli"
@@ -82,7 +83,7 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 				if point.IoType == points.IoTypeVolts { // update anypoint that is type voltage
 					writeValue = voltList[io16Pin]
 				}
-				store.WritePointValue(p.UUID, writeValue)
+				store.WritePointValue(p.UUID, points.NewPriArrayAt15(writeValue), float.New(0), float.New(0))
 			}
 		}
 	}

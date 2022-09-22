@@ -1,12 +1,31 @@
 package bacnet
 
 import (
+	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/float"
+	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/helpers/topics"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	log "github.com/sirupsen/logrus"
 )
+
+func getFloatPointer(in interface{}) (val *float64, ok bool) {
+	switch i := in.(type) {
+	case int:
+		val = float.New(float64(i))
+	case float64:
+		val = float.New(i)
+	case float32:
+		val = float.New(float64(i))
+	case int64:
+		val = float.New(float64(i))
+	default:
+		return nil, false
+	}
+	return val, true
+}
 
 func getFloat(in interface{}) (val float64, ok bool) {
 	switch i := in.(type) {
@@ -45,16 +64,19 @@ func fromFlow(body node.Node) {
 	if err != nil {
 		return
 	}
+	var ok bool
+	var in14 *float64
+	var in15 *float64
 	if isWriteable {
-		in14, ok := getFloat(body.ReadPin(node.In14))
+		in14, ok = getFloatPointer(body.ReadPin(node.In14))
 		if !ok {
 			log.Errorf("bacnet-server: failed to get node write value from node process")
 		}
-		in15, ok := getFloat(body.ReadPin(node.In15))
+		in15, ok = getFloatPointer(body.ReadPin(node.In15))
 		if !ok {
 			log.Errorf("bacnet-server: failed to get node write value from node process")
 		}
-
+		fmt.Println(in14, in15)
 	}
 	objectId, ok := getInt(body.ReadPin(node.ObjectId))
 	if !ok {
@@ -64,8 +86,7 @@ func fromFlow(body node.Node) {
 		log.Errorf("bacnet-server: failed to get object-id from node process")
 		return
 	}
-	createSync(val, objectType, points.ObjectID(objectId), points.FromFlow)
-}
+	createSync(nil, objectType, points.ObjectID(objectId), points.FromFlow, in14, in15)
 }
 
 func (inst *Server) fromBacnet(msg interface{}) {
@@ -83,9 +104,13 @@ func (inst *Server) fromBacnet(msg interface{}) {
 		return
 	}
 	if topics.IsPri(topic) {
-		value := payload.GetHighestPriority()
-		log.Infof("mqtt-runner-subscribe point type:%s-%d value:%f", point.ObjectType, point.ObjectID, value.Value)
-		createSync(value.Value, objectType, objectId, points.FromMqttPriory)
+		value := payload.GetFullPriority()
+		pprint.PrintJOSN(value)
+		highest := payload.GetHighestPriority()
+		if highest != nil {
+			log.Infof("mqtt-runner-subscribe point type:%s-%d value:%f", point.ObjectType, point.ObjectID, highest.Value)
+		}
+		createSync(value, objectType, objectId, points.FromMqttPriory, nil, nil)
 	}
 }
 
@@ -101,7 +126,7 @@ func getToSync() points.SyncTo {
 }
 
 // createSync can come from bacnet or the flow
-func createSync(writeValue float64, object points.ObjectType, id points.ObjectID, syncFrom points.SyncFrom) {
+func createSync(writeValue *points.PriArray, object points.ObjectType, id points.ObjectID, syncFrom points.SyncFrom, in14, in15 *float64) {
 	point := getStore().GetPointByObject(object, id)
 	if object == "" {
 		log.Errorf("bacnet-server: object type type can not be empty")
@@ -115,7 +140,7 @@ func createSync(writeValue float64, object points.ObjectType, id points.ObjectID
 	}
 	if point != nil {
 		getStore().AddSync(point.UUID, writeValue, syncFrom, sync, getApplication())
-		getStore().WritePointValue(point.UUID, writeValue)
+		getStore().WritePointValue(point.UUID, writeValue, in14, in15)
 	}
 
 }
