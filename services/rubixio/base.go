@@ -10,11 +10,30 @@ import (
 )
 
 type RubixIO struct {
-	rest *rubixcli.Client
+	rest        *rubixcli.Client
+	IP          string
+	StartAddrUI points.ObjectID
+	StartAddrUO points.ObjectID
+	StartAddrDO points.ObjectID
 }
 
-func New() *RubixIO {
-	rest := rubixcli.New(&rubixcli.Connection{Ip: "192.168.15.191"})
+func New(rio *RubixIO) *RubixIO {
+	if rio == nil {
+		rio = &RubixIO{}
+	}
+	if rio.IP == "" {
+		rio.IP = "0.0.0.0"
+	}
+	if rio.StartAddrUI > 0 {
+		rio.StartAddrUI = rio.StartAddrUI - 1 // start at 100 first address will be 100, 101 and so on (math is StartAddrUI=100+1 so will -1 so its 99+1=100)
+	}
+	if rio.StartAddrUO > 0 {
+		rio.StartAddrUO = rio.StartAddrUO - 1
+	}
+	if rio.StartAddrDO > 0 {
+		rio.StartAddrDO = rio.StartAddrDO - 1
+	}
+	rest := rubixcli.New(&rubixcli.Connection{Ip: rio.IP})
 	return &RubixIO{
 		rest: rest,
 	}
@@ -33,7 +52,6 @@ func (inst *RubixIO) BulkWrite(point []*points.Point) ([]*points.Point, error) {
 
 func (inst *RubixIO) bulkWrite(point []*points.Point) []*rubixcli.Output {
 	var outs []*rubixcli.Output
-
 	for _, p := range point {
 		ioName, err := inst.uoIoNum(p)
 		v := points.GetHighest(p.WriteValue)
@@ -54,33 +72,58 @@ func (inst *RubixIO) bulkWrite(point []*points.Point) []*rubixcli.Output {
 func (inst *RubixIO) uoIoNum(point *points.Point) (string, error) {
 	if point.IsWriteable && point.ObjectType == points.AnalogOutput {
 		switch point.ObjectID {
-		case 1:
+		case inst.StartAddrUO + 1:
 			return "UO1", nil
-		case 2:
+		case inst.StartAddrUO + 2:
 			return "UO2", nil
-		case 3:
+		case inst.StartAddrUO + 3:
 			return "UO3", nil
-		case 4:
+		case inst.StartAddrUO + 4:
 			return "UO4", nil
-		case 5:
+		case inst.StartAddrUO + 5:
 			return "UO5", nil
-		case 6:
+		case inst.StartAddrUO + 6:
 			return "UO6", nil
 		}
 	}
 	if point.IsWriteable && point.ObjectType == points.BinaryOutput {
 		switch point.ObjectID {
-		case 1:
+		case inst.StartAddrDO + 1:
 			return "DO1", nil
-		case 2:
+		case inst.StartAddrDO + 2:
 			return "DO2", nil
 		}
 	}
-
 	return "", errors.New("rubix-io input object-id was not found")
 }
 
-func (inst *RubixIO) GetInputValue(point *points.Point, inputs *rubixio.Inputs) (float64, error) {
+func (inst *RubixIO) getInputIONum(point *points.Point) (string, error) {
+	if !point.IsWriteable {
+		switch point.ObjectID {
+		case inst.StartAddrUI + 1:
+			return "UI1", nil
+		case inst.StartAddrUI + 2:
+			return "UI2", nil
+		case inst.StartAddrUI + 3:
+			return "UI3", nil
+		case inst.StartAddrUI + 4:
+			return "UI4", nil
+		case inst.StartAddrUI + 5:
+			return "UI5", nil
+		case inst.StartAddrUI + 6:
+			return "UI6", nil
+		case inst.StartAddrUI + 7:
+			return "UI7", nil
+		case inst.StartAddrUI + 8:
+			return "UI8", nil
+		}
+
+	}
+	return "", errors.New("rubix-io input object-id was not found")
+}
+
+// DecodeInputValue will get the selected IoType and return the value, ie user selects temperature
+func (inst *RubixIO) DecodeInputValue(point *points.Point, inputs *rubixio.Inputs) (float64, error) {
 	if point == nil {
 		return 0, errors.New("rubix-io point can not be empty")
 	}
@@ -93,31 +136,6 @@ func (inst *RubixIO) GetInputValue(point *points.Point, inputs *rubixio.Inputs) 
 	}
 	return inst.getInputValue(ioNum, point.IoType, inputs)
 
-}
-
-func (inst *RubixIO) getInputIONum(point *points.Point) (string, error) {
-	if !point.IsWriteable {
-		switch point.ObjectID {
-		case 1:
-			return "UI1", nil
-		case 2:
-			return "UI2", nil
-		case 3:
-			return "UI3", nil
-		case 4:
-			return "UI4", nil
-		case 5:
-			return "UI5", nil
-		case 6:
-			return "UI6", nil
-		case 7:
-			return "UI7", nil
-		case 8:
-			return "UI8", nil
-		}
-
-	}
-	return "", errors.New("rubix-io input object-id was not found")
 }
 
 func (inst *RubixIO) getInputValue(ioNum string, ioType points.IoType, inputs *rubixio.Inputs) (float64, error) {

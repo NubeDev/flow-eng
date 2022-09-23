@@ -124,12 +124,12 @@ func (inst *Store) mergePriority(p2 *PriArray, in14, in15 *float64) *PriArray {
 }
 
 //GetValueFromReadByObject get that value that has already been stored
-func (inst *Store) GetValueFromReadByObject(t ObjectType, id ObjectID) (float64, bool) {
+func (inst *Store) GetValueFromReadByObject(t ObjectType, id ObjectID) (*Point, float64, bool) {
 	p := inst.GetPointByObject(t, id)
 	if p != nil {
-		return p.ValueFromRead, true
+		return p, p.ValueFromRead, true
 	}
-	return 0, false
+	return nil, 0, false
 }
 
 //GetValueFromRead get that value that has already been stored
@@ -152,12 +152,12 @@ func (inst *Store) WriteValueFromRead(uuid string, value float64) bool {
 }
 
 //WritePointValue to is to be written to flow modbus or the wire-sheet @ priority 15
-func (inst *Store) WritePointValue(uuid string, value *PriArray, in14, in15 *float64) bool {
+func (inst *Store) WritePointValue(uuid string, value *PriArray, in14, in15 *float64) (cov bool) {
 	p := inst.GetPoint(uuid)
 	if p != nil {
 		if value == nil {
 			c := inst.mergePriority(p.WriteValue, in14, in15)
-			cov := !reflect.DeepEqual(c, p.WriteValue)
+			cov = !reflect.DeepEqual(c, p.WriteValue)
 			if !cov {
 				p.WriteValue = c
 			}
@@ -166,9 +166,8 @@ func (inst *Store) WritePointValue(uuid string, value *PriArray, in14, in15 *flo
 			c := inst.mergePriority(value, in14, in15)
 			p.WriteValue = c
 		}
-	} else {
 	}
-	return false
+	return cov
 }
 
 func (inst *Store) GetByType(objectType ObjectType) (out []*Point, count int) {

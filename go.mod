@@ -1,6 +1,6 @@
 module github.com/NubeDev/flow-eng
 
-go 1.17
+go 1.18
 
 require (
 	github.com/NubeIO/lib-goja v0.0.3

@@ -43,15 +43,11 @@ func (inst *AI) setObjectId() {
 	}
 }
 
-func (inst *AI) getObjectId() (int, bool) {
-	return conversions.GetInt(inst.ReadPin(node.ObjectId))
-}
-
 func (inst *AI) Process() {
 	if !inst.onStart {
 		inst.setObjectId()
 	}
-	updateInputs(inst, points.AnalogInput, inst.objectID)
+	toFlow(inst, inst.objectID)
 	inst.onStart = true
 }
 

@@ -62,8 +62,17 @@ func NewServer(body *node.Spec, childNodes ...*node.Spec) (node.Node, error) {
 		//return nil, err
 	}
 	eventbus.New()
-	rio := rubixIO.New()
-	db = points.New(application, nil)
+	rio := &rubixIO.RubixIO{}
+	if application == applications.RubixIO || application == applications.RubixIOAndModbus {
+		rubixIOUICount, rubixIOUOCount := points.CalcPointCount(1, application)
+		rio = rubixIO.New(&rubixIO.RubixIO{
+			IP:          "192.168.15.191",
+			StartAddrUI: rubixIOUICount,
+			StartAddrUO: rubixIOUOCount,
+			StartAddrDO: 2,
+		})
+	}
+	db = points.New(application, nil, 0, 200, 200)
 	s := &Server{body, client, rio, false, false, false}
 	inst = s
 	return s, err

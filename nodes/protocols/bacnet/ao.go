@@ -1,13 +1,14 @@
 package bacnet
 
 import (
+	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 )
 
 type AO struct {
 	*node.Spec
-	connected  bool
+	onStart    bool
 	objectID   points.ObjectID
 	objectType points.ObjectType
 	pointUUID  string
@@ -29,25 +30,19 @@ func NewAO(body *node.Spec) (node.Node, error) {
 		pointUUID,
 	}, err
 }
-
 func (inst *AO) setObjectId() {
-	id, ok := inst.ReadPin(node.ObjectId).(int)
+	id, ok := conversions.GetInt(inst.ReadPin(node.ObjectId))
 	if ok {
 		inst.objectID = points.ObjectID(id)
 	}
 }
-
 func (inst *AO) Process() {
-	fromFlow(inst)
-
-	//if !getMqtt().Connected() || !inst.connected {
-	//	inst.setObjectId()
-	//	inst.connected = true
-	//}
-	//if !getMqtt().Connected() {
-	//	inst.connected = false
-	//}
-
+	if !inst.onStart {
+		inst.setObjectId()
+	}
+	toFlow(inst, inst.objectID)
+	fromFlow(inst, inst.objectID)
+	inst.onStart = true
 }
 
 func (inst *AO) Cleanup() {}

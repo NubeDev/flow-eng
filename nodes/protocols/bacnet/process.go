@@ -1,7 +1,6 @@
 package bacnet
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/helpers/topics"
 	"github.com/NubeDev/flow-eng/node"
@@ -10,16 +9,14 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func updateInputs(body node.Node, objectType points.ObjectType, id points.ObjectID) {
-	v, _ := getStore().GetValueFromReadByObject(objectType, id)
-	body.WritePin(node.Out, v)
-	p := getStore().GetPointByObject(objectType, id)
-	fmt.Println(getServer().client.IsConnected())
-	getServer().mqttPublish(p)
+/*
+PROCESS
+Is where a message will come from the flow or bacnet
+These would only be messages that we need to write to, as in write output-point, to a modbus or edge-28 point
+*/
 
-}
-
-func fromFlow(body node.Node) {
+// fromFlow is when a node has been written to from the wire sheet connection, as in write a value @16
+func fromFlow(body node.Node, objectId points.ObjectID) {
 	objectType, isWriteable, _, err := getBacnetType(body.GetName())
 	if err != nil {
 		return
@@ -30,23 +27,18 @@ func fromFlow(body node.Node) {
 	if isWriteable {
 		in14, ok = conversions.GetFloatPointer(body.ReadPin(node.In14))
 		if !ok {
-			log.Errorf("bacnet-server: failed to get node write value from node process")
+			log.Errorf("bacnet-server: @14 failed to get node write value from node process")
 		}
 		in15, ok = conversions.GetFloatPointer(body.ReadPin(node.In15))
 		if !ok {
-			log.Errorf("bacnet-server: failed to get node write value from node process")
+			log.Errorf("bacnet-server:  @15 failed to get node write value from node process")
 		}
-		fmt.Println(in14, in15)
-	}
-	objectId, ok := conversions.GetInt(body.ReadPin(node.ObjectId))
-	if !ok {
-		log.Errorf("bacnet-server: failed to get node write value from node process")
 	}
 	if objectId == 0 {
 		log.Errorf("bacnet-server: failed to get object-id from node process")
 		return
 	}
-	createSync(nil, objectType, points.ObjectID(objectId), points.FromFlow, in14, in15)
+	createSync(nil, objectType, objectId, points.FromFlow, in14, in15)
 }
 
 func (inst *Server) fromBacnet(msg interface{}) {
@@ -98,8 +90,13 @@ func createSync(writeValue *points.PriArray, object points.ObjectType, id points
 		log.Errorf("bacnet-server: get sync type can not be empty")
 	}
 	if point != nil {
-		getStore().AddSync(point.UUID, writeValue, syncFrom, sync, getApplication())
-		getStore().WritePointValue(point.UUID, writeValue, in14, in15)
+		cov := getStore().WritePointValue(point.UUID, writeValue, in14, in15)
+		if cov {
+			if writeValue == nil {
+				getStore().AddSync(point.UUID, points.NewPriArray(in14, in15), syncFrom, sync, getApplication())
+			} else {
+				getStore().AddSync(point.UUID, writeValue, syncFrom, sync, getApplication())
+			}
+		}
 	}
-
 }

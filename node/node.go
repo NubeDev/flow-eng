@@ -7,6 +7,7 @@ type Node interface {
 	GetID() string       // node_abc123
 	GetName() string     // AND, OR
 	GetNodeName() string // my-node
+	GetNodeValues() []*PortValues
 	GetInputs() []*Input
 	GetInput(name InputName) *Input
 	GetOutputs() []*Output
@@ -74,6 +75,23 @@ func (n *Spec) GetNodeName() string {
 
 func (n *Spec) GetInputs() []*Input {
 	return n.Inputs
+}
+
+type PortValues struct {
+	Type  DataTypes   `json:"type"`
+	Value interface{} `json:"value"`
+}
+
+func (n *Spec) GetNodeValues() []*PortValues {
+	var out []*PortValues
+	for _, input := range n.Inputs {
+		input.GetValue()
+		out = append(out, &PortValues{
+			Type:  input.DataType,
+			Value: input.GetValue(),
+		})
+	}
+	return out
 }
 
 func (n *Spec) GetInput(name InputName) *Input {

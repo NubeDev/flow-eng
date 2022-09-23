@@ -28,7 +28,7 @@ func (inst *Server) protocolRunner() {
 	}
 	if !rubixIOLoop {
 		if gt == applications.RubixIO || gt == applications.RubixIOAndModbus {
-			go inst.rubixDispatch()
+			go inst.rubixOutputsDispatch()
 			rubixIOLoop = true
 		}
 	}

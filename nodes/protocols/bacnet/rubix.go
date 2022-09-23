@@ -33,7 +33,7 @@ func (inst *Server) rubixIOBus() {
 
 func (inst *Server) rubixInputsRunner(msg *eventbus.Message) {
 	rubix := &rubixIO.RubixIO{}
-	inputs, err := rubix.DecodeInputs(msg.Msg.Payload())
+	inputsPayload, err := rubix.DecodeInputs(msg.Msg.Payload()) // data comes from mqtt
 	if err != nil {
 		log.Error(err)
 		//return
@@ -41,7 +41,7 @@ func (inst *Server) rubixInputsRunner(msg *eventbus.Message) {
 
 	for _, point := range getStore().GetPointsByApplication(applications.RubixIO) {
 		if point.ObjectType == points.AnalogInput {
-			value, err := rubix.GetInputValue(point, inputs)
+			value, err := rubix.DecodeInputValue(point, inputsPayload)
 			if err != nil {
 				return
 			}

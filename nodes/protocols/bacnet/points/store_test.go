@@ -7,8 +7,13 @@ import (
 	"testing"
 )
 
+func Test_calcModbusRubix(t *testing.T) {
+	uiStart, uoStart := calcModbusRubix(2, true, true, false)
+	fmt.Println(uiStart, uoStart)
+}
+
 func TestNewStore(t *testing.T) {
-	bs := New(applications.Edge, nil)
+	bs := New(applications.Edge, nil, 1, 1, 1)
 
 	var st []*Point
 	pprint.PrintJOSN(bs)
@@ -35,5 +40,4 @@ func TestNewStore(t *testing.T) {
 	}
 
 	pprint.PrintJOSN(st)
-
 }

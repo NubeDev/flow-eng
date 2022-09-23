@@ -6,6 +6,7 @@ import (
 	"github.com/NubeDev/flow-eng/helpers"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
+	log "github.com/sirupsen/logrus"
 )
 
 type Store struct {
@@ -63,25 +64,93 @@ var (
 	edgeUICount = 8
 	edgeUOCount = 8
 	edgeDICount = 8
-	edgeDOCount = 8
+	edgeDOCount = 8 // 6DOs and r1, r2
 )
 
 // if modbus and rubix-io modbus will still start and 1 and then the last modbus addr,
 // is where the rubix addr will start (but if the user add a new modbus device the rubix-io address's will be push back)
 var (
 	rubixUICount = 8
-	rubixUOCount = 6
-	rubixDICount = 0
-	rubixDOCount = 2 // 6DOs and r1, r2
+	rubixUOCount = 6 // 6UOs and DO1, DO2
+	rubixDOCount = 2
 )
 
-func New(app node.ApplicationName, pStore *ObjectStore) *Store {
+var (
+	io16UICount = 8
+	io16UOCount = 8
+)
+
+var (
+	calculatedUICount = 0
+	calculatedUOCount = 0
+	calculatedDICount = 0
+	calculatedDOCount = 0
+)
+
+func CalcPointCount(deviceCount int, app node.ApplicationName) (rubixUIStart, rubixUOStart ObjectID) {
+	if deviceCount == 0 {
+		deviceCount = 1
+	}
+	if app == applications.Edge {
+		return calcModbusRubix(deviceCount, false, false, true)
+	}
+	if app == applications.Modbus {
+		return calcModbusRubix(deviceCount, true, false, false)
+	}
+	if app == applications.RubixIOAndModbus {
+		return calcModbusRubix(deviceCount, true, true, false)
+	}
+	if app == applications.RubixIO {
+		return calcModbusRubix(deviceCount, false, true, false)
+	}
+	return 0, 0
+
+}
+
+func calcModbusRubix(deviceCount int, isModbus, isRubix, isEdge bool) (rubixUIStart, rubixUOStart ObjectID) {
+	if isEdge { // edge
+		calculatedUICount = edgeUICount
+		calculatedUOCount = edgeUOCount
+		calculatedDICount = edgeDICount
+		calculatedDOCount = edgeDOCount
+		log.Infof(" calculated bacnet point EDGE-28 -> calculatedUICount:%d, calculatedUOCount:%d, calculatedDICount:%d, calculatedDOCount:%d,", calculatedUICount, calculatedUOCount, calculatedDICount, calculatedDOCount)
+		return 0, 0
+	}
+	if isRubix && !isModbus { // just rubix
+		calculatedUICount = rubixUICount
+		calculatedUOCount = rubixUOCount
+		calculatedDOCount = rubixDOCount
+		log.Infof(" calculated bacnet point RUBIX-IO -> calculatedUICount:%d, calculatedUOCount:%d, calculatedDICount:%d, calculatedDOCount:%d,", calculatedUICount, calculatedUOCount, calculatedDICount, calculatedDOCount)
+		return 1, 1
+	}
+
+	if !isRubix && isModbus { // just modbus
+		calculatedUICount = io16UICount * deviceCount
+		calculatedUOCount = io16UOCount * deviceCount
+		log.Infof(" calculated bacnet point MODBUS -> calculatedUICount:%d, calculatedUOCount:%d, calculatedDICount:%d, calculatedDOCount:%d,", calculatedUICount, calculatedUOCount, calculatedDICount, calculatedDOCount)
+		return 0, 0
+	}
+
+	if isRubix && isModbus { // rubix & modbus
+		calculatedUICount = io16UICount*deviceCount + rubixUICount
+		calculatedUOCount = io16UOCount*deviceCount + rubixUOCount
+		calculatedDOCount = rubixDOCount
+		log.Infof(" calculated bacnet point MODBUS & RUBIX-IO -> calculatedUICount:%d, calculatedUOCount:%d, calculatedDICount:%d, calculatedDOCount:%d,", calculatedUICount, calculatedUOCount, calculatedDICount, calculatedDOCount)
+		return ObjectID(calculatedUICount - 7), ObjectID(calculatedUOCount - 7)
+	}
+
+	return 0, 0
+}
+
+func New(app node.ApplicationName, pStore *ObjectStore, deviceCount, avAllowance, bvAllowance int) *Store {
 	bacnetStore := &Store{
 		Application: app,
 	}
 	if pStore == nil {
 		pStore = &ObjectStore{}
 	}
+
+	CalcPointCount(deviceCount, app)
 
 	ai := pStore.AI
 	ao := pStore.AO
@@ -95,7 +164,7 @@ func New(app node.ApplicationName, pStore *ObjectStore) *Store {
 			pointAllowance: pointAllowance{
 				Object: AnalogVariable,
 				From:   1,
-				Count:  200,
+				Count:  avAllowance,
 			},
 		}
 	}
@@ -104,48 +173,43 @@ func New(app node.ApplicationName, pStore *ObjectStore) *Store {
 			pointAllowance: pointAllowance{
 				Object: BinaryVariable,
 				From:   1,
-				Count:  200,
+				Count:  bvAllowance,
 			},
 		}
 	}
-
-	if app == applications.Edge || app == applications.RubixIO || app == applications.Modbus || app == applications.RubixIOAndModbus {
-		if ai == nil {
-			ai = &AIStore{
-				pointAllowance: pointAllowance{
-					Object: AnalogInput,
-					From:   1,
-					Count:  edgeUICount,
-				},
-			}
+	if ai == nil {
+		ai = &AIStore{
+			pointAllowance: pointAllowance{
+				Object: AnalogInput,
+				From:   1,
+				Count:  calculatedUICount,
+			},
 		}
 		if ao == nil {
 			ao = &AOStore{
 				pointAllowance: pointAllowance{
 					Object: AnalogOutput,
 					From:   1,
-					Count:  edgeUOCount,
+					Count:  calculatedUOCount,
 				},
 			}
 		}
-		if app == applications.Edge || app == applications.Modbus {
-			if bo == nil {
-				bo = &BOStore{
-					pointAllowance: pointAllowance{
-						Object: BinaryOutput,
-						From:   1,
-						Count:  edgeDOCount,
-					},
-				}
+		if bo == nil {
+			bo = &BOStore{
+				pointAllowance: pointAllowance{
+					Object: BinaryOutput,
+					From:   1,
+					Count:  calculatedDOCount,
+				},
 			}
-			if bi == nil {
-				bi = &BIStore{
-					pointAllowance: pointAllowance{
-						Object: BinaryInput,
-						From:   1,
-						Count:  edgeDICount,
-					},
-				}
+		}
+		if bi == nil {
+			bi = &BIStore{
+				pointAllowance: pointAllowance{
+					Object: BinaryInput,
+					From:   1,
+					Count:  calculatedDICount,
+				},
 			}
 		}
 	}
@@ -162,10 +226,6 @@ func New(app node.ApplicationName, pStore *ObjectStore) *Store {
 }
 
 func (inst *Store) GetStore() *ObjectStore {
-	return inst.Store
-}
-
-func (inst *Store) GetStoreByType(objectType ObjectType) *ObjectStore {
 	return inst.Store
 }
 
@@ -261,7 +321,7 @@ func (inst *Store) AddPoint(point *Point) (*Point, error) {
 	}
 
 	if !checked {
-		return nil, errors.New(fmt.Sprintf("store-add-point: not type found for object type:%s", objectType))
+		return nil, errors.New(fmt.Sprintf("store-add-point: not type found for object type: %s", objectType))
 	}
 	inst.Points = append(inst.Points, point)
 	return point, nil
@@ -269,7 +329,7 @@ func (inst *Store) AddPoint(point *Point) (*Point, error) {
 
 func errNoObj(pnt interface{}, objectType ObjectType) error {
 	if pnt == nil {
-		return errors.New(fmt.Sprintf("store-add-point: the server does not support object type:%s", objectType))
+		return errors.New(fmt.Sprintf("store-add-point: the server does not support object type: %s", objectType))
 	}
 	return nil
 }
@@ -290,7 +350,7 @@ func (inst *Store) checkExisting(point *Point, from, to int) error {
 func (inst *Store) allowableCount(objectID, from, count int) error {
 	to := from + count - 1
 	if objectID > to { // is above what is allowed
-		return errors.New(fmt.Sprintf("store-add-point: the allwoable max object-id is:%d and the current is:%d", to, objectID))
+		return errors.New(fmt.Sprintf("store-add-point: the allowable max object-id is: %d and the current is: %d", to, objectID))
 	}
 	return nil
 }

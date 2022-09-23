@@ -1,6 +1,9 @@
 package bacnet
 
 import (
+	"fmt"
+	pprint "github.com/NubeDev/flow-eng/helpers/print"
+	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	log "github.com/sirupsen/logrus"
 	"time"
@@ -9,18 +12,23 @@ import (
 /*
 DISPATCH
 Is where we loop through the store and get the latest write value and then try and write,
-the values to protocols like rubix-io and modbus
+the values to protocols like rubix-io, edge28 and modbus
 
 if fail we keep trying but if a new value arrives to the store we will take the latest value,
 and disregard the existing
 */
 
-func (inst *Server) bacnetDispatch(object points.ObjectType, id points.ObjectID) {
-	point := getStore().GetPointByObject(object, id)
-	inst.mqttPublish(point)
+func toFlow(body node.Node, id points.ObjectID) {
+	objectType, _, _, err := getBacnetType(body.GetName())
+	if err != nil {
+		return
+	}
+	p, v, _ := getStore().GetValueFromReadByObject(objectType, id) // get the latest value from the point store
+	body.WritePin(node.Out, v)
+	getServer().mqttPublish(p)
 }
 
-func (inst *Server) rubixDispatch() {
+func (inst *Server) rubixOutputsDispatch() {
 	log.Info("start rubix-io-outputs-dispatch")
 	for {
 		var pointsToWrite []*points.Point
@@ -28,11 +36,13 @@ func (inst *Server) rubixDispatch() {
 		for _, point := range getPoints { //get the list of the points to update
 			sync := getStore().GetLatestSyncValue(point.UUID, points.ToRubixIO)
 			if sync != nil {
+				pprint.PrintJOSN(sync)
 				point.CurrentSyncUUID = sync.UUID
 				pointsToWrite = append(pointsToWrite, point)
 			}
 		}
 		if len(pointsToWrite) > 0 {
+			fmt.Println("BULK WIRTE")
 			bulkPoints, err := inst.rio.BulkWrite(pointsToWrite)
 			if err != nil {
 				log.Error(err)

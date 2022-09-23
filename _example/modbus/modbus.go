@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	flowctrl "github.com/NubeDev/flow-eng"
+	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/math"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet"
@@ -24,29 +25,33 @@ func main() {
 		return
 	}
 
-	p, err := bacnet.NewAI(nil)
+	ai1, err := bacnet.NewAI(nil)
 	if err != nil {
 		log.Errorln(err)
 		return
 	}
 
-	b, err := bacnet.NewAO(nil)
+	ao1, err := bacnet.NewAO(nil)
 	if err != nil {
 		log.Errorln(err)
 		return
 	}
-	err = b.OverrideInputValue(node.In15, 11)
+	err = ao1.OverrideInputValue(node.In14, 1)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-
+	err = ao1.OverrideInputValue(node.In15, 0)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	graph := flowctrl.New()
 
 	graph.AddNode(bac)
-	graph.AddNodes(p, b, cont)
+	graph.AddNodes(ai1, ao1, cont)
 	runner := flowctrl.NewSerialRunner(graph)
-	// pprint.PrintJOSN(graph.GetNodes())
+	pprint.PrintJOSN(graph.GetNodes())
 
 	log.Println("Flow started")
 	for {

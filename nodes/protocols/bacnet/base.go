@@ -3,6 +3,7 @@ package bacnet
 import (
 	"errors"
 	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
 	points "github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
@@ -80,7 +81,7 @@ func nodeDefault(body *node.Spec, nodeName, category string, application node.Ap
 	body.Parameters = node.BuildParameters(parameters)
 	body = node.BuildNode(body, inputs, outputs, nil)
 
-	objectID, _ := objectIDInput.GetValue().(float64)
+	objectID, _ := conversions.GetInt(objectIDInput.GetValue())
 	if objectID == 0 {
 		log.Errorf("bacnet-server object-id must be grater then 0 object-type:%s", objectType)
 		objectID = 1
@@ -88,7 +89,9 @@ func nodeDefault(body *node.Spec, nodeName, category string, application node.Ap
 	point := addPoint(application, ioType, objectType, points.ObjectID(objectID), isWriteable, isIO, enable)
 	store := getStore()
 	point, err = store.AddPoint(point)
-	log.Infof("bacnet-server add new point type:%s-%d", point.ObjectType, point.ObjectID)
+	if err != nil && point != nil {
+		log.Infof("bacnet-server add new point type:%s-%d", point.ObjectType, point.ObjectID)
+	}
 	return body, err, point
 }
 
