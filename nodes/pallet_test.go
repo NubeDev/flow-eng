@@ -6,7 +6,18 @@ import (
 )
 
 func TestEncodePallet(t *testing.T) {
-	p, _ := EncodePallet()
+	p := All()
+	name := "add"
+	for _, spec := range p {
+		if spec.Info.Name == name {
+			pprint.Print(spec)
+		}
+	}
 
-	pprint.PrintJOSN(p)
+	palle2t, err := EncodePalle2t()
+	if err != nil {
+		return
+	}
+
+	pprint.PrintJOSN(palle2t)
 }

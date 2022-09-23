@@ -1,8 +1,6 @@
 package nodes
 
 import (
-	"fmt"
-	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 )
 
@@ -45,14 +43,26 @@ func convertInputs(node *node.Spec) []*PalletInputs {
 	return all
 }
 
+func EncodePalle2t() ([]*node.Spec, error) {
+	var all []*node.Spec
+	for _, spec := range All() {
+		nodeType, err := setType(spec)
+		if err != nil {
+			return nil, err
+		}
+		spec.Info.Type = nodeType
+		all = append(all, spec)
+
+	}
+	return all, nil
+}
+
 func EncodePallet() ([]*PalletNode, error) {
 	var all []*PalletNode
 	for _, spec := range All() {
 		one := &PalletNode{}
-		pprint.Print(spec)
 		nodeType, err := setType(spec)
 		if err != nil {
-			fmt.Println(err)
 			return nil, err
 		}
 		one.Type = nodeType

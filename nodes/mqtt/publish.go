@@ -3,13 +3,13 @@ package broker
 import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/node"
-	mqttclient2 "github.com/NubeDev/flow-eng/services/mqttclient"
+	"github.com/NubeDev/flow-eng/services/mqttclient"
 	log "github.com/sirupsen/logrus"
 )
 
 type MqttPub struct {
 	*node.Spec
-	client     *mqttclient2.Client
+	client     *mqttclient.Client
 	connected  bool
 	subscribed bool
 	newMessage string
@@ -46,10 +46,10 @@ func (inst *MqttPub) getTopic() string {
 }
 
 func (inst *MqttPub) publish(value interface{}) {
-	c, _ := mqttclient2.GetMQTT()
+	c, _ := mqttclient.GetMQTT()
 	if inst.getTopic() != "" {
 		v := fmt.Sprintf("%v", value)
-		err := c.Publish(inst.getTopic(), mqttclient2.AtMostOnce, true, v)
+		err := c.Publish(inst.getTopic(), mqttclient.AtMostOnce, true, v)
 		if err != nil {
 			log.Errorf(fmt.Sprintf("pointbus-publish topic:%s err:%s", inst.getTopic(), err.Error()))
 		}
@@ -60,11 +60,11 @@ func (inst *MqttPub) publish(value interface{}) {
 
 func (inst *MqttPub) connect() {
 	mqttBroker := "tcp://0.0.0.0:1883"
-	_, err := mqttclient2.InternalMQTT(mqttBroker)
+	_, err := mqttclient.InternalMQTT(mqttBroker)
 	if err != nil {
 		log.Errorf(fmt.Sprintf("pointbus-publish-connect err:%s", err.Error()))
 	}
-	client, connected := mqttclient2.GetMQTT()
+	client, connected := mqttclient.GetMQTT()
 	inst.connected = connected
 	inst.client = client
 }

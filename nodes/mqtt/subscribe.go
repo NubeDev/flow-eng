@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/node"
-	mqttclient2 "github.com/NubeDev/flow-eng/services/mqttclient"
+	"github.com/NubeDev/flow-eng/services/mqttclient"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	log "github.com/sirupsen/logrus"
 )
 
 type MqttSub struct {
 	*node.Spec
-	client     *mqttclient2.Client
+	client     *mqttclient.Client
 	connected  bool
 	subscribed bool
 	newMessage string
@@ -21,8 +21,6 @@ type MqttSub struct {
 const (
 	topic = "topic"
 )
-
-//var bus cbus.Bus
 
 func NewMqttSub(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, mqttSub, category)
@@ -41,7 +39,16 @@ func NewMqttSub(body *node.Spec) (node.Node, error) {
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeString, nil, body.Inputs))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, settings)
-	//bus = cbus.New(1)
+
+	//client, err = mqttclient.NewClient(mqttclient.ClientOptions{
+	//	Servers: []string{"tcp://0.0.0.0:1883"},
+	//})
+	//err = client.Connect()
+	//if err != nil {
+	//	log.Error(err)
+	//	//return nil, err
+	//}
+
 	return &MqttSub{body, nil, false, false, "", mqttTopic}, nil
 }
 
@@ -55,9 +62,9 @@ func (inst *MqttSub) getTopic() string {
 }
 
 func (inst *MqttSub) subscribe() {
-	c, _ := mqttclient2.GetMQTT()
+	c, _ := mqttclient.GetMQTT()
 	if inst.getTopic() != "" {
-		err := c.Subscribe(inst.getTopic(), mqttclient2.AtMostOnce, handle)
+		err := c.Subscribe(inst.getTopic(), mqttclient.AtMostOnce, handle)
 		if err != nil {
 			log.Errorf(fmt.Sprintf("pointbus-subscribe topic:%s err:%s", inst.getTopic(), err.Error()))
 		}
@@ -69,11 +76,11 @@ func (inst *MqttSub) subscribe() {
 
 func (inst *MqttSub) connect() {
 	mqttBroker := "tcp://0.0.0.0:1883"
-	_, err := mqttclient2.InternalMQTT(mqttBroker)
+	_, err := mqttclient.InternalMQTT(mqttBroker)
 	if err != nil {
 		log.Errorf(fmt.Sprintf("pointbus-subscribe-connect err:%s", err.Error()))
 	}
-	client, connected := mqttclient2.GetMQTT()
+	client, connected := mqttclient.GetMQTT()
 	inst.connected = connected
 	inst.client = client
 }

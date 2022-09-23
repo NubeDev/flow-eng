@@ -2,7 +2,6 @@ package bacnet
 
 import (
 	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
-	log "github.com/sirupsen/logrus"
 	"time"
 )
 
@@ -23,15 +22,10 @@ func (inst *Server) protocolRunner() {
 	}
 	if !modbusLoop {
 		if gt == applications.Modbus {
-			//go inst.modbusRunner()
+			go inst.modbusRunner()
 			modbusLoop = true
 		}
-	} else {
-		if gt == applications.Modbus {
-			log.Infof("SKIP Modbus as the current poll is not finished")
-		}
 	}
-
 	if !rubixIOLoop {
 		if gt == applications.RubixIO || gt == applications.RubixIOAndModbus {
 			go inst.rubixDispatch()

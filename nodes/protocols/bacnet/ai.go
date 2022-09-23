@@ -1,6 +1,7 @@
 package bacnet
 
 import (
+	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 )
@@ -36,14 +37,14 @@ func (inst *AI) subscribePresentValue() {
 }
 
 func (inst *AI) setObjectId() {
-	id, ok := getInt(inst.ReadPin(node.ObjectId))
+	id, ok := conversions.GetInt(inst.ReadPin(node.ObjectId))
 	if ok {
 		inst.objectID = points.ObjectID(id)
 	}
 }
 
 func (inst *AI) getObjectId() (int, bool) {
-	return getInt(inst.ReadPin(node.ObjectId))
+	return conversions.GetInt(inst.ReadPin(node.ObjectId))
 }
 
 func (inst *AI) Process() {

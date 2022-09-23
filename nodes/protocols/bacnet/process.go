@@ -2,6 +2,7 @@ package bacnet
 
 import (
 	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/helpers/topics"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
@@ -27,17 +28,17 @@ func fromFlow(body node.Node) {
 	var in14 *float64
 	var in15 *float64
 	if isWriteable {
-		in14, ok = getFloatPointer(body.ReadPin(node.In14))
+		in14, ok = conversions.GetFloatPointer(body.ReadPin(node.In14))
 		if !ok {
 			log.Errorf("bacnet-server: failed to get node write value from node process")
 		}
-		in15, ok = getFloatPointer(body.ReadPin(node.In15))
+		in15, ok = conversions.GetFloatPointer(body.ReadPin(node.In15))
 		if !ok {
 			log.Errorf("bacnet-server: failed to get node write value from node process")
 		}
 		fmt.Println(in14, in15)
 	}
-	objectId, ok := getInt(body.ReadPin(node.ObjectId))
+	objectId, ok := conversions.GetInt(body.ReadPin(node.ObjectId))
 	if !ok {
 		log.Errorf("bacnet-server: failed to get node write value from node process")
 	}

@@ -16,6 +16,8 @@ const (
 	logicCompare = "compare"
 	between      = "between"
 
+	funcNode = "func"
+
 	max = "min"
 	min = "max"
 	avg = "avg"
@@ -24,13 +26,12 @@ const (
 	inject = "inject"
 
 	bacnetServer = "server"
-
-	bacnetAI = "analog-input"
-	bacnetAO = "analog-output"
-	bacnetAV = "analog-variable"
-	bacnetBI = "binary-input"
-	bacnetBO = "binary-output"
-	bacnetBV = "binary-variable"
+	bacnetAI     = "analog-input"
+	bacnetAO     = "analog-output"
+	bacnetAV     = "analog-variable"
+	bacnetBI     = "binary-input"
+	bacnetBO     = "binary-output"
+	bacnetBV     = "binary-variable"
 
 	mqttSub = "pointbus-subscribe"
 	mqttPub = "pointbus-publish"

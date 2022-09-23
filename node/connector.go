@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	ErrNoInputData = errors.New("no input data was received")
+	ErrNoInputData = errors.New("no input conversions was received")
 )
 
 type Connector struct {
@@ -32,12 +32,12 @@ func (connector *Connector) ToUUID() uuid.Value {
 }
 
 func (connector *Connector) Trigger() error {
-	// exit if no new data was received
+	// exit if no new conversions was received
 	if !connector.written {
 		return ErrNoInputData
 	}
 
-	// move data to destination port
+	// move conversions to destination port
 	err := connector.from.Copy(connector.to)
 	return err
 }

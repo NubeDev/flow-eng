@@ -141,7 +141,7 @@ func (inst *RubixIO) getInputValue(ioNum string, ioType points.IoType, inputs *r
 
 }
 
-// DecodeInputs decode the mqtt data
+// DecodeInputs decode the mqtt conversions
 func (inst *RubixIO) DecodeInputs(body []byte) (*rubixio.Inputs, error) {
 	data := &rubixio.Inputs{}
 	err := json.Unmarshal(body, &data)

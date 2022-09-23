@@ -7,6 +7,7 @@ import (
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/compare"
 	debugging "github.com/NubeDev/flow-eng/nodes/debug"
+	"github.com/NubeDev/flow-eng/nodes/functions"
 	"github.com/NubeDev/flow-eng/nodes/logic"
 	"github.com/NubeDev/flow-eng/nodes/math"
 	broker "github.com/NubeDev/flow-eng/nodes/mqtt"
@@ -43,6 +44,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	delay, _ := timing.NewDelay(nil, nil)
 	inject, _ := timing.NewInject(nil)
 
+	funcNode, _ := functions.NewFunc(nil)
+
 	// bacnet
 	bacServer, _ := bacnet.NewServer(nil)
 	bacPointAI, _ := bacnet.NewAI(nil)
@@ -78,6 +81,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(delay),
 		node.ConvertToSpec(inject),
+
+		node.ConvertToSpec(funcNode),
 
 		node.ConvertToSpec(bacServer),
 		node.ConvertToSpec(bacPointAI),
@@ -131,6 +136,8 @@ func builderMisc(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case logNode:
 		return debugging.NewLog(body)
+	case funcNode:
+		return functions.NewFunc(body)
 	}
 	return nil, nil
 }

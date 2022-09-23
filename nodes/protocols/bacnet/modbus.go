@@ -28,13 +28,12 @@ func (inst *Server) modbusRunner() {
 	inst.modbusInputsRunner(init, pointsList) // process the inputs
 	time.Sleep(4 * time.Second)
 	modbusLoop = false
-
 }
 
 func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*points.Point) {
 	var err error
-	var tempList []float64
-	var voltList []float64
+	var tempList [8]float64
+	var voltList [8]float64
 	var completedTemp bool
 	var completedVolt bool
 	store := getStore()
@@ -42,7 +41,7 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 		if !point.IsWriteable {
 			addr, _ := cli.BuildInput(point.IoType, point.ObjectID)
 			slaveId := addr.DeviceAddr
-			if !completedTemp && point.IoType == points.IoTypeTemp {
+			if !completedTemp && (point.IoType == points.IoTypeTemp || point.IoType == points.IoTypeDigital) {
 				tempList, err = cli.ReadTemps(slaveId) // DO MODBUS READ FOR TEMPS
 				if err != nil {
 					//return
@@ -50,7 +49,7 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 				completedTemp = true
 			}
 			if !completedVolt && point.IoType == points.IoTypeVolts {
-				tempList, err = cli.ReadVolts(slaveId) // DO MODBUS READ FOR VOLTS
+				voltList, err = cli.ReadVolts(slaveId) // DO MODBUS READ FOR VOLTS
 				if err != nil {
 					//return
 				}

@@ -1,8 +1,8 @@
-package bacnet
+package conversions
 
 import "github.com/NubeDev/flow-eng/helpers/float"
 
-func getFloatPointer(in interface{}) (val *float64, ok bool) {
+func GetFloatPointer(in interface{}) (val *float64, ok bool) {
 	switch i := in.(type) {
 	case int:
 		val = float.New(float64(i))
@@ -18,7 +18,7 @@ func getFloatPointer(in interface{}) (val *float64, ok bool) {
 	return val, true
 }
 
-func getFloat(in interface{}) (val float64, ok bool) {
+func GetFloat(in interface{}) (val float64, ok bool) {
 	switch i := in.(type) {
 	case int:
 		val = float64(i)
@@ -34,7 +34,7 @@ func getFloat(in interface{}) (val float64, ok bool) {
 	return val, true
 }
 
-func getInt(in interface{}) (val int, ok bool) {
+func GetInt(in interface{}) (val int, ok bool) {
 	switch i := in.(type) {
 	case int:
 		val = i

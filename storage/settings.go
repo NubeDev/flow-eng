@@ -120,7 +120,7 @@ func (inst *db) GetGitToken(uuid string, previewToken bool) (string, error) {
 		return "", err
 	}
 	if data.GitToken != "" {
-		// data.GitToken = data.GitToken
+		// conversions.GitToken = conversions.GitToken
 		data.GitToken = decodeToken(data.GitToken)
 	}
 	if previewToken {

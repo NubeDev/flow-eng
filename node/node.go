@@ -135,6 +135,7 @@ type Info struct {
 	Name        string `json:"name"`               // add, or
 	NodeName    string `json:"nodeName,omitempty"` // my-node-abc
 	Category    string `json:"category,omitempty"`
+	Type        string `json:"type"`
 	Description string `json:"description,omitempty"`
 	Version     string `json:"version,omitempty"`
 }
