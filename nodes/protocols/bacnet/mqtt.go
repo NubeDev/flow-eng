@@ -2,8 +2,8 @@ package bacnet
 
 import (
 	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/topics"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
-	"github.com/NubeDev/flow-eng/services/eventbus"
 	"github.com/NubeDev/flow-eng/services/mqttclient"
 	log "github.com/sirupsen/logrus"
 	"time"
@@ -54,8 +54,8 @@ func getTopic(msg interface{}) string {
 	return ""
 }
 
-func decode(msg interface{}) *eventbus.Message {
-	m, ok := msg.(*eventbus.Message)
+func decode(msg interface{}) *topics.Message {
+	m, ok := msg.(*topics.Message)
 	if ok {
 		return m
 	}

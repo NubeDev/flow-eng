@@ -6,7 +6,9 @@ import (
 	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/math"
+	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet"
+	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	log "github.com/sirupsen/logrus"
 	"time"
 )
@@ -18,20 +20,20 @@ func main() {
 		log.Errorln(err)
 		return
 	}
-
-	bac, err := bacnet.NewServer(nil)
+	store := points.New(applications.RubixIO, nil, 1, 200, 200)
+	bac, err := bacnet.NewServer(nil, store)
 	if err != nil {
 		log.Errorln(err)
 		return
 	}
 
-	ai1, err := bacnet.NewAI(nil)
+	ai1, err := bacnet.NewAI(nil, store)
 	if err != nil {
 		log.Errorln(err)
 		return
 	}
 
-	ao1, err := bacnet.NewAO(nil)
+	ao1, err := bacnet.NewAO(nil, store)
 	if err != nil {
 		log.Errorln(err)
 		return

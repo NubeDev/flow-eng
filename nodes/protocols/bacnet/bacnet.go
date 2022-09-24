@@ -1,30 +1,15 @@
 package bacnet
 
 import (
-	"context"
-	"fmt"
 	"github.com/NubeDev/flow-eng/helpers"
-	"github.com/NubeDev/flow-eng/services/eventbus"
-	"github.com/mustafaturan/bus/v3"
+	"github.com/NubeDev/flow-eng/helpers/topics"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
-var priorityBus runnerStatus
-
-func (inst *Server) priorityBus() {
-	if !priorityBus {
-		handlerMQTT := bus.Handler{
-			Handle: func(ctx context.Context, e bus.Event) {
-				go func() {
-					decoded := decode(e.Data)
-					if decoded != nil {
-						inst.fromBacnet(decoded) // this messages will come from 3rd party bacnet devices
-					}
-				}()
-			},
-			Matcher: eventbus.BacnetPri,
-		}
-		key := fmt.Sprintf("key_%s", helpers.UUID())
-		eventbus.GetBus().RegisterHandler(key, handlerMQTT)
+var bacnetBus mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
+	mes := &topics.Message{UUID: helpers.ShortUUID("bus"), Msg: msg}
+	if topics.IsPri(msg.Topic()) {
+		inst.fromBacnet(mes)
 	}
-	priorityBus = true
+
 }

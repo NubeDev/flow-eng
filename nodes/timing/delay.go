@@ -21,12 +21,18 @@ func NewDelay(body *node.Spec, timer flowctrl.TimedDelay) (node.Node, error) {
 
 func (inst *Delay) Process() {
 	log.Println("Delayed START")
-	if !inst.timer.WaitFor(5 * time.Second) {
-		return
+	in1 := inst.ReadPinAsFloat(node.In)
+	if in1 > 0 {
+		if !inst.timer.WaitFor(5 * time.Second) {
+			return
+		}
+		inst.WritePin(node.Out, 1)
+	} else {
+		inst.WritePin(node.Out, 0)
 	}
+
 	log.Println("Delayed triggered")
-	in1 := inst.ReadPin(node.In)
-	inst.WritePin(node.Out, in1)
+
 }
 
 func (inst *Delay) Cleanup() {}

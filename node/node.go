@@ -12,6 +12,7 @@ type Node interface {
 	GetInput(name InputName) *Input
 	GetOutputs() []*Output
 	GetOutput(name OutputName) *Output
+	InputUpdated(name InputName) bool
 	InputsLen() int
 	OutputsLen() int
 	ReadPin(InputName) interface{}

@@ -1,6 +1,14 @@
 package topics
 
-import "strings"
+import (
+	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"strings"
+)
+
+type Message struct {
+	UUID string
+	Msg  mqtt.Message
+}
 
 func IsPV(topic string) (isBacnet bool) {
 	parts := strings.Split(topic, "/")

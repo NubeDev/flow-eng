@@ -4,6 +4,7 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
+	log "github.com/sirupsen/logrus"
 )
 
 type AI struct {
@@ -14,26 +15,20 @@ type AI struct {
 	pointUUID  string
 }
 
-func NewAI(body *node.Spec) (node.Node, error) {
+func NewAI(body *node.Spec, store *points.Store) (node.Node, error) {
 	var err error
-	store := getStore()
-	body, err, point := nodeDefault(body, bacnetAI, category, store.GetApplication())
-	var pointUUID string
-	if point != nil {
-		pointUUID = point.UUID
+	if store == nil {
+		store = getStore()
 	}
+	body, err = nodeDefault(body, bacnetAI, category, store.GetApplication())
+
 	return &AI{
 		body,
 		false,
 		0,
 		points.AnalogInput,
-		pointUUID,
+		"",
 	}, err
-}
-
-func (inst *AI) subscribePresentValue() {
-	//topicPv := TopicPresentValue(typeAI, inst.objectID)
-	//getMqtt().Subscribe(topicPv)
 }
 
 func (inst *AI) setObjectId() {
@@ -46,6 +41,14 @@ func (inst *AI) setObjectId() {
 func (inst *AI) Process() {
 	if !inst.onStart {
 		inst.setObjectId()
+		store := getStore()
+		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
+		ioType := points.IoTypeDigital // TODO make a setting
+		point := addPoint(getApplication(), ioType, objectType, inst.objectID, isWriteable, isIO, true)
+		point, err = store.AddPoint(point, true)
+		if err != nil {
+			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
+		}
 	}
 	toFlow(inst, inst.objectID)
 	inst.onStart = true
