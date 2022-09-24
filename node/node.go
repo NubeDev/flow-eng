@@ -15,6 +15,8 @@ type Node interface {
 	InputUpdated(name InputName) bool
 	InputsLen() int
 	OutputsLen() int
+	ReadPinAsInt(name InputName) int
+	ReadPinAsFloat(name InputName) float64
 	ReadPin(InputName) interface{}
 	ReadMultiple(count int) []interface{}
 	WritePin(OutputName, interface{})
@@ -196,7 +198,10 @@ const (
 	InputC InputName = "c"
 	InputD InputName = "d"
 
+	Topic InputName = "topic"
+
 	DelaySeconds InputName = "delay (s)"
+	Selection    InputName = "select"
 
 	From InputName = "from"
 	To   InputName = "to"
@@ -205,6 +210,9 @@ const (
 	ObjectId      InputName = "object-id"
 	ObjectType    InputName = "object-type"
 	OverrideInput InputName = "override-value"
+
+	RisingEdge  InputName = "rising-edge"
+	FallingEdge InputName = "falling-edge"
 )
 
 const (

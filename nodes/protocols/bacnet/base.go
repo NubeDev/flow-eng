@@ -124,7 +124,7 @@ func nodeDefaultOld(body *node.Spec, nodeName, category string, application node
 	body.Parameters = node.BuildParameters(parameters)
 	body = node.BuildNode(body, inputs, outputs, nil)
 
-	objectID, _ := conversions.GetInt(objectIDInput.GetValue())
+	objectID := conversions.GetInt(objectIDInput.GetValue())
 	if objectID == 0 {
 		log.Errorf("bacnet-server object-id must be grater then 0 object-type:%s", objectType)
 		objectID = 1

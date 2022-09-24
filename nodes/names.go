@@ -15,8 +15,11 @@ const (
 
 	logicCompare = "compare"
 	between      = "between"
+	hysteresis   = "hysteresis"
+	funcNode     = "func"
 
-	funcNode = "func"
+	stringToNum = "string-to-number"
+	numToString = "number-to-string"
 
 	max = "min"
 	min = "max"
@@ -25,6 +28,10 @@ const (
 	delay   = "delay"
 	inject  = "inject"
 	delayOn = "delayOn"
+
+	selectNum        = "select-numeric"
+	connectionInput  = "input"
+	connectionOutput = "output"
 
 	bacnetServer = "server"
 	bacnetAI     = "analog-input"

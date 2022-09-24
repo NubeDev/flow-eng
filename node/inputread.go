@@ -30,13 +30,13 @@ func (n *Spec) ReadPin(name InputName) interface{} {
 
 func (n *Spec) ReadPinAsFloat(name InputName) float64 {
 	r := n.ReadPin(name)
-	out, _ := conversions.GetFloat(r)
+	out := conversions.GetFloat(r)
 	return out
 }
 
 func (n *Spec) ReadPinAsInt(name InputName) int {
 	r := n.ReadPin(name)
-	out, _ := conversions.GetInt(r)
+	out := conversions.GetInt(r)
 	return out
 }
 

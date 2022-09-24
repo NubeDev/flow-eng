@@ -13,6 +13,7 @@ const (
 const (
 	logicCompare = "compare"
 	between      = "between"
+	hysteresis   = "hysteresis"
 )
 
 func B2F(b bool) float64 {

@@ -25,11 +25,11 @@ func fromFlow(body node.Node, objectId points.ObjectID) {
 	var in14 *float64
 	var in15 *float64
 	if isWriteable {
-		in14, ok = conversions.GetFloatPointer(body.ReadPin(node.In14))
+		in14, ok = conversions.GetFloatPointerOk(body.ReadPin(node.In14))
 		if !ok {
 			log.Errorf("bacnet-server: @14 failed to get node write value from node process")
 		}
-		in15, ok = conversions.GetFloatPointer(body.ReadPin(node.In15))
+		in15, ok = conversions.GetFloatPointerOk(body.ReadPin(node.In15))
 		if !ok {
 			log.Errorf("bacnet-server:  @15 failed to get node write value from node process")
 		}

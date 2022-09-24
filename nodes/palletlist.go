@@ -6,6 +6,8 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/timer"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/compare"
+	"github.com/NubeDev/flow-eng/nodes/connection"
+	"github.com/NubeDev/flow-eng/nodes/conversion"
 	debugging "github.com/NubeDev/flow-eng/nodes/debug"
 	"github.com/NubeDev/flow-eng/nodes/functions"
 	"github.com/NubeDev/flow-eng/nodes/logic"
@@ -15,6 +17,7 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/nodes/statistics"
+	switches "github.com/NubeDev/flow-eng/nodes/switch"
 	"github.com/NubeDev/flow-eng/nodes/timing"
 )
 
@@ -37,10 +40,14 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	// compare
 	comp, _ := compare.NewCompare(nil)
 	between, _ := compare.NewBetween(nil)
+	hysteresis, _ := compare.NewHysteresis(nil)
 
 	// compare
 	min, _ := statistics.NewMin(nil)
 	max, _ := statistics.NewMax(nil)
+
+	stringToNum, _ := conversion.NewStringToNum(nil)
+	numToString, _ := conversion.NewNumToString(nil)
 
 	// time
 	delay, _ := timing.NewDelay(nil, nil)
@@ -48,6 +55,11 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	delayOn, _ := timing.NewDelayOn(nil, nil)
 
 	funcNode, _ := functions.NewFunc(nil)
+
+	selectNode, _ := switches.NewSelectNum(nil)
+
+	connectionInput, _ := connection.NewInput(nil, nil)
+	connectionOutput, _ := connection.NewOutput(nil, nil)
 
 	// bacnet
 	bacServer, _ := bacnet.NewServer(nil, nil)
@@ -79,6 +91,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(comp),
 		node.ConvertToSpec(between),
+		node.ConvertToSpec(hysteresis),
 
 		node.ConvertToSpec(min),
 		node.ConvertToSpec(max),
@@ -88,6 +101,14 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(delayOn),
 
 		node.ConvertToSpec(funcNode),
+
+		node.ConvertToSpec(selectNode),
+
+		node.ConvertToSpec(stringToNum),
+		node.ConvertToSpec(numToString),
+
+		node.ConvertToSpec(connectionInput),
+		node.ConvertToSpec(connectionOutput),
 
 		node.ConvertToSpec(bacServer),
 		node.ConvertToSpec(bacPointAI),
@@ -111,6 +132,10 @@ func Builder(body *node.Spec, opts ...interface{}) (node.Node, error) {
 	if n != nil || err != nil {
 		return n, err
 	}
+	n, err = builderConversion(body)
+	if n != nil || err != nil {
+		return n, err
+	}
 	n, err = builderCompare(body)
 	if n != nil || err != nil {
 		return n, err
@@ -127,6 +152,10 @@ func Builder(body *node.Spec, opts ...interface{}) (node.Node, error) {
 	if n != nil || err != nil {
 		return n, err
 	}
+	n, err = builderSwitch(body)
+	if n != nil || err != nil {
+		return n, err
+	}
 	n, err = builderProtocols(body)
 	if n != nil || err != nil {
 		return n, err
@@ -139,12 +168,18 @@ func Builder(body *node.Spec, opts ...interface{}) (node.Node, error) {
 }
 
 func builderMisc(body *node.Spec) (node.Node, error) {
+	con := &connection.Store{}
 	switch body.GetName() {
 	case logNode:
 		return debugging.NewLog(body)
 	case funcNode:
 		return functions.NewFunc(body)
+	case connectionInput:
+		return connection.NewInput(body, con)
+	case connectionOutput:
+		return connection.NewOutput(body, con)
 	}
+
 	return nil, nil
 }
 
@@ -160,6 +195,24 @@ func builderMath(body *node.Spec) (node.Node, error) {
 		return math.NewMultiply(body)
 	case divide:
 		return math.NewDivide(body)
+	}
+	return nil, nil
+}
+
+func builderConversion(body *node.Spec) (node.Node, error) {
+	switch body.GetName() {
+	case numToString:
+		return conversion.NewNumToString(body)
+	case stringToNum:
+		return conversion.NewStringToNum(body)
+	}
+	return nil, nil
+}
+
+func builderSwitch(body *node.Spec) (node.Node, error) {
+	switch body.GetName() {
+	case selectNum:
+		return switches.NewSelectNum(body)
 	}
 	return nil, nil
 }
@@ -180,6 +233,8 @@ func builderCompare(body *node.Spec) (node.Node, error) {
 		return compare.NewCompare(body)
 	case between:
 		return compare.NewBetween(body)
+	case hysteresis:
+		return compare.NewHysteresis(body)
 	}
 	return nil, nil
 }
