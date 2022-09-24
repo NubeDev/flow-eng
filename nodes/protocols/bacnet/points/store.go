@@ -229,7 +229,7 @@ func (inst *Store) GetStore() *ObjectStore {
 	return inst.Store
 }
 
-func (inst *Store) AddPoint(point *Point) (*Point, error) {
+func (inst *Store) AddPoint(point *Point, ignoreError bool) (*Point, error) {
 	var err error
 	if point == nil {
 		return nil, errors.New(fmt.Sprintf("store-add-point: point can not be empty"))
@@ -242,6 +242,7 @@ func (inst *Store) AddPoint(point *Point) (*Point, error) {
 		}
 	}
 	var checked bool
+	log.Infof("bacnet-add-point type-%s:%d", point.ObjectType, point.ObjectID)
 
 	if objectType == AnalogInput {
 		checked = true
@@ -252,7 +253,9 @@ func (inst *Store) AddPoint(point *Point) (*Point, error) {
 		}
 		err = inst.checkExisting(point, p.From, p.Count)
 		if err != nil {
-			return nil, err
+			if !ignoreError {
+				return nil, err
+			}
 		}
 	}
 	if objectType == AnalogOutput {
@@ -264,7 +267,9 @@ func (inst *Store) AddPoint(point *Point) (*Point, error) {
 		}
 		err = inst.checkExisting(point, p.From, p.Count)
 		if err != nil {
-			return nil, err
+			if !ignoreError {
+				return nil, err
+			}
 		}
 	}
 
@@ -277,7 +282,9 @@ func (inst *Store) AddPoint(point *Point) (*Point, error) {
 		}
 		err = inst.checkExisting(point, p.From, p.Count)
 		if err != nil {
-			return nil, err
+			if !ignoreError {
+				return nil, err
+			}
 		}
 	}
 
@@ -290,7 +297,9 @@ func (inst *Store) AddPoint(point *Point) (*Point, error) {
 		}
 		err = inst.checkExisting(point, p.From, p.Count)
 		if err != nil {
-			return nil, err
+			if !ignoreError {
+				return nil, err
+			}
 		}
 	}
 
@@ -303,7 +312,9 @@ func (inst *Store) AddPoint(point *Point) (*Point, error) {
 		}
 		err = inst.checkExisting(point, p.From, p.Count)
 		if err != nil {
-			return nil, err
+			if !ignoreError {
+				return nil, err
+			}
 		}
 	}
 
@@ -316,7 +327,9 @@ func (inst *Store) AddPoint(point *Point) (*Point, error) {
 		}
 		err = inst.checkExisting(point, p.From, p.Count)
 		if err != nil {
-			return nil, err
+			if !ignoreError {
+				return nil, err
+			}
 		}
 	}
 
@@ -335,6 +348,7 @@ func errNoObj(pnt interface{}, objectType ObjectType) error {
 }
 
 func (inst *Store) checkExisting(point *Point, from, to int) error {
+
 	err := inst.allowableCount(int(point.ObjectID), from, to)
 	if err != nil {
 		return err
@@ -348,9 +362,8 @@ func (inst *Store) checkExisting(point *Point, from, to int) error {
 }
 
 func (inst *Store) allowableCount(objectID, from, count int) error {
-	to := from + count - 1
-	if objectID > to { // is above what is allowed
-		return errors.New(fmt.Sprintf("store-add-point: the allowable max object-id is: %d and the current is: %d", to, objectID))
+	if objectID > count { // is above what is allowed
+		return errors.New(fmt.Sprintf("store-add-point: the allowable max object-id is: %d and the current is: %d", count, objectID))
 	}
 	return nil
 }

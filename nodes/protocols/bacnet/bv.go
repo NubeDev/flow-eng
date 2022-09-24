@@ -16,19 +16,17 @@ const (
 	object = "object"
 )
 
-func NewBV(body *node.Spec) (node.Node, error) {
+func NewBV(body *node.Spec, store *points.Store) (node.Node, error) {
 	var err error
-	store := getStore()
-	body, err, point := nodeDefault(body, bacnetBV, category, store.GetApplication())
-	var pointUUID string
-	if point != nil {
-		pointUUID = point.UUID
+	if store == nil {
+		store = getStore()
 	}
+	body, err = nodeDefault(body, bacnetBV, category, store.GetApplication())
 	return &BV{
 		body,
 		0,
 		points.BinaryVariable,
-		pointUUID,
+		"",
 	}, err
 }
 

@@ -6,7 +6,6 @@ import (
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
-	eventbus "github.com/NubeDev/flow-eng/services/eventbus"
 	"github.com/NubeDev/flow-eng/services/mqttclient"
 	rubixIO "github.com/NubeDev/flow-eng/services/rubixio"
 	log "github.com/sirupsen/logrus"
@@ -33,7 +32,9 @@ var db *points.Store
 var client *mqttclient.Client
 var inst *Server
 
-func NewServer(body *node.Spec, childNodes ...*node.Spec) (node.Node, error) {
+//func NewServer(body *node.Spec, childNodes ...*node.Spec) (node.Node, error) {
+
+func NewServer(body *node.Spec, store *points.Store) (node.Node, error) {
 	var err error
 	body = node.Defaults(body, server, category)
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs))
@@ -49,19 +50,18 @@ func NewServer(body *node.Spec, childNodes ...*node.Spec) (node.Node, error) {
 		MaxNodeCount: 1,
 	}
 	body.Parameters = node.BuildParameters(parameters) // if node is already added then show the user
-	body = buildSubNodes(body, childNodes)
+	//body = buildSubNodes(body, childNodes)
 	body.IsParent = true
 	body = node.BuildNode(body, inputs, outputs, nil)
 	application := applications.RubixIO // make this a setting eg: if it's an edge-28 it would give the user 8AI, 8AOs and 100 BVs/AVs
 	client, err = mqttclient.NewClient(mqttclient.ClientOptions{
-		Servers: []string{"tcp://0.0.0.0:1883"},
+		Servers: []string{"tcp://192.168.15.191:1883"},
 	})
 	err = client.Connect()
 	if err != nil {
 		log.Error(err)
 		//return nil, err
 	}
-	eventbus.New()
 	rio := &rubixIO.RubixIO{}
 	if application == applications.RubixIO || application == applications.RubixIOAndModbus {
 		rubixIOUICount, rubixIOUOCount := points.CalcPointCount(1, application)
@@ -72,7 +72,8 @@ func NewServer(body *node.Spec, childNodes ...*node.Spec) (node.Node, error) {
 			StartAddrDO: 2,
 		})
 	}
-	db = points.New(application, nil, 0, 200, 200)
+	db = store
+	//db = points.New(application, nil, 0, 200, 200)
 	s := &Server{body, client, rio, false, false, false}
 	inst = s
 	return s, err
@@ -82,14 +83,7 @@ func getServer() *Server {
 	return inst
 }
 
-func (inst *Server) intBus() {
-	go inst.priorityBus()
-	go inst.rubixIOBus()
-}
-
 func (inst *Server) Process() {
-	inst.intBus()
-
 	if !inst.firstLoop {
 		go inst.subscribeToRubixIO()
 		inst.firstLoop = true
@@ -126,7 +120,8 @@ func getMqtt() *mqttclient.Client {
 
 func getStore() *points.Store {
 	if db == nil {
-		panic("bacnet-server-node: store can not be empty")
+		log.Error("bacnet-server-node: store can not be empty")
+		db = points.New(applications.RubixIOAndModbus, nil, 1, 200, 200)
 	}
 	return db
 }
@@ -135,7 +130,7 @@ func getApplication() node.ApplicationName {
 }
 
 func (inst *Server) subscribeBroker(topic string) {
-	err := getMqtt().Subscribe(topic, mqttclient.AtLeastOnce, eventbus.PointsHandler)
+	err := getMqtt().Subscribe(topic, mqttclient.AtLeastOnce, bacnetBus)
 	if err != nil {
 		log.Errorf("bacnet-server mqtt:%s", err.Error())
 		inst.pingFailed = false
@@ -144,7 +139,11 @@ func (inst *Server) subscribeBroker(topic string) {
 
 func (inst *Server) subscribeToRubixIO() {
 	if getApplication() == applications.RubixIO {
-		inst.subscribeBroker("rubixio/inputs/all")
+		err := getMqtt().Subscribe("rubixio/inputs/all", mqttclient.AtLeastOnce, rubixIOBus)
+		if err != nil {
+			log.Errorf("bacnet-server mqtt:%s", err.Error())
+			inst.pingFailed = false
+		}
 	}
 	objs := []string{"ai", "ao", "av", "bi", "bo", "bv"}
 	for _, obj := range objs {

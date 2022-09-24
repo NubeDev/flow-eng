@@ -26,9 +26,6 @@ func Test_test(t *testing.T) {
 	//pprint.PrintJOSN(nodesParsed)
 
 	decode, err := Decode(nodesParsed)
-	if err != nil {
-		return
-	}
 
 	pprint.PrintJOSN(decode)
 

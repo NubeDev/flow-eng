@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/topics"
-	"github.com/NubeDev/flow-eng/services/eventbus"
 	"strconv"
 	"strings"
 )
@@ -30,7 +29,7 @@ func NewPayload() *Payload {
 // bacnet/ao/1/pri -> {Null,33.3,Null,Null,Null,Null,Null,Null,Null,Null,Null,Null,Null,Null,Null,11.000000}
 
 func (inst *Payload) NewMessage(msg interface{}) error {
-	m, ok := msg.(*eventbus.Message)
+	m, ok := msg.(*topics.Message)
 	if ok {
 		msgString := string(m.Msg.Payload())
 		topic := m.Msg.Topic()

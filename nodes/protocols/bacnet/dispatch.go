@@ -2,7 +2,6 @@ package bacnet
 
 import (
 	"fmt"
-	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	log "github.com/sirupsen/logrus"
@@ -36,7 +35,6 @@ func (inst *Server) rubixOutputsDispatch() {
 		for _, point := range getPoints { //get the list of the points to update
 			sync := getStore().GetLatestSyncValue(point.UUID, points.ToRubixIO)
 			if sync != nil {
-				pprint.PrintJOSN(sync)
 				point.CurrentSyncUUID = sync.UUID
 				pointsToWrite = append(pointsToWrite, point)
 			}

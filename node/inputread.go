@@ -4,6 +4,15 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/conversions"
 )
 
+// InputUpdated if true means that the node input value has updated
+func (n *Spec) InputUpdated(name InputName) bool {
+	input := n.GetInput(name)
+	if input != nil {
+		return input.updated
+	}
+	return false
+}
+
 func (n *Spec) ReadPin(name InputName) interface{} {
 	input := n.GetInput(name)
 	if input == nil {
@@ -15,6 +24,7 @@ func (n *Spec) ReadPin(name InputName) interface{} {
 	if input.Connection.FallbackValue != nil { // this would be that the user wrote a value to the input directly
 		return input.Connection.FallbackValue
 	}
+
 	return input.GetValue()
 }
 
