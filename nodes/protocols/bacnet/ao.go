@@ -1,7 +1,6 @@
 package bacnet
 
 import (
-	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	log "github.com/sirupsen/logrus"
@@ -30,10 +29,7 @@ func NewAO(body *node.Spec, store *points.Store) (node.Node, error) {
 	}, err
 }
 func (inst *AO) setObjectId() {
-	id, ok := conversions.GetInt(inst.ReadPin(node.ObjectId))
-	if ok {
-		inst.objectID = points.ObjectID(id)
-	}
+	inst.objectID = points.ObjectID(inst.ReadPinAsInt(node.ObjectId))
 }
 func (inst *AO) Process() {
 	if !inst.onStart {

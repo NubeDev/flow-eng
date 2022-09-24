@@ -3,10 +3,12 @@ package bacnet
 import (
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
+	log "github.com/sirupsen/logrus"
 )
 
 type BV struct {
 	*node.Spec
+	onStart    bool
 	objectID   points.ObjectID
 	objectType points.ObjectType
 	pointUUID  string
@@ -24,6 +26,7 @@ func NewBV(body *node.Spec, store *points.Store) (node.Node, error) {
 	body, err = nodeDefault(body, bacnetBV, category, store.GetApplication())
 	return &BV{
 		body,
+		false,
 		0,
 		points.BinaryVariable,
 		"",
@@ -31,24 +34,27 @@ func NewBV(body *node.Spec, store *points.Store) (node.Node, error) {
 }
 
 func (inst *BV) setObjectId() {
-	id, ok := inst.ReadPin(node.ObjectId).(int)
-	if ok {
-		inst.objectID = points.ObjectID(id)
-	}
+	inst.objectID = points.ObjectID(inst.ReadPinAsInt(node.ObjectId))
 }
 
-var loopCount uint64
-
 func (inst *BV) Process() {
-	loopCount++
-	//if !getMqtt().Connected() || !inst.connected {
-	//	inst.setObjectId()
-	//	inst.subscribePriority()
-	//	inst.connected = true
-	//}
-	//if !getMqtt().Connected() {
-	//	inst.connected = false
-	//}
+	if !inst.onStart {
+		inst.setObjectId()
+		store := getStore()
+		objectType, isWriteable, _, err := getBacnetType(inst.Info.Name)
+		ioType := points.IoTypeDigital
+		point := addPoint(getApplication(), ioType, objectType, inst.objectID, isWriteable, false, true)
+		point, err = store.AddPoint(point, true)
+		if err != nil {
+			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
+		}
+	}
+	if inst.InputUpdated(node.In14) {
+
+	}
+	toFlow(inst, inst.objectID)
+	fromFlow(inst, inst.objectID)
+	inst.onStart = true
 
 }
 

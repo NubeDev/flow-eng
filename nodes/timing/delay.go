@@ -1,7 +1,7 @@
 package timing
 
 import (
-	flowctrl "github.com/NubeDev/flow-eng"
+	timer "github.com/NubeDev/flow-eng/helpers/timer"
 	"github.com/NubeDev/flow-eng/node"
 	"log"
 	"time"
@@ -9,10 +9,10 @@ import (
 
 type Delay struct {
 	*node.Spec
-	timer flowctrl.TimedDelay
+	timer timer.TimedDelay
 }
 
-func NewDelay(body *node.Spec, timer flowctrl.TimedDelay) (node.Node, error) {
+func NewDelay(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
 	body = node.Defaults(body, delay, category)
 	body.Inputs = node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs))
 	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))

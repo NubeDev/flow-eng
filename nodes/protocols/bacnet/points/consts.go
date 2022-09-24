@@ -20,6 +20,7 @@ const IoTypeTemp IoType = "thermistor_10k_type_2"
 const IoTypeCurrent IoType = "current"
 const IoTypeVolts IoType = "voltage_dc"
 const IoTypeDigital IoType = "digital"
+const IoTypeNumber IoType = "number"
 
 func ObjectSwitcher(o ObjectType) (string, error) {
 	switch o {

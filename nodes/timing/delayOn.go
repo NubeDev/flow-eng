@@ -1,22 +1,24 @@
 package timing
 
 import (
-	flowctrl "github.com/NubeDev/flow-eng"
+	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/timer"
 	"github.com/NubeDev/flow-eng/node"
-	"log"
 	"time"
 )
 
 type DelayOn struct {
 	*node.Spec
-	timer   flowctrl.TimedDelay
-	waiting bool
-	active  bool
+	timer     timer.TimedDelay
+	triggered bool
+	active    bool
 }
 
-func NewDelayOn(body *node.Spec, timer flowctrl.TimedDelay) (node.Node, error) {
+func NewDelayOn(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
 	body = node.Defaults(body, delayOn, category)
-	body.Inputs = node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs))
+	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs)
+	delayTime := node.BuildInput(node.DelaySeconds, node.TypeFloat, nil, body.Inputs)
+	body.Inputs = node.BuildInputs(delayTime, in)
 	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	return &DelayOn{body, timer, false, false}, nil
 }
@@ -26,8 +28,13 @@ if node input is true
 start delay, after the delay set the triggered to true
 */
 
+func duration(f int) time.Duration {
+	return time.Duration(f) * time.Second
+}
+
 func (inst *DelayOn) Process() {
-	log.Println("Delayed START")
+	timeDelay := inst.ReadPinAsInt(node.DelaySeconds)
+
 	in1 := inst.ReadPinAsFloat(node.In)
 
 	if in1 >= 1 && inst.active { // timer has gone to true and input is still true
@@ -37,9 +44,17 @@ func (inst *DelayOn) Process() {
 		inst.active = false // timer is true and input went back to 0
 	}
 
+	if in1 < 1 && inst.triggered { // went true but not for long enough to finish the timeOn delay, so reset the timer
+		inst.timer.Stop()
+		inst.timer = timer.NewTimer()
+		inst.triggered = false
+	}
+	fmt.Println(timeDelay, time.Duration(timeDelay)*time.Second, 99999, time.Duration(timeDelay).Seconds())
+
 	if in1 >= 1 {
-		if !inst.timer.WaitFor(5 * time.Second) {
+		if !inst.timer.WaitFor(duration(timeDelay)) {
 			inst.WritePin(node.Out, 0)
+			inst.triggered = true
 			return
 		} else {
 			inst.active = true

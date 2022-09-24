@@ -196,6 +196,8 @@ const (
 	InputC InputName = "c"
 	InputD InputName = "d"
 
+	DelaySeconds InputName = "delay (s)"
+
 	From InputName = "from"
 	To   InputName = "to"
 

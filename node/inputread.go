@@ -32,7 +32,12 @@ func (n *Spec) ReadPinAsFloat(name InputName) float64 {
 	r := n.ReadPin(name)
 	out, _ := conversions.GetFloat(r)
 	return out
+}
 
+func (n *Spec) ReadPinAsInt(name InputName) int {
+	r := n.ReadPin(name)
+	out, _ := conversions.GetInt(r)
+	return out
 }
 
 func (n *Spec) ReadMultiple(count int) []interface{} {

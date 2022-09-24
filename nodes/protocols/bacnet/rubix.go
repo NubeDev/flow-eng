@@ -31,6 +31,7 @@ func (inst *Server) rubixInputsRunner(msg *topics.Message) {
 		if point.ObjectType == points.AnalogInput {
 			value, err := rubix.DecodeInputValue(point, inputsPayload)
 			if err != nil {
+				log.Errorf("rubix-io inputs runner: %s", err.Error())
 				return
 			}
 			getStore().WriteValueFromRead(point.UUID, value)

@@ -3,7 +3,7 @@ package nodes
 import (
 	"errors"
 	"fmt"
-	flowctrl "github.com/NubeDev/flow-eng"
+	"github.com/NubeDev/flow-eng/helpers/timer"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/compare"
 	debugging "github.com/NubeDev/flow-eng/nodes/debug"
@@ -53,6 +53,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	bacServer, _ := bacnet.NewServer(nil, nil)
 	bacPointAI, _ := bacnet.NewAI(nil, nil)
 	bacPointAO, _ := bacnet.NewAO(nil, nil)
+	bacPointAV, _ := bacnet.NewAV(nil, nil)
 	bacPointBV, _ := bacnet.NewBV(nil, nil)
 
 	// pointbus
@@ -91,6 +92,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(bacServer),
 		node.ConvertToSpec(bacPointAI),
 		node.ConvertToSpec(bacPointAO),
+		node.ConvertToSpec(bacPointAV),
 		node.ConvertToSpec(bacPointBV),
 
 		node.ConvertToSpec(mqttSub),
@@ -195,11 +197,11 @@ func builderStatistics(body *node.Spec) (node.Node, error) {
 func builderTiming(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case delay:
-		return timing.NewDelay(body, flowctrl.NewTimer())
+		return timing.NewDelay(body, timer.NewTimer())
 	case inject:
 		return timing.NewInject(body)
 	case delayOn:
-		return timing.NewDelayOn(body, flowctrl.NewTimer())
+		return timing.NewDelayOn(body, timer.NewTimer())
 	}
 	return nil, nil
 }
@@ -213,6 +215,8 @@ func builderProtocols(body *node.Spec) (node.Node, error) {
 		return bacnet.NewAI(body, store)
 	case bacnetAO:
 		return bacnet.NewAO(body, store)
+	case bacnetAV:
+		return bacnet.NewAV(body, store)
 	case bacnetBV:
 		return bacnet.NewBV(body, store)
 

@@ -6,7 +6,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type AI struct {
+type AV struct {
 	*node.Spec
 	onStart    bool
 	objectID   points.ObjectID
@@ -14,40 +14,44 @@ type AI struct {
 	pointUUID  string
 }
 
-func NewAI(body *node.Spec, store *points.Store) (node.Node, error) {
+func NewAV(body *node.Spec, store *points.Store) (node.Node, error) {
 	var err error
 	if store == nil {
 		store = getStore()
 	}
-	body, err = nodeDefault(body, bacnetAI, category, store.GetApplication())
-
-	return &AI{
+	body, err = nodeDefault(body, bacnetAV, category, store.GetApplication())
+	return &AV{
 		body,
 		false,
 		0,
-		points.AnalogInput,
+		points.AnalogVariable,
 		"",
 	}, err
 }
 
-func (inst *AI) setObjectId() {
+func (inst *AV) setObjectId() {
 	inst.objectID = points.ObjectID(inst.ReadPinAsInt(node.ObjectId))
 }
 
-func (inst *AI) Process() {
+func (inst *AV) Process() {
 	if !inst.onStart {
 		inst.setObjectId()
 		store := getStore()
-		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
-		ioType := points.IoTypeDigital // TODO make a setting
-		point := addPoint(getApplication(), ioType, objectType, inst.objectID, isWriteable, isIO, true)
+		objectType, isWriteable, _, err := getBacnetType(inst.Info.Name)
+		ioType := points.IoTypeNumber
+		point := addPoint(getApplication(), ioType, objectType, inst.objectID, isWriteable, false, true)
 		point, err = store.AddPoint(point, true)
 		if err != nil {
 			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
 		}
 	}
+	if inst.InputUpdated(node.In14) {
+
+	}
 	toFlow(inst, inst.objectID)
+	fromFlow(inst, inst.objectID)
 	inst.onStart = true
+
 }
 
-func (inst *AI) Cleanup() {}
+func (inst *AV) Cleanup() {}
