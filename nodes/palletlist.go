@@ -45,6 +45,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	// time
 	delay, _ := timing.NewDelay(nil, nil)
 	inject, _ := timing.NewInject(nil)
+	delayOn, _ := timing.NewDelayOn(nil, nil)
 
 	funcNode, _ := functions.NewFunc(nil)
 
@@ -83,6 +84,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(delay),
 		node.ConvertToSpec(inject),
+		node.ConvertToSpec(delayOn),
 
 		node.ConvertToSpec(funcNode),
 
@@ -196,6 +198,8 @@ func builderTiming(body *node.Spec) (node.Node, error) {
 		return timing.NewDelay(body, flowctrl.NewTimer())
 	case inject:
 		return timing.NewInject(body)
+	case delayOn:
+		return timing.NewDelayOn(body, flowctrl.NewTimer())
 	}
 	return nil, nil
 }

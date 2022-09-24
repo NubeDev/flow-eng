@@ -22,8 +22,9 @@ const (
 	min = "max"
 	avg = "avg"
 
-	delay  = "delay"
-	inject = "inject"
+	delay   = "delay"
+	inject  = "inject"
+	delayOn = "delayOn"
 
 	bacnetServer = "server"
 	bacnetAI     = "analog-input"

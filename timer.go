@@ -18,6 +18,10 @@ func NewTimer() *Timer {
 	return &Timer{*timer.NewStoppedTimer(), false}
 }
 
+func (t *Timer) Stop() {
+	t.timer.Stop()
+}
+
 func (t *Timer) WaitFor(duration time.Duration) bool {
 	if !t.started {
 		t.timer.Reset(duration)
