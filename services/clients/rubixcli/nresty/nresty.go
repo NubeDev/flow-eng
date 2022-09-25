@@ -17,8 +17,8 @@ func FormatRestyResponse(resp *resty.Response, err error) (*resty.Response, erro
 	// it catches errors:
 	// => when we don't have host server (i/o timeout)
 	//    -> e.g: `Post \"http://10.8.1.9:1616/api/users/login\": dial tcp 10.8.1.9:1616: i/o timeout`
-	// => when we don't have app running (connection refused) etc...
-	//    -> e.g: `Post \"http://10.8.1.9:1616/api/users/login\": dial tcp 10.8.1.9:1616: connect: connection refused`
+	// => when we don't have app running (link refused) etc...
+	//    -> e.g: `Post \"http://10.8.1.9:1616/api/users/login\": dial tcp 10.8.1.9:1616: connect: link refused`
 	if err != nil {
 		return resp, err
 	}

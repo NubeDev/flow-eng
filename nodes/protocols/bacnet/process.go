@@ -15,7 +15,7 @@ Is where a message will come from the flow or bacnet
 These would only be messages that we need to write to, as in write output-point, to a modbus or edge-28 point
 */
 
-// fromFlow is when a node has been written to from the wire sheet connection, as in write a value @16
+// fromFlow is when a node has been written to from the wire sheet link, as in write a value @16
 func fromFlow(body node.Node, objectId points.ObjectID) {
 	objectType, isWriteable, _, err := getBacnetType(body.GetName())
 	if err != nil {

@@ -1,31 +1,33 @@
-package connection
+package link
 
 import (
 	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/node"
 )
 
-type Output struct {
+type Input struct {
 	*node.Spec
 }
 
-func NewOutput(body *node.Spec, store *Store) (node.Node, error) {
+func NewInput(body *node.Spec, store *Store) (node.Node, error) {
 	if store == nil {
 		store = getStore()
 	}
 
-	body = node.Defaults(body, connectionOutput, category)
+	body = node.Defaults(body, linkInput, category)
 	topic := node.BuildInput(node.Topic, node.TypeString, nil, body.Inputs)
-	inputs := node.BuildInputs(topic)
+	value := node.BuildInput(node.In, node.TypeString, nil, body.Inputs)
+	inputs := node.BuildInputs(topic, value)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
-	return &Output{body}, nil
+	return &Input{body}, nil
 }
 
-func (inst *Output) Process() {
+func (inst *Input) Process() {
 	topic := conversions.ToString(inst.ReadPin(node.Topic))
-	v, _ := getStore().Get(topic)
-	inst.WritePin(node.Out, v)
+	in1 := inst.ReadPin(node.In)
+	inst.WritePin(node.Out, in1)
+	getStore().Add(topic, in1)
 }
 
-func (inst *Output) Cleanup() {}
+func (inst *Input) Cleanup() {}

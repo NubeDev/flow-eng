@@ -35,9 +35,9 @@ const (
 	inject  = "inject"
 	delayOn = "delayOn"
 
-	selectNum        = "select-numeric"
-	connectionInput  = "input"
-	connectionOutput = "output"
+	selectNum  = "select-numeric"
+	linkInput  = "link-input"
+	linkOutput = "link-output"
 
 	bacnetServer = "server"
 	bacnetAI     = "analog-input"

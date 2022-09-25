@@ -56,7 +56,7 @@ type ClientOptions struct {
 	Password       string   // Will only be used if the username is set
 	SetKeepAlive   time.Duration
 	SetPingTimeout time.Duration
-	AutoReconnect  bool // If the client should automatically try to reconnect when the connection is lost
+	AutoReconnect  bool // If the client should automatically try to reconnect when the link is lost
 }
 
 type consumer struct {
@@ -161,12 +161,12 @@ func NewClient(options ClientOptions) (c *Client, err error) {
 	opts.SetPingTimeout(options.SetPingTimeout * time.Second)
 
 	opts.OnConnectionLost = func(c mqtt.Client, err error) {
-		topicLog{"error", "Lost connection", nil}.logErr()
+		topicLog{"error", "Lost link", nil}.logErr()
 	}
 	opts.OnConnect = func(cc mqtt.Client) {
 		topicLog{"msg", "connected", nil}.logInfo()
 		c.connected = true
-		// Subscribe here, otherwise after connection lost,
+		// Subscribe here, otherwise after link lost,
 		// you may not receive any message
 		for _, s := range c.consumers {
 			if token := cc.Subscribe(s.topic, 2, s.handler); token.Wait() && token.Error() != nil {
@@ -185,11 +185,11 @@ func NewClient(options ClientOptions) (c *Client, err error) {
 	return c, nil
 }
 
-// Connect opens c new connection
+// Connect opens c new link
 func (c *Client) Connect() (err error) {
 	token := c.client.Connect()
 	if token.WaitTimeout(2*time.Second) == false {
-		return errors.New("MQTT connection timeout")
+		return errors.New("MQTT link timeout")
 	}
 	if token.Error() != nil {
 		return token.Error()

@@ -6,12 +6,12 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/timer"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/compare"
-	"github.com/NubeDev/flow-eng/nodes/connection"
 	"github.com/NubeDev/flow-eng/nodes/constant"
 	"github.com/NubeDev/flow-eng/nodes/conversion"
 	debugging "github.com/NubeDev/flow-eng/nodes/debug"
 	"github.com/NubeDev/flow-eng/nodes/functions"
 	"github.com/NubeDev/flow-eng/nodes/hvac"
+	"github.com/NubeDev/flow-eng/nodes/link"
 	"github.com/NubeDev/flow-eng/nodes/logic"
 	"github.com/NubeDev/flow-eng/nodes/math"
 	broker "github.com/NubeDev/flow-eng/nodes/mqtt"
@@ -68,8 +68,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	selectNode, _ := switches.NewSelectNum(nil)
 
-	connectionInput, _ := connection.NewInput(nil, nil)
-	connectionOutput, _ := connection.NewOutput(nil, nil)
+	linkInput, _ := link.NewInput(nil, nil)
+	linkOutput, _ := link.NewOutput(nil, nil)
 
 	// bacnet
 	bacServer, _ := bacnet.NewServer(nil, nil)
@@ -123,8 +123,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(stringToNum),
 		node.ConvertToSpec(numToString),
 
-		node.ConvertToSpec(connectionInput),
-		node.ConvertToSpec(connectionOutput),
+		node.ConvertToSpec(linkInput),
+		node.ConvertToSpec(linkOutput),
 
 		node.ConvertToSpec(bacServer),
 		node.ConvertToSpec(bacPointAI),
@@ -196,16 +196,16 @@ func Builder(body *node.Spec, opts ...interface{}) (node.Node, error) {
 }
 
 func builderMisc(body *node.Spec) (node.Node, error) {
-	con := &connection.Store{}
+	con := &link.Store{}
 	switch body.GetName() {
 	case logNode:
 		return debugging.NewLog(body)
 	case funcNode:
 		return functions.NewFunc(body)
-	case connectionInput:
-		return connection.NewInput(body, con)
-	case connectionOutput:
-		return connection.NewOutput(body, con)
+	case linkInput:
+		return link.NewInput(body, con)
+	case linkOutput:
+		return link.NewOutput(body, con)
 	}
 
 	return nil, nil

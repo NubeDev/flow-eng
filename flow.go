@@ -118,10 +118,10 @@ func (p *Flow) ManualNodeConnector(outputNode node.Node, outPort node.OutputName
 			for _, output := range outputNode.GetOutputs() {
 				if output.Name == outPort {
 					output.Connect(input)
-					log.Infof("manual-connection: source-node:%s dest-node:%s source-port:%s dest-port:%s", inputNode.GetNodeName(), outputNode.GetNodeName(), outPort, inPort)
+					log.Infof("manual-link: source-node:%s dest-node:%s source-port:%s dest-port:%s", inputNode.GetNodeName(), outputNode.GetNodeName(), outPort, inPort)
 					input.Connection.NodeID = outputNode.GetID()
 					input.Connection.NodePort = outPort
-					return nil // connection was made so return
+					return nil // link was made so return
 				}
 			}
 		}
@@ -129,20 +129,20 @@ func (p *Flow) ManualNodeConnector(outputNode node.Node, outPort node.OutputName
 	return errors.New(fmt.Sprintf("failed to connect source-node:%s dest-node:%s source-port:%s dest-port:%s", inputNode.GetNodeName(), outputNode.GetNodeName(), outPort, inPort))
 }
 
-// we need the output name and the connection output name from the node with the input connection
+// we need the output name and the link output name from the node with the input link
 
 // nodeConnector will make the connections from nodeA to nodeA
-// for example we will make a connection from the math-const node to the math add-node
-//	-makeConnection if false will not make the connection, this would be set to false only when you want a snapshot of the current flow
+// for example we will make a link from the math-const node to the math add-node
+//	-makeConnection if false will not make the link, this would be set to false only when you want a snapshot of the current flow
 func (p *Flow) nodeConnector(nodeId string, makeConnection bool) error {
 	getNode := p.GetNode(nodeId) // this is the add node
 	if getNode == nil {
 		return errors.New(fmt.Sprintf("node-connector: failed to find node id:%s", nodeId))
 	}
 	if len(getNode.GetInputs()) > 0 {
-		// for a node we need its input and see if it has a connection, if so we need the uuid of the node its connection to
+		// for a node we need its input and see if it has a link, if so we need the uuid of the node its link to
 		for _, input := range getNode.GetInputs() { // this is the inputs from the add node
-			// check the input has connection
+			// check the input has link
 			connectionOutputName := input.Connection.NodePort // on const node will be named:out
 			connectionOutputId := input.Connection.NodeID     // const node nodeId
 			if connectionOutputName != "" {

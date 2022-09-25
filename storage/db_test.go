@@ -6,7 +6,7 @@ import (
 )
 
 func TestInitializeBuntDB(t *testing.T) {
-	db := New("test.db")
+	db := New("../flow.db")
 	add, err := db.AddSettings(&Settings{})
 	fmt.Println(add, err)
 

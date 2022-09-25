@@ -1,4 +1,4 @@
-package connection
+package link
 
 type values struct {
 	topic string

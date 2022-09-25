@@ -7,4 +7,9 @@ type Storage interface {
 	DeleteSettings() error
 	GetGitToken(uuid string, previewToken bool) (string, error)
 	GetSetting(uuid string) (*Settings, error)
+	AddConnection(body *Connection) (*Connection, error)
+	UpdateConnection(uuid string, body *Connection) (*Connection, error)
+	GetConnections() ([]Connection, error)
+	GetConnection(uuid string) (*Connection, error)
+	DeleteConnection(uuid string) error
 }

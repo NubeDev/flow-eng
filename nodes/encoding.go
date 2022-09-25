@@ -15,7 +15,7 @@ type NodesList struct {
 // Encode the flow from the flow-eng in correct format for react-flow
 func Encode(graph *flowctrl.Flow) (*NodesList, error) {
 	var listSchema []*node.Schema
-	for _, _node := range graph.GetNodesSpec() { // we need to add each node that has one connection
+	for _, _node := range graph.GetNodesSpec() { // we need to add each node that has one link
 		nodeSchema := &node.Schema{}
 		nodeType, err := setType(_node)
 		if err != nil {
@@ -28,9 +28,9 @@ func Encode(graph *flowctrl.Flow) (*NodesList, error) {
 		}
 		if len(_node.GetInputs()) > 0 {
 			links := map[string]node.SchemaLinks{}
-			// for a node we need its input and see if it has a connection, if so we need the uuid of the node its connection to
+			// for a node we need its input and see if it has a link, if so we need the uuid of the node its link to
 			for _, input := range _node.GetInputs() {
-				// check the input has connection
+				// check the input has link
 				destOutputName := input.Connection.NodePort
 				if destOutputName != "" {
 					inputName := input.Name
@@ -58,7 +58,7 @@ func Encode(graph *flowctrl.Flow) (*NodesList, error) {
 				PositionX: "271.5",
 				PositionY: "-69",
 			}
-			//nodeSchema.Inputs = node.SchemaInputs{Links: links} // when a connection is made
+			//nodeSchema.Inputs = node.SchemaInputs{Links: links} // when a link is made
 			listSchema = append(listSchema, nodeSchema)
 		} else { // if a node has no input then add it here
 			nodeSchema.Metadata = &node.Metadata{

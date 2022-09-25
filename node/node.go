@@ -186,8 +186,11 @@ const (
 )
 
 const (
-	SetPoint InputName = "set-point"
-	DeadBand InputName = "dead-band"
+	SetPoint   InputName = "set-point"
+	Offset     InputName = "offset"
+	CoolOffset InputName = "offset-cool"
+	HeatOffset InputName = "offset-heat"
+	DeadBand   InputName = "dead-band"
 
 	Comment  InputName = "comment"
 	InNumber InputName = "number"
@@ -256,14 +259,14 @@ const (
 type InputConnection struct {
 	NodeID        string      `json:"nodeID,omitempty"`
 	NodePort      OutputName  `json:"nodePort,omitempty"`
-	OverrideValue interface{} `json:"overrideValue,omitempty"` // used for when the user has no node connection and writes the value direct (or can be used to override a value)
+	OverrideValue interface{} `json:"overrideValue,omitempty"` // used for when the user has no node link and writes the value direct (or can be used to override a value)
 	CurrentValue  interface{} `json:"currentValue,omitempty"`
 	FallbackValue interface{} `json:"fallbackValue,omitempty"`
 	Disable       *bool       `json:"disable,omitempty"`
 }
 
 type OutputConnection struct {
-	OverrideValue interface{} `json:"overrideValue,omitempty"` // used for when the user has no node connection and writes the value direct (or can be used to override a value)
+	OverrideValue interface{} `json:"overrideValue,omitempty"` // used for when the user has no node link and writes the value direct (or can be used to override a value)
 	CurrentValue  interface{} `json:"currentValue,omitempty"`
 	FallbackValue interface{} `json:"fallbackValue,omitempty"`
 	Disable       *bool       `json:"disable,omitempty"`

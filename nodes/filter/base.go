@@ -1,4 +1,4 @@
-package mathematics
+package filter
 
 import (
 	"github.com/NubeDev/flow-eng/node"
@@ -7,6 +7,7 @@ import (
 
 const (
 	category = "math-advanced"
+	sin      = "sin"
 )
 
 func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error) {

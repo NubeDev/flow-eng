@@ -6,14 +6,14 @@ import (
 
 var m *Client
 
-// InternalMQTT internal non-secure pointbus connection
+// InternalMQTT internal non-secure pointbus link
 // for plugins use the plugin path as the topic
 func InternalMQTT(ip string) (bool, error) {
 	c, err := NewClient(ClientOptions{
 		Servers: []string{ip},
 	})
 	if err != nil {
-		log.Println("MQTT connection error:", err)
+		log.Println("MQTT link error:", err)
 		return false, err
 	}
 	m = c
