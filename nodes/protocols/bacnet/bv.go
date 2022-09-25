@@ -8,7 +8,6 @@ import (
 
 type BV struct {
 	*node.Spec
-	onStart    bool
 	objectID   points.ObjectID
 	objectType points.ObjectType
 	pointUUID  string
@@ -26,7 +25,6 @@ func NewBV(body *node.Spec, store *points.Store) (node.Node, error) {
 	body, err = nodeDefault(body, bacnetBV, category, store.GetApplication())
 	return &BV{
 		body,
-		false,
 		0,
 		points.BinaryVariable,
 		"",
@@ -38,7 +36,7 @@ func (inst *BV) setObjectId() {
 }
 
 func (inst *BV) Process() {
-	if !inst.onStart {
+	if !inst.OnStart {
 		inst.setObjectId()
 		store := getStore()
 		objectType, isWriteable, _, err := getBacnetType(inst.Info.Name)
@@ -54,7 +52,7 @@ func (inst *BV) Process() {
 	}
 	toFlow(inst, inst.objectID)
 	fromFlow(inst, inst.objectID)
-	inst.onStart = true
+	inst.OnStart = true
 
 }
 

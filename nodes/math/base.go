@@ -1,10 +1,10 @@
 package math
 
 import (
-	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/integer"
 	"github.com/NubeDev/flow-eng/node"
+	"github.com/NubeDev/flow-eng/schemas"
 )
 
 const (
@@ -33,6 +33,7 @@ func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error)
 	inputs := node.BuildInputs(node.DynamicInputs(node.TypeFloat, nil, count, integer.NonNil(buildCount.Min), integer.NonNil(buildCount.Max), body.Inputs, node.ABCs)...)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Result, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, settings)
+	body.SetSchema(schemas.GetInputCount())
 	return body, nil
 }
 
@@ -48,28 +49,4 @@ func process(body node.Node) {
 		body.WritePin(node.Result, float.NonNil(output))
 	}
 
-}
-
-func operation(operation string, values []*float64) *float64 {
-	var nonNilValues []float64
-	for _, value := range values {
-		if value != nil {
-			nonNilValues = append(nonNilValues, *value)
-		}
-	}
-	if len(nonNilValues) == 0 {
-		return nil
-	}
-	output := 0.0
-	switch operation {
-	case add:
-		output = array.Add(nonNilValues)
-	case sub:
-		output = array.Subtract(nonNilValues)
-	case multiply:
-		output = array.Multiply(nonNilValues)
-	case divide:
-		output = array.Divide(nonNilValues)
-	}
-	return &output
 }

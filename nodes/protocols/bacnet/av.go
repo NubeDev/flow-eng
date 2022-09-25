@@ -8,7 +8,6 @@ import (
 
 type AV struct {
 	*node.Spec
-	onStart    bool
 	objectID   points.ObjectID
 	objectType points.ObjectType
 	pointUUID  string
@@ -22,7 +21,6 @@ func NewAV(body *node.Spec, store *points.Store) (node.Node, error) {
 	body, err = nodeDefault(body, bacnetAV, category, store.GetApplication())
 	return &AV{
 		body,
-		false,
 		0,
 		points.AnalogVariable,
 		"",
@@ -34,7 +32,7 @@ func (inst *AV) setObjectId() {
 }
 
 func (inst *AV) Process() {
-	if !inst.onStart {
+	if !inst.OnStart {
 		inst.setObjectId()
 		store := getStore()
 		objectType, isWriteable, _, err := getBacnetType(inst.Info.Name)
@@ -50,7 +48,7 @@ func (inst *AV) Process() {
 	}
 	toFlow(inst, inst.objectID)
 	fromFlow(inst, inst.objectID)
-	inst.onStart = true
+	inst.OnStart = true
 
 }
 

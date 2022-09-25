@@ -89,17 +89,10 @@ func setType(n *node.Spec) (string, error) {
 
 }
 
-func decodeType(n *node.Schema) (category, name string, err error) {
-	if n == nil {
-		return "", "", errors.New("node schema can not be empty")
-	}
-	if n.Type == "" {
-		return "", "", errors.New("node type can not be empty")
-	}
-	parts := strings.Split(n.Type, "/")
+func decodeType(nodeType string) (category, name string, err error) {
+	parts := strings.Split(nodeType, "/")
 	if len(parts) > 1 {
 		return parts[0], parts[1], nil
 	}
 	return "", "", errors.New("failed to get category and name from node-type")
-
 }

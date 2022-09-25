@@ -8,7 +8,6 @@ import (
 
 type AO struct {
 	*node.Spec
-	onStart    bool
 	objectID   points.ObjectID
 	objectType points.ObjectType
 	pointUUID  string
@@ -22,7 +21,6 @@ func NewAO(body *node.Spec, store *points.Store) (node.Node, error) {
 	body, err = nodeDefault(body, bacnetAO, category, store.GetApplication())
 	return &AO{
 		body,
-		false,
 		0,
 		points.AnalogOutput,
 		"",
@@ -32,7 +30,7 @@ func (inst *AO) setObjectId() {
 	inst.objectID = points.ObjectID(inst.ReadPinAsInt(node.ObjectId))
 }
 func (inst *AO) Process() {
-	if !inst.onStart {
+	if !inst.OnStart {
 		inst.setObjectId()
 		store := getStore()
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
@@ -48,7 +46,7 @@ func (inst *AO) Process() {
 	}
 	toFlow(inst, inst.objectID)
 	fromFlow(inst, inst.objectID)
-	inst.onStart = true
+	inst.OnStart = true
 
 }
 
