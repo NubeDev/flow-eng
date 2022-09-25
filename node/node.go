@@ -29,7 +29,8 @@ type Node interface {
 	DeleteSubFlowNodes()
 	SetMetadata(m *Metadata)
 	GetSettings() []*Settings
-	SetPropertiesValue(name Title, value interface{}) error
+	GetSetting(name SettingTitle) *Settings
+	SetPropertiesValue(name SettingTitle, value interface{}) error
 }
 
 func New(id, name, nodeName string, meta *Metadata) *Spec {
@@ -163,6 +164,7 @@ type Info struct {
 
 type DataTypes string
 type InputName string
+
 type OutputName string
 type ApplicationName string // bacnet, mqtt
 
@@ -179,9 +181,15 @@ const (
 )
 
 const (
+	InputCount SettingTitle = "input count"
+	Operation  SettingTitle = "input count"
+)
+
+const (
 	SetPoint InputName = "set-point"
 	DeadBand InputName = "dead-band"
 
+	Comment  InputName = "comment"
 	InNumber InputName = "number"
 	InString InputName = "string"
 

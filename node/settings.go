@@ -8,13 +8,9 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-const (
-	InputCount = "Inputs Count"
-)
-
 type SettingOptions struct {
 	Type  PropType
-	Title Title
+	Title SettingTitle
 	Min   int
 	Max   int
 	Value interface{}
@@ -30,12 +26,6 @@ func NewSetting(body *Spec, opts *SettingOptions) (base *PropertyBase, setting *
 	var title = opts.Title
 	if title == "" {
 		return nil, nil, 0, errors.New("title can not be empty")
-	}
-	if min == 0 {
-		min = 1
-	}
-	if max == 0 {
-		max = 1
 	}
 	if opts.Type == "" {
 		panic("new-setting: dataType can not be empty")
@@ -70,19 +60,19 @@ func NewSetting(body *Spec, opts *SettingOptions) (base *PropertyBase, setting *
 }
 
 type PropertyBase struct {
-	Type     PropType    `json:"type" default:""`
-	Title    Title       `json:"title" default:""`
-	Min      *int        `json:"min,omitempty" default:"0"`
-	Max      *int        `json:"max,omitempty" default:"500"`
-	ReadOnly *bool       `json:"readOnly,omitempty"`
-	Value    interface{} `json:"value"`
+	Type     PropType     `json:"type" default:""`
+	Title    SettingTitle `json:"title" default:""`
+	Min      *int         `json:"min,omitempty" default:"0"`
+	Max      *int         `json:"max,omitempty" default:"500"`
+	ReadOnly *bool        `json:"readOnly,omitempty"`
+	Value    interface{}  `json:"value"`
 }
 
 func settingInt() {
 
 }
 
-type Title string
+type SettingTitle string
 type PropType string
 
 const (
@@ -115,7 +105,7 @@ func NewProperty(args *PropertyBase) *PropertyBase {
 	}
 }
 
-func Setting(propType PropType, settingTitle Title, body *PropertyBase) (*Settings, error) {
+func Setting(propType PropType, settingTitle SettingTitle, body *PropertyBase) (*Settings, error) {
 	return &Settings{
 		Type:       propType,
 		Title:      settingTitle,
@@ -124,16 +114,16 @@ func Setting(propType PropType, settingTitle Title, body *PropertyBase) (*Settin
 }
 
 type Settings struct {
-	Type       PropType    `json:"type"`
-	Title      Title       `json:"title"`
-	Properties interface{} `json:"properties"` // PropertyBase
+	Type       PropType     `json:"type"`
+	Title      SettingTitle `json:"title"`
+	Properties interface{}  `json:"properties"` // PropertyBase
 }
 
 func (n *Spec) GetSettings() []*Settings {
 	return n.Settings
 }
 
-func (n *Spec) GetSetting(name Title) *Settings {
+func (n *Spec) GetSetting(name SettingTitle) *Settings {
 	for _, setting := range n.Settings {
 		if name == setting.Title {
 			return setting
@@ -142,7 +132,7 @@ func (n *Spec) GetSetting(name Title) *Settings {
 	return nil
 }
 
-func (n *Spec) SetPropertiesValue(name Title, value interface{}) error {
+func (n *Spec) SetPropertiesValue(name SettingTitle, value interface{}) error {
 	data := n.GetProperties(name)
 	if data == nil {
 		return errors.New(fmt.Sprintf("failed to to settings properties by name%s", name))
@@ -160,7 +150,7 @@ func (n *Spec) SetPropertiesValue(name Title, value interface{}) error {
 	return nil
 }
 
-func (n *Spec) GetPropValue(name Title) (interface{}, error) {
+func (n *Spec) GetPropValue(name SettingTitle) (interface{}, error) {
 	data := n.GetProperties(name)
 	if data == nil {
 		return "", errors.New(fmt.Sprintf("failed to to settings properties by name%s", name))
@@ -174,7 +164,7 @@ func (n *Spec) GetPropValue(name Title) (interface{}, error) {
 }
 
 // GetPropValueInt if there was an existing value then try and get it (would be used when node is created from json)
-func (n *Spec) GetPropValueInt(name Title, fallbackValue int) int {
+func (n *Spec) GetPropValueInt(name SettingTitle, fallbackValue int) int {
 	data, err := n.GetPropValue(name)
 	if err != nil {
 		return 0
@@ -186,7 +176,7 @@ func (n *Spec) GetPropValueInt(name Title, fallbackValue int) int {
 	return i
 }
 
-func (n *Spec) GetPropValueStr(name Title) (string, error) {
+func (n *Spec) GetPropValueStr(name SettingTitle) (string, error) {
 	data, err := n.GetPropValue(name)
 	if err != nil {
 		return "", err
@@ -195,7 +185,7 @@ func (n *Spec) GetPropValueStr(name Title) (string, error) {
 	return toStr, nil
 }
 
-func (n *Spec) DecodeProperties(name Title, output interface{}) error {
+func (n *Spec) DecodeProperties(name SettingTitle, output interface{}) error {
 	data := n.GetProperties(name)
 	if data == nil {
 		return errors.New(fmt.Sprintf("failed to find settings properties by name:%s", name))
@@ -207,7 +197,7 @@ func (n *Spec) DecodeProperties(name Title, output interface{}) error {
 	return nil
 }
 
-func (n *Spec) GetProperties(name Title) interface{} {
+func (n *Spec) GetProperties(name SettingTitle) interface{} {
 	for _, setting := range n.Settings {
 		if name == setting.Title {
 			return setting.Properties
@@ -218,7 +208,7 @@ func (n *Spec) GetProperties(name Title) interface{} {
 
 func BuildSettings(props ...*Settings) ([]*Settings, error) {
 	var out []*Settings
-	var names []Title
+	var names []SettingTitle
 	for _, output := range props {
 		out = append(out, output)
 		names = append(names, output.Title)
@@ -229,7 +219,7 @@ func BuildSettings(props ...*Settings) ([]*Settings, error) {
 	return out, nil
 }
 
-func contains(e []Title, c Title) bool {
+func contains(e []SettingTitle, c SettingTitle) bool {
 	for _, s := range e {
 		if s == c {
 			return true
@@ -238,8 +228,8 @@ func contains(e []Title, c Title) bool {
 	return false
 }
 
-func unique(e []Title) []Title {
-	var r []Title
+func unique(e []SettingTitle) []SettingTitle {
+	var r []SettingTitle
 	for _, s := range e {
 		if !contains(r[:], s) {
 			r = append(r, s)

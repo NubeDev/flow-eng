@@ -1,6 +1,7 @@
 package debugging
 
 import (
+	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 	log "github.com/sirupsen/logrus"
 )
@@ -16,20 +17,26 @@ const (
 
 func NewLog(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, logNode, category)
+	comment := node.BuildInput(node.Comment, node.TypeString, nil, body.Inputs)
 	num := node.BuildInput(node.InNumber, node.TypeFloat, nil, body.Inputs)
 	str := node.BuildInput(node.InString, node.TypeString, nil, body.Inputs)
-	inputs := node.BuildInputs(num, str)
+	inputs := node.BuildInputs(comment, num, str)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
 	return &Log{body}, nil
 }
 
 func (inst *Log) Process() {
-	in1 := inst.ReadPin(node.In)
-	if in1 != nil {
-		log.Infof("log: node:%s value: %v", inst.Info.Name, in1)
-	} else {
-		log.Infof("log: node:%s no value", inst.Info.Name)
+	comment := inst.ReadPin(node.Comment)
+	inNum := inst.ReadPin(node.InNumber)
+	inStr := inst.ReadPin(node.InString)
+
+	if inNum != nil {
+		log.Infof("log: comment: %v number: %v", comment, inNum)
+	}
+	str := fmt.Sprintf("%v", inStr)
+	if str != "" {
+		log.Infof("log: omment: %v string: %s", comment, str)
 	}
 
 }

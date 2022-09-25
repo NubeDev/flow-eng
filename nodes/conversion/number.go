@@ -23,8 +23,10 @@ func (inst *NumToString) Process() {
 	v, ok := conversions.GetFloatOk(in1)
 	if ok {
 		inst.WritePin(node.Out, fmt.Sprintf("%f", v))
+	} else {
+		inst.WritePin(node.Out, nil)
 	}
-	inst.WritePin(node.Out, nil)
+
 }
 
 func (inst *NumToString) Cleanup() {}
