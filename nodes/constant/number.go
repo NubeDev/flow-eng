@@ -1,24 +1,24 @@
-package math
+package constant
 
 import (
 	"github.com/NubeDev/flow-eng/node"
 )
 
-type Const struct {
+type ConstNum struct {
 	*node.Spec
 }
 
-func NewConst(body *node.Spec) (node.Node, error) {
+func NewConstNum(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, constNum, category)
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
-	return &Const{body}, nil
+	return &ConstNum{body}, nil
 }
 
-func (inst *Const) Process() {
+func (inst *ConstNum) Process() {
 	in1 := inst.ReadPin(node.In)
 	inst.WritePin(node.Out, in1)
 }
 
-func (inst *Const) Cleanup() {}
+func (inst *ConstNum) Cleanup() {}

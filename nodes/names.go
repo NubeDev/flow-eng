@@ -2,6 +2,8 @@ package nodes
 
 const (
 	constNum = "const-num"
+	constStr = "const-string"
+
 	add      = "add"
 	divide   = "divide"
 	sub      = "subtract"
@@ -12,6 +14,10 @@ const (
 	not     = "not"
 	greater = "greater"
 	less    = "less"
+
+	flowLoopCount = "flow-loop-count"
+
+	deadBandNode = "dead-band"
 
 	logicCompare = "compare"
 	between      = "between"

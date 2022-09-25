@@ -5,7 +5,7 @@ import (
 	flowctrl "github.com/NubeDev/flow-eng"
 	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
-	"github.com/NubeDev/flow-eng/nodes/math"
+	"github.com/NubeDev/flow-eng/nodes/constant"
 	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
@@ -15,7 +15,7 @@ import (
 
 func main() {
 	var err error
-	cont, err := math.NewConst(nil)
+	cont, err := constant.NewConstNum(nil)
 	if err != nil {
 		log.Errorln(err)
 		return

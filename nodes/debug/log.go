@@ -16,7 +16,9 @@ const (
 
 func NewLog(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, logNode, category)
-	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs))
+	num := node.BuildInput(node.InNumber, node.TypeFloat, nil, body.Inputs)
+	str := node.BuildInput(node.InString, node.TypeString, nil, body.Inputs)
+	inputs := node.BuildInputs(num, str)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
 	return &Log{body}, nil

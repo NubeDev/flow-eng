@@ -4,6 +4,7 @@ import (
 	flowctrl "github.com/NubeDev/flow-eng"
 	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
+	"github.com/NubeDev/flow-eng/nodes/constant"
 	"github.com/NubeDev/flow-eng/nodes/math"
 	log "github.com/sirupsen/logrus"
 	"time"
@@ -11,7 +12,7 @@ import (
 
 func main() {
 
-	const1, err := math.NewConst(nil) // new node
+	const1, err := constant.NewConst(nil) // new node
 	if err != nil {
 		log.Errorln(err)
 		return
@@ -22,7 +23,7 @@ func main() {
 		log.Errorln(err)
 		return
 	}
-	const2, err := math.NewConst(nil)
+	const2, err := constant.NewConst(nil)
 	if err != nil {
 		log.Errorln(err)
 		return

@@ -3,20 +3,20 @@ package main
 import (
 	flowctrl "github.com/NubeDev/flow-eng"
 	pprint "github.com/NubeDev/flow-eng/helpers/print"
-	"github.com/NubeDev/flow-eng/nodes/math"
+	"github.com/NubeDev/flow-eng/nodes/constant"
 	log "github.com/sirupsen/logrus"
 	"time"
 )
 
 func main() {
 
-	const1, err := math.NewConst(nil) // new node
+	const1, err := constant.NewConst(nil) // new node
 	if err != nil {
 		log.Errorln(err)
 		return
 	}
 
-	const2, err := math.NewConst(nil)
+	const2, err := constant.NewConst(nil)
 	if err != nil {
 		log.Errorln(err)
 		return

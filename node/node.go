@@ -179,6 +179,12 @@ const (
 )
 
 const (
+	SetPoint InputName = "set-point"
+	DeadBand InputName = "dead-band"
+
+	InNumber InputName = "number"
+	InString InputName = "string"
+
 	In   InputName = "in"
 	In1  InputName = "in1"
 	In2  InputName = "in2"
@@ -221,7 +227,9 @@ const (
 	ErrMsg OutputName = "error"
 	Msg    OutputName = "message"
 
+	Toggle OutputName = "toggle"
 	Out    OutputName = "out"
+
 	OutNot OutputName = "out not"
 
 	Out1 OutputName = "out1"

@@ -7,9 +7,11 @@ import (
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/compare"
 	"github.com/NubeDev/flow-eng/nodes/connection"
+	"github.com/NubeDev/flow-eng/nodes/constant"
 	"github.com/NubeDev/flow-eng/nodes/conversion"
 	debugging "github.com/NubeDev/flow-eng/nodes/debug"
 	"github.com/NubeDev/flow-eng/nodes/functions"
+	"github.com/NubeDev/flow-eng/nodes/hvac"
 	"github.com/NubeDev/flow-eng/nodes/logic"
 	"github.com/NubeDev/flow-eng/nodes/math"
 	broker "github.com/NubeDev/flow-eng/nodes/mqtt"
@@ -18,6 +20,7 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/nodes/statistics"
 	switches "github.com/NubeDev/flow-eng/nodes/switch"
+	"github.com/NubeDev/flow-eng/nodes/system"
 	"github.com/NubeDev/flow-eng/nodes/timing"
 )
 
@@ -26,8 +29,10 @@ const (
 )
 
 func All() []*node.Spec { // get all the nodes, will be used for the UI to list all the nodes
+	constNum, _ := constant.NewConstNum(nil)
+	constStr, _ := constant.NewString(nil)
+
 	// math
-	constNum, _ := math.NewConst(nil)
 	add, _ := math.NewAdd(nil)
 	sub, _ := math.NewSub(nil)
 	multiply, _ := math.NewMultiply(nil)
@@ -46,6 +51,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	min, _ := statistics.NewMin(nil)
 	max, _ := statistics.NewMax(nil)
 
+	flowLoopCount, _ := system.NewLoopCount(nil)
+
 	stringToNum, _ := conversion.NewStringToNum(nil)
 	numToString, _ := conversion.NewNumToString(nil)
 
@@ -55,6 +62,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	delayOn, _ := timing.NewDelayOn(nil, nil)
 
 	funcNode, _ := functions.NewFunc(nil)
+
+	// hvac
+	deadBand, _ := hvac.NewDeadBand(nil)
 
 	selectNode, _ := switches.NewSelectNum(nil)
 
@@ -81,6 +91,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	return node.BuildNodes(
 		node.ConvertToSpec(constNum),
+		node.ConvertToSpec(constStr),
+
 		node.ConvertToSpec(add),
 		node.ConvertToSpec(sub),
 		node.ConvertToSpec(multiply),
@@ -95,6 +107,10 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(min),
 		node.ConvertToSpec(max),
+
+		node.ConvertToSpec(flowLoopCount),
+
+		node.ConvertToSpec(deadBand),
 
 		node.ConvertToSpec(delay),
 		node.ConvertToSpec(inject),
@@ -124,7 +140,19 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 }
 
 func Builder(body *node.Spec, opts ...interface{}) (node.Node, error) {
-	n, err := builderMath(body)
+	n, err := builderConst(body)
+	if n != nil || err != nil {
+		return n, err
+	}
+	n, err = builderMath(body)
+	if n != nil || err != nil {
+		return n, err
+	}
+	n, err = builderHVAC(body)
+	if n != nil || err != nil {
+		return n, err
+	}
+	n, err = builderSystem(body)
 	if n != nil || err != nil {
 		return n, err
 	}
@@ -183,10 +211,34 @@ func builderMisc(body *node.Spec) (node.Node, error) {
 	return nil, nil
 }
 
-func builderMath(body *node.Spec) (node.Node, error) {
+func builderSystem(body *node.Spec) (node.Node, error) {
+	switch body.GetName() {
+	case flowLoopCount:
+		return system.NewLoopCount(body)
+	}
+	return nil, nil
+}
+
+func builderHVAC(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case constNum:
-		return math.NewConst(body)
+		return hvac.NewDeadBand(body)
+	}
+	return nil, nil
+}
+
+func builderConst(body *node.Spec) (node.Node, error) {
+	switch body.GetName() {
+	case constNum:
+		return constant.NewConstNum(body)
+	case constStr:
+		return constant.NewString(body)
+	}
+	return nil, nil
+}
+
+func builderMath(body *node.Spec) (node.Node, error) {
+	switch body.GetName() {
 	case add:
 		return math.NewAdd(body)
 	case sub:
