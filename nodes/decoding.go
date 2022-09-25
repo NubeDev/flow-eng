@@ -11,7 +11,7 @@ func Decode(encodedNodes *NodesList) ([]*node.Spec, error) {
 	var decodedNodes []*node.Spec
 	for _, encodedNode := range encodedNodes.Nodes {
 		var decodedNode *node.Spec
-		_, getName, _ := decodeType(encodedNode)
+		_, getName, _ := decodeType(encodedNode.Type)
 		id := encodedNode.Id
 		name := getName
 		decodedNode = node.New(id, name, "", encodedNode.Metadata) // create a blank node
@@ -46,7 +46,7 @@ func DecodeNonSubNodes(encodedNodes *NodesList) ([]*node.Spec, error) {
 	var decodedNodes []*node.Spec
 	for _, encodedNode := range encodedNodes.Nodes {
 		var decodedNode *node.Spec
-		_, getName, _ := decodeType(encodedNode)
+		_, getName, _ := decodeType(encodedNode.Type)
 		id := encodedNode.Id
 		name := getName
 		decodedNode = node.New(id, name, "", encodedNode.Metadata) // create a blank node
@@ -58,7 +58,7 @@ func DecodeNonSubNodes(encodedNodes *NodesList) ([]*node.Spec, error) {
 			for inputName, links := range encodedNode.Inputs { // these would be the input connections
 				if input.Name == node.InputName(inputName) {
 					if links.Value != nil { // user has set a value and no input is connected
-						str := fmt.Sprintf("%v", links.Value, input.Name)
+						str := fmt.Sprintf("%v", links.Value)
 						input.Connection.OverrideValue = float.StrToFloat(str) // TODO add in dataTypes later
 					} else {
 						for _, link := range links.Links {

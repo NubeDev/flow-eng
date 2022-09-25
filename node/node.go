@@ -1,8 +1,14 @@
 package node
 
+import (
+	"github.com/NubeDev/flow-eng/schemas"
+)
+
 type Node interface {
 	Process() // runs the logic of the node
 	Cleanup()
+	SetSchema(schema *schemas.Schema)
+	GetSchema() *schemas.Schema
 	GetInfo() Info
 	GetID() string       // node_abc123
 	GetName() string     // AND, OR
@@ -55,6 +61,16 @@ type Spec struct {
 	Parameters *Parameters `json:"parameters,omitempty"`
 	IsParent   bool        `json:"isParent,omitempty"`
 	SubFlow    *SubFlow    `json:"subFlow,omitempty"`
+	schema     *schemas.Schema
+	OnStart    bool // used for see if it's the first loop of the runner, if false it's the first run
+}
+
+func (n *Spec) GetSchema() *schemas.Schema {
+	return n.schema
+}
+
+func (n *Spec) SetSchema(schema *schemas.Schema) {
+	n.schema = schema
 }
 
 func (n *Spec) GetInfo() Info {

@@ -22,6 +22,7 @@ require (
 )
 
 require (
+	github.com/NubeIO/lib-schema v0.1.6 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dlclark/regexp2 v1.7.0 // indirect
 	github.com/dop251/goja v0.0.0-20220915101355-d79e1b125a30 // indirect

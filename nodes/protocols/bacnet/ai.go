@@ -8,7 +8,6 @@ import (
 
 type AI struct {
 	*node.Spec
-	onStart    bool
 	objectID   points.ObjectID
 	objectType points.ObjectType
 	pointUUID  string
@@ -23,7 +22,6 @@ func NewAI(body *node.Spec, store *points.Store) (node.Node, error) {
 
 	return &AI{
 		body,
-		false,
 		0,
 		points.AnalogInput,
 		"",
@@ -35,7 +33,7 @@ func (inst *AI) setObjectId() {
 }
 
 func (inst *AI) Process() {
-	if !inst.onStart {
+	if !inst.OnStart {
 		inst.setObjectId()
 		store := getStore()
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
@@ -47,7 +45,7 @@ func (inst *AI) Process() {
 		}
 	}
 	toFlow(inst, inst.objectID)
-	inst.onStart = true
+	inst.OnStart = true
 }
 
 func (inst *AI) Cleanup() {}
