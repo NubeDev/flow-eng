@@ -14,7 +14,7 @@ func TestEncodePallet(t *testing.T) {
 		}
 	}
 
-	palle2t, err := EncodePalle2t()
+	palle2t, err := EncodePallet()
 	if err != nil {
 		return
 	}

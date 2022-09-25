@@ -21,6 +21,7 @@ type Node interface {
 	InputUpdated(name InputName) bool
 	InputsLen() int
 	OutputsLen() int
+	ReadPinAsString(name InputName) string
 	ReadPinAsInt(name InputName) int
 	ReadPinAsFloat(name InputName) float64
 	ReadPin(InputName) interface{}
@@ -231,7 +232,9 @@ const (
 	InputC InputName = "c"
 	InputD InputName = "d"
 
-	Topic InputName = "topic"
+	Topic       InputName = "topic"
+	Ip          InputName = "ip"
+	NetworkPort InputName = "port"
 
 	DelaySeconds InputName = "delay (s)"
 	Selection    InputName = "select"
