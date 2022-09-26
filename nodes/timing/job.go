@@ -1,7 +1,7 @@
 package timing
 
 import (
-	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/helpers/jobs"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/go-co-op/gocron"
@@ -18,8 +18,13 @@ type Inject struct {
 
 func NewInject(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, inject, category)
-	body.Inputs = node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs))
-	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
+
+	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs)
+	body.Inputs = node.BuildInputs(interval)
+
+	trigger := node.BuildOutput(node.Trigger, node.TypeFloat, nil, body.Outputs)
+	toggle := node.BuildOutput(node.Toggle, node.TypeFloat, nil, body.Outputs)
+	body.Outputs = node.BuildOutputs(trigger, toggle)
 	j := jobs.New().Get()
 	j.StartAsync()
 	return &Inject{body, j, false, "", time.Now()}, nil
@@ -29,37 +34,30 @@ var count int
 var t bool
 
 func set() {
-	time.Sleep(5 * time.Second)
+	time.Sleep(2 * time.Second)
 	t = false
-
 }
 
 func job() {
-	fmt.Println("*****************run job")
 	count++
 	t = true
 	go set()
 
 }
 
-func (inst *Inject) check() {
+func (inst *Inject) check(interval interface{}) {
 	if !inst.triggered {
-		inst.cron.Every(10).Second().Do(job)
+		inst.cron.Every(interval).Second().Do(job)
 	}
 	inst.triggered = true
 
 }
 
 func (inst *Inject) Process() {
-
-	inst.check()
-
-	in1 := inst.ReadPin(node.In)
-	inst.WritePin(node.Out, in1)
-
-	fmt.Println("job count", count)
-	fmt.Println("job trigger odd", count%2 == 0)
-	fmt.Println("job trigger", "even", t)
+	interval := inst.ReadPinAsInt(node.Interval)
+	inst.check(interval)
+	inst.WritePin(node.Trigger, conversions.BoolToNum(t))           // set to on for 2 sec
+	inst.WritePin(node.Toggle, conversions.BoolToNum(count%2 == 0)) // toggle on/off
 }
 
 func (inst *Inject) Cleanup() {}

@@ -5,6 +5,24 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/float"
 )
 
+type number interface {
+	int | int8 | int16 | int32 | int64 | float32 | float64
+}
+
+func BoolToNum(x bool) float64 {
+	if x {
+		return 0
+	}
+	return 1
+}
+
+func NumToBool[T number](x T) bool {
+	if x >= 1 {
+		return true
+	}
+	return false
+}
+
 func ToString(in interface{}) string {
 	return fmt.Sprintf("%v", in)
 }

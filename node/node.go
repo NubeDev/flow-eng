@@ -213,6 +213,10 @@ const (
 	InNumber InputName = "number"
 	InString InputName = "string"
 
+	Enable InputName = "enable"
+
+	Interval InputName = "interval"
+
 	In   InputName = "in"
 	In1  InputName = "in1"
 	In2  InputName = "in2"
@@ -257,8 +261,9 @@ const (
 	ErrMsg OutputName = "error"
 	Msg    OutputName = "message"
 
-	Toggle OutputName = "toggle"
-	Out    OutputName = "out"
+	Trigger OutputName = "trigger"
+	Toggle  OutputName = "toggle"
+	Out     OutputName = "out"
 
 	OutNot OutputName = "out not"
 

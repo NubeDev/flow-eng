@@ -6,6 +6,10 @@ import (
 	"github.com/NubeDev/flow-eng/schemas"
 )
 
+type name struct {
+	schema map[string]schemas.Schema
+}
+
 func GetSchema(nodeName string) (interface{}, error) {
 	s := &schemas.Schema{}
 	for _, spec := range All() {

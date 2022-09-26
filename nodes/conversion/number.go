@@ -26,7 +26,6 @@ func (inst *NumToString) Process() {
 	} else {
 		inst.WritePin(node.Out, nil)
 	}
-
 }
 
 func (inst *NumToString) Cleanup() {}
