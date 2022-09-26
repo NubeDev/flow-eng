@@ -14,6 +14,10 @@ const (
 	not = "not"
 	xor = "xor"
 
+	numLatch      = "numeric-latch"
+	stringLatch   = "string-latch"
+	setResetLatch = "set-reset-latch"
+
 	flowLoopCount = "flow-loop-count"
 
 	deadBandNode = "dead-band"

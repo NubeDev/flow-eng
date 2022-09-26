@@ -11,6 +11,7 @@ import (
 	debugging "github.com/NubeDev/flow-eng/nodes/debug"
 	"github.com/NubeDev/flow-eng/nodes/functions"
 	"github.com/NubeDev/flow-eng/nodes/hvac"
+	"github.com/NubeDev/flow-eng/nodes/latch"
 	"github.com/NubeDev/flow-eng/nodes/link"
 	"github.com/NubeDev/flow-eng/nodes/logic"
 	"github.com/NubeDev/flow-eng/nodes/math"
@@ -67,6 +68,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	// hvac
 	deadBand, _ := hvac.NewDeadBand(nil)
 
+	// latch
+	numLatch, _ := latch.NewNumLatch(nil)
+
 	selectNode, _ := switches.NewSelectNum(nil)
 
 	linkInput, _ := link.NewInput(nil, nil)
@@ -85,10 +89,10 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	logNode, _ := debugging.NewLog(nil)
 
-	//if disableMQTT {
+	// if disableMQTT {
 	//	mqttSub = nil
 	//	mqttPub = nil
-	//}
+	// }
 
 	return node.BuildNodes(
 		node.ConvertToSpec(constNum),
@@ -113,6 +117,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(flowLoopCount),
 
 		node.ConvertToSpec(deadBand),
+
+		node.ConvertToSpec(numLatch),
 
 		node.ConvertToSpec(delay),
 		node.ConvertToSpec(inject),
@@ -151,6 +157,10 @@ func Builder(body *node.Spec, opts ...interface{}) (node.Node, error) {
 		return n, err
 	}
 	n, err = builderHVAC(body)
+	if n != nil || err != nil {
+		return n, err
+	}
+	n, err = builderLatch(body)
 	if n != nil || err != nil {
 		return n, err
 	}
@@ -224,6 +234,14 @@ func builderSystem(body *node.Spec) (node.Node, error) {
 func builderHVAC(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case constNum:
+		return hvac.NewDeadBand(body)
+	}
+	return nil, nil
+}
+
+func builderLatch(body *node.Spec) (node.Node, error) {
+	switch body.GetName() {
+	case numLatch:
 		return hvac.NewDeadBand(body)
 	}
 	return nil, nil
