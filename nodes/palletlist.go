@@ -41,6 +41,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	// bool
 	and, _ := logic.NewAnd(nil)
 	or, _ := logic.NewOr(nil)
+	xor, _ := logic.NewXor(nil)
 
 	// compare
 	comp, _ := compare.NewCompare(nil)
@@ -100,6 +101,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(and),
 		node.ConvertToSpec(or),
+		node.ConvertToSpec(xor),
 
 		node.ConvertToSpec(comp),
 		node.ConvertToSpec(between),
@@ -275,6 +277,8 @@ func builderLogic(body *node.Spec) (node.Node, error) {
 		return logic.NewAnd(body)
 	case or:
 		return logic.NewOr(body)
+	case xor:
+		return logic.NewXor(body)
 	}
 	return nil, nil
 }

@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/NubeIO/lib-goja v0.0.3
+	github.com/NubeIO/lib-schema v0.1.6
 	github.com/NubeIO/nubeio-rubix-lib-helpers-go v0.2.7
 	github.com/NubeIO/nubeio-rubix-lib-modbus-go v0.0.3
 	github.com/NubeIO/nubeio-rubix-lib-models-go v1.3.7
@@ -13,8 +14,6 @@ require (
 	github.com/go-co-op/gocron v1.17.0
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/mustafaturan/bus/v3 v3.0.3
-	github.com/mustafaturan/monoton/v2 v2.0.2
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/sirupsen/logrus v1.9.0
 	github.com/stretchr/testify v1.8.0
@@ -22,7 +21,6 @@ require (
 )
 
 require (
-	github.com/NubeIO/lib-schema v0.1.6 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dlclark/regexp2 v1.7.0 // indirect
 	github.com/dop251/goja v0.0.0-20220915101355-d79e1b125a30 // indirect

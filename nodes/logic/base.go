@@ -12,11 +12,10 @@ const (
 )
 
 const (
-	and     = "and"
-	or      = "or"
-	not     = "not"
-	greater = "greater"
-	less    = "less"
+	and = "and"
+	or  = "or"
+	not = "not"
+	xor = "xor"
 )
 
 const (
@@ -50,7 +49,7 @@ func Process(body node.Node) {
 	output := operation(equation, inputs)
 	if output == nil {
 	} else {
-		//log.Infof("logic: %s, result: %v", equation, *output)
+		// log.Infof("logic: %s, result: %v", equation, *output)
 		body.WritePin(node.Result, float.NonNil(output))
 	}
 

@@ -9,11 +9,10 @@ const (
 	sub      = "subtract"
 	multiply = "multiply"
 
-	and     = "and"
-	or      = "or"
-	not     = "not"
-	greater = "greater"
-	less    = "less"
+	and = "and"
+	or  = "or"
+	not = "not"
+	xor = "xor"
 
 	flowLoopCount = "flow-loop-count"
 
