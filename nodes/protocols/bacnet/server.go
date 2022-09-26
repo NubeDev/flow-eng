@@ -55,7 +55,7 @@ func NewServer(body *node.Spec, store *points.Store) (node.Node, error) {
 	body = node.BuildNode(body, inputs, outputs, nil)
 	application := applications.RubixIO // make this a setting eg: if it's an edge-28 it would give the user 8AI, 8AOs and 100 BVs/AVs
 	client, err = mqttclient.NewClient(mqttclient.ClientOptions{
-		Servers: []string{"tcp://192.168.15.191:1883"},
+		Servers: []string{"tcp://0.0.0.0:1883"},
 	})
 	err = client.Connect()
 	if err != nil {
@@ -66,7 +66,7 @@ func NewServer(body *node.Spec, store *points.Store) (node.Node, error) {
 	if application == applications.RubixIO || application == applications.RubixIOAndModbus {
 		rubixIOUICount, rubixIOUOCount := points.CalcPointCount(1, application)
 		rio = rubixIO.New(&rubixIO.RubixIO{
-			IP:          "192.168.15.191",
+			IP:          "0.0.0.0",
 			StartAddrUI: rubixIOUICount,
 			StartAddrUO: rubixIOUOCount,
 			StartAddrDO: 2,

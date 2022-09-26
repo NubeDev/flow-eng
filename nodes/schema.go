@@ -6,11 +6,19 @@ import (
 	"github.com/NubeDev/flow-eng/schemas"
 )
 
-func GetSchema(nodeName string) (*schemas.Schema, error) {
+func GetSchema(nodeName string) (interface{}, error) {
+	s := &schemas.Schema{}
 	for _, spec := range All() {
 		if nodeName == spec.GetName() {
-			return spec.GetSchema(), nil
+			s = spec.GetSchema()
 		}
 	}
-	return nil, errors.New(fmt.Sprintf("no node found by name: %s", nodeName))
+	res := map[string]interface{}{
+		"schema": s,
+	}
+	if s == nil {
+		return nil, errors.New(fmt.Sprintf("no node found by name: %s", nodeName))
+	}
+	return res, nil
+
 }

@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	disableMQTT = true // example now how to disable a node from the user being able to add it, will be moved to the config file
+	disableMQTT = false // example now how to disable a node from the user being able to add it, will be moved to the config file
 )
 
 func All() []*node.Spec { // get all the nodes, will be used for the UI to list all the nodes
@@ -85,10 +85,10 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	logNode, _ := debugging.NewLog(nil)
 
-	if disableMQTT {
-		mqttSub = nil
-		mqttPub = nil
-	}
+	//if disableMQTT {
+	//	mqttSub = nil
+	//	mqttPub = nil
+	//}
 
 	return node.BuildNodes(
 		node.ConvertToSpec(constNum),

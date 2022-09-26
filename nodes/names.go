@@ -46,8 +46,8 @@ const (
 	bacnetBO     = "binary-output"
 	bacnetBV     = "binary-variable"
 
-	mqttSub = "pointbus-subscribe"
-	mqttPub = "pointbus-publish"
+	mqttSub = "mqtt-subscribe"
+	mqttPub = "mqtt-publish"
 
 	logNode = "log"
 )

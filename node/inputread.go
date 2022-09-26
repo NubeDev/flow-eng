@@ -1,6 +1,7 @@
 package node
 
 import (
+	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/conversions"
 )
 
@@ -32,6 +33,11 @@ func (n *Spec) ReadPinAsFloat(name InputName) float64 {
 	r := n.ReadPin(name)
 	out := conversions.GetFloat(r)
 	return out
+}
+
+func (n *Spec) ReadPinAsString(name InputName) string {
+	r := n.ReadPin(name)
+	return fmt.Sprintf("%v", r)
 }
 
 func (n *Spec) ReadPinAsInt(name InputName) int {
