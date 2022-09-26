@@ -70,6 +70,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	// latch
 	numLatch, _ := latch.NewNumLatch(nil)
+	stringLatch, _ := latch.NewStringLatch(nil)
 
 	selectNode, _ := switches.NewSelectNum(nil)
 
@@ -119,6 +120,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(deadBand),
 
 		node.ConvertToSpec(numLatch),
+		node.ConvertToSpec(stringLatch),
 
 		node.ConvertToSpec(delay),
 		node.ConvertToSpec(inject),
@@ -242,7 +244,9 @@ func builderHVAC(body *node.Spec) (node.Node, error) {
 func builderLatch(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case numLatch:
-		return hvac.NewDeadBand(body)
+		return latch.NewNumLatch(body)
+	case stringLatch:
+		return latch.NewStringLatch(body)
 	}
 	return nil, nil
 }
