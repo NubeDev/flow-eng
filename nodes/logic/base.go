@@ -22,7 +22,7 @@ const (
 )
 
 func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error) {
-	body = node.Defaults(body, xor, category)
+	body = node.Defaults(body, nodeName, category)
 	in1 := node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs)
 	in2 := node.BuildInput(node.In2, node.TypeFloat, nil, body.Inputs)
 
