@@ -3,7 +3,7 @@ package points
 import (
 	"fmt"
 	pprint "github.com/NubeDev/flow-eng/helpers/print"
-	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
+	"github.com/NubeDev/flow-eng/nodes/protocols/driver"
 	"testing"
 )
 
@@ -13,18 +13,18 @@ func Test_calcModbusRubix(t *testing.T) {
 }
 
 func TestNewStore(t *testing.T) {
-	bs := New(applications.Edge, nil, 1, 1, 1)
+	bs := New(driver.Edge, nil, 1, 1, 1)
 
 	var st []*Point
 	pprint.PrintJOSN(bs)
 
 	ai1 := &Point{
-		Application: applications.Edge,
+		Application: driver.Edge,
 		ObjectType:  AnalogInput,
 		ObjectID:    1,
 	}
 	ai2 := &Point{
-		Application: applications.Edge,
+		Application: driver.Edge,
 		ObjectType:  AnalogInput,
 		ObjectID:    2,
 	}

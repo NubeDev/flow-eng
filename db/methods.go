@@ -1,6 +1,6 @@
-package storage
+package db
 
-type Storage interface {
+type DB interface {
 	Close() error
 	AddSettings(body *Settings) (*Settings, error)
 	UpdateSettings(uuid string, body *Settings) (*Settings, error)
@@ -10,6 +10,7 @@ type Storage interface {
 	AddConnection(body *Connection) (*Connection, error)
 	UpdateConnection(uuid string, body *Connection) (*Connection, error)
 	GetConnections() ([]Connection, error)
+	GetConnectionByName(name string) (*Connection, error)
 	GetConnection(uuid string) (*Connection, error)
 	DeleteConnection(uuid string) error
 }

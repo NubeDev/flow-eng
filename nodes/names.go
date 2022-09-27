@@ -15,6 +15,10 @@ const (
 	greater = "greater"
 	less    = "less"
 
+	flowNetwork = "network"
+	flowDevice  = "device"
+	flowPoint   = "point"
+
 	flowLoopCount = "flow-loop-count"
 
 	deadBandNode = "dead-band"

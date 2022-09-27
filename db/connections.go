@@ -1,12 +1,43 @@
-package storage
+package db
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers"
+	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/tidwall/buntdb"
 )
+
+type Connection struct {
+	UUID                          string                `json:"uuid"`
+	Enabled                       *bool                 `json:"enabled,omitempty"`
+	Application                   names.ApplicationName `json:"application"` // bacnet
+	Name                          string                `json:"name,omitempty"`
+	Host                          string                `json:"host,omitempty"`
+	Port                          int                   `json:"port,omitempty"`
+	Authentication                *bool                 `json:"authentication,omitempty"`
+	HTTPS                         *bool                 `json:"https,omitempty"`
+	Username                      string                `json:"username,omitempty"`
+	Password                      string                `json:"password,omitempty"`
+	Token                         string                `json:"token,omitempty"`
+	Keepalive                     int                   `json:"keepalive,omitempty"`
+	Qos                           int                   `json:"qos,omitempty"`
+	Retain                        *bool                 `json:"retain,omitempty"`
+	AttemptReconnectOnUnavailable *bool                 `json:"attemptReconnectOnUnavailable,omitempty"`
+	AttemptReconnectSecs          int                   `json:"attemptReconnectSecs,omitempty"`
+	Timeout                       int                   `json:"timeout,omitempty"`
+}
+
+func matchConnection(t names.ApplicationName) bool {
+	switch t {
+	case names.FlowFramework:
+		return true
+	case names.MQTT:
+		return true
+	}
+	return false
+}
 
 func matchConnectionUUID(uuid string) bool {
 	if len(uuid) == 16 {
@@ -17,35 +48,22 @@ func matchConnectionUUID(uuid string) bool {
 	return false
 }
 
-type ConnType string
-
-const ConnMQTT ConnType = "mqtt"
-const ConnFlowFramework ConnType = "flow-framework"
-
-type Connection struct {
-	UUID                          string
-	Enabled                       *bool    `json:"enabled,omitempty"`
-	Application                   ConnType `json:"application"` // bacnet
-	Name                          string   `json:"name,omitempty"`
-	Host                          string   `json:"host,omitempty"`
-	Port                          int      `json:"port,omitempty"`
-	Authentication                *bool    `json:"authentication,omitempty"`
-	HTTPS                         *bool    `json:"https,omitempty"`
-	Username                      string   `json:"username,omitempty"`
-	Password                      string   `json:"password,omitempty"`
-	Token                         string   `json:"token,omitempty"`
-	Keepalive                     int      `json:"keepalive,omitempty"`
-	Qos                           int      `json:"qos,omitempty"`
-	Retain                        *bool    `json:"retain,omitempty"`
-	AttemptReconnectOnUnavailable *bool    `json:"attemptReconnectOnUnavailable,omitempty"`
-	AttemptReconnectSecs          int      `json:"attemptReconnectSecs,omitempty"`
-	Timeout                       int      `json:"timeout,omitempty"`
-	db                            Storage
-}
-
 func (inst *db) AddConnection(body *Connection) (*Connection, error) {
-	data, err := json.Marshal(body)
 	body.UUID = helpers.UUID("con")
+	if !matchConnection(body.Application) {
+		return nil, errors.New("application name does not match, try mqtt")
+	}
+
+	if body.Name == "" {
+		return nil, errors.New("name can not be empty")
+	}
+	c, err := inst.GetConnections()
+	for _, connection := range c {
+		if connection.Name == body.Name {
+			return nil, errors.New("existing name can not be empty")
+		}
+	}
+	data, err := json.Marshal(body)
 	if err != nil {
 		fmt.Printf("Error: %s", err)
 		return nil, err
@@ -78,14 +96,27 @@ func (inst *db) UpdateConnection(uuid string, body *Connection) (*Connection, er
 	return body, nil
 }
 
-func (inst *db) GetConnectionsByType(t ConnType) ([]Connection, error) {
+func (inst *db) GetConnectionByName(name string) (*Connection, error) {
+	conn, err := inst.GetConnections()
+	if err != nil {
+		return nil, err
+	}
+	for _, conn := range conn {
+		if conn.Name == name {
+			return &conn, nil
+		}
+	}
+	return nil, nil
+}
+
+func (inst *db) GetConnectionsByType(t names.ApplicationName) ([]Connection, error) {
 	var resp []Connection
 	conn, err := inst.GetConnections()
 	if err != nil {
 		return conn, err
 	}
-	for _, connection := range conn {
-		if connection.Application == t {
+	for _, conn := range conn {
+		if conn.Application == t {
 			var data Connection
 			resp = append(resp, data)
 		}

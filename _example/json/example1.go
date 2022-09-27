@@ -5,9 +5,9 @@ import (
 	"flag"
 	"fmt"
 	flowctrl "github.com/NubeDev/flow-eng"
+	"github.com/NubeDev/flow-eng/db"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes"
-	"github.com/NubeDev/flow-eng/storage"
 	"io/ioutil"
 	"log"
 	"os"
@@ -16,7 +16,7 @@ import (
 
 func main() {
 
-	storage.New("")
+	db.New("")
 
 	filePath := flag.String("f", "../flow-eng/_example/json/test.json", "flow file")
 	flag.Parse()

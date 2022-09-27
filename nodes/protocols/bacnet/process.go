@@ -2,9 +2,9 @@ package bacnet
 
 import (
 	"github.com/NubeDev/flow-eng/helpers/conversions"
+	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/helpers/topics"
 	"github.com/NubeDev/flow-eng/node"
-	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	log "github.com/sirupsen/logrus"
 )
@@ -68,9 +68,9 @@ func (inst *Server) fromBacnet(msg interface{}) {
 func getToSync() points.SyncTo {
 	app := getApplication()
 	switch app {
-	case applications.RubixIO:
+	case names.RubixIO:
 		return points.ToRubixIO
-	case applications.RubixIOAndModbus:
+	case names.RubixIOAndModbus:
 		return points.ToRubixIOModbus
 	}
 	return ""

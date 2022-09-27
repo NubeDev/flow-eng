@@ -1,4 +1,4 @@
-package storage
+package db
 
 import (
 	"github.com/tidwall/buntdb"
@@ -9,7 +9,7 @@ type db struct {
 	DB *buntdb.DB
 }
 
-func New(dbFile string) Storage {
+func New(dbFile string) DB {
 	if dbFile == "" {
 		dbFile = "./flow.db"
 	}

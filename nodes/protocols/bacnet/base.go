@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/conversions"
+	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/node"
-	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
 	points "github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	log "github.com/sirupsen/logrus"
 )
@@ -45,7 +45,7 @@ func getBacnetType(nodeName string) (obj points.ObjectType, isWriteable, isIO bo
 	return "", false, false, errors.New(fmt.Sprintf("bacnet add new point object type not found node: %s", nodeName))
 }
 
-func nodeDefault(body *node.Spec, nodeName, category string, application node.ApplicationName) (*node.Spec, error) {
+func nodeDefault(body *node.Spec, nodeName, category string, application names.ApplicationName) (*node.Spec, error) {
 	var err error
 	body = node.Defaults(body, nodeName, category)
 	_, isWriteable, _, err := getBacnetType(nodeName)
@@ -65,7 +65,7 @@ func nodeDefault(body *node.Spec, nodeName, category string, application node.Ap
 
 	parameters := &node.Parameters{
 		Application: &node.Application{
-			Application: applications.BACnet,
+			Application: names.BACnet,
 			IsChild:     true,
 		},
 	}
@@ -74,7 +74,7 @@ func nodeDefault(body *node.Spec, nodeName, category string, application node.Ap
 	return body, err
 }
 
-func addPoint(application node.ApplicationName, ioType points.IoType, objectType points.ObjectType, id points.ObjectID, isWriteable, isIO, enable bool) *points.Point {
+func addPoint(application names.ApplicationName, ioType points.IoType, objectType points.ObjectType, id points.ObjectID, isWriteable, isIO, enable bool) *points.Point {
 	point := &points.Point{
 		Application: application,
 		ObjectType:  objectType,
@@ -88,7 +88,7 @@ func addPoint(application node.ApplicationName, ioType points.IoType, objectType
 
 }
 
-func nodeDefaultOld(body *node.Spec, nodeName, category string, application node.ApplicationName) (*node.Spec, error, *points.Point) {
+func nodeDefaultOld(body *node.Spec, nodeName, category string, application names.ApplicationName) (*node.Spec, error, *points.Point) {
 	var err error
 	body = node.Defaults(body, nodeName, category)
 	objectType, isWriteable, isIO, err := getBacnetType(nodeName)
@@ -117,7 +117,7 @@ func nodeDefaultOld(body *node.Spec, nodeName, category string, application node
 
 	parameters := &node.Parameters{
 		Application: &node.Application{
-			Application: applications.BACnet,
+			Application: names.BACnet,
 			IsChild:     true,
 		},
 	}

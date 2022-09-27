@@ -3,8 +3,8 @@ package bacnet
 import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers"
+	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/helpers/topics"
-	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/services/rubixio"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -27,7 +27,7 @@ func (inst *Server) rubixInputsRunner(msg *topics.Message) {
 		//return
 	}
 
-	for _, point := range getStore().GetPointsByApplication(applications.RubixIO) {
+	for _, point := range getStore().GetPointsByApplication(names.RubixIO) {
 		if point.ObjectType == points.AnalogInput {
 			value, err := rubix.DecodeInputValue(point, inputsPayload)
 			if err != nil {

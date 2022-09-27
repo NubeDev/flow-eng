@@ -1,12 +1,16 @@
 package node
 
 import (
+	"github.com/NubeDev/flow-eng/db"
+	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/schemas"
 )
 
 type Node interface {
 	Process() // runs the logic of the node
 	Cleanup()
+	AddDB(d db.DB)
+	GetDB() db.DB
 	SetSchema(schema *schemas.Schema)
 	GetSchema() *schemas.Schema
 	GetInfo() Info
@@ -64,6 +68,15 @@ type Spec struct {
 	SubFlow    *SubFlow    `json:"subFlow,omitempty"`
 	schema     *schemas.Schema
 	OnStart    bool // used for see if it's the first loop of the runner, if false it's the first run
+	db         db.DB
+}
+
+func (n *Spec) AddDB(d db.DB) {
+	n.db = d
+}
+
+func (n *Spec) GetDB() db.DB {
+	return n.db
 }
 
 func (n *Spec) GetSchema() *schemas.Schema {
@@ -183,7 +196,8 @@ type DataTypes string
 type InputName string
 
 type OutputName string
-type ApplicationName string // bacnet, mqtt
+
+//type ApplicationName string // bacnet, mqtt
 
 const (
 	TypeString DataTypes = "string"
@@ -307,8 +321,8 @@ type SubFlow struct {
 }
 
 type Application struct {
-	Application ApplicationName `json:"application,omitempty"` // eg: bacnet-point belongs to bacnet-server
-	IsChild     bool            `json:"isChild"`
+	Application names.ApplicationName `json:"application,omitempty"` // eg: bacnet-point belongs to bacnet-server
+	IsChild     bool                  `json:"isChild"`
 }
 
 type Parameters struct {

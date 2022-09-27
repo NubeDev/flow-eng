@@ -9,7 +9,7 @@ import (
 
 func TestNew(t *testing.T) {
 
-	c := New()
+	c := New(nil)
 	ping, err := c.rest.Ping()
 	fmt.Println(err)
 	if err != nil {
@@ -21,7 +21,7 @@ func TestNew(t *testing.T) {
 
 func TestWrite(t *testing.T) {
 
-	c := New()
+	c := New(nil)
 	out1 := &rubixcli.Output{
 		IoNumber: "UO1",
 		Value:    0,

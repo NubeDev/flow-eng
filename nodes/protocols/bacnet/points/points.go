@@ -3,16 +3,15 @@ package points
 import (
 	"errors"
 	"fmt"
-	"github.com/NubeDev/flow-eng/node"
-	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
+	"github.com/NubeDev/flow-eng/helpers/names"
 	"math"
 	"reflect"
 )
 
 type Point struct {
-	UUID             string               `json:"uuid"`
-	Application      node.ApplicationName `json:"application"`
-	ObjectType       ObjectType           `json:"objectType"`
+	UUID             string                `json:"uuid"`
+	Application      names.ApplicationName `json:"application"`
+	ObjectType       ObjectType            `json:"objectType"`
 	ObjectID         ObjectID
 	presentValue     *float64
 	priAndValue      *priAndValue
@@ -33,11 +32,11 @@ func (inst *Store) GetPoints() []*Point {
 	return inst.Points
 }
 
-func (inst *Store) GetWriteablePointsByApplication(name node.ApplicationName) []*Point {
+func (inst *Store) GetWriteablePointsByApplication(name names.ApplicationName) []*Point {
 	var out []*Point
 	app := inst.GetApplication()
 	var rubix bool
-	if app == applications.RubixIO || app == applications.RubixIOAndModbus {
+	if app == names.RubixIO || app == names.RubixIOAndModbus {
 		rubix = true
 	}
 	for _, point := range inst.GetPoints() {
@@ -59,7 +58,7 @@ func (inst *Store) GetWriteablePointsByApplication(name node.ApplicationName) []
 	return out
 }
 
-func (inst *Store) GetPointsByApplication(name node.ApplicationName) []*Point {
+func (inst *Store) GetPointsByApplication(name names.ApplicationName) []*Point {
 	var out []*Point
 	for _, point := range inst.GetPoints() {
 		if point.Application == name {

@@ -2,9 +2,9 @@ package bacnet
 
 import (
 	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/names"
 	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
-	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/services/mqttclient"
 	rubixIO "github.com/NubeDev/flow-eng/services/rubixio"
@@ -44,7 +44,7 @@ func NewServer(body *node.Spec, store *points.Store) (node.Node, error) {
 	outputs := node.BuildOutputs(outputBroker, outputApplication, outputErr)
 	parameters := &node.Parameters{
 		Application: &node.Application{
-			Application: applications.BACnet,
+			Application: names.BACnet,
 			IsChild:     false,
 		},
 		MaxNodeCount: 1,
@@ -53,7 +53,7 @@ func NewServer(body *node.Spec, store *points.Store) (node.Node, error) {
 	//body = buildSubNodes(body, childNodes)
 	body.IsParent = true
 	body = node.BuildNode(body, inputs, outputs, nil)
-	application := applications.RubixIO // make this a setting eg: if it's an edge-28 it would give the user 8AI, 8AOs and 100 BVs/AVs
+	application := names.RubixIO // make this a setting eg: if it's an edge-28 it would give the user 8AI, 8AOs and 100 BVs/AVs
 	client, err = mqttclient.NewClient(mqttclient.ClientOptions{
 		Servers: []string{"tcp://0.0.0.0:1883"},
 	})
@@ -63,7 +63,7 @@ func NewServer(body *node.Spec, store *points.Store) (node.Node, error) {
 		//return nil, err
 	}
 	rio := &rubixIO.RubixIO{}
-	if application == applications.RubixIO || application == applications.RubixIOAndModbus {
+	if application == names.RubixIO || application == names.RubixIOAndModbus {
 		rubixIOUICount, rubixIOUOCount := points.CalcPointCount(1, application)
 		rio = rubixIO.New(&rubixIO.RubixIO{
 			IP:          "0.0.0.0",
@@ -121,11 +121,11 @@ func getMqtt() *mqttclient.Client {
 func getStore() *points.Store {
 	if db == nil {
 		log.Error("bacnet-server-node: store can not be empty")
-		db = points.New(applications.RubixIOAndModbus, nil, 1, 200, 200)
+		db = points.New(names.RubixIOAndModbus, nil, 1, 200, 200)
 	}
 	return db
 }
-func getApplication() node.ApplicationName {
+func getApplication() names.ApplicationName {
 	return db.GetApplication()
 }
 
@@ -138,7 +138,7 @@ func (inst *Server) subscribeBroker(topic string) {
 }
 
 func (inst *Server) subscribeToRubixIO() {
-	if getApplication() == applications.RubixIO {
+	if getApplication() == names.RubixIO {
 		err := getMqtt().Subscribe("rubixio/inputs/all", mqttclient.AtLeastOnce, rubixIOBus)
 		if err != nil {
 			log.Errorf("bacnet-server mqtt:%s", err.Error())

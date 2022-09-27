@@ -3,6 +3,8 @@ package nodes
 import (
 	"errors"
 	"fmt"
+	"github.com/NubeDev/flow-eng/db"
+	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/helpers/timer"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/compare"
@@ -15,9 +17,9 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/logic"
 	"github.com/NubeDev/flow-eng/nodes/math"
 	broker "github.com/NubeDev/flow-eng/nodes/mqtt"
-	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
+	"github.com/NubeDev/flow-eng/nodes/protocols/flow"
 	"github.com/NubeDev/flow-eng/nodes/statistics"
 	switches "github.com/NubeDev/flow-eng/nodes/switch"
 	"github.com/NubeDev/flow-eng/nodes/system"
@@ -50,6 +52,10 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	// compare
 	min, _ := statistics.NewMin(nil)
 	max, _ := statistics.NewMax(nil)
+
+	flowNetwork, _ := flow.NewNetwork(nil)
+	flowDevice, _ := flow.NewDevice(nil)
+	flowPoint, _ := flow.NewPoint(nil)
 
 	flowLoopCount, _ := system.NewLoopCount(nil)
 
@@ -110,7 +116,15 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(flowLoopCount),
 
+		node.ConvertToSpec(flowNetwork),
+		node.ConvertToSpec(flowDevice),
+		node.ConvertToSpec(flowPoint),
+
 		node.ConvertToSpec(deadBand),
+
+		node.ConvertToSpec(delay),
+		node.ConvertToSpec(inject),
+		node.ConvertToSpec(delayOn),
 
 		node.ConvertToSpec(delay),
 		node.ConvertToSpec(inject),
@@ -139,12 +153,17 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	)
 }
 
-func Builder(body *node.Spec, opts ...interface{}) (node.Node, error) {
+func Builder(body *node.Spec, db db.DB, opts ...interface{}) (node.Node, error) {
+	body.AddDB(db)
 	n, err := builderConst(body)
 	if n != nil || err != nil {
 		return n, err
 	}
 	n, err = builderMath(body)
+	if n != nil || err != nil {
+		return n, err
+	}
+	n, err = builderFlowNetworks(body)
 	if n != nil || err != nil {
 		return n, err
 	}
@@ -215,6 +234,18 @@ func builderSystem(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case flowLoopCount:
 		return system.NewLoopCount(body)
+	}
+	return nil, nil
+}
+
+func builderFlowNetworks(body *node.Spec) (node.Node, error) {
+	switch body.GetName() {
+	case flowNetwork:
+		return flow.NewNetwork(body)
+	case flowDevice:
+		return flow.NewDevice(body)
+	case flowPoint:
+		return flow.NewPoint(body)
 	}
 	return nil, nil
 }
@@ -314,7 +345,7 @@ func builderTiming(body *node.Spec) (node.Node, error) {
 }
 
 func builderProtocols(body *node.Spec) (node.Node, error) {
-	store := points.New(applications.RubixIO, nil, 0, 200, 200)
+	store := points.New(names.RubixIO, nil, 0, 200, 200)
 	switch body.GetName() {
 	case bacnetServer:
 		return bacnet.NewServer(body, store)

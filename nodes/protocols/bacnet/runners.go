@@ -1,7 +1,7 @@
 package bacnet
 
 import (
-	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
+	"github.com/NubeDev/flow-eng/helpers/names"
 	"time"
 )
 
@@ -21,13 +21,13 @@ func (inst *Server) protocolRunner() {
 		mqttPubLoop = true
 	}
 	if !modbusLoop {
-		if gt == applications.Modbus {
+		if gt == names.Modbus {
 			go inst.modbusRunner()
 			modbusLoop = true
 		}
 	}
 	if !rubixIOLoop {
-		if gt == applications.RubixIO || gt == applications.RubixIOAndModbus {
+		if gt == names.RubixIO || gt == names.RubixIOAndModbus {
 			go inst.rubixOutputsDispatch()
 			rubixIOLoop = true
 		}

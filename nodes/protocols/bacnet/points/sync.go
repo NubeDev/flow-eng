@@ -2,8 +2,7 @@ package points
 
 import (
 	"github.com/NubeDev/flow-eng/helpers"
-	"github.com/NubeDev/flow-eng/node"
-	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
+	"github.com/NubeDev/flow-eng/helpers/names"
 	"sort"
 	"time"
 )
@@ -37,9 +36,9 @@ type writeSync struct {
 	SyncTo      []*SyncList // modbus, rubix-io
 }
 
-func (inst *Store) AddSync(pointUUID string, writeValue *PriArray, syncFrom SyncFrom, syncTo SyncTo, application node.ApplicationName) {
+func (inst *Store) AddSync(pointUUID string, writeValue *PriArray, syncFrom SyncFrom, syncTo SyncTo, application names.ApplicationName) {
 	p := inst.GetPoint(pointUUID)
-	if application == applications.RubixIOAndModbus {
+	if application == names.RubixIOAndModbus {
 		if p != nil {
 			modbus := inst.addWrite(writeValue, syncFrom, ToModbus)
 			rubix := inst.addWrite(writeValue, syncFrom, ToRubixIO)

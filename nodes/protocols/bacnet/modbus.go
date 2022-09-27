@@ -1,7 +1,7 @@
 package bacnet
 
 import (
-	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
+	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/services/modbuscli"
 	log "github.com/sirupsen/logrus"
@@ -23,7 +23,7 @@ func (inst *Server) modbusRunner() {
 		return
 	}
 	store := getStore()
-	pointsList := store.GetPointsByApplication(applications.Modbus)
+	pointsList := store.GetPointsByApplication(names.Modbus)
 	inst.modbusInputsRunner(init, pointsList) // process the inputs
 	time.Sleep(4 * time.Second)
 	modbusLoop = false

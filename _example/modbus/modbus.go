@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 	flowctrl "github.com/NubeDev/flow-eng"
+	"github.com/NubeDev/flow-eng/helpers/names"
 	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/constant"
-	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	log "github.com/sirupsen/logrus"
@@ -20,7 +20,7 @@ func main() {
 		log.Errorln(err)
 		return
 	}
-	store := points.New(applications.RubixIO, nil, 1, 200, 200)
+	store := points.New(names.RubixIO, nil, 1, 200, 200)
 	bac, err := bacnet.NewServer(nil, store)
 	if err != nil {
 		log.Errorln(err)

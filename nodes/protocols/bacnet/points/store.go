@@ -4,15 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers"
-	"github.com/NubeDev/flow-eng/node"
-	"github.com/NubeDev/flow-eng/nodes/protocols/applications"
+	"github.com/NubeDev/flow-eng/helpers/names"
 	log "github.com/sirupsen/logrus"
 )
 
 type Store struct {
-	Application node.ApplicationName `json:"application"`
-	Store       *ObjectStore         `json:"store"`
-	Points      []*Point             `json:"points"`
+	Application names.ApplicationName `json:"application"`
+	Store       *ObjectStore          `json:"store"`
+	Points      []*Point              `json:"points"`
 }
 
 type pointAllowance struct {
@@ -87,20 +86,20 @@ var (
 	calculatedDOCount = 0
 )
 
-func CalcPointCount(deviceCount int, app node.ApplicationName) (rubixUIStart, rubixUOStart ObjectID) {
+func CalcPointCount(deviceCount int, app names.ApplicationName) (rubixUIStart, rubixUOStart ObjectID) {
 	if deviceCount == 0 {
 		deviceCount = 1
 	}
-	if app == applications.Edge {
+	if app == names.Edge {
 		return calcModbusRubix(deviceCount, false, false, true)
 	}
-	if app == applications.Modbus {
+	if app == names.Modbus {
 		return calcModbusRubix(deviceCount, true, false, false)
 	}
-	if app == applications.RubixIOAndModbus {
+	if app == names.RubixIOAndModbus {
 		return calcModbusRubix(deviceCount, true, true, false)
 	}
-	if app == applications.RubixIO {
+	if app == names.RubixIO {
 		return calcModbusRubix(deviceCount, false, true, false)
 	}
 	return 0, 0
@@ -142,7 +141,7 @@ func calcModbusRubix(deviceCount int, isModbus, isRubix, isEdge bool) (rubixUISt
 	return 0, 0
 }
 
-func New(app node.ApplicationName, pStore *ObjectStore, deviceCount, avAllowance, bvAllowance int) *Store {
+func New(app names.ApplicationName, pStore *ObjectStore, deviceCount, avAllowance, bvAllowance int) *Store {
 	bacnetStore := &Store{
 		Application: app,
 	}
@@ -368,6 +367,6 @@ func (inst *Store) allowableCount(objectID, from, count int) error {
 	return nil
 }
 
-func (inst *Store) GetApplication() node.ApplicationName {
+func (inst *Store) GetApplication() names.ApplicationName {
 	return inst.Application
 }
