@@ -13,6 +13,7 @@ import (
 	debugging "github.com/NubeDev/flow-eng/nodes/debug"
 	"github.com/NubeDev/flow-eng/nodes/functions"
 	"github.com/NubeDev/flow-eng/nodes/hvac"
+	"github.com/NubeDev/flow-eng/nodes/latch"
 	"github.com/NubeDev/flow-eng/nodes/link"
 	"github.com/NubeDev/flow-eng/nodes/logic"
 	"github.com/NubeDev/flow-eng/nodes/math"
@@ -43,6 +44,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	// bool
 	and, _ := logic.NewAnd(nil)
 	or, _ := logic.NewOr(nil)
+	xor, _ := logic.NewXor(nil)
 
 	// compare
 	comp, _ := compare.NewCompare(nil)
@@ -72,7 +74,13 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	// hvac
 	deadBand, _ := hvac.NewDeadBand(nil)
 
+	// latch
+	numLatch, _ := latch.NewNumLatch(nil)
+	stringLatch, _ := latch.NewStringLatch(nil)
+	setResetLatch, _ := latch.NewSetResetLatch(nil)
+
 	selectNode, _ := switches.NewSelectNum(nil)
+	switchNode, _ := switches.NewSwitch(nil)
 
 	linkInput, _ := link.NewInput(nil, nil)
 	linkOutput, _ := link.NewOutput(nil, nil)
@@ -90,10 +98,10 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	logNode, _ := debugging.NewLog(nil)
 
-	//if disableMQTT {
+	// if disableMQTT {
 	//	mqttSub = nil
 	//	mqttPub = nil
-	//}
+	// }
 
 	return node.BuildNodes(
 		node.ConvertToSpec(constNum),
@@ -106,6 +114,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(and),
 		node.ConvertToSpec(or),
+		node.ConvertToSpec(xor),
 
 		node.ConvertToSpec(comp),
 		node.ConvertToSpec(between),
@@ -122,6 +131,10 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(deadBand),
 
+		node.ConvertToSpec(numLatch),
+		node.ConvertToSpec(stringLatch),
+		node.ConvertToSpec(setResetLatch),
+
 		node.ConvertToSpec(delay),
 		node.ConvertToSpec(inject),
 		node.ConvertToSpec(delayOn),
@@ -132,6 +145,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(funcNode),
 
+		node.ConvertToSpec(switchNode),
 		node.ConvertToSpec(selectNode),
 
 		node.ConvertToSpec(stringToNum),
@@ -168,6 +182,10 @@ func Builder(body *node.Spec, db db.DB, opts ...interface{}) (node.Node, error) 
 		return n, err
 	}
 	n, err = builderHVAC(body)
+	if n != nil || err != nil {
+		return n, err
+	}
+	n, err = builderLatch(body)
 	if n != nil || err != nil {
 		return n, err
 	}
@@ -258,6 +276,18 @@ func builderHVAC(body *node.Spec) (node.Node, error) {
 	return nil, nil
 }
 
+func builderLatch(body *node.Spec) (node.Node, error) {
+	switch body.GetName() {
+	case numLatch:
+		return latch.NewNumLatch(body)
+	case stringLatch:
+		return latch.NewStringLatch(body)
+	case setResetLatch:
+		return latch.NewSetResetLatch(body)
+	}
+	return nil, nil
+}
+
 func builderConst(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case constNum:
@@ -294,6 +324,8 @@ func builderConversion(body *node.Spec) (node.Node, error) {
 
 func builderSwitch(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
+	case switchNode:
+		return switches.NewSwitch(body)
 	case selectNum:
 		return switches.NewSelectNum(body)
 	}
@@ -306,6 +338,8 @@ func builderLogic(body *node.Spec) (node.Node, error) {
 		return logic.NewAnd(body)
 	case or:
 		return logic.NewOr(body)
+	case xor:
+		return logic.NewXor(body)
 	}
 	return nil, nil
 }

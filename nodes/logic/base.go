@@ -3,7 +3,6 @@ package logic
 import (
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/float"
-	"github.com/NubeDev/flow-eng/helpers/integer"
 	"github.com/NubeDev/flow-eng/node"
 )
 
@@ -12,11 +11,10 @@ const (
 )
 
 const (
-	and     = "and"
-	or      = "or"
-	not     = "not"
-	greater = "greater"
-	less    = "less"
+	and = "and"
+	or  = "or"
+	not = "not"
+	xor = "xor"
 )
 
 const (
@@ -25,21 +23,12 @@ const (
 
 func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error) {
 	body = node.Defaults(body, nodeName, category)
-	buildCount, setting, value, err := node.NewSetting(body, &node.SettingOptions{Type: node.Number, Title: node.InputCount, Min: 2, Max: 20})
-	if err != nil {
-		return nil, err
-	}
-	settings, err := node.BuildSettings(setting)
-	if err != nil {
-		return nil, err
-	}
-	count, ok := value.(int)
-	if !ok {
-		count = 2
-	}
-	inputs := node.BuildInputs(node.DynamicInputs(node.TypeFloat, nil, count, integer.NonNil(buildCount.Min), integer.NonNil(buildCount.Max), body.Inputs, node.ABCs)...)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Result, node.TypeFloat, nil, body.Outputs))
-	body = node.BuildNode(body, inputs, outputs, settings)
+	in1 := node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs) // TODO: this input shouldn't have a manual override value
+	in2 := node.BuildInput(node.In2, node.TypeFloat, nil, body.Inputs) // TODO: this input shouldn't have a manual override value
+
+	inputs := node.BuildInputs(in1, in2)
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
+	body = node.BuildNode(body, inputs, outputs, nil)
 	return body, nil
 }
 
@@ -50,7 +39,7 @@ func Process(body node.Node) {
 	output := operation(equation, inputs)
 	if output == nil {
 	} else {
-		//log.Infof("logic: %s, result: %v", equation, *output)
+		// log.Infof("logic: %s, result: %v", equation, *output)
 		body.WritePin(node.Result, float.NonNil(output))
 	}
 

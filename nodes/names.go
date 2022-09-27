@@ -9,11 +9,14 @@ const (
 	sub      = "subtract"
 	multiply = "multiply"
 
-	and     = "and"
-	or      = "or"
-	not     = "not"
-	greater = "greater"
-	less    = "less"
+	and = "and"
+	or  = "or"
+	not = "not"
+	xor = "xor"
+
+	numLatch      = "numeric-latch"
+	stringLatch   = "string-latch"
+	setResetLatch = "set-reset-latch"
 
 	flowNetwork = "network"
 	flowDevice  = "device"
@@ -39,7 +42,10 @@ const (
 	inject  = "inject"
 	delayOn = "delayOn"
 
+	// switch
+	switchNode = "switch"
 	selectNum  = "select-numeric"
+
 	linkInput  = "link-input"
 	linkOutput = "link-output"
 
