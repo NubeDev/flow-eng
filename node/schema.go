@@ -6,6 +6,7 @@ type Schema struct {
 	Type     string                  `json:"type"`               // math/add
 	Metadata *Metadata               `json:"metadata,omitempty"` // positions on the editor
 	Inputs   map[string]SchemaInputs `json:"inputs"`
+	Settings map[string]interface{}  `json:"settings"`
 }
 
 type SchemaInputs struct {

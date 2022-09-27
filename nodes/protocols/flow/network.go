@@ -28,7 +28,6 @@ func NewNetwork(body *node.Spec) (node.Node, error) {
 	})
 
 	if body.GetDB() != nil {
-		fmt.Println("ADD CONNECTION, is body")
 		connection, err := body.GetDB().GetConnectionByName("flow-framework")
 		fmt.Println(connection, err)
 	} else {

@@ -139,10 +139,6 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(inject),
 		node.ConvertToSpec(delayOn),
 
-		node.ConvertToSpec(delay),
-		node.ConvertToSpec(inject),
-		node.ConvertToSpec(delayOn),
-
 		node.ConvertToSpec(funcNode),
 
 		node.ConvertToSpec(switchNode),
