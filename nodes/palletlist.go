@@ -71,8 +71,10 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	// latch
 	numLatch, _ := latch.NewNumLatch(nil)
 	stringLatch, _ := latch.NewStringLatch(nil)
+	setResetLatch, _ := latch.NewSetResetLatch(nil)
 
 	selectNode, _ := switches.NewSelectNum(nil)
+	switchNode, _ := switches.NewSwitch(nil)
 
 	linkInput, _ := link.NewInput(nil, nil)
 	linkOutput, _ := link.NewOutput(nil, nil)
@@ -121,6 +123,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(numLatch),
 		node.ConvertToSpec(stringLatch),
+		node.ConvertToSpec(setResetLatch),
 
 		node.ConvertToSpec(delay),
 		node.ConvertToSpec(inject),
@@ -128,6 +131,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(funcNode),
 
+		node.ConvertToSpec(switchNode),
 		node.ConvertToSpec(selectNode),
 
 		node.ConvertToSpec(stringToNum),
@@ -247,6 +251,8 @@ func builderLatch(body *node.Spec) (node.Node, error) {
 		return latch.NewNumLatch(body)
 	case stringLatch:
 		return latch.NewStringLatch(body)
+	case setResetLatch:
+		return latch.NewSetResetLatch(body)
 	}
 	return nil, nil
 }
@@ -287,6 +293,8 @@ func builderConversion(body *node.Spec) (node.Node, error) {
 
 func builderSwitch(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
+	case switchNode:
+		return switches.NewSwitch(body)
 	case selectNum:
 		return switches.NewSelectNum(body)
 	}

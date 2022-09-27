@@ -36,7 +36,7 @@ func (inst *Log) Process() {
 	}
 	str := fmt.Sprintf("%v", inStr)
 	if str != "" {
-		log.Infof("log: omment: %v string: %s", comment, str)
+		log.Infof("log: comment: %v string: %s", comment, str)
 	}
 
 }

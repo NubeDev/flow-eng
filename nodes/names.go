@@ -38,7 +38,10 @@ const (
 	inject  = "inject"
 	delayOn = "delayOn"
 
+	// switch
+	switchNode = "switch"
 	selectNum  = "select-numeric"
+
 	linkInput  = "link-input"
 	linkOutput = "link-output"
 

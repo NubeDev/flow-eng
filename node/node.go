@@ -251,9 +251,12 @@ const (
 	FallingEdge InputName = "falling-edge"
 
 	Switch  InputName = "switch"
-	Latch   InputName = "latch"
 	InTrue  InputName = "inTrue"
 	InFalse InputName = "inFalse"
+
+	Latch InputName = "latch"
+	Set   InputName = "set"
+	Reset InputName = "reset"
 )
 
 const (

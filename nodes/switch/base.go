@@ -7,8 +7,9 @@ import (
 )
 
 const (
-	selectNum = "select-numeric"
-	category  = "switch"
+	selectNum  = "select-numeric"
+	switchNode = "switch"
+	category   = "switch"
 )
 
 func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error) {
@@ -26,7 +27,7 @@ func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error)
 		count = 2
 	}
 	var nodeInputs []*node.Input
-	selection := node.BuildInput(node.Selection, node.TypeFloat, nil, body.Inputs)
+	selection := node.BuildInput(node.Selection, node.TypeFloat, nil, body.Inputs) // TODO: this input shouldn't have a manual override value
 	inputsCount := node.DynamicInputs(node.TypeFloat, nil, count, integer.NonNil(buildCount.Min), integer.NonNil(buildCount.Max), body.Inputs, node.ABCs)
 	nodeInputs = append(nodeInputs, selection)
 	nodeInputs = append(nodeInputs, inputsCount...)

@@ -1,7 +1,6 @@
 package latch
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 )
 
@@ -13,8 +12,8 @@ type StringLatch struct {
 
 func NewStringLatch(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, stringLatch, category)
-	input := node.BuildInput(node.Input_, node.TypeString, "", body.Inputs)
-	latch := node.BuildInput(node.Latch, node.TypeFloat, nil, body.Inputs)
+	input := node.BuildInput(node.Input_, node.TypeString, nil, body.Inputs)
+	latch := node.BuildInput(node.Latch, node.TypeFloat, nil, body.Inputs) // TODO: this input shouldn't have a manual override value
 
 	inputs := node.BuildInputs(input, latch)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, "", body.Outputs))
@@ -27,10 +26,7 @@ func (inst *StringLatch) Process() {
 	latch := inst.ReadPinAsFloat(node.Latch)
 	latchBool := latch == 1
 
-	fmt.Println("STRING LATCH INPUT:", input)
-
 	if latchBool && !inst.lastTrigger {
-		fmt.Println("LATCH TRIGGER")
 		inst.currentVal = input
 	}
 	inst.lastTrigger = latchBool
