@@ -1,10 +1,12 @@
 package driver
 
 import (
-	"errors"
-	"github.com/NubeDev/flow-eng/db"
 	"github.com/NubeDev/flow-eng/helpers/names"
 )
+
+type Networks struct {
+	Networks []*Network
+}
 
 type Network struct {
 	UUID            string                `json:"uuid"`
@@ -13,13 +15,12 @@ type Network struct {
 	MaxDeviceCount  int                   `json:"maxDeviceCount"`
 	Application     names.ApplicationName `json:"application"`
 	devices         []*Device
-	Storage         db.DB
 }
 
 type Device struct {
 	UUID   string `json:"uuid"`
 	Name   string `json:"name"`
-	points []*Point
+	Points []*Point
 }
 
 type Point struct {
@@ -30,62 +31,68 @@ type Point struct {
 	Priority   *Priority `json:"priority"`
 }
 
-type Networks interface {
-	Get() *Network
-
-	GetDevices() []*Device
-	GetDevice(uuid string) *Device
-	AddDevice(dev *Device)
-
-	AddPoint(deviceUUID string, body *Point) error
-	GetPoints() []*Point
+type Driver interface {
+	Get() *Networks
+	AddNetwork(body *Network)
+	GetNetworks() []*Network
+	GetNetwork(uuid string) *Network
+	GetNetworkByName(name string) *Network
+	GetDeviceByNetworkName(networkName string) []*Device
+	GetDeviceByName(networkName, deviceName string) *Device
 }
 
-func New(driver *Network) Networks {
-	return driver
+func New(n *Networks) Driver {
+	return n
 }
 
-func (inst *Network) Get() *Network {
+func (inst *Networks) Get() *Networks {
 	return inst
 }
 
-func (inst *Network) GetDevices() []*Device {
-	return inst.devices
+func (inst *Networks) AddNetwork(body *Network) {
+	inst.Networks = append(inst.Networks, body)
 }
 
-func (inst *Network) AddDevice(body *Device) {
-	inst.devices = append(inst.devices, body)
+func (inst *Networks) GetNetworks() []*Network {
+	return inst.Networks
 }
 
-func (inst *Network) GetDevice(uuid string) *Device {
-	for _, device := range inst.devices {
-		if device.UUID == uuid {
-			return device
+func (inst *Networks) GetNetwork(uuid string) *Network {
+	for _, network := range inst.Networks {
+		if network.UUID == uuid {
+			return network
 		}
 	}
 	return nil
 }
 
-func (inst *Network) GetPoints() []*Point {
-	var out []*Point
-	for _, device := range inst.devices {
-		out = append(out, device.points...)
-	}
-	return out
-}
-
-func (inst *Network) AddPoint(deviceUUID string, body *Point) error {
-	if inst.MaxDeviceCount == 1 {
-		devices := inst.GetDevices()
-		if len(devices) > 0 {
-			deviceUUID = devices[0].UUID
+func (inst *Networks) GetNetworkByName(name string) *Network {
+	for _, network := range inst.Networks {
+		if network.Name == name {
+			return network
 		}
 	}
-	body.DeviceUUID = deviceUUID
-	dev := inst.GetDevice(deviceUUID)
-	if dev == nil {
-		return errors.New("failed to find device")
+	return nil
+}
+
+func (inst *Networks) GetDeviceByNetworkName(networkName string) []*Device {
+	for _, network := range inst.GetNetworks() {
+		if network.Name == networkName {
+			return network.devices
+		}
 	}
-	dev.points = append(dev.points, body)
+	return nil
+}
+
+func (inst *Networks) GetDeviceByName(networkName, deviceName string) *Device {
+	for _, network := range inst.GetNetworks() {
+		if network.Name == networkName {
+			for _, device := range network.devices {
+				if device.Name == deviceName {
+					return device
+				}
+			}
+		}
+	}
 	return nil
 }

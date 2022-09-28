@@ -1,13 +1,12 @@
 package flow
 
 import (
-	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/node"
-	"github.com/NubeDev/flow-eng/nodes/protocols/driver"
 )
 
 type Device struct {
 	*node.Spec
+	firstLoop bool
 }
 
 func NewDevice(body *node.Spec) (node.Node, error) {
@@ -17,14 +16,7 @@ func NewDevice(body *node.Spec) (node.Node, error) {
 	inputs := node.BuildInputs(networkName, value)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
-	if network == nil {
-		network = driver.New(&driver.Network{
-			Name:        string(names.FlowFramework),
-			Application: names.FlowFramework,
-			Storage:     body.GetDB(),
-		})
-	}
-	return &Device{body}, nil
+	return &Device{body, false}, nil
 }
 
 func (inst *Device) Process() {

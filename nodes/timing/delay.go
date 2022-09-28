@@ -3,7 +3,6 @@ package timing
 import (
 	timer "github.com/NubeDev/flow-eng/helpers/timer"
 	"github.com/NubeDev/flow-eng/node"
-	"log"
 	"time"
 )
 
@@ -20,14 +19,11 @@ func NewDelay(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
 }
 
 func (inst *Delay) Process() {
-	log.Println("Delayed START")
 	in1 := inst.ReadPinAsFloat(node.In)
 	if !inst.timer.WaitFor(5 * time.Second) {
 		return
 	}
 	inst.WritePin(node.Out, in1)
-
-	log.Println("Delayed triggered")
 
 }
 
