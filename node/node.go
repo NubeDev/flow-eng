@@ -253,6 +253,9 @@ const (
 	Connection InputName = "topic"
 	Topic      InputName = "topic"
 
+	Filter   InputName = "filter"
+	Equation InputName = "equation"
+
 	Ip          InputName = "ip"
 	NetworkPort InputName = "port"
 

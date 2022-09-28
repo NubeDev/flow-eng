@@ -14,6 +14,7 @@ import (
 	debugging "github.com/NubeDev/flow-eng/nodes/debug"
 	"github.com/NubeDev/flow-eng/nodes/functions"
 	"github.com/NubeDev/flow-eng/nodes/hvac"
+	nodejson "github.com/NubeDev/flow-eng/nodes/json"
 	"github.com/NubeDev/flow-eng/nodes/latch"
 	"github.com/NubeDev/flow-eng/nodes/link"
 	"github.com/NubeDev/flow-eng/nodes/math"
@@ -73,6 +74,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	delayOn, _ := timing.NewDelayOn(nil, nil)
 
 	funcNode, _ := functions.NewFunc(nil)
+
+	jsonFilter, _ := nodejson.NewFilter(nil)
 
 	// hvac
 	deadBand, _ := hvac.NewDeadBand(nil)
@@ -136,6 +139,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(deadBand),
 
+		node.ConvertToSpec(jsonFilter),
+
 		node.ConvertToSpec(numLatch),
 		node.ConvertToSpec(stringLatch),
 		node.ConvertToSpec(setResetLatch),
@@ -183,6 +188,10 @@ func Builder(body *node.Spec, db db.DB, opts ...interface{}) (node.Node, error) 
 		return n, err
 	}
 	n, err = builderHVAC(body)
+	if n != nil || err != nil {
+		return n, err
+	}
+	n, err = builderJson(body)
 	if n != nil || err != nil {
 		return n, err
 	}
@@ -253,6 +262,14 @@ func builderSystem(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case flowLoopCount:
 		return system.NewLoopCount(body)
+	}
+	return nil, nil
+}
+
+func builderJson(body *node.Spec) (node.Node, error) {
+	switch body.GetName() {
+	case jsonFilter:
+		return nodejson.NewFilter(body)
 	}
 	return nil, nil
 }
