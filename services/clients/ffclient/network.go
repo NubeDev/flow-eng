@@ -7,7 +7,7 @@ import (
 )
 
 // AddNetwork an object
-func (inst *FlowClient) AddNetwork(body *model.Network) (*model.Network, error) {
+func (inst *Client) AddNetwork(body *model.Network) (*model.Network, error) {
 	resp, err := nresty.FormatRestyResponse(inst.client.R().
 		SetResult(&model.Network{}).
 		SetBody(body).
@@ -19,7 +19,7 @@ func (inst *FlowClient) AddNetwork(body *model.Network) (*model.Network, error) 
 }
 
 // EditNetwork edit an object
-func (inst *FlowClient) EditNetwork(uuid string, device *model.Network) (*model.Network, error) {
+func (inst *Client) EditNetwork(uuid string, device *model.Network) (*model.Network, error) {
 	url := fmt.Sprintf("/api/networks/%s", uuid)
 	resp, err := nresty.FormatRestyResponse(inst.client.R().
 		SetResult(&model.Network{}).
@@ -32,7 +32,7 @@ func (inst *FlowClient) EditNetwork(uuid string, device *model.Network) (*model.
 }
 
 // GetNetworkByPluginName an object
-func (inst *FlowClient) GetNetworkByPluginName(pluginName string, withPoints ...bool) (*model.Network, error) {
+func (inst *Client) GetNetworkByPluginName(pluginName string, withPoints ...bool) (*model.Network, error) {
 	url := fmt.Sprintf("/api/networks/plugin/%s", pluginName)
 	if len(withPoints) > 0 {
 		url = fmt.Sprintf("/api/networks/plugin/%s?with_points=true", pluginName)
@@ -47,7 +47,7 @@ func (inst *FlowClient) GetNetworkByPluginName(pluginName string, withPoints ...
 }
 
 // GetNetworks an object
-func (inst *FlowClient) GetNetworks(withDevices ...bool) ([]model.Network, error) {
+func (inst *Client) GetNetworks(withDevices ...bool) ([]model.Network, error) {
 	url := fmt.Sprintf("/api/networks")
 	if len(withDevices) > 0 {
 		if withDevices[0] == true {
@@ -67,7 +67,7 @@ func (inst *FlowClient) GetNetworks(withDevices ...bool) ([]model.Network, error
 }
 
 // GetNetworksWithPoints an object
-func (inst *FlowClient) GetNetworksWithPoints() ([]model.Network, error) {
+func (inst *Client) GetNetworksWithPoints() ([]model.Network, error) {
 	resp, err := nresty.FormatRestyResponse(inst.client.R().
 		SetResult(&[]model.Network{}).
 		Get("/api/networks/?with_points=true"))
@@ -80,7 +80,7 @@ func (inst *FlowClient) GetNetworksWithPoints() ([]model.Network, error) {
 }
 
 // GetNetworkWithPoints an object
-func (inst *FlowClient) GetNetworkWithPoints(uuid string) (*model.Network, error) {
+func (inst *Client) GetNetworkWithPoints(uuid string) (*model.Network, error) {
 	resp, err := nresty.FormatRestyResponse(inst.client.R().
 		SetResult(&model.Network{}).
 		SetPathParams(map[string]string{"uuid": uuid}).
@@ -92,7 +92,7 @@ func (inst *FlowClient) GetNetworkWithPoints(uuid string) (*model.Network, error
 }
 
 // GetFirstNetwork first object
-func (inst *FlowClient) GetFirstNetwork(withDevices ...bool) (*model.Network, error) {
+func (inst *Client) GetFirstNetwork(withDevices ...bool) (*model.Network, error) {
 	nets, err := inst.GetNetworks(withDevices...)
 	if err != nil {
 		return nil, err

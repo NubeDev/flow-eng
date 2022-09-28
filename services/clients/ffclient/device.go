@@ -7,7 +7,7 @@ import (
 )
 
 // AddDevice an object
-func (inst *FlowClient) AddDevice(device *model.Device) (*model.Device, error) {
+func (inst *Client) AddDevice(device *model.Device) (*model.Device, error) {
 	url := fmt.Sprintf("/api/devices")
 	resp, err := nresty.FormatRestyResponse(inst.client.R().
 		SetResult(&model.Device{}).
@@ -20,7 +20,7 @@ func (inst *FlowClient) AddDevice(device *model.Device) (*model.Device, error) {
 }
 
 // GetFirstDevice first object
-func (inst *FlowClient) GetFirstDevice(withPoints ...bool) (*model.Device, error) {
+func (inst *Client) GetFirstDevice(withPoints ...bool) (*model.Device, error) {
 	devices, err := inst.GetDevices(withPoints...)
 	if err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func (inst *FlowClient) GetFirstDevice(withPoints ...bool) (*model.Device, error
 }
 
 // GetDevices all objects
-func (inst *FlowClient) GetDevices(withPoints ...bool) ([]model.Device, error) {
+func (inst *Client) GetDevices(withPoints ...bool) ([]model.Device, error) {
 	url := fmt.Sprintf("/api/devices")
 	if len(withPoints) > 0 {
 		if withPoints[0] == true {
@@ -51,7 +51,7 @@ func (inst *FlowClient) GetDevices(withPoints ...bool) ([]model.Device, error) {
 }
 
 // GetDevice an object
-func (inst *FlowClient) GetDevice(uuid string, withPoints ...bool) (*model.Device, error) {
+func (inst *Client) GetDevice(uuid string, withPoints ...bool) (*model.Device, error) {
 	url := fmt.Sprintf("/api/devices/%s", uuid)
 	if len(withPoints) > 0 {
 		if withPoints[0] == true {
@@ -68,7 +68,7 @@ func (inst *FlowClient) GetDevice(uuid string, withPoints ...bool) (*model.Devic
 }
 
 // EditDevice edit an object
-func (inst *FlowClient) EditDevice(uuid string, device *model.Device) (*model.Device, error) {
+func (inst *Client) EditDevice(uuid string, device *model.Device) (*model.Device, error) {
 	url := fmt.Sprintf("/api/devices/%s", uuid)
 	resp, err := nresty.FormatRestyResponse(inst.client.R().
 		SetResult(&model.Device{}).
@@ -81,7 +81,7 @@ func (inst *FlowClient) EditDevice(uuid string, device *model.Device) (*model.De
 }
 
 // DeleteDevice an object
-func (inst *FlowClient) DeleteDevice(uuid string) (bool, error) {
+func (inst *Client) DeleteDevice(uuid string) (bool, error) {
 	_, err := nresty.FormatRestyResponse(inst.client.R().
 		SetPathParams(map[string]string{"uuid": uuid}).
 		Delete("/api/devices/{uuid}"))
