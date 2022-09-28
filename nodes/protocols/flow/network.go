@@ -14,6 +14,10 @@ type Network struct {
 
 var network driver.Networks
 
+// user will add a new connection from maybe the UI
+// user will add the network node and then select the connection by name/uuid
+// the network node will be a container node, so once they add the network they can then add the device then point
+
 func NewNetwork(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, flowNetwork, category)
 	networkName := node.BuildInput(node.Topic, node.TypeString, nil, body.Inputs)
