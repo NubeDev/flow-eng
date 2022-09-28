@@ -13,11 +13,17 @@ import (
 
 type Server struct {
 	*node.Spec
-	client        *mqttclient.Client
-	rio           *rubixIO.RubixIO
+	client  *mqttclient.Client
+	clients *clients
+
 	firstLoop     bool
 	pingFailed    bool
 	reconnectedOk bool
+}
+
+type clients struct {
+	rio *rubixIO.RubixIO
+	//edge28 *edge28
 }
 
 func buildSubNodes(body *node.Spec, childNodes []*node.Spec) *node.Spec {
@@ -53,7 +59,7 @@ func NewServer(body *node.Spec, store *points.Store) (node.Node, error) {
 	//body = buildSubNodes(body, childNodes)
 	body.IsParent = true
 	body = node.BuildNode(body, inputs, outputs, nil)
-	application := names.RubixIO // make this a setting eg: if it's an edge-28 it would give the user 8AI, 8AOs and 100 BVs/AVs
+	application := names.Edge // make this a setting eg: if it's an edge-28 it would give the user 8AI, 8AOs and 100 BVs/AVs
 	client, err = mqttclient.NewClient(mqttclient.ClientOptions{
 		Servers: []string{"tcp://0.0.0.0:1883"},
 	})
@@ -62,19 +68,24 @@ func NewServer(body *node.Spec, store *points.Store) (node.Node, error) {
 		log.Error(err)
 		//return nil, err
 	}
-	rio := &rubixIO.RubixIO{}
+	c := &clients{}
+	s := &Server{body, client, c, false, false, false}
+
 	if application == names.RubixIO || application == names.RubixIOAndModbus {
 		rubixIOUICount, rubixIOUOCount := points.CalcPointCount(1, application)
+		rio := &rubixIO.RubixIO{}
 		rio = rubixIO.New(&rubixIO.RubixIO{
 			IP:          "0.0.0.0",
 			StartAddrUI: rubixIOUICount,
 			StartAddrUO: rubixIOUOCount,
 			StartAddrDO: 2,
 		})
+		s.clients.rio = rio
+	}
+	if application == names.Edge {
+
 	}
 	db = store
-	//db = points.New(application, nil, 0, 200, 200)
-	s := &Server{body, client, rio, false, false, false}
 	inst = s
 	return s, err
 }
