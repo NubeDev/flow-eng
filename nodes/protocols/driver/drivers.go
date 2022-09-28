@@ -23,9 +23,11 @@ type Device struct {
 }
 
 type Point struct {
-	UUID     string    `json:"uuid"`
-	Name     string    `json:"name"`
-	Priority *Priority `json:"priority"`
+	UUID       string    `json:"uuid"`
+	DeviceUUID string    `json:"deviceUUID"`
+	Name       string    `json:"name"`
+	ReadOnly   *bool     `json:"readOnly"`
+	Priority   *Priority `json:"priority"`
 }
 
 type Networks interface {
@@ -79,6 +81,7 @@ func (inst *Network) AddPoint(deviceUUID string, body *Point) error {
 			deviceUUID = devices[0].UUID
 		}
 	}
+	body.DeviceUUID = deviceUUID
 	dev := inst.GetDevice(deviceUUID)
 	if dev == nil {
 		return errors.New("failed to find device")

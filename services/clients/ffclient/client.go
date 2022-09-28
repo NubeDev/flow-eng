@@ -13,10 +13,10 @@ import (
 
 var (
 	mutex       = &sync.RWMutex{}
-	flowClients = map[string]*FlowClient{}
+	flowClients = map[string]*Client{}
 )
 
-type FlowClient struct {
+type Client struct {
 	client *resty.Client
 }
 
@@ -34,11 +34,12 @@ var transport = http.Transport{
 }
 
 type Connection struct {
-	Ip   string
-	Port int
+	Ip    string
+	Port  int
+	Token string
 }
 
-func New(conn *Connection) *FlowClient {
+func New(conn *Connection) *Client {
 	mutex.Lock()
 	defer mutex.Unlock()
 	ip := conn.Ip
@@ -59,7 +60,7 @@ func New(conn *Connection) *FlowClient {
 	client.SetBaseURL(url)
 	client.SetError(&nresty.Error{})
 	client.SetTransport(&transport)
-	flowClient := &FlowClient{client: client}
+	flowClient := &Client{client: client}
 	flowClients[url] = flowClient
 	return flowClient
 }

@@ -5,6 +5,7 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/driver"
+	"github.com/NubeDev/flow-eng/services/clients/ffclient"
 )
 
 type Network struct {
@@ -47,8 +48,22 @@ func (inst *Network) getInst() *Network {
 	return inst
 }
 
-func (inst *Network) getNetwork() {
+//type netDetails struct {
+//	ip    string
+//	port  int
+//	token string
+//}
 
+func (inst *Network) connection() (*ffclient.Client, error) {
+	connection, err := inst.GetDB().GetConnectionByName("flow")
+	if err != nil {
+		return nil, err
+	}
+
+	return ffclient.New(&ffclient.Connection{
+		Ip:   connection.Host,
+		Port: connection.Port,
+	}), nil
 }
 
 func (inst *Network) Process() {

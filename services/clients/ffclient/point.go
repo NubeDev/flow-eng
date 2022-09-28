@@ -26,7 +26,7 @@ type Priority struct {
 }
 
 // PointWriteByName an object /api/points/name?network_name=modbus&device_name=modbus&point_name=modbus
-func (inst *FlowClient) PointWriteByName(networkName string, deviceName string, pointName string, pri *Priority) (*model.Point, error) {
+func (inst *Client) PointWriteByName(networkName string, deviceName string, pointName string, pri *Priority) (*model.Point, error) {
 	url := fmt.Sprintf("/api/points/name/?network_name=%s&device_name=%s&point_name=%s", networkName, deviceName, pointName)
 	body := map[string]interface{}{
 		"priority": pri,
@@ -42,7 +42,7 @@ func (inst *FlowClient) PointWriteByName(networkName string, deviceName string, 
 }
 
 // PointWrite write a point by its uuid
-func (inst *FlowClient) PointWrite(uuid string, pri *Priority) (*model.Point, error) {
+func (inst *Client) PointWrite(uuid string, pri *Priority) (*model.Point, error) {
 	url := fmt.Sprintf("/api/points/write/%s", uuid)
 	body := map[string]interface{}{
 		"priority": pri,
@@ -58,7 +58,7 @@ func (inst *FlowClient) PointWrite(uuid string, pri *Priority) (*model.Point, er
 }
 
 // AddPoint an object
-func (inst *FlowClient) AddPoint(body *model.Point) (*model.Point, error) {
+func (inst *Client) AddPoint(body *model.Point) (*model.Point, error) {
 	resp, err := nresty.FormatRestyResponse(inst.client.R().
 		SetResult(&model.Point{}).
 		SetBody(body).
@@ -70,7 +70,7 @@ func (inst *FlowClient) AddPoint(body *model.Point) (*model.Point, error) {
 }
 
 // GetPoints an objects
-func (inst *FlowClient) GetPoints() ([]model.Point, error) {
+func (inst *Client) GetPoints() ([]model.Point, error) {
 	resp, err := nresty.FormatRestyResponse(inst.client.R().
 		SetResult(&[]model.Point{}).
 		Get("/api/points"))
@@ -83,7 +83,7 @@ func (inst *FlowClient) GetPoints() ([]model.Point, error) {
 }
 
 // GetPoint an object
-func (inst *FlowClient) GetPoint(uuid string) (*model.Point, error) {
+func (inst *Client) GetPoint(uuid string) (*model.Point, error) {
 	resp, err := nresty.FormatRestyResponse(inst.client.R().
 		SetResult(&model.Point{}).
 		SetPathParams(map[string]string{"uuid": uuid}).
@@ -95,7 +95,7 @@ func (inst *FlowClient) GetPoint(uuid string) (*model.Point, error) {
 }
 
 // DeletePoint an object
-func (inst *FlowClient) DeletePoint(uuid string) (bool, error) {
+func (inst *Client) DeletePoint(uuid string) (bool, error) {
 	_, err := nresty.FormatRestyResponse(inst.client.R().
 		SetPathParams(map[string]string{"uuid": uuid}).
 		Delete("/api/points/{uuid}"))
@@ -106,7 +106,7 @@ func (inst *FlowClient) DeletePoint(uuid string) (bool, error) {
 }
 
 // EditPoint an object
-func (inst *FlowClient) EditPoint(uuid string, body *model.Point) (*model.Point, error) {
+func (inst *Client) EditPoint(uuid string, body *model.Point) (*model.Point, error) {
 	resp, err := nresty.FormatRestyResponse(inst.client.R().
 		SetBody(body).
 		SetResult(&model.Point{}).
