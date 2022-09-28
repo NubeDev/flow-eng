@@ -14,10 +14,8 @@ type Flow struct {
 	nodes  []node.Node
 }
 
-func New(nodes ...node.Node) *Flow {
-	runners := makeRunners(nodes)
-	ordered := makeGraphs(runners)
-	return &Flow{ordered, nodes}
+func New() *Flow {
+	return &Flow{nil, nil}
 }
 
 func (p *Flow) Get() *Flow {
@@ -44,11 +42,11 @@ func (p *Flow) GetNodeSpec(id string) *node.Spec {
 
 func (p *Flow) AddNodes(node ...node.Node) {
 	for _, n := range node {
-		p.AddNode(n)
+		p.addNode(n)
 	}
 }
 
-func (p *Flow) AddNode(node node.Node) *Flow {
+func (p *Flow) addNode(node node.Node) *Flow {
 	flows := p.Get()
 	flows.nodes = append(flows.nodes, node)
 	runners := makeRunners(flows.nodes)
@@ -68,6 +66,21 @@ func (p *Flow) ReBuildFlow(makeConnection bool) {
 	for _, n := range p.GetNodes() {
 		p.rebuildNode(n)
 	}
+}
+
+func removeNode(s []node.Node, index int) []node.Node {
+	ret := make([]node.Node, 0)
+	ret = append(ret, s[:index]...)
+	return append(ret, s[index+1:]...)
+}
+
+func (p *Flow) rebuildNode(node node.Node) {
+	for i, n := range p.Get().nodes {
+		if n.GetID() == node.GetID() {
+			p.nodes = removeNode(p.nodes, i)
+		}
+	}
+	p.addNode(node)
 }
 
 func (p *Flow) WipeFlow() *Flow {
@@ -94,21 +107,6 @@ func (p *Flow) GetNodeRunner(id string) *node.Runner {
 		}
 	}
 	return nil
-}
-
-func RemoveIndex(s []node.Node, index int) []node.Node {
-	ret := make([]node.Node, 0)
-	ret = append(ret, s[:index]...)
-	return append(ret, s[index+1:]...)
-}
-
-func (p *Flow) rebuildNode(node node.Node) {
-	for i, n := range p.Get().nodes {
-		if n.GetID() == node.GetID() {
-			p.nodes = RemoveIndex(p.nodes, i)
-		}
-	}
-	p.AddNode(node)
 }
 
 // ManualNodeConnector this node is just to really be used at the moment when testing the framework by making building the flow through code and not the json import
