@@ -20,6 +20,7 @@ import (
 	broker "github.com/NubeDev/flow-eng/nodes/mqtt"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
+	"github.com/NubeDev/flow-eng/nodes/protocols/driver"
 	"github.com/NubeDev/flow-eng/nodes/protocols/flow"
 	"github.com/NubeDev/flow-eng/nodes/statistics"
 	switches "github.com/NubeDev/flow-eng/nodes/switch"
@@ -57,9 +58,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	min, _ := statistics.NewMin(nil)
 	max, _ := statistics.NewMax(nil)
 
-	flowNetwork, _ := flow.NewNetwork(nil)
-	flowDevice, _ := flow.NewDevice(nil)
-	flowPoint, _ := flow.NewPoint(nil)
+	flowNetwork, _ := flow.NewNetwork(nil, nil)
+	flowDevice, _ := flow.NewDevice(nil, nil)
+	flowPoint, _ := flow.NewPoint(nil, nil)
 
 	flowLoopCount, _ := system.NewLoopCount(nil)
 
@@ -257,13 +258,14 @@ func builderSystem(body *node.Spec) (node.Node, error) {
 }
 
 func builderFlowNetworks(body *node.Spec) (node.Node, error) {
+	networksPool := driver.New(&driver.Networks{})
 	switch body.GetName() {
 	case flowNetwork:
-		return flow.NewNetwork(body)
+		return flow.NewNetwork(body, networksPool)
 	case flowDevice:
-		return flow.NewDevice(body)
+		return flow.NewDevice(body, networksPool)
 	case flowPoint:
-		return flow.NewPoint(body)
+		return flow.NewPoint(body, networksPool)
 	}
 	return nil, nil
 }

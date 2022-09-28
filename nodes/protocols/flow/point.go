@@ -1,39 +1,53 @@
 package flow
 
 import (
-	"github.com/NubeDev/flow-eng/helpers/names"
+	"fmt"
+	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/driver"
 )
 
 type Point struct {
 	*node.Spec
+	firstLoop  bool
+	deviceUUID string
+	pool       driver.Driver
 }
 
-func NewPoint(body *node.Spec) (node.Node, error) {
+func NewPoint(body *node.Spec, pool driver.Driver) (node.Node, error) {
 	body = node.Defaults(body, flowPoint, category)
-
-	networkName := node.BuildInput(node.Topic, node.TypeString, nil, body.Inputs)
-	value := node.BuildInput(node.In, node.TypeString, nil, body.Inputs)
-	inputs := node.BuildInputs(networkName, value)
+	name := node.BuildInput(node.Name, node.TypeString, nil, body.Inputs)
+	deviceUUID := node.BuildInput(node.UUID, node.TypeString, nil, body.Inputs)
+	inputs := node.BuildInputs(name, deviceUUID)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
-	if network == nil {
-		network = driver.New(&driver.Network{
-			Name:        string(names.FlowFramework),
-			Application: names.FlowFramework,
-			Storage:     body.GetDB(),
+	return &Point{body, false, body.ReadPinAsString(node.UUID), pool}, nil
+}
+
+func (inst *Point) setConnection() {
+	fmt.Println("NEW POINT", inst.deviceUUID, inst.pool)
+	dev := inst.pool.GetDevice(inst.deviceUUID)
+
+	//pprint.Print(pnt)
+	if dev != nil {
+		fmt.Println("******************")
+		pnt := inst.pool.AddPoint(inst.deviceUUID, &driver.Point{
+			UUID: inst.GetID(),
+			Name: inst.ReadPinAsString(node.Name),
 		})
-	}
-	if body.GetDB() != nil {
-		body.GetDB().GetConnections()
+		inst.firstLoop = true
+		pprint.Print(pnt)
+	} else {
+		fmt.Println("!!!!!!!!!")
 	}
 
-	return &Point{body}, nil
 }
 
 func (inst *Point) Process() {
+	if !inst.firstLoop {
+		inst.setConnection()
 
+	}
 }
 
 func (inst *Point) Cleanup() {}

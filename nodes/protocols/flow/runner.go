@@ -1,9 +1,17 @@
 package flow
 
+import (
+	pprint "github.com/NubeDev/flow-eng/helpers/print"
+)
+
 func (inst *Network) runner() {
 
-	//for _, point := range network.GetPoints() {
-	//
-	//}
+	for _, net := range inst.pool.GetNetworksByConnection(inst.connectionUUID) {
+
+		if net.UUID == inst.networkUUID {
+			pprint.Print(net)
+		}
+
+	}
 
 }

@@ -2,7 +2,8 @@ package flow
 
 import (
 	"fmt"
-	"github.com/NubeDev/flow-eng/helpers/names"
+	"github.com/NubeDev/flow-eng/db"
+	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/driver"
 	"github.com/NubeDev/flow-eng/services/clients/ffclient"
@@ -10,63 +11,82 @@ import (
 
 type Network struct {
 	*node.Spec
-	network driver.Networks
+	firstLoop      bool
+	loopCount      uint64
+	networkUUID    string
+	connectionUUID string
+	connection     *db.Connection
+	client         *ffclient.Client
+	pool           driver.Driver
 }
 
-var network driver.Networks
+// user will select an existing connection
+// user will select a ff network/device and then point by names
 
-// user will add a new connection from maybe the UI
-// user will add the network node and then select the connection by name/uuid
-// the network node will be a container node, so once they add the network they can then add the device then point
-
-func NewNetwork(body *node.Spec) (node.Node, error) {
+func NewNetwork(body *node.Spec, pool driver.Driver) (node.Node, error) {
+	//var err error
 	body = node.Defaults(body, flowNetwork, category)
-	networkName := node.BuildInput(node.Topic, node.TypeString, nil, body.Inputs)
-	value := node.BuildInput(node.In, node.TypeString, nil, body.Inputs)
-	inputs := node.BuildInputs(networkName, value)
+	connectionName := node.BuildInput(node.Connection, node.TypeString, nil, body.Inputs)
+	name := node.BuildInput(node.Name, node.TypeString, nil, body.Inputs)
+	networkUUID := node.BuildInput(node.UUID, node.TypeString, nil, body.Inputs)
+	inputs := node.BuildInputs(connectionName, name, networkUUID)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
-	network = driver.New(&driver.Network{
-		Name:        string(names.FlowFramework),
-		Application: names.FlowFramework,
-		Storage:     body.GetDB(),
-	})
+	return &Network{body, false, 0, body.ReadPinAsString(node.UUID), "", nil, nil, pool}, nil
+}
 
-	if body.GetDB() != nil {
-		connection, err := body.GetDB().GetConnectionByName("flow-framework")
-		fmt.Println(connection, err)
-	} else {
-		fmt.Println("NO DB BODY")
-	}
-
-	fmt.Println(4444, body.ReadPinAsString(node.Topic))
-
-	return &Network{body, network}, nil
+func (inst *Network) getNetwork() driver.Driver {
+	return inst.pool
 }
 
 func (inst *Network) getInst() *Network {
 	return inst
 }
 
-//type netDetails struct {
-//	ip    string
-//	port  int
-//	token string
-//}
-
-func (inst *Network) connection() (*ffclient.Client, error) {
-	connection, err := inst.GetDB().GetConnectionByName("flow")
+func (inst *Network) setConnection() {
+	fmt.Println("ADD NETWORK", inst.pool)
+	connection, err := inst.GetDB().GetConnection("con_1b8b9c8bd63f")
 	if err != nil {
-		return nil, err
+		inst.firstLoop = false // if fail try again
+		return
 	}
-
-	return ffclient.New(&ffclient.Connection{
+	inst.connectionUUID = connection.UUID
+	inst.client = ffclient.New(&ffclient.Connection{
 		Ip:   connection.Host,
 		Port: connection.Port,
-	}), nil
+	})
+
+	net := inst.pool.AddNetwork(&driver.Network{
+		UUID:           inst.networkUUID,
+		Name:           inst.ReadPinAsString(node.Topic),
+		ConnectionUUID: connection.UUID,
+	})
+
+	pprint.PrintJOSN(net)
+	inst.firstLoop = true
+
+}
+
+func (inst *Network) ping(loop uint64) {
+	rePing := loop % 10
+	if rePing == 0 {
+		err := inst.client.Ping()
+		if err != nil {
+
+		}
+	}
+
 }
 
 func (inst *Network) Process() {
+	inst.loopCount++
+	if !inst.firstLoop {
+		inst.setConnection()
+
+	}
+	inst.ping(inst.loopCount)
+
+	inst.runner()
 
 }
 
