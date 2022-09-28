@@ -1,4 +1,4 @@
-package logic
+package boolean
 
 import (
 	"github.com/NubeDev/flow-eng/helpers/array"
@@ -7,14 +7,15 @@ import (
 )
 
 const (
-	category = "logic"
+	category = "boolean"
 )
 
 const (
-	and = "and"
-	or  = "or"
-	not = "not"
-	xor = "xor"
+	and    = "and"
+	or     = "or"
+	not    = "not"
+	xor    = "xor"
+	toggle = "toggle"
 )
 
 const (
@@ -39,10 +40,9 @@ func Process(body node.Node) {
 	output := operation(equation, inputs)
 	if output == nil {
 	} else {
-		// log.Infof("logic: %s, result: %v", equation, *output)
+		// log.Infof("boolean: %s, result: %v", equation, *output)
 		body.WritePin(node.Result, float.NonNil(output))
 	}
-
 }
 
 func operation(operation string, values []*float64) *float64 {

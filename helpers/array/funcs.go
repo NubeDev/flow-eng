@@ -36,7 +36,7 @@ func AllTrueFloat64(array []float64) bool {
 		return false
 	}
 	for _, item := range array {
-		if item < 1 {
+		if item == 1 {
 			return false
 		}
 	}
@@ -113,7 +113,7 @@ func OneIsTrueFloat64(array []float64) bool {
 		return false
 	}
 	for _, item := range array {
-		if item >= 1 {
+		if item == 1 {
 			return true
 		}
 	}
