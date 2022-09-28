@@ -1,7 +1,9 @@
 package flow
 
 import (
+	"fmt"
 	"github.com/NubeDev/flow-eng/db"
+	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/driver"
 	"github.com/NubeDev/flow-eng/services/clients/ffclient"
@@ -9,11 +11,13 @@ import (
 
 type Network struct {
 	*node.Spec
-	firstLoop  bool
-	loopCount  uint64
-	connection *db.Connection
-	client     *ffclient.Client
-	pool       driver.Driver
+	firstLoop      bool
+	loopCount      uint64
+	networkUUID    string
+	connectionUUID string
+	connection     *db.Connection
+	client         *ffclient.Client
+	pool           driver.Driver
 }
 
 // user will select an existing connection
@@ -22,19 +26,13 @@ type Network struct {
 func NewNetwork(body *node.Spec, pool driver.Driver) (node.Node, error) {
 	//var err error
 	body = node.Defaults(body, flowNetwork, category)
-	connectionName := node.BuildInput(node.Topic, node.TypeString, nil, body.Inputs)
-	value := node.BuildInput(node.In, node.TypeString, nil, body.Inputs)
-	inputs := node.BuildInputs(connectionName, value)
+	connectionName := node.BuildInput(node.Connection, node.TypeString, nil, body.Inputs)
+	name := node.BuildInput(node.Name, node.TypeString, nil, body.Inputs)
+	networkUUID := node.BuildInput(node.UUID, node.TypeString, nil, body.Inputs)
+	inputs := node.BuildInputs(connectionName, name, networkUUID)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
-	if pool != nil {
-		pool.AddNetwork(&driver.Network{
-			UUID: body.GetID(),
-			Name: body.ReadPinAsString(node.Topic),
-		})
-	}
-
-	return &Network{body, false, 0, nil, nil, pool}, nil
+	return &Network{body, false, 0, body.ReadPinAsString(node.UUID), "", nil, nil, pool}, nil
 }
 
 func (inst *Network) getNetwork() driver.Driver {
@@ -46,15 +44,27 @@ func (inst *Network) getInst() *Network {
 }
 
 func (inst *Network) setConnection() {
+	fmt.Println("ADD NETWORK", inst.pool)
 	connection, err := inst.GetDB().GetConnection("con_1b8b9c8bd63f")
 	if err != nil {
 		inst.firstLoop = false // if fail try again
 		return
 	}
+	inst.connectionUUID = connection.UUID
 	inst.client = ffclient.New(&ffclient.Connection{
 		Ip:   connection.Host,
 		Port: connection.Port,
 	})
+
+	net := inst.pool.AddNetwork(&driver.Network{
+		UUID:           inst.networkUUID,
+		Name:           inst.ReadPinAsString(node.Topic),
+		ConnectionUUID: connection.UUID,
+	})
+
+	pprint.PrintJOSN(net)
+	inst.firstLoop = true
+
 }
 
 func (inst *Network) ping(loop uint64) {
@@ -72,7 +82,7 @@ func (inst *Network) Process() {
 	inst.loopCount++
 	if !inst.firstLoop {
 		inst.setConnection()
-		inst.firstLoop = false
+
 	}
 	inst.ping(inst.loopCount)
 

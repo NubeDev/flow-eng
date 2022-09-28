@@ -250,7 +250,9 @@ const (
 	InputC InputName = "c"
 	InputD InputName = "d"
 
-	Topic       InputName = "topic"
+	Connection InputName = "topic"
+	Topic      InputName = "topic"
+
 	Ip          InputName = "ip"
 	NetworkPort InputName = "port"
 
@@ -260,6 +262,7 @@ const (
 	From InputName = "from"
 	To   InputName = "to"
 
+	UUID          InputName = "uuid"
 	Name          InputName = "name"
 	ObjectId      InputName = "object-id"
 	ObjectType    InputName = "object-type"

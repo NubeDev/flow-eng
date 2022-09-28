@@ -59,8 +59,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	max, _ := statistics.NewMax(nil)
 
 	flowNetwork, _ := flow.NewNetwork(nil, nil)
-	flowDevice, _ := flow.NewDevice(nil)
-	flowPoint, _ := flow.NewPoint(nil)
+	flowDevice, _ := flow.NewDevice(nil, nil)
+	flowPoint, _ := flow.NewPoint(nil, nil)
 
 	flowLoopCount, _ := system.NewLoopCount(nil)
 
@@ -263,9 +263,9 @@ func builderFlowNetworks(body *node.Spec) (node.Node, error) {
 	case flowNetwork:
 		return flow.NewNetwork(body, networksPool)
 	case flowDevice:
-		return flow.NewDevice(body)
+		return flow.NewDevice(body, networksPool)
 	case flowPoint:
-		return flow.NewPoint(body)
+		return flow.NewPoint(body, networksPool)
 	}
 	return nil, nil
 }

@@ -6,8 +6,12 @@ import (
 
 func (inst *Network) runner() {
 
-	for _, net := range inst.pool.GetNetworks() {
-		pprint.Print(net)
+	for _, net := range inst.pool.GetNetworksByConnection(inst.connectionUUID) {
+
+		if net.UUID == inst.networkUUID {
+			pprint.Print(net)
+		}
+
 	}
 
 }
