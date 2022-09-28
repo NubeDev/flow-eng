@@ -259,9 +259,6 @@ func builderSystem(body *node.Spec) (node.Node, error) {
 
 func builderFlowNetworks(body *node.Spec) (node.Node, error) {
 	networksPool := driver.New(&driver.Networks{})
-	fmt.Println(1111)
-
-	fmt.Println(1111)
 	switch body.GetName() {
 	case flowNetwork:
 		return flow.NewNetwork(body, networksPool)
