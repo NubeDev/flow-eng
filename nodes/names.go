@@ -9,10 +9,11 @@ const (
 	sub      = "subtract"
 	multiply = "multiply"
 
-	and = "and"
-	or  = "or"
-	not = "not"
-	xor = "xor"
+	and    = "and"
+	or     = "or"
+	not    = "not"
+	xor    = "xor"
+	toggle = "toggle"
 
 	numLatch      = "numeric-latch"
 	stringLatch   = "string-latch"

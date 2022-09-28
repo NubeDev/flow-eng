@@ -7,6 +7,7 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/helpers/timer"
 	"github.com/NubeDev/flow-eng/node"
+	"github.com/NubeDev/flow-eng/nodes/boolean"
 	"github.com/NubeDev/flow-eng/nodes/compare"
 	"github.com/NubeDev/flow-eng/nodes/constant"
 	"github.com/NubeDev/flow-eng/nodes/conversion"
@@ -15,7 +16,6 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/hvac"
 	"github.com/NubeDev/flow-eng/nodes/latch"
 	"github.com/NubeDev/flow-eng/nodes/link"
-	"github.com/NubeDev/flow-eng/nodes/logic"
 	"github.com/NubeDev/flow-eng/nodes/math"
 	broker "github.com/NubeDev/flow-eng/nodes/mqtt"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet"
@@ -42,9 +42,11 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	divide, _ := math.NewDivide(nil)
 
 	// bool
-	and, _ := logic.NewAnd(nil)
-	or, _ := logic.NewOr(nil)
-	xor, _ := logic.NewXor(nil)
+	and, _ := boolean.NewAnd(nil)
+	or, _ := boolean.NewOr(nil)
+	xor, _ := boolean.NewXor(nil)
+	not, _ := boolean.NewNot(nil)
+	toggle, _ := boolean.NewToggle(nil)
 
 	// compare
 	comp, _ := compare.NewCompare(nil)
@@ -115,6 +117,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(and),
 		node.ConvertToSpec(or),
 		node.ConvertToSpec(xor),
+		node.ConvertToSpec(not),
+		node.ConvertToSpec(toggle),
 
 		node.ConvertToSpec(comp),
 		node.ConvertToSpec(between),
@@ -189,7 +193,7 @@ func Builder(body *node.Spec, db db.DB, opts ...interface{}) (node.Node, error) 
 	if n != nil || err != nil {
 		return n, err
 	}
-	n, err = builderLogic(body)
+	n, err = builderBoolean(body)
 	if n != nil || err != nil {
 		return n, err
 	}
@@ -328,14 +332,18 @@ func builderSwitch(body *node.Spec) (node.Node, error) {
 	return nil, nil
 }
 
-func builderLogic(body *node.Spec) (node.Node, error) {
+func builderBoolean(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case and:
-		return logic.NewAnd(body)
+		return boolean.NewAnd(body)
 	case or:
-		return logic.NewOr(body)
+		return boolean.NewOr(body)
 	case xor:
-		return logic.NewXor(body)
+		return boolean.NewXor(body)
+	case not:
+		return boolean.NewNot(body)
+	case toggle:
+		return boolean.NewToggle(body)
 	}
 	return nil, nil
 }

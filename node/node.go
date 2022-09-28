@@ -7,7 +7,7 @@ import (
 )
 
 type Node interface {
-	Process() // runs the logic of the node
+	Process() // runs the boolean of the node
 	Cleanup()
 	AddDB(d db.DB)
 	GetDB() db.DB
@@ -197,7 +197,7 @@ type InputName string
 
 type OutputName string
 
-//type ApplicationName string // bacnet, mqtt
+// type ApplicationName string // bacnet, mqtt
 
 const (
 	TypeString DataTypes = "string"
