@@ -7,7 +7,7 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/helpers/timer"
 	"github.com/NubeDev/flow-eng/node"
-	"github.com/NubeDev/flow-eng/nodes/boolean"
+	"github.com/NubeDev/flow-eng/nodes/bool"
 	"github.com/NubeDev/flow-eng/nodes/compare"
 	"github.com/NubeDev/flow-eng/nodes/constant"
 	"github.com/NubeDev/flow-eng/nodes/conversion"
@@ -42,11 +42,11 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	divide, _ := math.NewDivide(nil)
 
 	// bool
-	and, _ := boolean.NewAnd(nil)
-	or, _ := boolean.NewOr(nil)
-	xor, _ := boolean.NewXor(nil)
-	not, _ := boolean.NewNot(nil)
-	toggle, _ := boolean.NewToggle(nil)
+	and, _ := bool.NewAnd(nil)
+	or, _ := bool.NewOr(nil)
+	xor, _ := bool.NewXor(nil)
+	not, _ := bool.NewNot(nil)
+	toggle, _ := bool.NewToggle(nil)
 
 	// compare
 	comp, _ := compare.NewCompare(nil)
@@ -335,15 +335,15 @@ func builderSwitch(body *node.Spec) (node.Node, error) {
 func builderBoolean(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case and:
-		return boolean.NewAnd(body)
+		return bool.NewAnd(body)
 	case or:
-		return boolean.NewOr(body)
+		return bool.NewOr(body)
 	case xor:
-		return boolean.NewXor(body)
+		return bool.NewXor(body)
 	case not:
-		return boolean.NewNot(body)
+		return bool.NewNot(body)
 	case toggle:
-		return boolean.NewToggle(body)
+		return bool.NewToggle(body)
 	}
 	return nil, nil
 }

@@ -7,7 +7,7 @@ import (
 )
 
 type Node interface {
-	Process() // runs the boolean of the node
+	Process() // runs the bool of the node
 	Cleanup()
 	AddDB(d db.DB)
 	GetDB() db.DB

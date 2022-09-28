@@ -79,7 +79,7 @@ const (
 	Array   PropType = "array"
 	String  PropType = "string"
 	Number  PropType = "number"
-	Boolean PropType = "boolean"
+	Boolean PropType = "bool"
 )
 
 func NewProperty(args *PropertyBase) *PropertyBase {

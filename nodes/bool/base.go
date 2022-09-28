@@ -1,4 +1,4 @@
-package boolean
+package bool
 
 import (
 	"github.com/NubeDev/flow-eng/helpers/array"
@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	category = "boolean"
+	category = "bool"
 )
 
 const (
@@ -39,9 +39,10 @@ func Process(body node.Node) {
 	inputs := float.ConvertInterfaceToFloatMultiple(body.ReadMultiple(count))
 	output := operation(equation, inputs)
 	if output == nil {
+		body.WritePin(node.Out, nil)
 	} else {
-		// log.Infof("boolean: %s, result: %v", equation, *output)
-		body.WritePin(node.Result, float.NonNil(output))
+		// log.Infof("bool: %s, result: %v", equation, *output)
+		body.WritePin(node.Out, float.NonNil(output))
 	}
 }
 
