@@ -1,7 +1,6 @@
 package switches
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 )
 
@@ -27,9 +26,6 @@ func (inst *Switch) Process() {
 	inFalse := inst.ReadPinAsFloat(node.InFalse)
 
 	inSwitchAsBool := inSwitch == 1
-
-	fmt.Println("inSwitch: ", inSwitch)
-	fmt.Println("inSwitchAsBool: ", inSwitchAsBool)
 
 	if inSwitchAsBool {
 		inst.WritePin(node.Out, inTrue)

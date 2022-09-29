@@ -23,6 +23,8 @@ const (
 	HeatOffset InputName = "offset-heat"
 	DeadBand   InputName = "dead-band"
 
+	AlertDelayMins InputName = "alert-delay-mins"
+
 	Comment  InputName = "comment"
 	InNumber InputName = "number"
 	InString InputName = "string"
@@ -92,6 +94,8 @@ const (
 
 	ErrMsg OutputName = "error"
 	Msg    OutputName = "message"
+
+	Flatline OutputName = "flatline"
 
 	Trigger OutputName = "trigger"
 	Toggle  OutputName = "toggle"

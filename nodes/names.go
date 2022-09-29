@@ -43,6 +43,8 @@ const (
 	min = "max"
 	avg = "avg"
 
+	flatline = "flatline"
+
 	delay   = "delay"
 	inject  = "inject"
 	delayOn = "delayOn"

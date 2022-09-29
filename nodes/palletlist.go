@@ -26,6 +26,7 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/protocols/driver"
 	"github.com/NubeDev/flow-eng/nodes/protocols/flow"
 	"github.com/NubeDev/flow-eng/nodes/statistics"
+	"github.com/NubeDev/flow-eng/nodes/streams"
 	switches "github.com/NubeDev/flow-eng/nodes/switch"
 	"github.com/NubeDev/flow-eng/nodes/system"
 	"github.com/NubeDev/flow-eng/nodes/timing"
@@ -39,12 +40,6 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	constNum, _ := constant.NewConstNum(nil)
 	constStr, _ := constant.NewString(nil)
 
-	// math
-	add, _ := math.NewAdd(nil)
-	sub, _ := math.NewSub(nil)
-	multiply, _ := math.NewMultiply(nil)
-	divide, _ := math.NewDivide(nil)
-
 	// bool
 	and, _ := bool.NewAnd(nil)
 	or, _ := bool.NewOr(nil)
@@ -57,9 +52,12 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	between, _ := compare.NewBetween(nil)
 	hysteresis, _ := compare.NewHysteresis(nil)
 
-	// compare
+	// statistics
 	min, _ := statistics.NewMin(nil)
 	max, _ := statistics.NewMax(nil)
+
+	// streams
+	flatline, _ := streams.NewFlatline(nil)
 
 	flowNetwork, _ := flow.NewNetwork(nil, nil)
 	flowDevice, _ := flow.NewDevice(nil, nil)
@@ -69,11 +67,6 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	stringToNum, _ := conversion.NewStringToNum(nil)
 	numToString, _ := conversion.NewNumToString(nil)
-
-	// time
-	delay, _ := timing.NewDelay(nil, nil)
-	inject, _ := timing.NewInject(nil)
-	delayOn, _ := timing.NewDelayOn(nil, nil)
 
 	funcNode, _ := functions.NewFunc(nil)
 
@@ -95,6 +88,17 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	linkInput, _ := link.NewInput(nil, nil)
 	linkOutput, _ := link.NewOutput(nil, nil)
+
+	// math
+	add, _ := math.NewAdd(nil)
+	sub, _ := math.NewSub(nil)
+	multiply, _ := math.NewMultiply(nil)
+	divide, _ := math.NewDivide(nil)
+
+	// time
+	delay, _ := timing.NewDelay(nil, nil)
+	inject, _ := timing.NewInject(nil)
+	delayOn, _ := timing.NewDelayOn(nil, nil)
 
 	// bacnet
 	bacServer, _ := bacnet.NewServer(nil, nil)
@@ -157,6 +161,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(inject),
 		node.ConvertToSpec(delayOn),
 
+		node.ConvertToSpec(flatline),
+
 		node.ConvertToSpec(funcNode),
 
 		node.ConvertToSpec(switchNode),
@@ -216,6 +222,10 @@ func Builder(body *node.Spec, db db.DB, opts ...interface{}) (node.Node, error) 
 		return n, err
 	}
 	n, err = builderBoolean(body)
+	if n != nil || err != nil {
+		return n, err
+	}
+	n, err = builderStreams(body)
 	if n != nil || err != nil {
 		return n, err
 	}
@@ -325,6 +335,14 @@ func builderLatch(body *node.Spec) (node.Node, error) {
 		return latch.NewStringLatch(body)
 	case setResetLatch:
 		return latch.NewSetResetLatch(body)
+	}
+	return nil, nil
+}
+
+func builderStreams(body *node.Spec) (node.Node, error) {
+	switch body.GetName() {
+	case flatline:
+		return streams.NewFlatline(body)
 	}
 	return nil, nil
 }
