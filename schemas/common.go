@@ -9,7 +9,7 @@ type Schema struct {
 type String struct {
 	Type     string `json:"type" default:"string"`
 	Title    string `json:"title" default:""`
-	Default  string `json:"default" default:"noreply@nube-io.com"`
+	Default  string `json:"default" default:""`
 	Help     string `json:"help" default:""`
 	ReadOnly bool   `json:"readOnly" default:"false"`
 }
