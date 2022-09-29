@@ -14,14 +14,11 @@ func buildSchema() *schemas.Schema {
 	m := &nodeSchema{}
 	m.Address.Title = "address"
 	pprint.PrintJOSN(m)
-
 	schema.Set(m)
-
 	s := &schemas.Schema{
 		Title:      "email",
 		Properties: m,
 		UiSchema:   nil,
 	}
-
 	return s
 }
