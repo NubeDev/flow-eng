@@ -14,6 +14,7 @@ const (
 	ToRubixIOModbus SyncTo = "ToRubixIOModbus" // write to rubix-io outputs
 	ToRubixIO       SyncTo = "ToRubixIO"       // write to rubix-io outputs
 	ToModbus        SyncTo = "ToModbus"        // write to rubix-io outputs
+	ToEdge28        SyncTo = "ToEdge28"        // write to rubix-io outputs
 )
 
 const (

@@ -6,6 +6,7 @@ import (
 	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
+	edge28lib "github.com/NubeDev/flow-eng/services/edge28"
 	"github.com/NubeDev/flow-eng/services/mqttclient"
 	rubixIO "github.com/NubeDev/flow-eng/services/rubixio"
 	log "github.com/sirupsen/logrus"
@@ -13,17 +14,16 @@ import (
 
 type Server struct {
 	*node.Spec
-	client  *mqttclient.Client
-	clients *clients
-
+	client        *mqttclient.Client
+	clients       *clients
 	firstLoop     bool
 	pingFailed    bool
 	reconnectedOk bool
 }
 
 type clients struct {
-	rio *rubixIO.RubixIO
-	//edge28 *edge28
+	rio    *rubixIO.RubixIO
+	edge28 *edge28lib.Edge28
 }
 
 func buildSubNodes(body *node.Spec, childNodes []*node.Spec) *node.Spec {
@@ -37,6 +37,7 @@ func buildSubNodes(body *node.Spec, childNodes []*node.Spec) *node.Spec {
 var db *points.Store
 var client *mqttclient.Client
 var inst *Server
+var application = names.Edge
 
 //func NewServer(body *node.Spec, childNodes ...*node.Spec) (node.Node, error) {
 
@@ -59,7 +60,6 @@ func NewServer(body *node.Spec, store *points.Store) (node.Node, error) {
 	//body = buildSubNodes(body, childNodes)
 	body.IsParent = true
 	body = node.BuildNode(body, inputs, outputs, nil)
-	application := names.Edge // make this a setting eg: if it's an edge-28 it would give the user 8AI, 8AOs and 100 BVs/AVs
 	client, err = mqttclient.NewClient(mqttclient.ClientOptions{
 		Servers: []string{"tcp://0.0.0.0:1883"},
 	})
@@ -83,7 +83,8 @@ func NewServer(body *node.Spec, store *points.Store) (node.Node, error) {
 		s.clients.rio = rio
 	}
 	if application == names.Edge {
-
+		edge28 := edge28lib.New("192.168.15.141")
+		s.clients.edge28 = edge28
 	}
 	db = store
 	inst = s
@@ -132,7 +133,7 @@ func getMqtt() *mqttclient.Client {
 func getStore() *points.Store {
 	if db == nil {
 		log.Error("bacnet-server-node: store can not be empty")
-		db = points.New(names.RubixIOAndModbus, nil, 1, 200, 200)
+		db = points.New(application, nil, 1, 200, 200)
 	}
 	return db
 }

@@ -96,9 +96,9 @@ func nodeDefaultOld(body *node.Spec, nodeName, category string, application name
 	objectIDInput := node.BuildInput(node.ObjectId, node.TypeFloat, 0, body.Inputs)
 	//fmt.Println(11111, objectType)
 	//pprint.PrintJOSN(objectIDInput)
-	ioType := points.IoTypeTemp // TODO make a setting
+	ioType := points.IoTypeDigital // TODO make a setting
 	if isWriteable {
-		ioType = points.IoTypeVolts
+		ioType = points.IoTypeDigital
 	}
 
 	enable := true // TODO make a setting

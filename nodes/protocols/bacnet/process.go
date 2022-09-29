@@ -72,6 +72,8 @@ func getToSync() points.SyncTo {
 		return points.ToRubixIO
 	case names.RubixIOAndModbus:
 		return points.ToRubixIOModbus
+	case names.Edge:
+		return points.ToEdge28
 	}
 	return ""
 }

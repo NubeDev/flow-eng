@@ -13,26 +13,17 @@ import (
 )
 
 // GetGPIOValueForUOByType converts the point value to the correct edge28 UO GPIO value based on the IoType
-func getValueUO(ioType string) (float64, error) {
+func getValueUO(ioType string, value float64) (float64, error) {
 	var err error
-	var result float64
-	if !structs.ExistsInStrut(UOTypes, ioType) {
-		err = errors.New(fmt.Sprintf("skipping IoType %s not recognized.", ioType))
-		return 0, err
-	}
+	var out float64
 	switch ioType {
-	case UOTypes.DIGITAL:
-		result, err = convertDigital(result, true)
 	case UOTypes.VOLTSDC:
-		result = edge28.VoltageToGPIOValue(result)
+		out = edge28.VoltageToGPIOValue(value)
 	default:
 		err = errors.New("UO IoType is not a recognized type")
 	}
-	if err != nil {
-		return 0, err
-	} else {
-		return result, nil
-	}
+	return out, err
+
 }
 
 // getValueUI converts the GPIO value to the scaled UI value based on the IoType
@@ -98,23 +89,20 @@ func convertDigital(input interface{}, isUO bool) (float64, error) {
 	}
 }
 
-func limitValue(ioType string, inputVal *float64) (outputVal *float64) {
-	if inputVal == nil {
-		return nil
-	}
-	inputValFloat := *inputVal
+func limitValue(ioType string, inputVal float64) (outputVal float64) {
+	inputValFloat := inputVal
 	switch ioType {
 	case UOTypes.DIGITAL, UITypes.DIGITAL:
 		if inputValFloat <= 0 {
-			outputVal = float.New(0)
+			outputVal = 0
 		} else {
-			outputVal = float.New(1)
+			outputVal = 1
 		}
 	case UOTypes.VOLTSDC, UITypes.VOLTSDC:
 		if inputValFloat <= 0 {
-			outputVal = float.New(0)
+			outputVal = 0
 		} else if inputValFloat >= 10 {
-			outputVal = float.New(10)
+			outputVal = 10
 		} else {
 			outputVal = inputVal
 		}

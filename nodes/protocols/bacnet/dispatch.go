@@ -2,6 +2,7 @@ package bacnet
 
 import (
 	"fmt"
+	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	log "github.com/sirupsen/logrus"
@@ -41,7 +42,7 @@ func (inst *Server) rubixOutputsDispatch() {
 		}
 		if len(pointsToWrite) > 0 {
 			fmt.Println("BULK WIRTE")
-			bulkPoints, err := inst.rio.BulkWrite(pointsToWrite)
+			bulkPoints, err := inst.clients.rio.BulkWrite(pointsToWrite)
 			if err != nil {
 				log.Error(err)
 			} else {
@@ -66,4 +67,24 @@ func (inst *Server) rubixOutputsDispatch() {
 		time.Sleep(runnerDelay * time.Millisecond)
 		//time.Sleep(2000 * time.Millisecond)
 	}
+}
+
+func (inst *Server) edge28OutputsDispatch() {
+	log.Info("start rubix-io-outputs-dispatch")
+	getPoints := getStore().GetWriteablePointsByApplication(getApplication())
+	for _, point := range getPoints { //get the list of the points to update
+		sync := getStore().GetLatestSyncValue(point.UUID, points.ToEdge28)
+		pprint.Print(sync)
+		if sync != nil {
+			if point.ObjectType == points.AnalogOutput {
+				inst.clients.edge28.WriteUO(point)
+			}
+			if point.ObjectType == points.BinaryOutput {
+				inst.clients.edge28.WriteDO(point)
+			}
+			pprint.Print(point)
+
+		}
+	}
+
 }
