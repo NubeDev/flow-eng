@@ -20,7 +20,7 @@ type Connection struct {
 	HTTPS                         *bool                 `json:"https,omitempty"`
 	Username                      string                `json:"username,omitempty"`
 	Password                      string                `json:"password,omitempty"`
-	Email                         string                `json:"email,omitempty"`
+	Email                         string                `json:"gmail,omitempty"`
 	Token                         string                `json:"token,omitempty"`
 	Keepalive                     int                   `json:"keepalive,omitempty"`
 	Qos                           int                   `json:"qos,omitempty"`

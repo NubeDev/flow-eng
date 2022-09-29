@@ -1,11 +1,13 @@
-package email
+package gmail
 
 import (
 	"fmt"
 	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/notify"
+	"github.com/jordan-wright/email"
 	"github.com/mitchellh/mapstructure"
+	"net/smtp"
 	"strings"
 )
 
@@ -63,6 +65,17 @@ func (inst *Gmail) setEmailClient() {
 	}
 	inst.firstLoop = true
 	pprint.Print(connection)
+	e := email.NewEmail()
+	e.From = "nubeio <noreply@nube-io.com>"
+	e.To = []string{"ap@nube-io.com"}
+	e.Subject = "test"
+	e.Text = []byte("Text Body is, of course, supported!")
+	e.HTML = []byte("<h1>Fancy HTML is supported, too!</h1>")
+	err = e.Send("smtp.gmail.com:587", smtp.PlainAuth("", "noreply@nube-io.com", "22222-11eb-111111111", "smtp.gmail.com"))
+	fmt.Println(err)
+	if err != nil {
+		return
+	}
 
 }
 
@@ -74,7 +87,7 @@ func (inst *Gmail) Process() {
 
 	// if trigger == true then set triggered to true
 	// if trigger == false && triggered == true then rest triggered to false
-	// now we can send email again
+	// now we can send gmail again
 	trigger := inst.ReadPinBool(node.TriggerInput)
 	if trigger {
 		fmt.Println("TRIGGER EMAIL")

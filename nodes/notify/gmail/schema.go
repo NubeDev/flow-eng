@@ -1,4 +1,4 @@
-package email
+package gmail
 
 import (
 	"github.com/NubeDev/flow-eng/schemas"
@@ -15,7 +15,7 @@ func buildSchema() *schemas.Schema {
 	m.Address.Default = "noreply@nube-io.com"
 	schema.Set(m)
 	s := &schemas.Schema{
-		Title:      "email",
+		Title:      "gmail",
 		Properties: m,
 		UiSchema:   nil,
 	}

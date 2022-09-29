@@ -19,7 +19,7 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/link"
 	"github.com/NubeDev/flow-eng/nodes/math"
 	broker "github.com/NubeDev/flow-eng/nodes/mqtt"
-	"github.com/NubeDev/flow-eng/nodes/notify/email"
+	"github.com/NubeDev/flow-eng/nodes/notify/gmail"
 	"github.com/NubeDev/flow-eng/nodes/notify/ping"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
@@ -75,7 +75,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	// hvac
 	deadBand, _ := hvac.NewDeadBand(nil)
 
-	gmailNode, _ := email.NewGmail(nil)
+	gmailNode, _ := gmail.NewGmail(nil)
 	pingNode, _ := ping.NewPing(nil)
 
 	// latch
@@ -291,7 +291,7 @@ func builderSystem(body *node.Spec) (node.Node, error) {
 func builderNotify(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case gmailNode:
-		return email.NewGmail(body)
+		return gmail.NewGmail(body)
 	case pingNode:
 		return ping.NewPing(body)
 	}
