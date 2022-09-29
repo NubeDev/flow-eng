@@ -402,7 +402,7 @@ func builderTiming(body *node.Spec) (node.Node, error) {
 }
 
 func builderProtocols(body *node.Spec) (node.Node, error) {
-	store := points.New(names.RubixIO, nil, 0, 200, 200)
+	store := points.New(names.Edge, nil, 0, 200, 200)
 	switch body.GetName() {
 	case bacnetServer:
 		return bacnet.NewServer(body, store)

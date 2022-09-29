@@ -105,8 +105,8 @@ type DI struct {
 }
 
 // PingServer all points
-func (a *RestClient) PingServer() (*ServerPing, error) {
-	resp, err := nresty.FormatRestyResponse(a.client.R().
+func (inst *Client) PingServer() (*ServerPing, error) {
+	resp, err := nresty.FormatRestyResponse(inst.client.R().
 		SetResult(&ServerPing{}).
 		Get("/"))
 	if err != nil {
@@ -115,8 +115,8 @@ func (a *RestClient) PingServer() (*ServerPing, error) {
 	return resp.Result().(*ServerPing), nil
 }
 
-func (a *RestClient) GetUIs() (*UI, error) {
-	resp, err := nresty.FormatRestyResponse(a.client.R().
+func (inst *Client) GetUIs() (*UI, error) {
+	resp, err := nresty.FormatRestyResponse(inst.client.R().
 		SetResult(UI{}).
 		Get("/api/1.1/read/all/ui"))
 	if err != nil {
@@ -125,8 +125,8 @@ func (a *RestClient) GetUIs() (*UI, error) {
 	return resp.Result().(*UI), nil
 }
 
-func (a *RestClient) GetDIs() (*DI, error) {
-	resp, err := nresty.FormatRestyResponse(a.client.R().
+func (inst *Client) GetDIs() (*DI, error) {
+	resp, err := nresty.FormatRestyResponse(inst.client.R().
 		SetResult(DI{}).
 		Get("/api/1.1/read/all/di"))
 	if err != nil {
@@ -135,10 +135,10 @@ func (a *RestClient) GetDIs() (*DI, error) {
 	return resp.Result().(*DI), nil
 }
 
-func (a *RestClient) WriteUO(ioNum string, value float64) (*WriteResponseUO, error) {
+func (inst *Client) WriteUO(ioNum string, value float64) (*WriteResponseUO, error) {
 	req := fmt.Sprintf("/api/1.1/write/uo/%s/%d/16", strings.ToLower(ioNum), int(value))
-	a.edge28ClientDebugMsg("WriteUO:", req)
-	resp, err := nresty.FormatRestyResponse(a.client.R().
+	inst.edge28ClientDebugMsg("WriteUO:", req)
+	resp, err := nresty.FormatRestyResponse(inst.client.R().
 		SetResult(WriteResponseUO{}).
 		Get(req))
 	if err != nil {
@@ -147,10 +147,10 @@ func (a *RestClient) WriteUO(ioNum string, value float64) (*WriteResponseUO, err
 	return resp.Result().(*WriteResponseUO), nil
 }
 
-func (a *RestClient) WriteDO(ioNum string, value float64) (*WriteResponse, error) {
+func (inst *Client) WriteDO(ioNum string, value float64) (*WriteResponse, error) {
 	req := fmt.Sprintf("/api/1.1/write/do/%s/%d/16", strings.ToLower(ioNum), int(value))
-	a.edge28ClientDebugMsg("WriteDO:", req)
-	resp, err := nresty.FormatRestyResponse(a.client.R().
+	inst.edge28ClientDebugMsg("WriteDO:", req)
+	resp, err := nresty.FormatRestyResponse(inst.client.R().
 		SetResult(WriteResponse{}).
 		Get(req))
 	if err != nil {

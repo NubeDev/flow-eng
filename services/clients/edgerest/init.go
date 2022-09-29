@@ -7,14 +7,19 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// RestClient is used to invoke Form3 Accounts API.
-type RestClient struct {
+// Client is used to invoke Form3 Accounts API.
+type Client struct {
 	client      *resty.Client
 	ClientToken string
 }
 
-// NewNoAuth returns a new instance
-func NewNoAuth(address string, port int) *RestClient {
+func New(address string, port int) *Client {
+	if address == "" {
+		address = "0.0.0.0"
+	}
+	if port == 0 {
+		port = 5000
+	}
 	client := resty.New()
 	client.SetDebug(false)
 	url := fmt.Sprintf("http://%s:%d", address, port)
@@ -22,10 +27,10 @@ func NewNoAuth(address string, port int) *RestClient {
 	client.SetBaseURL(apiURL)
 	client.SetError(&nresty.Error{})
 	client.SetHeader("Content-Type", "application/json")
-	return &RestClient{client: client}
+	return &Client{client: client}
 }
 
-func (*RestClient) edge28ClientDebugMsg(args ...interface{}) {
+func (*Client) edge28ClientDebugMsg(args ...interface{}) {
 	enable := false
 	if enable {
 		prefix := "Edge28 Client: "
@@ -33,7 +38,7 @@ func (*RestClient) edge28ClientDebugMsg(args ...interface{}) {
 	}
 }
 
-func (*RestClient) edge28ClientErrorMsg(args ...interface{}) {
+func (*Client) edge28ClientErrorMsg(args ...interface{}) {
 	prefix := "Edge28 Client: "
 	log.Error(prefix, args)
 }
