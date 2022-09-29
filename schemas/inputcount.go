@@ -6,12 +6,6 @@ type InputCount struct {
 	NumberLimits NumberLimits `json:"inputCount"`
 }
 
-type Schema struct {
-	Title      string      `json:"title"`
-	Properties interface{} `json:"properties"`
-	UiSchema   interface{} `json:"uiSchema"`
-}
-
 func GetInputCount() *Schema {
 	m := &InputCount{}
 	m.NumberLimits.Title = "count"

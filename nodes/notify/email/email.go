@@ -27,6 +27,7 @@ func NewGmail(body *node.Spec) (node.Node, error) {
 	trigger := node.BuildInput(node.TriggerInput, node.TypeFloat, nil, body.Inputs)
 	body.Inputs = node.BuildInputs(to, subject, message, trigger)
 	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Result, node.TypeString, nil, body.Outputs))
+	body.SetSchema(buildSchema())
 	return &Gmail{body, false, false, 0}, nil
 }
 
