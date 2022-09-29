@@ -1,7 +1,6 @@
 package timing
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/timer"
 	"github.com/NubeDev/flow-eng/node"
 	"time"
@@ -49,7 +48,7 @@ func (inst *DelayOn) Process() {
 		inst.timer = timer.NewTimer()
 		inst.triggered = false
 	}
-	fmt.Println(timeDelay, time.Duration(timeDelay)*time.Second, 99999, time.Duration(timeDelay).Seconds())
+	// fmt.Println(timeDelay, time.Duration(timeDelay)*time.Second, 99999, time.Duration(timeDelay).Seconds())
 
 	if in1 >= 1 {
 		if !inst.timer.WaitFor(duration(timeDelay)) {
