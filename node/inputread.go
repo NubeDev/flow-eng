@@ -36,6 +36,12 @@ func (n *Spec) ReadPinAsFloat(name InputName) float64 {
 	return out
 }
 
+func (n *Spec) ReadPinAsUint64(name InputName) uint64 {
+	r := n.ReadPin(name)
+	out := uint64(conversions.GetFloat(r))
+	return out
+}
+
 func (n *Spec) ReadPinAsString(name InputName) string {
 	r := n.ReadPin(name)
 	return fmt.Sprintf("%v", r)

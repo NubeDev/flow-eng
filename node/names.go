@@ -33,6 +33,8 @@ const (
 
 	Interval InputName = "interval"
 
+	Count InputName = "count"
+
 	In   InputName = "in"
 	In1  InputName = "in1"
 	In2  InputName = "in2"
