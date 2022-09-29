@@ -43,9 +43,8 @@ func process(body node.Node) {
 	inputs := float.ConvertInterfaceToFloatMultiple(body.ReadMultiple(count))
 	output := operation(equation, inputs)
 	if output == nil {
-		//log.Infof("equation: %s, result: %v", equation, output)
+		body.WritePin(node.Result, nil)
 	} else {
-		//log.Infof("equation: %s, result: %v", equation, *output)
 		body.WritePin(node.Result, float.NonNil(output))
 	}
 
