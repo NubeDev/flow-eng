@@ -19,7 +19,6 @@ func NewAdd(body *node.Spec) (node.Node, error) {
 
 func (inst *Add) Process() {
 	process(inst)
-	//go getPoints()
 }
 
 func (inst *Add) Cleanup() {}
