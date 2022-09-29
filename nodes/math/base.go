@@ -26,7 +26,11 @@ func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error)
 	if err != nil {
 		return nil, err
 	}
-	inputs := node.BuildInputs(node.DynamicInputs(node.TypeFloat, nil, settings.InputCount, 2, 20, body.Inputs, node.ABCs)...)
+	var count = 2
+	if settings != nil {
+		count = settings.InputCount
+	}
+	inputs := node.BuildInputs(node.DynamicInputs(node.TypeFloat, nil, count, 2, 20, body.Inputs, node.ABCs)...)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Result, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(schemas.GetInputCount())
