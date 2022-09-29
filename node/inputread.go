@@ -3,6 +3,7 @@ package node
 import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/conversions"
+	"strconv"
 )
 
 // InputUpdated if true means that the node input value has updated
@@ -38,6 +39,12 @@ func (n *Spec) ReadPinAsFloat(name InputName) float64 {
 func (n *Spec) ReadPinAsString(name InputName) string {
 	r := n.ReadPin(name)
 	return fmt.Sprintf("%v", r)
+}
+
+func (n *Spec) ReadPinBool(name InputName) bool {
+	r := n.ReadPin(name)
+	result, _ := strconv.ParseBool(fmt.Sprintf("%v", r))
+	return result
 }
 
 func (n *Spec) ReadPinAsInt(name InputName) int {

@@ -25,10 +25,7 @@ func NewPoint(body *node.Spec, pool driver.Driver) (node.Node, error) {
 }
 
 func (inst *Point) setConnection() {
-	fmt.Println("NEW POINT", inst.deviceUUID, inst.pool)
 	dev := inst.pool.GetDevice(inst.deviceUUID)
-
-	//pprint.Print(pnt)
 	if dev != nil {
 		fmt.Println("******************")
 		pnt := inst.pool.AddPoint(inst.deviceUUID, &driver.Point{
@@ -38,7 +35,6 @@ func (inst *Point) setConnection() {
 		inst.firstLoop = true
 		pprint.Print(pnt)
 	} else {
-		fmt.Println("!!!!!!!!!")
 	}
 
 }

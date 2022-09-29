@@ -78,7 +78,7 @@ func getToSync() points.SyncTo {
 	return ""
 }
 
-// createSync can come from bacnet or the flow
+//// createSync can come from bacnet or the flow
 func createSync(writeValue *points.PriArray, object points.ObjectType, id points.ObjectID, syncFrom points.SyncFrom, in14, in15 *float64) {
 	point := getStore().GetPointByObject(object, id)
 	if object == "" {

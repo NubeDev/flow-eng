@@ -15,6 +15,9 @@ const (
 	xor    = "xor"
 	toggle = "toggle"
 
+	gmailNode = "gmail"
+	pingNode  = "ping"
+
 	numLatch      = "numeric-latch"
 	stringLatch   = "string-latch"
 	setResetLatch = "set-reset-latch"

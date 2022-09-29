@@ -1,98 +1,22 @@
 {
   "nodes": [
     {
-      "id": "48F4389F-5187-459E-A23E-2930C9FA4ACB",
-      "type": "math/const-num",
+      "id": "01EAAE5F-E990-4E21-96A7-4B1F2DA63DD7",
+      "type": "math/add",
       "metadata": {
-        "positionX": "101",
-        "positionY": "568"
+        "positionX": "492",
+        "positionY": "168"
       },
       "inputs": {
-        "in": {
-          "value": 0
-        }
-      }
-    },
-    {
-      "id": "6863285A-A06E-40D8-A3D8-C613C6D04AA8",
-      "type": "bacnet/analog-input",
-      "metadata": {
-        "positionX": "514",
-        "positionY": "147"
-      },
-      "inputs": {
-        "name": {
-          "value": ""
-        },
-        "object-id": {
+        "a": {
           "value": 0
         },
-        "override-value": {
+        "b": {
           "value": 0
         }
-      }
-    },
-    {
-      "id": "740BCAA2-F7A0-490D-85D9-B30D8CA82146",
-      "type": "bacnet/server",
-      "metadata": {
-        "positionX": "774",
-        "positionY": "181"
       },
-      "inputs": {
-        "in": {
-          "value": 0
-        }
-      }
-    },
-    {
-      "id": "924CEFE9-A4D9-426F-9448-6FCCEEB2CCD4",
-      "type": "bacnet/analog-output",
-      "metadata": {
-        "positionX": "375",
-        "positionY": "483"
-      },
-      "inputs": {
-        "name": {
-          "value": ""
-        },
-        "object-id": {
-          "value": 1
-        },
-        "in14": {
-          "links": [
-            {
-              "nodeId": "48F4389F-5187-459E-A23E-2930C9FA4ACB",
-              "socket": "out"
-            }
-          ]
-        },
-        "in15": {
-          "links": [
-            {
-              "nodeId": "48F4389F-5187-459E-A23E-2930C9FA4ACB",
-              "socket": "out"
-            }
-          ]
-        }
-      }
-    },
-    {
-      "id": "C83A0861-3943-4EB5-9365-D43DAD16E7DF",
-      "type": "debug/log",
-      "metadata": {
-        "positionX": "738",
-        "positionY": "487"
-      },
-      "inputs": {
-        "in": {
-          "links": [
-            {
-              "nodeId": "924CEFE9-A4D9-426F-9448-6FCCEEB2CCD4",
-              "socket": "out"
-            }
-          ]
-        }
+      "settings": {
+        "inputCount": 33
       }
     }
   ]

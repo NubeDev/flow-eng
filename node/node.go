@@ -44,7 +44,7 @@ type Node interface {
 	SetPropertiesValue(name SettingTitle, value interface{}) error
 }
 
-func New(id, name, nodeName string, meta *Metadata) *Spec {
+func New(id, name, nodeName string, meta *Metadata, settings []*Settings) *Spec {
 	return &Spec{
 		Inputs:  nil,
 		Outputs: nil,
@@ -54,6 +54,7 @@ func New(id, name, nodeName string, meta *Metadata) *Spec {
 			NodeName: nodeName,
 		},
 		Metadata: meta,
+		Settings: settings,
 	}
 }
 
@@ -66,8 +67,8 @@ type Spec struct {
 	Parameters *Parameters `json:"parameters,omitempty"`
 	IsParent   bool        `json:"isParent,omitempty"`
 	SubFlow    *SubFlow    `json:"subFlow,omitempty"`
+	OnStart    bool        `json:"-"` // used for see if it's the first loop of the runner, if false it's the first run
 	schema     *schemas.Schema
-	OnStart    bool // used for see if it's the first loop of the runner, if false it's the first run
 	db         db.DB
 }
 
@@ -250,13 +251,17 @@ const (
 	InputC InputName = "c"
 	InputD InputName = "d"
 
-	Connection InputName = "topic"
-	Topic      InputName = "topic"
+	Connection   InputName = "topic"
+	Topic        InputName = "topic"
+	TriggerInput InputName = "trigger"
+	Message      InputName = "message"
+	Subject      InputName = "subject"
 
 	Filter   InputName = "filter"
 	Equation InputName = "equation"
 
 	Ip          InputName = "ip"
+	Time        InputName = "time"
 	NetworkPort InputName = "port"
 
 	DelaySeconds InputName = "delay (s)"

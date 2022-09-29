@@ -19,6 +19,8 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/link"
 	"github.com/NubeDev/flow-eng/nodes/math"
 	broker "github.com/NubeDev/flow-eng/nodes/mqtt"
+	"github.com/NubeDev/flow-eng/nodes/notify/email"
+	"github.com/NubeDev/flow-eng/nodes/notify/ping"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/nodes/protocols/driver"
@@ -80,6 +82,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	// hvac
 	deadBand, _ := hvac.NewDeadBand(nil)
 
+	gmailNode, _ := email.NewGmail(nil)
+	pingNode, _ := ping.NewPing(nil)
+
 	// latch
 	numLatch, _ := latch.NewNumLatch(nil)
 	stringLatch, _ := latch.NewStringLatch(nil)
@@ -130,6 +135,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(min),
 		node.ConvertToSpec(max),
+
+		node.ConvertToSpec(gmailNode),
+		node.ConvertToSpec(pingNode),
 
 		node.ConvertToSpec(flowLoopCount),
 
@@ -192,6 +200,10 @@ func Builder(body *node.Spec, db db.DB, opts ...interface{}) (node.Node, error) 
 		return n, err
 	}
 	n, err = builderJson(body)
+	if n != nil || err != nil {
+		return n, err
+	}
+	n, err = builderNotify(body)
 	if n != nil || err != nil {
 		return n, err
 	}
@@ -262,6 +274,16 @@ func builderSystem(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case flowLoopCount:
 		return system.NewLoopCount(body)
+	}
+	return nil, nil
+}
+
+func builderNotify(body *node.Spec) (node.Node, error) {
+	switch body.GetName() {
+	case gmailNode:
+		return email.NewGmail(body)
+	case pingNode:
+		return ping.NewPing(body)
 	}
 	return nil, nil
 }

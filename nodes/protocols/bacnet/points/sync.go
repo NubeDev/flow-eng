@@ -34,7 +34,7 @@ type writeSync struct {
 	SyncPending bool
 	Time        time.Time
 	SyncFrom    SyncFrom
-	SyncTo      []*SyncList // modbus, rubix-io
+	SyncTo      *SyncList // modbus, rubix-io
 }
 
 func (inst *Store) AddSync(pointUUID string, writeValue *PriArray, syncFrom SyncFrom, syncTo SyncTo, application names.ApplicationName) {
@@ -55,22 +55,10 @@ func (inst *Store) AddSync(pointUUID string, writeValue *PriArray, syncFrom Sync
 
 func (inst *Store) GetLatestSyncValue(pointUUID string, to SyncTo) *writeSync {
 	s := inst.GetSyncByPoint(pointUUID)
-	w := &writeSync{}
-	var found bool
-	for i, sync := range s {
-		for _, list := range sync.SyncTo {
-			if i == 0 {
-				if list.SyncTo == to {
-					w = sync
-					found = true
-				}
-			} else {
-				//inst.DeleteSyncWrite(pointUUID, sync.UUID)
-			}
+	for _, sync := range s {
+		if sync.SyncTo.SyncTo == to {
+			return sync
 		}
-	}
-	if found {
-		return w
 	}
 	return nil
 }
@@ -90,10 +78,7 @@ func (inst *Store) CompleteProtocolWrite(pointUUID, pointCurrentSyncUUID string)
 	p := inst.GetSyncByPoint(pointUUID)
 	for _, sync := range p {
 		if sync.UUID == pointCurrentSyncUUID {
-			for _, list := range sync.SyncTo {
-				list.Completed = true
-				return true
-			}
+			sync.SyncTo.Completed = true
 		}
 	}
 	return false
@@ -109,9 +94,7 @@ func (inst *Store) addWrite(writeValue *PriArray, syncFrom SyncFrom, syncTo Sync
 		SyncPending: false,
 		Time:        time.Now(),
 		SyncFrom:    syncFrom,
-		SyncTo: []*SyncList{
-			to,
-		},
+		SyncTo:      to,
 	}
 	return w
 }
