@@ -57,17 +57,18 @@ func New(id, name, nodeName string, meta *Metadata, settings map[string]interfac
 }
 
 type Spec struct {
-	Inputs     []*Input               `json:"inputs,omitempty"`
-	Outputs    []*Output              `json:"outputs,omitempty"`
-	Info       Info                   `json:"info"`
-	Settings   map[string]interface{} `json:"settings,omitempty"`
-	Metadata   *Metadata              `json:"metadata,omitempty"`
-	Parameters *Parameters            `json:"parameters,omitempty"`
-	IsParent   bool                   `json:"isParent,omitempty"`
-	SubFlow    *SubFlow               `json:"subFlow,omitempty"`
-	OnStart    bool                   `json:"-"` // used for see if it's the first loop of the runner, if false it's the first run
-	schema     *schemas.Schema
-	db         db.DB
+	Inputs        []*Input               `json:"inputs,omitempty"`
+	Outputs       []*Output              `json:"outputs,omitempty"`
+	Info          Info                   `json:"info"`
+	Settings      map[string]interface{} `json:"settings,omitempty"`
+	AllowSettings bool                   `json:"allowSettings"`
+	Metadata      *Metadata              `json:"metadata,omitempty"`
+	Parameters    *Parameters            `json:"parameters,omitempty"`
+	IsParent      bool                   `json:"isParent,omitempty"`
+	SubFlow       *SubFlow               `json:"subFlow,omitempty"`
+	OnStart       bool                   `json:"-"` // used for see if it's the first loop of the runner, if false it's the first run
+	schema        *schemas.Schema
+	db            db.DB
 }
 
 func (n *Spec) AddDB(d db.DB) {
@@ -84,6 +85,7 @@ func (n *Spec) GetSchema() *schemas.Schema {
 
 func (n *Spec) SetSchema(schema *schemas.Schema) {
 	n.schema = schema
+	n.AllowSettings = true
 }
 
 func (n *Spec) GetInfo() Info {

@@ -1,5 +1,8 @@
 package schemas
 
+// see react schema
+// https://rjsf-team.github.io/react-jsonschema-form/
+
 type Schema struct {
 	Title      string      `json:"title"`
 	Properties interface{} `json:"properties"`
