@@ -14,6 +14,16 @@ type String struct {
 	ReadOnly bool   `json:"readOnly" default:"false"`
 }
 
+type StringLimits struct {
+	Type     string `json:"type" default:"string"`
+	Title    string `json:"title" default:""`
+	Min      int    `json:"minLength" default:"0"`
+	Max      int    `json:"maxLength" default:"0"`
+	Default  string `json:"default" default:""`
+	Help     string `json:"help" default:""`
+	ReadOnly bool   `json:"readOnly" default:"false"`
+}
+
 type Number struct {
 	Type     string `json:"type" default:"number"`
 	Title    string `json:"title" default:""`
