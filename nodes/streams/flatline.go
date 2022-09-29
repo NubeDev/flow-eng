@@ -56,7 +56,7 @@ func (inst *Flatline) Process() {
 			}
 			inst.timeout = time.AfterFunc(alertDelayDuration, f)
 		*/
-		inst.timeout = time.AfterFunc(10*time.Second, f)
+		inst.timeout = time.AfterFunc(30*time.Minute, f)
 	}
 	inst.WritePin(node.Flatline, inst.alertStatus)
 }
