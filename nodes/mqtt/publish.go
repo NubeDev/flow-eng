@@ -37,11 +37,11 @@ func NewMqttPub(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *MqttPub) getTopic() string {
-	str, err := inst.GetPropValueStr(topic)
-	if err != nil {
-		return ""
-	}
-	inst.mqttTopic = str
+	//str, err := inst.GetPropValueStr(topic)
+	//if err != nil {
+	//	return ""
+	//}
+	inst.mqttTopic = "str"
 	return inst.mqttTopic
 }
 

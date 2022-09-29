@@ -2,7 +2,6 @@ package switches
 
 import (
 	"github.com/NubeDev/flow-eng/helpers/conversions"
-	"github.com/NubeDev/flow-eng/helpers/integer"
 	"github.com/NubeDev/flow-eng/node"
 )
 
@@ -14,26 +13,26 @@ const (
 
 func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error) {
 	body = node.Defaults(body, nodeName, category)
-	buildCount, setting, value, err := node.NewSetting(body, &node.SettingOptions{Type: node.Number, Title: node.InputCount, Min: 2, Max: 20})
-	if err != nil {
-		return nil, err
-	}
-	settings, err := node.BuildSettings(setting)
-	if err != nil {
-		return nil, err
-	}
-	count, ok := value.(int)
-	if !ok {
-		count = 2
-	}
+	//buildCount, setting, value, err := node.NewSetting(body, &node.SettingOptions{Type: node.Number, Title: node.InputCount, Min: 2, Max: 20})
+	//if err != nil {
+	//	return nil, err
+	//}
+	//settings, err := node.BuildSettings(setting)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//count, ok := value.(int)
+	//if !ok {
+	//	count = 2
+	//}
 	var nodeInputs []*node.Input
 	selection := node.BuildInput(node.Selection, node.TypeFloat, nil, body.Inputs) // TODO: this input shouldn't have a manual override value
-	inputsCount := node.DynamicInputs(node.TypeFloat, nil, count, integer.NonNil(buildCount.Min), integer.NonNil(buildCount.Max), body.Inputs, node.ABCs)
+	inputsCount := node.DynamicInputs(node.TypeFloat, nil, 2, 2, 20, body.Inputs, node.ABCs)
 	nodeInputs = append(nodeInputs, selection)
 	nodeInputs = append(nodeInputs, inputsCount...)
 	inputs := node.BuildInputs(nodeInputs...)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Result, node.TypeFloat, nil, body.Outputs))
-	body = node.BuildNode(body, inputs, outputs, settings)
+	body = node.BuildNode(body, inputs, outputs, nil)
 	return body, nil
 }
 

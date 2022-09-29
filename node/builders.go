@@ -14,7 +14,7 @@ func BuildNodes(body ...*Spec) []*Spec {
 	return out
 }
 
-func BuildNode(body *Spec, inputs []*Input, outputs []*Output, settings []*Settings) *Spec {
+func BuildNode(body *Spec, inputs []*Input, outputs []*Output, settings map[string]interface{}) *Spec {
 	body.Settings = settings
 	body.Inputs = inputs
 	body.Outputs = outputs
