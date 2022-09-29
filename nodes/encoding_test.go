@@ -30,30 +30,3 @@ func Test_test(t *testing.T) {
 	pprint.PrintJOSN(decode)
 
 }
-
-type T struct {
-	Nodes []struct {
-		Id       string `json:"id"`
-		Type     string `json:"type"`
-		Metadata struct {
-			PositionX string `json:"positionX"`
-			PositionY string `json:"positionY"`
-		} `json:"metadata"`
-		Inputs struct {
-			A struct {
-				Value string `json:"value,omitempty"`
-				Links []struct {
-					NodeId string `json:"nodeId"`
-					Socket string `json:"socket"`
-				} `json:"links,omitempty"`
-			} `json:"a"`
-			B struct {
-				Value string `json:"value,omitempty"`
-				Links []struct {
-					NodeId string `json:"nodeId"`
-					Socket string `json:"socket"`
-				} `json:"links,omitempty"`
-			} `json:"b,omitempty"`
-		} `json:"inputs,omitempty"`
-	} `json:"nodes"`
-}

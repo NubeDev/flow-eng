@@ -138,7 +138,10 @@ func getStore() *points.Store {
 	return db
 }
 func getApplication() names.ApplicationName {
-	return db.GetApplication()
+	if db != nil {
+		return db.GetApplication()
+	}
+	return ""
 }
 
 func (inst *Server) subscribeBroker(topic string) {

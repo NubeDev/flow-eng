@@ -13,7 +13,7 @@ func Decode(encodedNodes *NodesList) ([]*node.Spec, error) {
 		_, getName, _ := decodeType(encodedNode.Type)
 		id := encodedNode.Id
 		name := getName
-		decodedNode = node.New(id, name, "", encodedNode.Metadata) // create a blank node
+		decodedNode = node.New(id, name, "", encodedNode.Metadata, nil) // create a blank node
 		newNode, err := Builder(decodedNode, nil)
 		if err != nil {
 			return nil, err
@@ -46,7 +46,7 @@ func DecodeNonSubNodes(encodedNodes *NodesList) ([]*node.Spec, error) {
 		_, getName, _ := decodeType(encodedNode.Type)
 		id := encodedNode.Id
 		name := getName
-		decodedNode = node.New(id, name, "", encodedNode.Metadata) // create a blank node
+		decodedNode = node.New(id, name, "", encodedNode.Metadata, nil) // create a blank node
 		newNode, err := Builder(decodedNode, nil)
 		if err != nil {
 			return nil, err

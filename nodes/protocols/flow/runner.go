@@ -11,7 +11,6 @@ func (inst *Network) runner() {
 		if net.UUID == inst.networkUUID {
 			pprint.Print(net)
 		}
-
 	}
 
 }

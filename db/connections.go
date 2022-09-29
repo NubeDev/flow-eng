@@ -20,6 +20,7 @@ type Connection struct {
 	HTTPS                         *bool                 `json:"https,omitempty"`
 	Username                      string                `json:"username,omitempty"`
 	Password                      string                `json:"password,omitempty"`
+	Email                         string                `json:"email,omitempty"`
 	Token                         string                `json:"token,omitempty"`
 	Keepalive                     int                   `json:"keepalive,omitempty"`
 	Qos                           int                   `json:"qos,omitempty"`
@@ -34,6 +35,8 @@ func matchConnection(t names.ApplicationName) bool {
 	case names.FlowFramework:
 		return true
 	case names.MQTT:
+		return true
+	case names.Email:
 		return true
 	}
 	return false
