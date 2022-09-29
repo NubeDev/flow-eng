@@ -3,7 +3,6 @@ package bacnet
 import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/names"
-	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	edge28lib "github.com/NubeDev/flow-eng/services/edge28"
@@ -14,7 +13,6 @@ import (
 
 type Server struct {
 	*node.Spec
-	client        *mqttclient.Client
 	clients       *clients
 	firstLoop     bool
 	pingFailed    bool
@@ -22,28 +20,19 @@ type Server struct {
 }
 
 type clients struct {
-	rio    *rubixIO.RubixIO
-	edge28 *edge28lib.Edge28
-}
-
-func buildSubNodes(body *node.Spec, childNodes []*node.Spec) *node.Spec {
-	for _, childNode := range childNodes {
-		pprint.PrintJOSN(childNode)
-	}
-	body.SubFlow.Nodes = childNodes
-	return body
+	mqttCli *mqttclient.Client
+	rio     *rubixIO.RubixIO
+	edge28  *edge28lib.Edge28
 }
 
 var db *points.Store
-var client *mqttclient.Client
+var mqttClient *mqttclient.Client
 var inst *Server
 var application = names.Edge
 
-//func NewServer(body *node.Spec, childNodes ...*node.Spec) (node.Node, error) {
-
 func NewServer(body *node.Spec, store *points.Store) (node.Node, error) {
 	var err error
-	body = node.Defaults(body, server, category)
+	body = node.Defaults(body, serverNode, category)
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs))
 	outputBroker := node.BuildOutput(node.Msg, node.TypeString, nil, body.Outputs)
 	outputApplication := node.BuildOutput(node.Msg, node.TypeString, nil, body.Outputs)
@@ -60,17 +49,17 @@ func NewServer(body *node.Spec, store *points.Store) (node.Node, error) {
 	//body = buildSubNodes(body, childNodes)
 	body.IsParent = true
 	body = node.BuildNode(body, inputs, outputs, nil)
-	client, err = mqttclient.NewClient(mqttclient.ClientOptions{
+	mqttClient, err = mqttclient.NewClient(mqttclient.ClientOptions{
 		Servers: []string{"tcp://0.0.0.0:1883"},
 	})
-	err = client.Connect()
+	err = mqttClient.Connect()
 	if err != nil {
 		log.Error(err)
 		//return nil, err
 	}
-	c := &clients{}
-	s := &Server{body, client, c, false, false, false}
-
+	clients := &clients{}
+	server := &Server{body, clients, false, false, false}
+	server.clients.mqttCli = mqttClient
 	if application == names.RubixIO || application == names.RubixIOAndModbus {
 		rubixIOUICount, rubixIOUOCount := points.CalcPointCount(1, application)
 		rio := &rubixIO.RubixIO{}
@@ -80,15 +69,15 @@ func NewServer(body *node.Spec, store *points.Store) (node.Node, error) {
 			StartAddrUO: rubixIOUOCount,
 			StartAddrDO: 2,
 		})
-		s.clients.rio = rio
+		server.clients.rio = rio
 	}
 	if application == names.Edge {
 		edge28 := edge28lib.New("192.168.15.141")
-		s.clients.edge28 = edge28
+		server.clients.edge28 = edge28
 	}
 	db = store
-	inst = s
-	return s, err
+	inst = server
+	return server, err
 }
 
 func getServer() *Server {
@@ -110,7 +99,7 @@ func (inst *Server) Process() {
 
 func (inst *Server) mqttReconnect() {
 	var err error
-	err = client.Ping()
+	err = mqttClient.Ping()
 	if err != nil {
 		log.Errorf("bacnet-server mqtt ping failed")
 		inst.pingFailed = true
@@ -127,7 +116,7 @@ func (inst *Server) mqttReconnect() {
 }
 
 func getMqtt() *mqttclient.Client {
-	return client
+	return mqttClient
 }
 
 func getStore() *points.Store {

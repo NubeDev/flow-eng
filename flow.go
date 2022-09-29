@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/NubeDev/flow-eng/graph"
+	"github.com/NubeDev/flow-eng/helpers/uuid"
 	"github.com/NubeDev/flow-eng/node"
-	"github.com/NubeDev/flow-eng/uuid"
 	log "github.com/sirupsen/logrus"
 )
 

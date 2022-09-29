@@ -2,7 +2,7 @@ package node
 
 import (
 	"fmt"
-	"github.com/NubeDev/flow-eng/uuid"
+	"github.com/NubeDev/flow-eng/helpers/uuid"
 	log "github.com/sirupsen/logrus"
 )
 

@@ -37,7 +37,7 @@ func (inst *Server) mqttPublish(pnt *points.Point) {
 	v := points.GetHighest(value)
 	topic := fmt.Sprintf("bacnet/%s/%d", obj, objectId)
 	if v != nil {
-		err = inst.client.Publish(topic, mqttclient.AtMostOnce, true, fmt.Sprintf("%f", v.Value))
+		err = mqttClient.Publish(topic, mqttclient.AtMostOnce, true, fmt.Sprintf("%f", v.Value))
 		if err != nil {
 			log.Errorf("bacnet-server: mqtt publish err: %s", err.Error())
 			return

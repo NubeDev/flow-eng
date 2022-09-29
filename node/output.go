@@ -2,7 +2,7 @@ package node
 
 import (
 	"errors"
-	"github.com/NubeDev/flow-eng/uuid"
+	"github.com/NubeDev/flow-eng/helpers/uuid"
 )
 
 var ErrTypesMismatch = errors.New("provided buffers types are different")

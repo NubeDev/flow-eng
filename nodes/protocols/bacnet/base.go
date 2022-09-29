@@ -11,14 +11,14 @@ import (
 )
 
 const (
-	category = "bacnet"
-	server   = "server"
-	bacnetBI = "binary-input"
-	bacnetBO = "binary-output"
-	bacnetBV = "binary-variable"
-	bacnetAV = "analog-variable"
-	bacnetAO = "analog-output"
-	bacnetAI = "analog-input"
+	category   = "bacnet"
+	serverNode = "server"
+	bacnetBI   = "binary-input"
+	bacnetBO   = "binary-output"
+	bacnetBV   = "binary-variable"
+	bacnetAV   = "analog-variable"
+	bacnetAO   = "analog-output"
+	bacnetAI   = "analog-input"
 
 	typeAI = "ai"
 	typeAO = "ao"

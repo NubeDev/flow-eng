@@ -1,7 +1,7 @@
 package uuid_test
 
 import (
-	"github.com/NubeDev/flow-eng/uuid"
+	"github.com/NubeDev/flow-eng/helpers/uuid"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

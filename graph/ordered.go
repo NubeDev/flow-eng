@@ -1,8 +1,8 @@
 package graph
 
 import (
+	"github.com/NubeDev/flow-eng/helpers/uuid"
 	"github.com/NubeDev/flow-eng/node"
-	"github.com/NubeDev/flow-eng/uuid"
 )
 
 type Ordered struct {

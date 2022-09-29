@@ -2,7 +2,7 @@ package node
 
 import (
 	"github.com/NubeDev/flow-eng/helpers/array"
-	"github.com/NubeDev/flow-eng/uuid"
+	"github.com/NubeDev/flow-eng/helpers/uuid"
 )
 
 type Input struct {
