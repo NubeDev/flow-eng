@@ -69,6 +69,7 @@ func (inst *Store) GetLatestSyncValue(pointUUID string, to SyncTo) *writeSync {
 			}
 		}
 	}
+
 	if found {
 		return w
 	}
