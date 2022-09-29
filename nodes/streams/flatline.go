@@ -1,7 +1,6 @@
 package streams
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 	"time"
 )
@@ -38,7 +37,6 @@ func NewFlatline(body *node.Spec) (node.Node, error) {
 func (inst *Flatline) Process() {
 	in := inst.ReadPinAsFloat(node.In) // TODO: input value should be allowed to be nil
 	if in != inst.lastVal {            // COV
-		fmt.Println("FLATLINE CHANGE OF VALUE!!")
 		inst.lastVal = in
 		inst.WritePin(node.Flatline, 0)
 		inst.alertStatus = false
@@ -46,7 +44,6 @@ func (inst *Flatline) Process() {
 		f := func() {
 			inst.WritePin(node.Flatline, 1)
 			inst.alertStatus = true
-			fmt.Println("FLATLINE TIMEOUT EXPIRED!!")
 		}
 		/*
 			delayValue := inst.GetPropValueInt(node.AlertDelayMins, 30)
