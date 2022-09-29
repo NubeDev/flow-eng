@@ -4,10 +4,10 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
+	"github.com/mitchellh/mapstructure"
 )
 
 const (
-	constNum = "const-num"
 	category = "math"
 	divide   = "divide"
 	add      = "add"
@@ -15,11 +15,20 @@ const (
 	multiply = "multiply"
 )
 
+type nodeSettings struct {
+	InputCount int `json:"inputCount"`
+}
+
 func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error) {
 	body = node.Defaults(body, nodeName, category)
-	inputs := node.BuildInputs(node.DynamicInputs(node.TypeFloat, nil, 2, 2, 20, body.Inputs, node.ABCs)...)
+	settings := &nodeSettings{}
+	err := mapstructure.Decode(body.Settings, &settings)
+	if err != nil {
+		return nil, err
+	}
+	inputs := node.BuildInputs(node.DynamicInputs(node.TypeFloat, nil, settings.InputCount, 2, 20, body.Inputs, node.ABCs)...)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Result, node.TypeFloat, nil, body.Outputs))
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(schemas.GetInputCount())
 	return body, nil
 }
