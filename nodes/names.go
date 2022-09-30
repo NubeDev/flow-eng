@@ -29,6 +29,8 @@ const (
 
 	flowLoopCount = "flow-loop-count"
 
+	getNode = "get"
+
 	deadBandNode = "dead-band"
 
 	logicCompare = "compare"

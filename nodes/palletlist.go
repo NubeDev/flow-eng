@@ -25,6 +25,7 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/nodes/protocols/driver"
 	"github.com/NubeDev/flow-eng/nodes/protocols/flow"
+	"github.com/NubeDev/flow-eng/nodes/protocols/rest"
 	"github.com/NubeDev/flow-eng/nodes/statistics"
 	"github.com/NubeDev/flow-eng/nodes/streams"
 	switches "github.com/NubeDev/flow-eng/nodes/switch"
@@ -113,6 +114,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	logNode, _ := debugging.NewLog(nil)
 
+	// rest
+	getNode, _ := rest.NewGet(nil)
+
 	// if disableMQTT {
 	//	mqttSub = nil
 	//	mqttPub = nil
@@ -184,6 +188,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(mqttPub),
 
 		node.ConvertToSpec(logNode),
+
+		node.ConvertToSpec(getNode),
 	)
 }
 
@@ -206,6 +212,10 @@ func Builder(body *node.Spec, db db.DB, opts ...interface{}) (node.Node, error) 
 		return n, err
 	}
 	n, err = builderJson(body)
+	if n != nil || err != nil {
+		return n, err
+	}
+	n, err = builderRest(body)
 	if n != nil || err != nil {
 		return n, err
 	}
@@ -284,6 +294,14 @@ func builderSystem(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case flowLoopCount:
 		return system.NewLoopCount(body)
+	}
+	return nil, nil
+}
+
+func builderRest(body *node.Spec) (node.Node, error) {
+	switch body.GetName() {
+	case getNode:
+		return rest.NewGet(body)
 	}
 	return nil, nil
 }
