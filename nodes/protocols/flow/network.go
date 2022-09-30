@@ -31,6 +31,7 @@ func NewNetwork(body *node.Spec, pool driver.Driver) (node.Node, error) {
 	networkUUID := node.BuildInput(node.UUID, node.TypeString, nil, body.Inputs)
 	inputs := node.BuildInputs(connectionName, name, networkUUID)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
+	body.IsParent = true
 	body = node.BuildNode(body, inputs, outputs, nil)
 	return &Network{body, false, 0, body.ReadPinAsString(node.UUID), "", nil, nil, pool}, nil
 }

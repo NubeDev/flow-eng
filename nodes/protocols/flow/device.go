@@ -18,6 +18,7 @@ func NewDevice(body *node.Spec, pool driver.Driver) (node.Node, error) {
 	networkUUID := node.BuildInput(node.UUID, node.TypeString, nil, body.Inputs)
 	inputs := node.BuildInputs(name, networkUUID)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
+	body.IsParent = true
 	body = node.BuildNode(body, inputs, outputs, nil)
 	return &Device{body, false, body.ReadPinAsString(node.UUID), pool}, nil
 }
