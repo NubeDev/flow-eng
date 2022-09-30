@@ -1,20 +1,24 @@
 package node
 
-import "reflect"
+import (
+	"reflect"
+)
 
 func Ports(node Node, direction Direction) []Port {
 	ports := make([]Port, 0, 1)
-	for _, input := range node.GetInputs() {
-		if input.Direction() != direction {
-			continue
+	if node != nil {
+		for _, input := range node.GetInputs() {
+			if input.Direction() != direction {
+				continue
+			}
+			ports = append(ports, input)
 		}
-		ports = append(ports, input)
-	}
-	for _, output := range node.GetOutputs() {
-		if output.Direction() != direction {
-			continue
+		for _, output := range node.GetOutputs() {
+			if output.Direction() != direction {
+				continue
+			}
+			ports = append(ports, output)
 		}
-		ports = append(ports, output)
 	}
 	return ports
 }

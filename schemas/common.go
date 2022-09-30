@@ -44,3 +44,10 @@ type NumberLimits struct {
 	Help     string `json:"help" default:""`
 	ReadOnly bool   `json:"readOnly" default:"false"`
 }
+
+type Enum struct {
+	Type     string   `json:"type" default:"string"`
+	Title    string   `json:"title" default:""`
+	Options  []string `json:"enum" default:"[]"`
+	EnumName []string `json:"enumNames" default:"[]"`
+}

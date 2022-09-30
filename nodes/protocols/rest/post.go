@@ -7,12 +7,12 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-type Get struct {
+type HttpWrite struct {
 	*node.Spec
 }
 
-func NewGet(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, getNode, category)
+func NewHttpWrite(body *node.Spec) (node.Node, error) {
+	body = node.Defaults(body, writeNode, category)
 	url := node.BuildInput(node.URL, node.TypeString, nil, body.Inputs)
 	filter := node.BuildInput(node.Filter, node.TypeString, nil, body.Inputs)
 	trigger := node.BuildInput(node.TriggerInput, node.TypeFloat, nil, body.Inputs)
@@ -23,12 +23,10 @@ func NewGet(body *node.Spec) (node.Node, error) {
 
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, nil)
-	body.SetSchema(buildSchema())
-
-	return &Get{body}, nil
+	return &HttpWrite{body}, nil
 }
 
-func (inst *Get) Process() {
+func (inst *HttpWrite) Process() {
 	url := inst.ReadPinAsString(node.URL)
 	filter := inst.ReadPinAsString(node.Filter)
 	enable := inst.ReadPinAsString(node.Enable)
@@ -54,4 +52,4 @@ func (inst *Get) Process() {
 
 }
 
-func (inst *Get) Cleanup() {}
+func (inst *HttpWrite) Cleanup() {}
