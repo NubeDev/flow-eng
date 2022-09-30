@@ -5,6 +5,7 @@ type InputName string
 type OutputName string
 
 const (
+	TypeBool   DataTypes = "boolean"
 	TypeString DataTypes = "string"
 	TypeInt    DataTypes = "int"
 	TypeFloat  DataTypes = "number"
@@ -55,6 +56,7 @@ const (
 	InputD InputName = "d"
 
 	Connection   InputName = "topic"
+	URL          InputName = "url"
 	Topic        InputName = "topic"
 	TriggerInput InputName = "trigger"
 	Message      InputName = "message"
