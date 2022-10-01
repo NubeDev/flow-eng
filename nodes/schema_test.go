@@ -7,7 +7,7 @@ import (
 )
 
 func TestGetSchema(t *testing.T) {
-	n, err := GetSchema("add")
+	n, err := GetSchema("http-get")
 	fmt.Println(err)
 	pprint.PrintJOSN(n)
 }

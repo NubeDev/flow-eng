@@ -116,6 +116,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	// rest
 	getNode, _ := rest.NewGet(nil)
+	writeNode, _ := rest.NewHttpWrite(nil)
 
 	// if disableMQTT {
 	//	mqttSub = nil
@@ -190,6 +191,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(logNode),
 
 		node.ConvertToSpec(getNode),
+		node.ConvertToSpec(writeNode),
 	)
 }
 
@@ -300,8 +302,10 @@ func builderSystem(body *node.Spec) (node.Node, error) {
 
 func builderRest(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
-	case getNode:
+	case getHttpNode:
 		return rest.NewGet(body)
+	case writeHttpNode:
+		return rest.NewHttpWrite(body)
 	}
 	return nil, nil
 }

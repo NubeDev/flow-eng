@@ -7,16 +7,18 @@ type InputCount struct {
 }
 
 func GetInputCount() *Schema {
-	m := &InputCount{}
-	m.NumberLimits.Title = "count"
-	m.NumberLimits.Min = 2
-	m.NumberLimits.Max = 20
-	schema.Set(m)
+	props := &InputCount{}
+	props.NumberLimits.Title = "count"
+
+	props.NumberLimits.Max = 20
+	schema.Set(props)
 
 	s := &Schema{
-		Title:      "Input Count",
-		Properties: m,
-		UiSchema:   nil,
+		Schema: SchemaBody{
+			Title:      "Input Count",
+			Properties: props,
+		},
+		UiSchema: nil,
 	}
 
 	return s

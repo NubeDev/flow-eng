@@ -29,7 +29,8 @@ const (
 
 	flowLoopCount = "flow-loop-count"
 
-	getNode = "get"
+	getHttpNode   = "http-get"
+	writeHttpNode = "http-write"
 
 	deadBandNode = "dead-band"
 

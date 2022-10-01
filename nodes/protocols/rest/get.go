@@ -11,20 +11,24 @@ type Get struct {
 	*node.Spec
 }
 
-func NewGet(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, getNode, category)
+func build(body *node.Spec) *node.Spec {
+	// ins
 	url := node.BuildInput(node.URL, node.TypeString, nil, body.Inputs)
 	filter := node.BuildInput(node.Filter, node.TypeString, nil, body.Inputs)
 	trigger := node.BuildInput(node.TriggerInput, node.TypeFloat, nil, body.Inputs)
 	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs)
-
 	inputs := node.BuildInputs(url, filter, trigger, enable)
+	// outs
 	out := node.BuildOutput(node.Result, node.TypeString, nil, body.Outputs)
-
 	outputs := node.BuildOutputs(out)
-	body = node.BuildNode(body, inputs, outputs, nil)
-	body.SetSchema(buildSchema())
+	return node.BuildNode(body, inputs, outputs, nil)
 
+}
+
+func NewGet(body *node.Spec) (node.Node, error) {
+	body = node.Defaults(body, getNode, category)
+	body = build(body)
+	body.SetSchema(buildSchema())
 	return &Get{body}, nil
 }
 

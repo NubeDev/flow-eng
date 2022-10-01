@@ -3,7 +3,7 @@ module github.com/NubeDev/flow-eng
 go 1.18
 
 require (
-	github.com/NubeIO/lib-goja v0.0.3
+	github.com/NubeIO/lib-goja v0.0.4
 	github.com/NubeIO/lib-schema v0.1.6
 	github.com/NubeIO/nubeio-rubix-lib-helpers-go v0.2.7
 	github.com/NubeIO/nubeio-rubix-lib-modbus-go v0.0.3
@@ -21,7 +21,6 @@ require (
 	github.com/stretchr/testify v1.8.0
 	github.com/tidwall/buntdb v1.2.8
 	github.com/tidwall/gjson v1.14.3
-	github.com/tidwall/sjson v1.2.5
 )
 
 require (

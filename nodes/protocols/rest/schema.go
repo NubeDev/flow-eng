@@ -1,27 +1,27 @@
 package rest
 
 import (
-	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
 )
 
 type nodeSchema struct {
-	Address schemas.Enum `json:"method"`
+	Address schemas.EnumString `json:"address"`
 }
 
 func buildSchema() *schemas.Schema {
-	m := &nodeSchema{}
-	m.Address.Title = "method"
-	m.Address.Options = []string{"GET", "POST"}
-	m.Address.EnumName = []string{"GET", "POST"}
-	pprint.PrintJOSN(m)
-	schema.Set(m)
-
+	props := &nodeSchema{}
+	props.Address.Title = "method"
+	props.Address.Default = get
+	props.Address.Options = []string{post, patch, put, httpDelete}
+	props.Address.EnumName = []string{post, patch, put, httpDelete}
+	schema.Set(props)
 	s := &schemas.Schema{
-		Title:      "gmail",
-		Properties: m,
-		UiSchema:   nil,
+		Schema: schemas.SchemaBody{
+			Title:      "method",
+			Properties: props,
+		},
+		UiSchema: nil,
 	}
 	return s
 }
