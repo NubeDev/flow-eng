@@ -11,11 +11,12 @@ const (
 )
 
 const (
-	and    = "and"
-	or     = "or"
-	not    = "not"
-	xor    = "xor"
-	toggle = "toggle"
+	and           = "and"
+	or            = "or"
+	not           = "not"
+	xor           = "xor"
+	toggle        = "toggle"
+	delayMinOnOff = "min-on off"
 )
 
 const (

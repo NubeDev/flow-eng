@@ -33,8 +33,10 @@ const (
 
 	Enable InputName = "enable"
 
-	Interval InputName = "interval"
-	Duration InputName = "duration"
+	OnInterval  InputName = "on-interval"
+	OffInterval InputName = "off-interval"
+	Interval    InputName = "interval"
+	Duration    InputName = "duration"
 
 	Count InputName = "count"
 
@@ -113,6 +115,9 @@ const (
 	OutNot OutputName = "out not"
 
 	Out OutputName = "out"
+
+	MinOn  OutputName = "min-on"
+	MinOff OutputName = "min-off"
 
 	Out1 OutputName = "out1"
 	Out2 OutputName = "out2"

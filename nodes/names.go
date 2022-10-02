@@ -48,12 +48,12 @@ const (
 	min = "max"
 	avg = "avg"
 
-	flatline = "flatline"
+	flatLine = "flatLine"
 
-	delay      = "delay"
-	inject     = "inject"
-	delayOn    = "delayOn"
-	delayMinON = "min-on-delay"
+	delay         = "delay"
+	inject        = "inject"
+	delayOn       = "delayOn"
+	delayMinOnOff = "min-on off"
 
 	// switch
 	switchNode = "switch"

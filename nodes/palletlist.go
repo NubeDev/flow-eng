@@ -48,7 +48,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	xor, _ := bool.NewXor(nil)
 	not, _ := bool.NewNot(nil)
 	toggle, _ := bool.NewToggle(nil)
-
+	delayMinOnOff, _ := bool.NewMinOn(nil, nil)
 	// compare
 	comp, _ := compare.NewCompare(nil)
 	between, _ := compare.NewBetween(nil)
@@ -100,7 +100,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	// time
 	delay, _ := timing.NewDelay(nil, nil)
-	delayMinON, _ := timing.NewMinOn(nil, nil)
+
 	inject, _ := timing.NewInject(nil)
 	delayOn, _ := timing.NewDelayOn(nil, nil)
 
@@ -141,6 +141,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(xor),
 		node.ConvertToSpec(not),
 		node.ConvertToSpec(toggle),
+		node.ConvertToSpec(delayMinOnOff),
 
 		node.ConvertToSpec(comp),
 		node.ConvertToSpec(between),
@@ -169,7 +170,6 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(delay),
 		node.ConvertToSpec(inject),
 		node.ConvertToSpec(delayOn),
-		node.ConvertToSpec(delayMinON),
 
 		node.ConvertToSpec(flatline),
 
@@ -369,7 +369,7 @@ func builderLatch(body *node.Spec) (node.Node, error) {
 
 func builderStreams(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
-	case flatline:
+	case flatLine:
 		return streams.NewFlatline(body)
 	}
 	return nil, nil
@@ -435,6 +435,8 @@ func builderBoolean(body *node.Spec) (node.Node, error) {
 		return bool.NewNot(body)
 	case toggle:
 		return bool.NewToggle(body)
+	case delayMinOnOff:
+		return bool.NewMinOn(body, timer.NewTimer())
 	}
 	return nil, nil
 }
@@ -469,8 +471,6 @@ func builderTiming(body *node.Spec) (node.Node, error) {
 		return timing.NewInject(body)
 	case delayOn:
 		return timing.NewDelayOn(body, timer.NewTimer())
-	case delayMinON:
-		return timing.NewMinOn(body, timer.NewTimer())
 	}
 	return nil, nil
 }
