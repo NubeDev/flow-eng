@@ -38,7 +38,11 @@ const (
 	Interval    InputName = "interval"
 	Duration    InputName = "duration"
 
-	Count InputName = "count"
+	Count     InputName = "count"
+	CountUp   InputName = "count-up"
+	CountDown InputName = "count-down"
+	Min       InputName = "min"
+	Max       InputName = "max"
 
 	In   InputName = "in"
 	In1  InputName = "in1"
@@ -66,6 +70,7 @@ const (
 	Subject      InputName = "subject"
 
 	Filter   InputName = "filter"
+	Body     InputName = "body"
 	Equation InputName = "equation"
 
 	Ip          InputName = "ip"
@@ -113,7 +118,8 @@ const (
 
 	OutNot OutputName = "out not"
 
-	Out OutputName = "out"
+	Out      OutputName = "out"
+	CountOut OutputName = "count"
 
 	MinOn  OutputName = "min-on"
 	MinOff OutputName = "min-off"

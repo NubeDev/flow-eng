@@ -28,7 +28,6 @@ func build(body *node.Spec) *node.Spec {
 func NewGet(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, getNode, category)
 	body = build(body)
-	body.SetSchema(buildSchema())
 	return &Get{body}, nil
 }
 

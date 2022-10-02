@@ -1,7 +1,6 @@
 package mathematics
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/mitchellh/mapstructure"
 )
@@ -29,7 +28,6 @@ func getSettings(body map[string]interface{}) (string, error) {
 
 func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error) {
 	body = node.Defaults(body, nodeName, category)
-
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
@@ -39,9 +37,11 @@ func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error)
 
 func process(body node.Node) {
 	function, err := getSettings(body.GetSettings())
-	fmt.Println(function, err)
 	if err != nil {
 		return
+	}
+	if function == "" {
+		function = acos
 	}
 	in := body.ReadPinAsFloat(node.In)
 	output, err := mathFunc(function, in)

@@ -1,4 +1,4 @@
-package timing
+package trigger
 
 import (
 	"github.com/NubeDev/flow-eng/helpers/jobs"

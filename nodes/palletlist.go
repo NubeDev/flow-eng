@@ -11,6 +11,7 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/compare"
 	"github.com/NubeDev/flow-eng/nodes/constant"
 	"github.com/NubeDev/flow-eng/nodes/conversion"
+	"github.com/NubeDev/flow-eng/nodes/count"
 	debugging "github.com/NubeDev/flow-eng/nodes/debug"
 	"github.com/NubeDev/flow-eng/nodes/functions"
 	"github.com/NubeDev/flow-eng/nodes/hvac"
@@ -31,6 +32,7 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/streams"
 	switches "github.com/NubeDev/flow-eng/nodes/switch"
 	"github.com/NubeDev/flow-eng/nodes/system"
+	"github.com/NubeDev/flow-eng/nodes/tigger"
 	"github.com/NubeDev/flow-eng/nodes/timing"
 )
 
@@ -101,10 +103,15 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	mathAdvanced, _ := mathematics.NewAdvanced(nil)
 
+	// trigger
+	countNode, _ := count.NewCount(nil)
+
+	// trigger
+	inject, _ := trigger.NewInject(nil)
+	randomFloat, _ := trigger.NewRandom(nil)
+
 	// time
 	delay, _ := timing.NewDelay(nil, nil)
-
-	inject, _ := timing.NewInject(nil)
 	delayOn, _ := timing.NewDelayOn(nil, nil)
 
 	// bacnet
@@ -172,10 +179,14 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(setResetLatch),
 
 		node.ConvertToSpec(delay),
-		node.ConvertToSpec(inject),
 		node.ConvertToSpec(delayOn),
 
+		node.ConvertToSpec(randomFloat),
+		node.ConvertToSpec(inject),
+
 		node.ConvertToSpec(flatline),
+
+		node.ConvertToSpec(countNode),
 
 		node.ConvertToSpec(funcNode),
 
@@ -264,6 +275,14 @@ func Builder(body *node.Spec, db db.DB, opts ...interface{}) (node.Node, error) 
 		return n, err
 	}
 	n, err = builderTiming(body)
+	if n != nil || err != nil {
+		return n, err
+	}
+	n, err = builderTrigger(body)
+	if n != nil || err != nil {
+		return n, err
+	}
+	n, err = builderCount(body)
 	if n != nil || err != nil {
 		return n, err
 	}
@@ -469,12 +488,28 @@ func builderStatistics(body *node.Spec) (node.Node, error) {
 	return nil, nil
 }
 
+func builderCount(body *node.Spec) (node.Node, error) {
+	switch body.GetName() {
+	case countNode:
+		return count.NewCount(body)
+	}
+	return nil, nil
+}
+
+func builderTrigger(body *node.Spec) (node.Node, error) {
+	switch body.GetName() {
+	case inject:
+		return trigger.NewInject(body)
+	case randomFloat:
+		return trigger.NewRandom(body)
+	}
+	return nil, nil
+}
+
 func builderTiming(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case delay:
 		return timing.NewDelay(body, timer.NewTimer())
-	case inject:
-		return timing.NewInject(body)
 	case delayOn:
 		return timing.NewDelayOn(body, timer.NewTimer())
 	}

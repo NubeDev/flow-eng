@@ -52,8 +52,14 @@ const (
 
 	flatLine = "flatLine"
 
+	// count
+	countNode = "count"
+
+	// trigger
+	randomFloat = "random-number"
+	inject      = "inject"
+
 	delay         = "delay"
-	inject        = "inject"
 	delayOn       = "delayOn"
 	delayMinOnOff = "min on off"
 
