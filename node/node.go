@@ -9,6 +9,7 @@ import (
 type Node interface {
 	Process() // runs the bool of the node
 	Cleanup()
+	Loop() (count uint64, firstLoop bool)
 	AddDB(d db.DB)
 	GetDB() db.DB
 	SetSchema(schema *schemas.Schema)
@@ -66,9 +67,10 @@ type Spec struct {
 	Parameters    *Parameters            `json:"parameters,omitempty"`
 	IsParent      bool                   `json:"isParent,omitempty"`
 	SubFlow       *SubFlow               `json:"subFlow,omitempty"`
-	OnStart       bool                   `json:"-"` // used for see if it's the first loop of the runner, if false it's the first run
-	schema        *schemas.Schema
-	db            db.DB
+	//OnStart       bool                   `json:"-"` // used for see if it's the first loop of the runner, if false it's the first run
+	loopCount uint64
+	schema    *schemas.Schema
+	db        db.DB
 }
 
 func (n *Spec) AddDB(d db.DB) {
@@ -77,6 +79,17 @@ func (n *Spec) AddDB(d db.DB) {
 
 func (n *Spec) GetDB() db.DB {
 	return n.db
+}
+
+// Loop will give you the loop count and a flag if it's the first loop
+func (n *Spec) Loop() (loopCount uint64, firstLoop bool) {
+	if n.loopCount == 0 {
+		firstLoop = true
+	} else {
+		firstLoop = false
+	}
+	n.loopCount++
+	return n.loopCount, firstLoop
 }
 
 func (n *Spec) GetSchema() *schemas.Schema {

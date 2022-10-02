@@ -8,23 +8,28 @@ import (
 
 type Delay struct {
 	*node.Spec
-	timer timer.TimedDelay
+	timer     timer.TimedDelay
+	lastValue float64
 }
 
 func NewDelay(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
 	body = node.Defaults(body, delay, category)
-	body.Inputs = node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs))
+	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs)
+	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs)
+	body.Inputs = node.BuildInputs(in, interval)
 	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
-	return &Delay{body, timer}, nil
+	return &Delay{body, timer, 0}, nil
 }
 
 func (inst *Delay) Process() {
-	in1 := inst.ReadPinAsFloat(node.In)
-	if !inst.timer.WaitFor(5 * time.Second) {
-		inst.WritePin(node.Out, 0)
-		return
+	in := inst.ReadPinAsFloat(node.In)
+	interval := inst.ReadPinAsInt(node.Interval)
+	if !inst.timer.WaitFor(time.Duration(interval) * time.Second) {
+		inst.WritePin(node.Out, inst.lastValue)
+	} else {
+		inst.lastValue = in
+		inst.WritePin(node.Out, in)
 	}
-	inst.WritePin(node.Out, in1)
 
 }
 

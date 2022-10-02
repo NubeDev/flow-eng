@@ -33,7 +33,8 @@ func (inst *AI) setObjectId() {
 }
 
 func (inst *AI) Process() {
-	if !inst.OnStart {
+	_, firstLoop := inst.Loop()
+	if !firstLoop {
 		inst.setObjectId()
 		store := getStore()
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
@@ -45,7 +46,6 @@ func (inst *AI) Process() {
 		}
 	}
 	toFlow(inst, inst.objectID)
-	inst.OnStart = true
 }
 
 func (inst *AI) Cleanup() {}

@@ -20,25 +20,28 @@ func NewLog(body *node.Spec) (node.Node, error) {
 	comment := node.BuildInput(node.Comment, node.TypeString, nil, body.Inputs)
 	num := node.BuildInput(node.InNumber, node.TypeFloat, nil, body.Inputs)
 	str := node.BuildInput(node.InString, node.TypeString, nil, body.Inputs)
-	inputs := node.BuildInputs(comment, num, str)
+	b := node.BuildInput(node.InBoolean, node.TypeBool, nil, body.Inputs)
+	inputs := node.BuildInputs(comment, num, str, b)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
 	return &Log{body}, nil
 }
 
 func (inst *Log) Process() {
-	comment := inst.ReadPin(node.Comment)
+	comment := inst.ReadPinAsString(node.Comment)
 	inNum := inst.ReadPin(node.InNumber)
 	inStr := inst.ReadPin(node.InString)
-
+	inBool := inst.ReadPin(node.InBoolean)
 	if inNum != nil {
 		log.Infof("log: comment: %v number: %v", comment, inNum)
 	}
-	str := fmt.Sprintf("%v", inStr)
-	if str != "" {
+	if inStr != nil {
+		str := fmt.Sprintf("%v", inStr)
 		log.Infof("log: comment: %v string: %s", comment, str)
 	}
-
+	if inBool != nil {
+		log.Infof("log: comment: %s bool: %t", comment, inBool)
+	}
 }
 
 func (inst *Log) Cleanup() {}

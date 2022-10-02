@@ -50,9 +50,10 @@ const (
 
 	flatline = "flatline"
 
-	delay   = "delay"
-	inject  = "inject"
-	delayOn = "delayOn"
+	delay      = "delay"
+	inject     = "inject"
+	delayOn    = "delayOn"
+	delayMinON = "min-on-delay"
 
 	// switch
 	switchNode = "switch"

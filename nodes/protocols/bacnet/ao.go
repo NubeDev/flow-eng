@@ -30,7 +30,8 @@ func (inst *AO) setObjectId() {
 	inst.objectID = points.ObjectID(inst.ReadPinAsInt(node.ObjectId))
 }
 func (inst *AO) Process() {
-	if !inst.OnStart {
+	_, firstLoop := inst.Loop()
+	if !firstLoop {
 		inst.setObjectId()
 		store := getStore()
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
@@ -43,7 +44,6 @@ func (inst *AO) Process() {
 	}
 	toFlow(inst, inst.objectID)
 	fromFlow(inst, inst.objectID)
-	inst.OnStart = true
 
 }
 

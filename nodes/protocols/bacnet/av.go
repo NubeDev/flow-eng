@@ -32,7 +32,8 @@ func (inst *AV) setObjectId() {
 }
 
 func (inst *AV) Process() {
-	if !inst.OnStart {
+	_, firstLoop := inst.Loop()
+	if !firstLoop {
 		inst.setObjectId()
 		store := getStore()
 		objectType, isWriteable, _, err := getBacnetType(inst.Info.Name)
@@ -46,7 +47,6 @@ func (inst *AV) Process() {
 
 	toFlow(inst, inst.objectID)
 	fromFlow(inst, inst.objectID)
-	inst.OnStart = true
 
 }
 

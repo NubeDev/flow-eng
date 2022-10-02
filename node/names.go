@@ -26,13 +26,15 @@ const (
 
 	AlertDelayMins InputName = "alert-delay-mins"
 
-	Comment  InputName = "comment"
-	InNumber InputName = "number"
-	InString InputName = "string"
+	Comment   InputName = "comment"
+	InNumber  InputName = "number"
+	InString  InputName = "string"
+	InBoolean InputName = "boolean"
 
 	Enable InputName = "enable"
 
 	Interval InputName = "interval"
+	Duration InputName = "duration"
 
 	Count InputName = "count"
 
