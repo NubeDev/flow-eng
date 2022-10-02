@@ -43,9 +43,7 @@ func (inst *AV) Process() {
 			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
 		}
 	}
-	if inst.InputUpdated(node.In14) {
 
-	}
 	toFlow(inst, inst.objectID)
 	fromFlow(inst, inst.objectID)
 	inst.OnStart = true

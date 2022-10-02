@@ -3,6 +3,7 @@ package conversions
 import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/float"
+	"strconv"
 )
 
 type number interface {
@@ -14,6 +15,24 @@ func BoolToNum(x bool) float64 {
 		return 0
 	}
 	return 1
+}
+
+func IsBool(value interface{}) bool {
+	switch value.(type) {
+	case bool:
+		return true
+	default:
+		return false
+	}
+}
+
+func IsBoolWithValue(value interface{}) (isBool, val bool) {
+	switch v := value.(type) {
+	case bool:
+		return true, v
+	default:
+		return false, false
+	}
 }
 
 func NumToBool[T number](x T) bool {
@@ -69,6 +88,12 @@ func GetFloat(in interface{}) (val float64) {
 		val = float64(i)
 	case int64:
 		val = float64(i)
+	case string:
+		if s, err := strconv.ParseFloat(fmt.Sprintf("%v", in), 64); err == nil {
+			val = s
+		} else {
+			val = 0
+		}
 	default:
 		return 0
 	}
@@ -85,6 +110,13 @@ func GetFloatOk(in interface{}) (val float64, ok bool) {
 		val = float64(i)
 	case int64:
 		val = float64(i)
+	case string:
+		if s, err := strconv.ParseFloat(fmt.Sprintf("%v", in), 64); err == nil {
+			val = s
+		} else {
+			val = 0
+			ok = false
+		}
 	default:
 		return 0, false
 	}

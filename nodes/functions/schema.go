@@ -9,8 +9,14 @@ type nodeSchema struct {
 	Code schemas.String `json:"code"`
 }
 
-const eg = `let out = arg["in1"]+arg["in2"]
-return out*2
+const eg = `let in1 = Number(arg["in1"])
+let in2 = Number(arg["in2"])
+
+for (let i = 0; i < 5; i++) {
+  in1 += i
+}
+
+return in1+in2
 `
 
 func buildSchema() *schemas.Schema {

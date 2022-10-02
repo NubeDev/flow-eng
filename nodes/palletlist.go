@@ -38,7 +38,8 @@ const (
 )
 
 func All() []*node.Spec { // get all the nodes, will be used for the UI to list all the nodes
-	constNum, _ := constant.NewConstNum(nil)
+	constNum, _ := constant.NewNumber(nil)
+	constBool, _ := constant.NewBoolean(nil)
 	constStr, _ := constant.NewString(nil)
 
 	// bool
@@ -66,8 +67,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	flowLoopCount, _ := system.NewLoopCount(nil)
 
-	stringToNum, _ := conversion.NewStringToNum(nil)
-	numToString, _ := conversion.NewNumToString(nil)
+	conversionString, _ := conversion.NewString(nil)
+	conversionNum, _ := conversion.NewNumber(nil)
+	conversionBool, _ := conversion.NewBoolean(nil)
 
 	funcNode, _ := functions.NewFunc(nil)
 
@@ -125,6 +127,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	return node.BuildNodes(
 		node.ConvertToSpec(constNum),
+		node.ConvertToSpec(constBool),
 		node.ConvertToSpec(constStr),
 
 		node.ConvertToSpec(add),
@@ -173,8 +176,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(switchNode),
 		node.ConvertToSpec(selectNode),
 
-		node.ConvertToSpec(stringToNum),
-		node.ConvertToSpec(numToString),
+		node.ConvertToSpec(conversionString),
+		node.ConvertToSpec(conversionNum),
+		node.ConvertToSpec(conversionBool),
 
 		node.ConvertToSpec(linkInput),
 		node.ConvertToSpec(linkOutput),
@@ -372,9 +376,11 @@ func builderStreams(body *node.Spec) (node.Node, error) {
 func builderConst(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case constNum:
-		return constant.NewConstNum(body)
+		return constant.NewNumber(body)
 	case constStr:
 		return constant.NewString(body)
+	case constBool:
+		return constant.NewBoolean(body)
 	}
 	return nil, nil
 }
@@ -395,10 +401,12 @@ func builderMath(body *node.Spec) (node.Node, error) {
 
 func builderConversion(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
-	case numToString:
-		return conversion.NewNumToString(body)
-	case stringToNum:
-		return conversion.NewStringToNum(body)
+	case conversionString:
+		return conversion.NewString(body)
+	case conversionNum:
+		return conversion.NewNumber(body)
+	case conversionBool:
+		return conversion.NewBoolean(body)
 	}
 	return nil, nil
 }

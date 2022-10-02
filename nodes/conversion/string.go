@@ -2,30 +2,41 @@ package conversion
 
 import (
 	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/node"
 	"strconv"
 )
 
-type StringToNum struct {
+type String struct {
 	*node.Spec
 }
 
-func NewStringToNum(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, stringToNum, category)
+func NewString(body *node.Spec) (node.Node, error) {
+	body = node.Defaults(body, conversionString, category)
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeString, nil, body.Inputs))
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
+	asBool := node.BuildOutput(node.Boolean, node.TypeBool, nil, body.Outputs)
+	asString := node.BuildOutput(node.Float, node.TypeFloat, nil, body.Outputs)
+	outputs := node.BuildOutputs(asBool, asString)
 	body = node.BuildNode(body, inputs, outputs, nil)
-	return &StringToNum{body}, nil
+	return &String{body}, nil
 }
 
-func (inst *StringToNum) Process() {
-	in1 := inst.ReadPin(node.In)
-	if s, err := strconv.ParseFloat(fmt.Sprintf("%v", in1), 64); err == nil {
-		inst.WritePin(node.Out, s)
+func (inst *String) Process() {
+	in1 := inst.ReadPinAsString(node.In)
+	f, ok := conversions.GetFloatOk(in1)
+	if ok { // to float
+		inst.WritePin(node.Float, fmt.Sprintf("%f", f))
 	} else {
-		inst.WritePin(node.Out, nil)
+		inst.WritePin(node.Float, nil)
+	}
+
+	result, err := strconv.ParseBool(in1) // to bool
+	if err != nil {
+		inst.WritePin(node.Boolean, nil)
+	} else {
+		inst.WritePin(node.Boolean, result)
 	}
 
 }
 
-func (inst *StringToNum) Cleanup() {}
+func (inst *String) Cleanup() {}

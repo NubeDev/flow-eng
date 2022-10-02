@@ -6,26 +6,34 @@ import (
 	"github.com/NubeDev/flow-eng/node"
 )
 
-type NumToString struct {
+type Number struct {
 	*node.Spec
 }
 
-func NewNumToString(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, numToString, category)
+func NewNumber(body *node.Spec) (node.Node, error) {
+	body = node.Defaults(body, conversionNum, category)
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs))
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
+	asBool := node.BuildOutput(node.Boolean, node.TypeBool, nil, body.Outputs)
+	asString := node.BuildOutput(node.String, node.TypeString, nil, body.Outputs)
+	outputs := node.BuildOutputs(asBool, asString)
 	body = node.BuildNode(body, inputs, outputs, nil)
-	return &NumToString{body}, nil
+	return &Number{body}, nil
 }
 
-func (inst *NumToString) Process() {
+func (inst *Number) Process() {
 	in1 := inst.ReadPinAsFloat(node.In)
-	v, ok := conversions.GetFloatOk(in1)
+	f, ok := conversions.GetFloatOk(in1)
 	if ok {
-		inst.WritePin(node.Out, fmt.Sprintf("%f", v))
+		if f == 1 {
+			inst.WritePin(node.Boolean, true)
+		} else {
+			inst.WritePin(node.Boolean, false)
+		}
+		inst.WritePin(node.String, fmt.Sprintf("%f", f))
 	} else {
-		inst.WritePin(node.Out, nil)
+		inst.WritePin(node.Boolean, nil)
+		inst.WritePin(node.String, nil)
 	}
 }
 
-func (inst *NumToString) Cleanup() {}
+func (inst *Number) Cleanup() {}

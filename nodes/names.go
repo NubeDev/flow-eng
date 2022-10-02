@@ -1,8 +1,9 @@
 package nodes
 
 const (
-	constNum = "const-num"
-	constStr = "const-string"
+	constNum  = "const-num"
+	constBool = "const-bool"
+	constStr  = "const-string"
 
 	add      = "add"
 	divide   = "divide"
@@ -39,8 +40,9 @@ const (
 	hysteresis   = "hysteresis"
 	funcNode     = "func"
 
-	stringToNum = "string-to-number"
-	numToString = "number-to-string"
+	conversionString = "conversion-string"
+	conversionNum    = "conversion-number"
+	conversionBool   = "conversion-bool"
 
 	max = "min"
 	min = "max"

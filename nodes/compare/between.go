@@ -1,6 +1,7 @@
 package compare
 
 import (
+	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/node"
 )
 
@@ -9,17 +10,33 @@ type Between struct {
 }
 
 func NewBetween(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, between, category)
-	var inNames = []string{node.SetInputName(node.In), node.SetInputName(node.From), node.SetInputName(node.To)}
-	var outNames = []string{node.SetOutputName(node.Out), node.SetOutputName(node.OutNot), node.SetOutputName(node.Above), node.SetOutputName(node.Below)}
-	inputs := node.BuildInputs(node.DynamicInputs(node.TypeFloat, nil, 3, 0, 0, body.Inputs, inNames)...)
-	outputs := node.BuildOutputs(node.DynamicOutputs(node.TypeFloat, nil, 4, 0, 0, body.Outputs, outNames)...)
+	body = node.Defaults(body, betweenNode, category)
+
+	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs)
+	from := node.BuildInput(node.From, node.TypeFloat, nil, body.Inputs)
+	to := node.BuildInput(node.To, node.TypeFloat, nil, body.Inputs)
+
+	inputs := node.BuildInputs(in, from, to)
+	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
+	outNot := node.BuildOutput(node.OutNot, node.TypeBool, nil, body.Outputs)
+	above := node.BuildOutput(node.Above, node.TypeBool, nil, body.Outputs)
+	below := node.BuildOutput(node.Below, node.TypeBool, nil, body.Outputs)
+	outputs := node.BuildOutputs(out, outNot, above, below)
 	body = node.BuildNode(body, inputs, outputs, nil)
+
 	return &Between{body}, nil
 }
 
 func (inst *Between) Process() {
-	Process(inst)
+	in := inst.ReadPinAsFloat(node.In)
+	from := inst.ReadPinAsFloat(node.From)
+	to := inst.ReadPinAsFloat(node.To)
+
+	between, below, above := array.Between(in, from, to)
+	inst.WritePin(node.Out, between)
+	inst.WritePin(node.OutNot, !between)
+	inst.WritePin(node.Above, above)
+	inst.WritePin(node.Below, below)
 }
 
 func (inst *Between) Cleanup() {}

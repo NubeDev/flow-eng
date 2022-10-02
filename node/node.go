@@ -22,7 +22,7 @@ type Node interface {
 	GetInput(name InputName) *Input
 	GetOutputs() []*Output
 	GetOutput(name OutputName) *Output
-	InputUpdated(name InputName) bool
+	InputUpdated(name InputName) (updated bool, boolCOV bool)
 	InputsLen() int
 	OutputsLen() int
 	ReadPinAsString(name InputName) string

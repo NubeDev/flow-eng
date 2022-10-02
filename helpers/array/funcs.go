@@ -31,6 +31,30 @@ func Compare(array []float64) (greater, less, equal bool) {
 	return greater, less, equal
 }
 
+func OneIsTrue(array []bool) bool {
+	if len(array) == 0 {
+		return false
+	}
+	for _, item := range array {
+		if item {
+			return true
+		}
+	}
+	return false
+}
+
+func AllTrue(array []bool) bool {
+	if len(array) == 0 {
+		return false
+	}
+	for _, item := range array {
+		if !item {
+			return false
+		}
+	}
+	return true
+}
+
 func AllTrueFloat64(array []float64) bool {
 	if len(array) == 0 {
 		return false

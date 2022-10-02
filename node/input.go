@@ -48,17 +48,6 @@ func (p *Input) Connectors() []*Connector {
 }
 
 func (p *Input) GetValue() interface{} {
-	if p.values.Length() > 1 { // work out if the input has updated
-		p.values.RemoveFirst()
-		p.values.Add(p.value)
-	} else {
-		p.values.Add(p.value)
-	}
-	if p.values.GetByIndex(0) != p.values.GetByIndex(1) {
-		p.updated = true
-	} else {
-		p.updated = false
-	}
 	if p.value == nil {
 		if p.Connection.OverrideValue != nil {
 			return p.Connection.OverrideValue

@@ -99,13 +99,18 @@ const (
 	ErrMsg OutputName = "error"
 	Msg    OutputName = "message"
 
-	Flatline OutputName = "flatline"
+	FlatLine OutputName = "flatline"
 
 	Trigger OutputName = "trigger"
 	Toggle  OutputName = "toggle"
-	Out     OutputName = "out"
+
+	String  OutputName = "string"
+	Boolean OutputName = "boolean"
+	Float   OutputName = "float"
 
 	OutNot OutputName = "out not"
+
+	Out OutputName = "out"
 
 	Out1 OutputName = "out1"
 	Out2 OutputName = "out2"

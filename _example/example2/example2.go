@@ -12,7 +12,7 @@ import (
 
 func main() {
 
-	const1, err := constant.NewConstNum(nil) // new node
+	const1, err := constant.NewNumber(nil) // new node
 	if err != nil {
 		log.Errorln(err)
 		return
@@ -23,7 +23,7 @@ func main() {
 		log.Errorln(err)
 		return
 	}
-	const2, err := constant.NewConstNum(nil)
+	const2, err := constant.NewNumber(nil)
 	if err != nil {
 		log.Errorln(err)
 		return

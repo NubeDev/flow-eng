@@ -7,12 +7,32 @@ import (
 )
 
 // InputUpdated if true means that the node input value has updated
-func (n *Spec) InputUpdated(name InputName) bool {
+func (n *Spec) InputUpdated(name InputName) (updated bool, boolCOV bool) {
 	input := n.GetInput(name)
-	if input != nil {
-		return input.updated
+
+	if input.values.Length() > 1 { // work out if the input has updated
+		input.values.RemoveFirst()
+		input.values.Add(input.value)
+	} else {
+		input.values.Add(input.value)
 	}
-	return false
+	if input.values.GetByIndex(0) != input.values.GetByIndex(1) {
+		input.updated = true
+	} else {
+		input.updated = false
+	}
+	if input != nil {
+
+		isBool, val := conversions.IsBoolWithValue(input.GetValue())
+		if input.updated && isBool && val {
+			boolCOV = true
+		} else {
+			boolCOV = false
+		}
+
+		return input.updated, boolCOV
+	}
+	return false, false
 }
 
 func (n *Spec) ReadPin(name InputName) interface{} {

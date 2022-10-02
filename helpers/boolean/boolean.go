@@ -34,3 +34,22 @@ func IsNil(b *bool) bool {
 		return false
 	}
 }
+
+func ConvertInterfaceToBool(value interface{}) *bool {
+	if value == nil {
+		return nil
+	}
+	output, ok := value.(bool)
+	if ok {
+		return &output
+	}
+	return nil
+}
+
+func ConvertInterfaceToBoolMultiple(values []interface{}) []*bool {
+	var output []*bool
+	for _, value := range values {
+		output = append(output, ConvertInterfaceToBool(value))
+	}
+	return output
+}

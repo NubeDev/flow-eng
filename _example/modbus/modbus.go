@@ -15,7 +15,7 @@ import (
 
 func main() {
 	var err error
-	cont, err := constant.NewConstNum(nil)
+	cont, err := constant.NewNumber(nil)
 	if err != nil {
 		log.Errorln(err)
 		return
