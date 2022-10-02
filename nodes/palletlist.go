@@ -18,6 +18,7 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/latch"
 	"github.com/NubeDev/flow-eng/nodes/link"
 	"github.com/NubeDev/flow-eng/nodes/math"
+	"github.com/NubeDev/flow-eng/nodes/mathematics"
 	broker "github.com/NubeDev/flow-eng/nodes/mqtt"
 	"github.com/NubeDev/flow-eng/nodes/notify/gmail"
 	"github.com/NubeDev/flow-eng/nodes/notify/ping"
@@ -98,6 +99,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	multiply, _ := math.NewMultiply(nil)
 	divide, _ := math.NewDivide(nil)
 
+	mathAdvanced, _ := mathematics.NewAdvanced(nil)
+
 	// time
 	delay, _ := timing.NewDelay(nil, nil)
 
@@ -135,6 +138,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(sub),
 		node.ConvertToSpec(multiply),
 		node.ConvertToSpec(divide),
+		node.ConvertToSpec(mathAdvanced),
 
 		node.ConvertToSpec(and),
 		node.ConvertToSpec(or),
@@ -397,6 +401,8 @@ func builderMath(body *node.Spec) (node.Node, error) {
 		return math.NewMultiply(body)
 	case divide:
 		return math.NewDivide(body)
+	case mathAdvanced:
+		return mathematics.NewAdvanced(body)
 	}
 	return nil, nil
 }

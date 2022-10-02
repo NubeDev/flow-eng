@@ -53,7 +53,6 @@ const (
 	In15 InputName = "in15"
 	In16 InputName = "in16"
 
-	Input_ InputName = "input"
 	InputA InputName = "a"
 	InputB InputName = "b"
 	InputC InputName = "c"

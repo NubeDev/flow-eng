@@ -10,6 +10,8 @@ const (
 	sub      = "subtract"
 	multiply = "multiply"
 
+	mathAdvanced = "advanced"
+
 	and    = "and"
 	or     = "or"
 	not    = "not"

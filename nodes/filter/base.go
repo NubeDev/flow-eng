@@ -13,17 +13,9 @@ const (
 func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error) {
 	body = node.Defaults(body, nodeName, category)
 
-	_, setting, _, err := node.NewSetting(body, &node.SettingOptions{Type: node.Array, Title: node.Operation})
-	if err != nil {
-		return nil, err
-	}
-	settings, err := node.BuildSettings(setting)
-	if err != nil {
-		return nil, err
-	}
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
-	body = node.BuildNode(body, inputs, outputs, settings)
+	body = node.BuildNode(body, inputs, outputs, nil)
 	return body, nil
 }
 

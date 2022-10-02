@@ -10,20 +10,20 @@ type Not struct {
 
 func NewNot(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, not, category)
-	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs) // TODO: this input shouldn't have a manual override value
+	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs) // TODO: this input shouldn't have a manual override value
 
 	inputs := node.BuildInputs(in)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
 	return &Not{body}, nil
 }
 
 func (inst *Not) Process() {
-	in := inst.ReadPinAsFloat(node.In)
-	if in == 1 {
-		inst.WritePin(node.Out, 0)
+	in := inst.ReadPinBool(node.In)
+	if in {
+		inst.WritePin(node.Out, false)
 	} else {
-		inst.WritePin(node.Out, 1)
+		inst.WritePin(node.Out, true)
 	}
 }
 

@@ -12,7 +12,7 @@ type NumLatch struct {
 
 func NewNumLatch(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, numLatch, category)
-	input := node.BuildInput(node.Input_, node.TypeFloat, nil, body.Inputs)
+	input := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs)
 	latch := node.BuildInput(node.Latch, node.TypeFloat, nil, body.Inputs) // TODO: this input shouldn't have a manual override value
 
 	inputs := node.BuildInputs(input, latch)
@@ -22,7 +22,7 @@ func NewNumLatch(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *NumLatch) Process() {
-	input := inst.ReadPinAsFloat(node.Input_)
+	input := inst.ReadPinAsFloat(node.In)
 	latch := inst.ReadPinAsFloat(node.Latch)
 	latchBool := latch == 1
 

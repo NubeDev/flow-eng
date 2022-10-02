@@ -1,51 +1,53 @@
 package mathematics
 
 import (
+	"fmt"
 	"github.com/NubeDev/flow-eng/node"
-	"math"
+	"github.com/mitchellh/mapstructure"
 )
 
 const (
-	category = "math-advanced"
+	category     = "math"
+	mathAdvanced = "advanced"
 )
+
+type nodeSettings struct {
+	Function string `json:"function"`
+}
+
+func getSettings(body map[string]interface{}) (string, error) {
+	settings := &nodeSettings{}
+	err := mapstructure.Decode(body, settings)
+	if err != nil {
+		return "", err
+	}
+	if settings != nil {
+		return settings.Function, nil
+	}
+	return "", nil
+}
 
 func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error) {
 	body = node.Defaults(body, nodeName, category)
 
-	_, setting, _, err := node.NewSetting(body, &node.SettingOptions{Type: node.Array, Title: node.Operation})
-	if err != nil {
-		return nil, err
-	}
-	settings, err := node.BuildSettings(setting)
-	if err != nil {
-		return nil, err
-	}
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
-	body = node.BuildNode(body, inputs, outputs, settings)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
+	body.SetSchema(buildSchema())
 	return body, nil
 }
 
 func process(body node.Node) {
-	//setting := body.GetSetting(node.Operation)
-	//
-	//setting.Properties
-
+	function, err := getSettings(body.GetSettings())
+	fmt.Println(function, err)
+	if err != nil {
+		return
+	}
 	in := body.ReadPinAsFloat(node.In)
-	output, ok := operation("ceil", in)
-	if !ok {
-		body.WritePin(node.Result, nil)
+	output, err := mathFunc(function, in)
+	if err != nil {
+		body.WritePin(node.Result, 0)
 	} else {
 		body.WritePin(node.Result, output)
 	}
-}
-
-func operation(operation string, value float64) (val float64, ok bool) {
-	output := 0.0
-	switch operation {
-	case "ceil":
-		output = math.Ceil(value)
-		ok = true
-	}
-	return output, ok
 }

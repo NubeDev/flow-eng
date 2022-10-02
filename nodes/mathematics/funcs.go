@@ -5,21 +5,6 @@ import (
 	"math"
 )
 
-// NODEs will single in/out
-const (
-	acos  = "acos"
-	asin  = "asin"
-	atan  = "atan"
-	cbrt  = "cbrt"
-	cos   = "cos"
-	exp   = "exp"
-	log   = "log"
-	log10 = "log10"
-	sin   = "sin"
-	sqrt  = "sqrt"
-	tan   = "tan"
-)
-
 func mathFunc(def string, x float64) (float64, error) {
 	switch def {
 	case acos:
