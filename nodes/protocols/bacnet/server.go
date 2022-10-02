@@ -121,7 +121,7 @@ func getMqtt() *mqttclient.Client {
 
 func getStore() *points.Store {
 	if db == nil {
-		log.Error("bacnet-server-node: store can not be empty")
+		//log.Error("bacnet-server-node: store can not be empty")
 		db = points.New(application, nil, 1, 200, 200)
 	}
 	return db

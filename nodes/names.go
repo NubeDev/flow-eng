@@ -53,7 +53,7 @@ const (
 	delay         = "delay"
 	inject        = "inject"
 	delayOn       = "delayOn"
-	delayMinOnOff = "min-on off"
+	delayMinOnOff = "min on off"
 
 	// switch
 	switchNode = "switch"

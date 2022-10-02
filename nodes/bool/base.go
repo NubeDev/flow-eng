@@ -16,7 +16,7 @@ const (
 	not           = "not"
 	xor           = "xor"
 	toggle        = "toggle"
-	delayMinOnOff = "min-on off"
+	delayMinOnOff = "min on off"
 )
 
 const (

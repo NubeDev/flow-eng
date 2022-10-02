@@ -19,8 +19,8 @@ type MinOnOff struct {
 func NewMinOnOff(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
 	body = node.Defaults(body, delayMinOnOff, category)
 	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs)
-	onInterval := node.BuildInput(node.OnInterval, node.TypeFloat, nil, body.Inputs)
-	offInterval := node.BuildInput(node.OffInterval, node.TypeFloat, nil, body.Inputs)
+	onInterval := node.BuildInput(node.OnInterval, node.TypeFloat, 0, body.Inputs)
+	offInterval := node.BuildInput(node.OffInterval, node.TypeFloat, 0, body.Inputs)
 	body.Inputs = node.BuildInputs(in, onInterval, offInterval)
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	body.Outputs = node.BuildOutputs(out)
