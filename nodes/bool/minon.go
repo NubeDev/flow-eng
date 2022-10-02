@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type MinOn struct {
+type MinOnOff struct {
 	*node.Spec
 	timer           timer.TimedDelay
 	lastValue       bool
@@ -16,7 +16,7 @@ type MinOn struct {
 	minOffTriggered bool
 }
 
-func NewMinOn(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
+func NewMinOnOff(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
 	body = node.Defaults(body, delayMinOnOff, category)
 	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs)
 	onInterval := node.BuildInput(node.OnInterval, node.TypeFloat, nil, body.Inputs)
@@ -24,10 +24,10 @@ func NewMinOn(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
 	body.Inputs = node.BuildInputs(in, onInterval, offInterval)
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	body.Outputs = node.BuildOutputs(out)
-	return &MinOn{body, timer, false, false, false, false, false}, nil
+	return &MinOnOff{body, timer, false, false, false, false, false}, nil
 }
 
-func (inst *MinOn) minOn(interval int) {
+func (inst *MinOnOff) minOn(interval int) {
 	inst.lockedMinOn = true
 	time.Sleep(time.Duration(interval) * time.Second)
 	inst.lockedMinOn = false
@@ -35,7 +35,7 @@ func (inst *MinOn) minOn(interval int) {
 
 }
 
-func (inst *MinOn) minOff(interval int) {
+func (inst *MinOnOff) minOff(interval int) {
 	inst.lockedMinOff = true
 	time.Sleep(time.Duration(interval) * time.Second)
 	inst.lockedMinOff = false
@@ -47,7 +47,7 @@ func (inst *MinOn) minOff(interval int) {
 // out is true if minOn is on
 // trigger minOn if in == true and minOff is not active
 
-func (inst *MinOn) Process() {
+func (inst *MinOnOff) Process() {
 	in := inst.ReadPinBool(node.In)
 	onInterval := inst.ReadPinAsInt(node.OnInterval)
 	offInterval := inst.ReadPinAsInt(node.OffInterval)
@@ -81,4 +81,4 @@ func (inst *MinOn) Process() {
 
 }
 
-func (inst *MinOn) Cleanup() {}
+func (inst *MinOnOff) Cleanup() {}

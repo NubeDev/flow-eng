@@ -48,7 +48,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	xor, _ := bool.NewXor(nil)
 	not, _ := bool.NewNot(nil)
 	toggle, _ := bool.NewToggle(nil)
-	delayMinOnOff, _ := bool.NewMinOn(nil, nil)
+	delayMinOnOff, _ := bool.NewMinOnOff(nil, nil)
 	// compare
 	comp, _ := compare.NewCompare(nil)
 	between, _ := compare.NewBetween(nil)
@@ -436,7 +436,7 @@ func builderBoolean(body *node.Spec) (node.Node, error) {
 	case toggle:
 		return bool.NewToggle(body)
 	case delayMinOnOff:
-		return bool.NewMinOn(body, timer.NewTimer())
+		return bool.NewMinOnOff(body, timer.NewTimer())
 	}
 	return nil, nil
 }
