@@ -18,52 +18,59 @@ type Ping struct {
 	triggered bool
 	loopCount uint64
 	lastOk    time.Time
+	lastFail  time.Time
+	lastPing  bool
 }
 
 func NewPing(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, pingNode, notify.Category)
 
 	ip := node.BuildInput(node.Ip, node.TypeString, nil, body.Inputs)
-	t := node.BuildInput(node.Time, node.TypeString, nil, body.Inputs)
-	trigger := node.BuildInput(node.TriggerInput, node.TypeFloat, nil, body.Inputs)
-	body.Inputs = node.BuildInputs(ip, t, trigger)
+	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs)
+	body.Inputs = node.BuildInputs(ip, trigger)
 
-	msg := node.BuildOutput(node.Result, node.TypeString, nil, body.Outputs)
-	body.Outputs = node.BuildOutputs(msg)
-	return &Ping{body, false, false, 0, time.Now()}, nil
+	ok := node.BuildOutput(node.Ok, node.TypeBool, nil, body.Outputs)
+	msg := node.BuildOutput(node.Msg, node.TypeString, nil, body.Outputs)
+	body.Outputs = node.BuildOutputs(ok, msg)
+	return &Ping{body, false, false, 0, time.Now(), time.Now(), false}, nil
 }
 
-func (inst *Ping) ping() {
-	if !inst.firstLoop {
-		//inst.setEmailClient()
-	}
-	trigger := inst.ReadPinBool(node.TriggerInput)
+func (inst *Ping) ping(ip string, trigger bool) {
+
 	if trigger && !inst.triggered {
 		inst.triggered = true
-		ip := inst.ReadPinAsString(node.Ip)
-		fmt.Println("TRIGGER PING", ip)
 		ok := helpers.CommandPing(ip)
 		if ok {
 			inst.lastOk = time.Now()
-			ping := helpers.PingMessage(ip, ok, inst.lastOk)
-			fmt.Println(ping)
 			inst.triggered = false
+			inst.lastPing = true
 		} else {
-			ping := helpers.PingMessage(ip, ok, inst.lastOk)
-			fmt.Println(ping)
+			inst.lastFail = time.Now()
 			inst.triggered = false
-		}
+			inst.lastPing = false
 
+		}
 	}
 	if !trigger && inst.triggered {
-		fmt.Println("RESET")
 		inst.triggered = false
 	}
 }
 
 func (inst *Ping) Process() {
-	inst.loopCount++
-	go inst.ping()
+	ip := inst.ReadPinAsString(node.Ip)
+	firstLoop, trigger := inst.InputUpdated(node.TriggerInput)
+	if firstLoop || trigger {
+		go inst.ping(ip, true)
+	}
+	pingMsg := helpers.PingMessage(ip, inst.lastPing, inst.lastOk)
+	pingFailMsg := helpers.PingMessage(ip, inst.lastPing, inst.lastFail)
+	fmt.Println(inst.lastOk, inst.lastFail)
+	if inst.lastPing {
+		inst.WritePin(node.Msg, pingMsg)
+	} else {
+		inst.WritePin(node.Msg, pingFailMsg)
+	}
+	inst.WritePin(node.Ok, inst.lastPing)
 
 }
 

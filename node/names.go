@@ -102,6 +102,7 @@ const (
 )
 
 const (
+	Ok     OutputName = "ok"
 	Result OutputName = "result"
 
 	ErrMsg OutputName = "error"
