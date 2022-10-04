@@ -21,3 +21,8 @@ if InputHasConnection(node.InBoolean) {
     log.Infof("log: comment: %s bool: %t", comment, inBool)
 }
 ```
+
+### blocking go-routine
+when a blocking function is need to be executed eg:(do a database call) a `go-routine` can be used, see example blow
+
+[example](https://github.com/NubeDev/flow-eng/blob/620e14572a55b390c99e4efc2214d20a681423de/nodes/count/ramp.go#L49)
