@@ -1,6 +1,7 @@
 package point
 
 import (
+	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/node"
 )
 
@@ -22,9 +23,9 @@ func (inst *Number) Process() {
 	in1 := inst.ReadPinAsFloatPointer(node.In1)
 	in2 := inst.ReadPinAsFloatPointer(node.In2)
 	if in1 != nil {
-		inst.WritePin(node.Out, in1)
+		inst.WritePin(node.Out, float.NonNil(in1))
 	} else {
-		inst.WritePin(node.Out, in2)
+		inst.WritePin(node.Out, float.NonNil(in2))
 	}
 
 }

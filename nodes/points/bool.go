@@ -1,7 +1,6 @@
 package point
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/boolean"
 	"github.com/NubeDev/flow-eng/node"
 )
@@ -23,7 +22,6 @@ func NewBoolean(body *node.Spec) (node.Node, error) {
 func (inst *Boolean) Process() {
 	in1 := inst.ReadPinBoolPointer(node.In1)
 	in2 := inst.ReadPinBoolPointer(node.In2)
-	fmt.Println(boolean.NonNil(in1), boolean.NonNil(in2))
 	if in1 != nil {
 		inst.WritePin(node.Out, boolean.NonNil(in1))
 	} else {
