@@ -35,6 +35,18 @@ func (n *Spec) InputUpdated(name InputName) (updated bool, boolCOV bool) {
 	return false, false
 }
 
+// InputHasConnection true if the node input has a connection
+func (n *Spec) InputHasConnection(name InputName) bool {
+	input := n.GetInput(name)
+	if input == nil {
+		return false
+	}
+	if input.Connection.NodeID != "" {
+		return true
+	}
+	return false
+}
+
 func (n *Spec) ReadPin(name InputName) interface{} {
 	input := n.GetInput(name)
 	if input == nil {
