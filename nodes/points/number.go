@@ -27,6 +27,5 @@ func (inst *Number) Process() {
 	} else {
 		inst.WritePin(node.Out, float.NonNil(in2))
 	}
-
 }
 func (inst *Number) Cleanup() {}

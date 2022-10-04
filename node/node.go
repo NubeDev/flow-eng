@@ -42,6 +42,7 @@ type Node interface {
 	DeleteSubFlowNodes()
 	SetMetadata(m *Metadata)
 	GetSettings() map[string]interface{}
+	NodeValues() *Values
 }
 
 func New(id, name, nodeName string, meta *Metadata, settings map[string]interface{}) *Spec {

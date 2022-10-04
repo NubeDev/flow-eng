@@ -26,6 +26,15 @@ func (p *Flow) GetNodes() []node.Node {
 	return p.nodes
 }
 
+// NodesValues get all the node current values from the runtime
+func (p *Flow) NodesValues() []*node.Values {
+	var out []*node.Values
+	for _, n := range p.GetNodes() {
+		out = append(out, n.NodeValues())
+	}
+	return out
+}
+
 func (p *Flow) GetNodesSpec() []*node.Spec {
 	var list []*node.Spec
 	for _, n := range p.GetNodes() {
