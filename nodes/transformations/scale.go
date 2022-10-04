@@ -16,7 +16,7 @@ func NewScale(body *node.Spec) (node.Node, error) {
 	maxIn := node.BuildInput(node.InMax, node.TypeFloat, nil, body.Inputs)
 	minOut := node.BuildInput(node.OutMin, node.TypeFloat, nil, body.Inputs)
 	maxOut := node.BuildInput(node.OutMax, node.TypeFloat, nil, body.Inputs)
-	inputs := node.BuildInputs(in, minIn, minOut, maxIn, maxOut)
+	inputs := node.BuildInputs(in, minIn, maxIn, minOut, maxOut)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
 	return &Scale{body}, nil

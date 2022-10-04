@@ -217,6 +217,10 @@ func Scale(value, inMin, inMax, outMin, outMax float64) float64 {
 	}
 }
 
+func scaleBetween(unscaledNum, minAllowed, maxAllowed, min, max float64) float64 {
+	return (maxAllowed-minAllowed)*(unscaledNum-min)/(max-min) + minAllowed
+}
+
 func ConvertInterfaceToFloat(value interface{}) *float64 {
 	if value == nil {
 		return nil
