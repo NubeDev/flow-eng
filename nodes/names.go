@@ -25,6 +25,9 @@ const (
 	stringLatch   = "string-latch"
 	setResetLatch = "set-reset-latch"
 
+	pointNumber  = "point-num"
+	pointBoolean = "point-bool"
+
 	rampNode = "ramp"
 
 	scaleNode = "scale"

@@ -23,6 +23,7 @@ import (
 	broker "github.com/NubeDev/flow-eng/nodes/mqtt"
 	"github.com/NubeDev/flow-eng/nodes/notify/gmail"
 	"github.com/NubeDev/flow-eng/nodes/notify/ping"
+	point "github.com/NubeDev/flow-eng/nodes/points"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/nodes/protocols/driver"
@@ -134,6 +135,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	logNode, _ := debugging.NewLog(nil)
 
+	pointNum, _ := point.NewNumber(nil)
+	pointBool, _ := point.NewBoolean(nil)
+
 	// rest
 	getNode, _ := rest.NewGet(nil)
 	writeNode, _ := rest.NewHttpWrite(nil)
@@ -178,6 +182,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(flowPoint),
 
 		node.ConvertToSpec(deadBand),
+
+		node.ConvertToSpec(pointNum),
+		node.ConvertToSpec(pointBool),
 
 		node.ConvertToSpec(jsonFilter),
 		node.ConvertToSpec(dataStore),
@@ -287,6 +294,10 @@ func Builder(body *node.Spec, db db.DB, opts ...interface{}) (node.Node, error) 
 		return n, err
 	}
 	n, err = builderStatistics(body)
+	if n != nil || err != nil {
+		return n, err
+	}
+	n, err = builderPoints(body)
 	if n != nil || err != nil {
 		return n, err
 	}
@@ -512,6 +523,16 @@ func builderStatistics(body *node.Spec) (node.Node, error) {
 		return statistics.NewMin(body)
 	case max:
 		return statistics.NewMax(body)
+	}
+	return nil, nil
+}
+
+func builderPoints(body *node.Spec) (node.Node, error) {
+	switch body.GetName() {
+	case pointNumber:
+		return point.NewNumber(body)
+	case pointBoolean:
+		return point.NewBoolean(body)
 	}
 	return nil, nil
 }

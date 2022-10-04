@@ -2,6 +2,7 @@ package node
 
 import (
 	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/boolean"
 	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"strconv"
 	"time"
@@ -63,6 +64,11 @@ func (n *Spec) ReadPin(name InputName) interface{} {
 	return input.GetValue()
 }
 
+func (n *Spec) ReadPinAsFloatPointer(name InputName) *float64 {
+	r := n.ReadPin(name)
+	return conversions.GetFloatPointer(r)
+}
+
 func (n *Spec) ReadPinAsFloat(name InputName) float64 {
 	r := n.ReadPin(name)
 	out := conversions.GetFloat(r)
@@ -89,6 +95,12 @@ func (n *Spec) ReadPinBool(name InputName) bool {
 	r := n.ReadPin(name)
 	result, _ := strconv.ParseBool(fmt.Sprintf("%v", r))
 	return result
+}
+
+func (n *Spec) ReadPinBoolPointer(name InputName) *bool {
+	r := n.ReadPin(name)
+	result, _ := strconv.ParseBool(fmt.Sprintf("%v", r))
+	return boolean.New(result)
 }
 
 func (n *Spec) ReadPinAsInt(name InputName) int {

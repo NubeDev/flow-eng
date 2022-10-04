@@ -27,6 +27,19 @@ func IsFalse(b *bool) bool {
 	return !IsTrue(b)
 }
 
+func NonNil(b *bool) bool {
+	if b == nil {
+		return false
+	} else {
+		if *b == true {
+			return true
+		} else {
+			return false
+		}
+
+	}
+}
+
 func IsNil(b *bool) bool {
 	if b == nil {
 		return true
