@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"strconv"
+	"time"
 )
 
 // InputUpdated if true means that the node input value has updated
@@ -66,6 +67,11 @@ func (n *Spec) ReadPinAsFloat(name InputName) float64 {
 	r := n.ReadPin(name)
 	out := conversions.GetFloat(r)
 	return out
+}
+
+func (n *Spec) ReadPinAsDuration(name InputName) time.Duration {
+	r := n.ReadPin(name)
+	return time.Duration(conversions.GetInt(r))
 }
 
 func (n *Spec) ReadPinAsUint64(name InputName) uint64 {

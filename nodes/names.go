@@ -25,6 +25,8 @@ const (
 	stringLatch   = "string-latch"
 	setResetLatch = "set-reset-latch"
 
+	rampNode = "ramp"
+
 	scaleNode = "scale"
 	limitNode = "limit"
 

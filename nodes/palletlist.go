@@ -107,6 +107,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	// trigger
 	countNode, _ := count.NewCount(nil)
+	rampNode, _ := count.NewRamp(nil)
 
 	// trigger
 	inject, _ := trigger.NewInject(nil)
@@ -194,6 +195,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(flatline),
 
 		node.ConvertToSpec(countNode),
+		node.ConvertToSpec(rampNode),
 
 		node.ConvertToSpec(funcNode),
 
@@ -518,6 +520,8 @@ func builderCount(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case countNode:
 		return count.NewCount(body)
+	case rampNode:
+		return count.NewRamp(body)
 	}
 	return nil, nil
 }
