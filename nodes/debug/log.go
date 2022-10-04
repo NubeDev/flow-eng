@@ -39,7 +39,7 @@ func (inst *Log) Process() {
 		str := fmt.Sprintf("%v", inStr)
 		log.Infof("log: comment: %v string: %s", comment, str)
 	}
-	if inBool != nil {
+	if inst.InputHasConnection(node.InBoolean) {
 		log.Infof("log: comment: %s bool: %t", comment, inBool)
 	}
 }
