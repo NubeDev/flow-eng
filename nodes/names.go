@@ -24,7 +24,9 @@ const (
 	numLatch      = "numeric-latch"
 	stringLatch   = "string-latch"
 	setResetLatch = "set-reset-latch"
-	jsonFilter    = "json-filter"
+
+	dataStore  = "data-store"
+	jsonFilter = "json-filter"
 
 	flowNetwork = "network"
 	flowDevice  = "device"

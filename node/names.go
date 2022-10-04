@@ -44,6 +44,12 @@ const (
 	Min       InputName = "min"
 	Max       InputName = "max"
 
+	Delete InputName = "delete"
+
+	Size    InputName = "size"
+	MaxSize InputName = "max-size"
+	MinSize InputName = "min-size"
+
 	In   InputName = "in"
 	In1  InputName = "in1"
 	In2  InputName = "in2"

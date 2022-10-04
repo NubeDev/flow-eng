@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/go-resty/resty/v2"
 	"github.com/tidwall/gjson"
@@ -33,14 +32,11 @@ func (inst *HttpWrite) request(method, body interface{}) (resp *resty.Response, 
 	resp = &resty.Response{}
 	client := inst.getClient()
 	url := inst.ReadPinAsString(node.URL)
-	fmt.Println(url)
 	if method == patch {
 		resp, err = client.R().
 			EnableTrace().
 			SetBody(body).
 			Patch(url)
-		fmt.Println(3333, err)
-		fmt.Println(resp.Status(), resp.String())
 		return resp, err
 	}
 
@@ -50,19 +46,15 @@ func (inst *HttpWrite) request(method, body interface{}) (resp *resty.Response, 
 func (inst *HttpWrite) do() {
 	filter := inst.ReadPinAsString(node.Filter)
 	reqBody := inst.ReadPinAsString(node.Body)
-	fmt.Println(reqBody)
 	method, err := getSettings(inst.GetSettings())
 	if method == "" {
 		method = patch
 	}
-
 	resp, err := inst.request(method, reqBody)
-	fmt.Println(method, err)
 	if err != nil {
 		inst.WritePin(node.Result, nil)
 		return
 	}
-	fmt.Println(resp.Status(), err)
 	if filter != "" {
 		value := gjson.Get(resp.String(), filter)
 		inst.WritePin(node.Result, value.String())
