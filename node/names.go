@@ -41,8 +41,14 @@ const (
 	Count     InputName = "count"
 	CountUp   InputName = "count-up"
 	CountDown InputName = "count-down"
-	Min       InputName = "min"
-	Max       InputName = "max"
+
+	Min InputName = "min"
+	Max InputName = "max"
+
+	InMin  InputName = "in-min"
+	InMax  InputName = "in-max"
+	OutMin InputName = "out-min"
+	OutMax InputName = "out-max"
 
 	Delete InputName = "delete"
 

@@ -44,15 +44,7 @@ func (inst *Store) Process() {
 			}
 		}
 	}
-
-	//jsonBytes, err := json.MarshalIndent(inst.store.GetAll(), "", "   ")
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-	//inst.store.GetAll()
-	//fmt.Println(inst.store.GetAll())
 	out, _ := json.Marshal(inst.store.GetAll())
-	//fmt.Println(string(out))
 	value := gjson.ParseBytes(out)
 	inst.WritePin(node.Out, value.String())
 }

@@ -25,6 +25,9 @@ const (
 	stringLatch   = "string-latch"
 	setResetLatch = "set-reset-latch"
 
+	scaleNode = "scale"
+	limitNode = "limit"
+
 	dataStore  = "data-store"
 	jsonFilter = "json-filter"
 
