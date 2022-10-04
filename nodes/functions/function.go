@@ -2,6 +2,7 @@ package functions
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeIO/lib-goja/js"
 	"github.com/mitchellh/mapstructure"
@@ -42,10 +43,28 @@ func (inst *Func) Process() {
 	if err != nil {
 		return
 	}
-	in1 := inst.ReadPinAsString(node.In1)
-	in2 := inst.ReadPinAsString(node.In2)
+	in1 := inst.ReadPin(node.In1)
+	in2 := inst.ReadPin(node.In2)
 	f, err := runFunc(in1, in2, code)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	inst.WritePin(node.Out, f)
+}
+
+func runFunc(val1, val2 interface{}, code string) (interface{}, error) {
+	script, err := js.New(js.NewScript(code))
+	if err != nil {
+		return 0, err
+	}
+	arg := map[string]interface{}{"in1": val1, "in2": val2, "in3": val2}
+	consoleLogs := new(bytes.Buffer)
+	f, err := js.NewEngine().Execute(script, arg, js.WithLogging(consoleLogs))
+	fmt.Println(consoleLogs)
+
+	return f, err
+
 }
 
 /*
@@ -62,16 +81,5 @@ let pri = {
 // need to stringify otherwise the node would output a map
 return JSON.stringify(pri)
 */
-
-func runFunc(val1, val2 string, code string) (interface{}, error) {
-	script, err := js.New(js.NewScript(code))
-	if err != nil {
-		return 0, err
-	}
-	arg := map[string]interface{}{"in1": val1, "in2": val2, "in3": val2}
-	consoleLogs := new(bytes.Buffer)
-	return js.NewEngine().Execute(script, arg, js.WithLogging(consoleLogs))
-
-}
 
 func (inst *Func) Cleanup() {}

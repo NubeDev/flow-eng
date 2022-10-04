@@ -1,7 +1,7 @@
 package ping
 
 import (
-	"fmt"
+	"encoding/json"
 	"github.com/NubeDev/flow-eng/helpers"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/notify"
@@ -12,14 +12,21 @@ const (
 	pingNode = "ping"
 )
 
+type result struct {
+	Ip       string    `json:"ip"`
+	Ok       bool      `json:"ok"`
+	LastOk   time.Time `json:"lastOk"`
+	LastFail time.Time `json:"lastFail"`
+}
+
 type Ping struct {
 	*node.Spec
-	firstLoop bool
 	triggered bool
 	loopCount uint64
 	lastOk    time.Time
 	lastFail  time.Time
 	lastPing  bool
+	results   []result
 }
 
 func NewPing(body *node.Spec) (node.Node, error) {
@@ -28,49 +35,51 @@ func NewPing(body *node.Spec) (node.Node, error) {
 	ip := node.BuildInput(node.Ip, node.TypeString, nil, body.Inputs)
 	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs)
 	body.Inputs = node.BuildInputs(ip, trigger)
-
-	ok := node.BuildOutput(node.Ok, node.TypeBool, nil, body.Outputs)
-	msg := node.BuildOutput(node.Msg, node.TypeString, nil, body.Outputs)
-	body.Outputs = node.BuildOutputs(ok, msg)
-	return &Ping{body, false, false, 0, time.Now(), time.Now(), false}, nil
+	msg := node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs)
+	body.Outputs = node.BuildOutputs(msg)
+	var res []result
+	return &Ping{body, false, 0, time.Now(), time.Now(), false, res}, nil
 }
 
-func (inst *Ping) ping(ip string, trigger bool) {
-
-	if trigger && !inst.triggered {
-		inst.triggered = true
+func (inst *Ping) ping(ipList []string) {
+	inst.results = nil
+	inst.triggered = true
+	var r result
+	for _, ip := range ipList {
 		ok := helpers.CommandPing(ip)
+		r.Ip = ip
+		r.Ok = ok
 		if ok {
-			inst.lastOk = time.Now()
-			inst.triggered = false
-			inst.lastPing = true
+			r.LastOk = time.Now()
 		} else {
-			inst.lastFail = time.Now()
-			inst.triggered = false
-			inst.lastPing = false
-
+			r.LastFail = time.Now()
 		}
+		inst.results = append(inst.results, r)
 	}
-	if !trigger && inst.triggered {
-		inst.triggered = false
-	}
+	inst.triggered = false
 }
 
 func (inst *Ping) Process() {
-	ip := inst.ReadPinAsString(node.Ip)
 	firstLoop, trigger := inst.InputUpdated(node.TriggerInput)
+	read := inst.ReadPin(node.Ip)
+	var ipList []string
+	err := json.Unmarshal([]byte(read.(string)), &ipList)
+	if err != nil {
+		ipList = append(ipList, read.(string))
+	}
+
 	if firstLoop || trigger {
-		go inst.ping(ip, true)
+		if !inst.triggered {
+			go inst.ping(ipList)
+		}
 	}
-	pingMsg := helpers.PingMessage(ip, inst.lastPing, inst.lastOk)
-	pingFailMsg := helpers.PingMessage(ip, inst.lastPing, inst.lastFail)
-	fmt.Println(inst.lastOk, inst.lastFail)
-	if inst.lastPing {
-		inst.WritePin(node.Msg, pingMsg)
+	if len(inst.results) > 0 {
+		out, _ := json.Marshal(inst.results)
+		//value := gjson.ParseBytes(out)
+		inst.WritePin(node.Out, string(out))
 	} else {
-		inst.WritePin(node.Msg, pingFailMsg)
+		inst.WritePin(node.Out, nil)
 	}
-	inst.WritePin(node.Ok, inst.lastPing)
 
 }
 

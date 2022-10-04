@@ -34,6 +34,7 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/system"
 	"github.com/NubeDev/flow-eng/nodes/tigger"
 	"github.com/NubeDev/flow-eng/nodes/timing"
+	"github.com/NubeDev/flow-eng/nodes/transformations"
 )
 
 const (
@@ -77,6 +78,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	funcNode, _ := functions.NewFunc(nil)
 
 	jsonFilter, _ := nodejson.NewFilter(nil)
+	dataStore, _ := nodejson.NewStore(nil)
 
 	// hvac
 	deadBand, _ := hvac.NewDeadBand(nil)
@@ -113,6 +115,10 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	// time
 	delay, _ := timing.NewDelay(nil, nil)
 	delayOn, _ := timing.NewDelayOn(nil, nil)
+
+	// number transformations
+	scaleNode, _ := transformations.NewScale(nil)
+	limitNode, _ := transformations.NewLimit(nil)
 
 	// bacnet
 	bacServer, _ := bacnet.NewServer(nil, nil)
@@ -173,6 +179,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(deadBand),
 
 		node.ConvertToSpec(jsonFilter),
+		node.ConvertToSpec(dataStore),
 
 		node.ConvertToSpec(numLatch),
 		node.ConvertToSpec(stringLatch),
@@ -209,6 +216,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(mqttSub),
 		node.ConvertToSpec(mqttPub),
 
+		node.ConvertToSpec(scaleNode),
+		node.ConvertToSpec(limitNode),
+
 		node.ConvertToSpec(logNode),
 
 		node.ConvertToSpec(getNode),
@@ -235,6 +245,10 @@ func Builder(body *node.Spec, db db.DB, opts ...interface{}) (node.Node, error) 
 		return n, err
 	}
 	n, err = builderJson(body)
+	if n != nil || err != nil {
+		return n, err
+	}
+	n, err = builderTransformations(body)
 	if n != nil || err != nil {
 		return n, err
 	}
@@ -349,10 +363,22 @@ func builderNotify(body *node.Spec) (node.Node, error) {
 	return nil, nil
 }
 
+func builderTransformations(body *node.Spec) (node.Node, error) {
+	switch body.GetName() {
+	case limitNode:
+		return transformations.NewLimit(body)
+	case scaleNode:
+		return transformations.NewScale(body)
+	}
+	return nil, nil
+}
+
 func builderJson(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case jsonFilter:
 		return nodejson.NewFilter(body)
+	case dataStore:
+		return nodejson.NewStore(body)
 	}
 	return nil, nil
 }

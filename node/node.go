@@ -24,6 +24,7 @@ type Node interface {
 	GetOutputs() []*Output
 	GetOutput(name OutputName) *Output
 	InputUpdated(name InputName) (updated bool, boolCOV bool)
+	InputHasConnection(name InputName) bool
 	InputsLen() int
 	OutputsLen() int
 	ReadPinAsString(name InputName) string
