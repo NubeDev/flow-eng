@@ -22,8 +22,7 @@ func (inst *Server) modbusRunner() {
 	if err != nil {
 		return
 	}
-	store := getStore()
-	pointsList := store.GetPointsByApplication(names.Modbus)
+	pointsList := inst.store.GetPointsByApplication(names.Modbus)
 	inst.modbusInputsRunner(init, pointsList) // process the inputs
 	time.Sleep(4 * time.Second)
 	modbusLoop = false
@@ -35,7 +34,6 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 	var voltList [8]float64
 	var completedTemp bool
 	var completedVolt bool
-	store := getStore()
 	for _, point := range pointsList { // do modbus read
 		if !point.IsWriteable {
 			addr, _ := cli.BuildInput(point.IoType, point.ObjectID)
@@ -65,7 +63,7 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 		var writeValue float64
 		if point.ObjectType == points.AnalogInput {
 			if point.ObjectID == points.ObjectID(objectId) {
-				p := store.GetPointByObject(points.AnalogInput, point.ObjectID)
+				p := inst.store.GetPointByObject(points.AnalogInput, point.ObjectID)
 				io16Pin := addr.IoPin
 				if io16Pin <= 0 {
 					log.Errorf("modbus-polling failed to get correct io-pin")
@@ -81,7 +79,7 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 				if point.IoType == points.IoTypeVolts { // update anypoint that is type voltage
 					writeValue = voltList[io16Pin]
 				}
-				store.WriteValueFromRead(p.UUID, writeValue)
+				inst.store.WriteValueFromRead(p.UUID, writeValue)
 			}
 		}
 	}

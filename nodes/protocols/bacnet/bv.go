@@ -1,6 +1,7 @@
 package bacnet
 
 import (
+	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	log "github.com/sirupsen/logrus"
@@ -8,26 +9,28 @@ import (
 
 type BV struct {
 	*node.Spec
-	objectID   points.ObjectID
-	objectType points.ObjectType
-	pointUUID  string
+	objectID    points.ObjectID
+	objectType  points.ObjectType
+	pointUUID   string
+	store       *points.Store
+	application names.ApplicationName
 }
 
 const (
 	object = "object"
 )
 
-func NewBV(body *node.Spec, store *points.Store) (node.Node, error) {
+func NewBV(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	var err error
-	if store == nil {
-		store = getStore()
-	}
-	body, err = nodeDefault(body, bacnetBV, category, store.GetApplication())
+
+	body, err = nodeDefault(body, bacnetBV, category, opts.Application)
 	return &BV{
 		body,
 		0,
 		points.BinaryVariable,
 		"",
+		opts.Store,
+		opts.Application,
 	}, err
 }
 
@@ -39,17 +42,15 @@ func (inst *BV) Process() {
 	_, firstLoop := inst.Loop()
 	if !firstLoop {
 		inst.setObjectId()
-		store := getStore()
-		objectType, isWriteable, _, err := getBacnetType(inst.Info.Name)
-		ioType := points.IoTypeDigital
-		point := addPoint(getApplication(), ioType, objectType, inst.objectID, isWriteable, false, true)
-		point, err = store.AddPoint(point, true)
+		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
+		ioType := points.IoTypeNumber // TODO make a setting
+		point := addPoint(inst.application, ioType, objectType, inst.objectID, isWriteable, isIO, true)
+		point, err = inst.store.AddPoint(point, true)
 		if err != nil {
 			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
 		}
 	}
-	toFlow(inst, inst.objectID)
-	fromFlow(inst, inst.objectID)
+	toFlow(inst, inst.objectID, inst.store)
 
 }
 

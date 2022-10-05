@@ -36,6 +36,8 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/tigger"
 	"github.com/NubeDev/flow-eng/nodes/timing"
 	"github.com/NubeDev/flow-eng/nodes/transformations"
+	"github.com/NubeDev/flow-eng/services/mqttclient"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -568,18 +570,31 @@ func builderTiming(body *node.Spec) (node.Node, error) {
 }
 
 func builderProtocols(body *node.Spec) (node.Node, error) {
-	store := points.New(names.Edge, nil, 0, 200, 200)
+	mqttClient, err := mqttclient.NewClient(mqttclient.ClientOptions{
+		Servers: []string{"tcp://0.0.0.0:1883"},
+	})
+	err = mqttClient.Connect()
+	if err != nil {
+		log.Error(err)
+	}
+
+	opts := &bacnet.Bacnet{
+		Store:       points.New(names.Edge, nil, 0, 200, 200),
+		MqttClient:  mqttClient,
+		Application: "",
+	}
+
 	switch body.GetName() {
 	case bacnetServer:
-		return bacnet.NewServer(body, store)
+		return bacnet.NewServer(body, opts)
 	case bacnetAI:
-		return bacnet.NewAI(body, store)
+		return bacnet.NewAI(body, opts)
 	case bacnetAO:
-		return bacnet.NewAO(body, store)
+		return bacnet.NewAO(body, opts)
 	case bacnetAV:
-		return bacnet.NewAV(body, store)
+		return bacnet.NewAV(body, opts)
 	case bacnetBV:
-		return bacnet.NewBV(body, store)
+		return bacnet.NewBV(body, opts)
 
 	}
 

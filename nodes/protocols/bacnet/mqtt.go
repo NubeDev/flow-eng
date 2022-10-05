@@ -13,15 +13,15 @@ import (
 func (inst *Server) writeRunner() {
 	log.Info("start mqtt-pub-runner")
 	for {
-		for _, point := range getStore().GetPoints() {
-			inst.mqttPublish(point)
+		for _, point := range inst.store.GetPoints() {
+			inst.mqttPublishPV(point)
 		}
 		time.Sleep(runnerDelay * time.Millisecond)
 	}
 }
 
 // mqttPublish example for future MQTT write to the bacnet-server
-func (inst *Server) mqttPublish(pnt *points.Point) {
+func (inst *Server) mqttPublishPV(pnt *points.Point) {
 	if pnt == nil {
 		log.Errorf("bacnet-server-publish point can not be empty")
 		return
@@ -35,9 +35,9 @@ func (inst *Server) mqttPublish(pnt *points.Point) {
 		return
 	}
 	v := points.GetHighest(value)
-	topic := fmt.Sprintf("bacnet/%s/%d", obj, objectId)
+	topic := fmt.Sprintf("bacnet/%s/%d/write/pv", obj, objectId) // bacnet/ao/1/write/pv
 	if v != nil {
-		err = mqttClient.Publish(topic, mqttclient.AtMostOnce, true, fmt.Sprintf("%f", v.Value))
+		err = inst.clients.mqttClient.Publish(topic, mqttclient.AtMostOnce, true, fmt.Sprintf("%f", v.Value))
 		if err != nil {
 			log.Errorf("bacnet-server: mqtt publish err: %s", err.Error())
 			return
@@ -61,3 +61,21 @@ func decode(msg interface{}) *topics.Message {
 	}
 	return nil
 }
+
+/*
+update name
+
+topic
+bacnet/ao/0/write/name
+
+{"value" : "ao_name0", "uuid" : "123456"}
+
+to update present value of AO
+
+topic
+bacnet/ao/0/write/pv
+
+json payload
+{"value" : "100.50", "uuid" : "123456"}
+
+*/

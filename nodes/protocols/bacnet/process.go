@@ -2,7 +2,6 @@ package bacnet
 
 import (
 	"github.com/NubeDev/flow-eng/helpers/conversions"
-	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/helpers/topics"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
@@ -16,7 +15,7 @@ These would only be messages that we need to write to, as in write output-point,
 */
 
 // fromFlow is when a node has been written to from the wire sheet link, as in write a value @16
-func fromFlow(body node.Node, objectId points.ObjectID) {
+func fromFlow(body node.Node, objectId points.ObjectID, store *points.Store) {
 	objectType, isWriteable, _, err := getBacnetType(body.GetName())
 	if err != nil {
 		return
@@ -38,10 +37,10 @@ func fromFlow(body node.Node, objectId points.ObjectID) {
 		log.Errorf("bacnet-server: failed to get object-id from node process")
 		return
 	}
-	createSync(nil, objectType, objectId, points.FromFlow, in14, in15)
+	store.CreateSync(nil, objectType, objectId, points.FromFlow, in14, in15)
 }
 
-func (inst *Server) fromBacnet(msg interface{}) {
+func fromBacnet(msg interface{}, store *points.Store) {
 	payload := points.NewPayload()
 	err := payload.NewMessage(msg)
 	if err != nil {
@@ -50,7 +49,7 @@ func (inst *Server) fromBacnet(msg interface{}) {
 	}
 	topic := payload.GetTopic()
 	objectType, objectId := payload.GetObjectID()
-	point := getStore().GetPointByObject(objectType, objectId)
+	point := store.GetPointByObject(objectType, objectId)
 	if point == nil {
 		log.Errorf("mqtt-payload-priorty-array no point-found in store for type:%s-%d", objectType, objectId)
 		return
@@ -61,44 +60,6 @@ func (inst *Server) fromBacnet(msg interface{}) {
 		if highest != nil {
 			log.Infof("mqtt-runner-subscribe point type:%s-%d value:%f", point.ObjectType, point.ObjectID, highest.Value)
 		}
-		createSync(value, objectType, objectId, points.FromMqttPriory, nil, nil)
-	}
-}
-
-func getToSync() points.SyncTo {
-	app := getApplication()
-	switch app {
-	case names.RubixIO:
-		return points.ToRubixIO
-	case names.RubixIOAndModbus:
-		return points.ToRubixIOModbus
-	case names.Edge:
-		return points.ToEdge28
-	}
-	return ""
-}
-
-//// createSync can come from bacnet or the flow
-func createSync(writeValue *points.PriArray, object points.ObjectType, id points.ObjectID, syncFrom points.SyncFrom, in14, in15 *float64) {
-	point := getStore().GetPointByObject(object, id)
-	if object == "" {
-		log.Errorf("bacnet-server: object type type can not be empty")
-	}
-	if syncFrom == "" {
-		log.Errorf("bacnet-server: get sync from can not be empty")
-	}
-	sync := getToSync()
-	if sync == "" {
-		log.Errorf("bacnet-server: get sync type can not be empty")
-	}
-	if point != nil {
-		cov := getStore().WritePointValue(point.UUID, writeValue, in14, in15)
-		if cov {
-			if writeValue == nil {
-				getStore().AddSync(point.UUID, points.NewPriArray(in14, in15), syncFrom, sync, getApplication())
-			} else {
-				getStore().AddSync(point.UUID, writeValue, syncFrom, sync, getApplication())
-			}
-		}
+		store.CreateSync(value, objectType, objectId, points.FromMqttPriory, nil, nil)
 	}
 }

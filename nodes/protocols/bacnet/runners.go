@@ -16,7 +16,7 @@ var rubixIOLoop runnerStatus
 var edgeIOLoop runnerStatus
 
 func (inst *Server) protocolRunner() {
-	gt := getApplication()
+	gt := inst.application
 	if !mqttPubLoop {
 		go inst.writeRunner()
 		mqttPubLoop = true
@@ -36,6 +36,7 @@ func (inst *Server) protocolRunner() {
 	if !edgeIOLoop {
 		if gt == names.Edge {
 			go inst.edge28OutputsDispatch()
+			go inst.edge28InputsRunner()
 			edgeIOLoop = true
 		}
 	}
