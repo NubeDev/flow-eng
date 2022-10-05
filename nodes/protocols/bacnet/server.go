@@ -10,6 +10,7 @@ import (
 	rubixIO "github.com/NubeDev/flow-eng/services/rubixio"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	log "github.com/sirupsen/logrus"
+	"time"
 )
 
 type Bacnet struct {
@@ -23,6 +24,8 @@ type Server struct {
 	clients       *clients
 	firstLoop     bool
 	pingFailed    bool
+	pingLock      bool
+	runnersLock   bool
 	reconnectedOk bool
 	store         *points.Store
 	application   names.ApplicationName
@@ -65,7 +68,7 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	body = node.BuildNode(body, inputs, outputs, nil)
 
 	clients := &clients{}
-	server := &Server{body, clients, false, false, false, opts.Store, application}
+	server := &Server{body, clients, false, false, false, false, false, opts.Store, application}
 	server.clients.mqttClient = opts.MqttClient
 	if application == names.RubixIO || application == names.RubixIOAndModbus {
 		rubixIOUICount, rubixIOUOCount := points.CalcPointCount(1, application)
@@ -95,13 +98,18 @@ func (inst *Server) Process() {
 	if inst.pingFailed || inst.reconnectedOk { // on failed resubscribe
 		go inst.subscribeToRubixIO()
 	}
-	go inst.mqttReconnect()
-	go inst.protocolRunner()
-
+	if !inst.pingLock {
+		go inst.mqttReconnect()
+	}
+	if !inst.runnersLock {
+		go inst.protocolRunner(inst.application)
+		inst.runnersLock = true
+	}
 }
 
 func (inst *Server) mqttReconnect() {
 	var err error
+	inst.pingLock = true
 	err = inst.clients.mqttClient.Ping()
 	if err != nil {
 		log.Errorf("bacnet-server mqtt ping failed")
@@ -113,9 +121,9 @@ func (inst *Server) mqttReconnect() {
 		} else {
 			inst.reconnectedOk = true
 		}
-	} else {
-		fmt.Println("ping server ok")
 	}
+	time.Sleep(1 * time.Minute)
+	inst.pingLock = false
 }
 
 func (inst *Server) subscribeBroker(topic string) {
@@ -123,7 +131,7 @@ func (inst *Server) subscribeBroker(topic string) {
 		rawData := message.Payload()
 		fmt.Println("MQTT callback", message.Topic(), string(rawData))
 	}
-	err := inst.clients.mqttClient.Subscribe("test", mqttclient.AtLeastOnce, callback)
+	err := inst.clients.mqttClient.Subscribe(topic, mqttclient.AtLeastOnce, callback)
 	if err != nil {
 		log.Errorf("bacnet-server mqtt:%s", err.Error())
 		inst.pingFailed = false
@@ -132,13 +140,9 @@ func (inst *Server) subscribeBroker(topic string) {
 }
 
 func (inst *Server) subscribeToRubixIO() {
-	//if inst.application == names.RubixIO {
-	//	err := inst.clients.mqttClient.Subscribe("rubixio/inputs/all", mqttclient.AtLeastOnce, rubixIOBus)
-	//	if err != nil {
-	//		log.Errorf("bacnet-server mqtt:%s", err.Error())
-	//		inst.pingFailed = false
-	//	}
-	//}
+	if inst.application == names.RubixIO {
+		inst.subscribeBroker("rubixio/inputs/all")
+	}
 	objs := []string{"ai", "ao", "av", "bi", "bo", "bv"}
 	for _, obj := range objs {
 		topic := fmt.Sprintf("%s/+/pv", topicObjectBuilder(obj))

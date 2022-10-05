@@ -14,21 +14,23 @@ func (inst *Server) writeRunner() {
 	log.Info("start mqtt-pub-runner")
 	for {
 		for _, point := range inst.store.GetPoints() {
-			inst.mqttPublishPV(point)
+			if inst.store.PendingMQTTPublish(point) {
+				inst.mqttPublishPV(point)
+			}
 		}
 		time.Sleep(runnerDelay * time.Millisecond)
 	}
 }
 
 // mqttPublish example for future MQTT write to the bacnet-server
-func (inst *Server) mqttPublishPV(pnt *points.Point) {
-	if pnt == nil {
+func (inst *Server) mqttPublishPV(point *points.Point) {
+	if point == nil {
 		log.Errorf("bacnet-server-publish point can not be empty")
 		return
 	}
-	objectType := pnt.ObjectType
-	objectId := pnt.ObjectID
-	value := pnt.WriteValue
+	objectType := point.ObjectType
+	objectId := point.ObjectID
+	value := point.WriteValue
 	obj, err := points.ObjectSwitcher(objectType)
 	if err != nil {
 		log.Error(err)
@@ -36,11 +38,14 @@ func (inst *Server) mqttPublishPV(pnt *points.Point) {
 	}
 	v := points.GetHighest(value)
 	topic := fmt.Sprintf("bacnet/%s/%d/write/pv", obj, objectId) // bacnet/ao/1/write/pv
+	fmt.Println(topic)
 	if v != nil {
 		err = inst.clients.mqttClient.Publish(topic, mqttclient.AtMostOnce, true, fmt.Sprintf("%f", v.Value))
 		if err != nil {
 			log.Errorf("bacnet-server: mqtt publish err: %s", err.Error())
 			return
+		} else {
+			inst.store.CompleteMQTTPublish(point)
 		}
 	}
 }

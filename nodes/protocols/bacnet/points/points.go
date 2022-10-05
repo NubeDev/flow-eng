@@ -9,24 +9,21 @@ import (
 )
 
 type Point struct {
-	UUID              string                `json:"uuid"`
-	Application       names.ApplicationName `json:"application"`
-	ObjectType        ObjectType            `json:"objectType"`
-	ObjectID          ObjectID
-	presentValue      *float64
-	priAndValue       *priAndValue
-	writeValue        float64
-	IoType            IoType
-	IsIO              bool // if it's an io-pin for a real device
-	IsWriteable       bool
-	Enable            bool
-	ValueFromRead     float64
-	ValueFromReadCOV  float64
-	WriteValue        *PriArray
-	PendingWriteCount uint64
-	WriteCOV          float64
-	Sync              []*writeSync
-	CurrentSyncUUID   string
+	UUID               string                `json:"uuid"`
+	Application        names.ApplicationName `json:"application"`
+	ObjectType         ObjectType            `json:"objectType"`
+	ObjectID           ObjectID
+	presentValue       *float64
+	priAndValue        *priAndValue
+	writeValue         float64
+	IoType             IoType
+	IsIO               bool // if it's an io-pin for a real device
+	IsWriteable        bool
+	Enable             bool
+	ValueFromRead      float64
+	WriteValue         *PriArray
+	PendingWriteCount  uint64
+	PendingMQTTPublish bool
 }
 
 func (inst *Store) GetPoints() []*Point {
@@ -182,6 +179,18 @@ func (inst *Store) WritePointValue(uuid string, value *PriArray, in14, in15 *flo
 	}
 }
 
+func (inst *Store) SetPendingMQTTPublish(point *Point) {
+	point.PendingMQTTPublish = true
+}
+
+func (inst *Store) PendingMQTTPublish(point *Point) bool {
+	return point.PendingMQTTPublish
+}
+
+func (inst *Store) CompleteMQTTPublish(point *Point) {
+	point.PendingMQTTPublish = false
+}
+
 func (inst *Store) PendingWrite(point *Point) bool {
 	if point.PendingWriteCount > 0 {
 		return true
@@ -194,6 +203,7 @@ func (inst *Store) AddPendingWriteCount(point *Point) {
 }
 func (inst *Store) CompletePendingWriteCount(point *Point) {
 	point.PendingWriteCount--
+	inst.SetPendingMQTTPublish(point)
 }
 
 func (inst *Store) GetByType(objectType ObjectType) (out []*Point, count int) {

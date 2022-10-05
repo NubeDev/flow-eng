@@ -1,7 +1,6 @@
 package bacnet
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/helpers/topics"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
@@ -16,7 +15,6 @@ func (inst *Server) rubixInputsRunner(msg *topics.Message) {
 		log.Error(err)
 		//return
 	}
-
 	for _, point := range inst.store.GetPointsByApplication(names.RubixIO) {
 		if point.ObjectType == points.AnalogInput {
 			value, err := rubix.DecodeInputValue(point, inputsPayload)
@@ -25,7 +23,6 @@ func (inst *Server) rubixInputsRunner(msg *topics.Message) {
 				return
 			}
 			inst.store.WriteValueFromRead(point.UUID, value)
-			fmt.Println(value, "rubix-io-input-value")
 		}
 	}
 

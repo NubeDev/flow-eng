@@ -2,7 +2,6 @@ package points
 
 import (
 	log "github.com/sirupsen/logrus"
-	"time"
 )
 
 type SyncFrom string // FromMqttPriory, FromFlow, FromRubixIO
@@ -12,19 +11,6 @@ const (
 	FromMqttPriory SyncFrom = "FromMqttPriory" // message from the broker, ie: something wrote via bacnet
 	FromFlow       SyncFrom = "FromFlow"       // message from the broker, ie: something wrote via bacnet
 )
-
-type SyncList struct {
-	Completed bool
-}
-
-type writeSync struct {
-	UUID        string
-	WriteValue  *PriArray
-	SyncPending bool
-	Time        time.Time
-	SyncFrom    SyncFrom
-	SyncTo      *SyncList // modbus, rubix-io
-}
 
 // CreateSync can come from bacnet or the flow
 func (inst *Store) CreateSync(writeValue *PriArray, object ObjectType, id ObjectID, syncFrom SyncFrom, in14, in15 *float64) {

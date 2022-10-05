@@ -14,21 +14,25 @@ func (inst *Server) edge28OutputsDispatch() {
 		getPoints := inst.store.GetWriteablePointsByApplication(inst.application)
 		for _, point := range getPoints { //get the list of the points to update
 			if inst.store.PendingWrite(point) {
-				time.Sleep(1000 * time.Millisecond)
 				if point.ObjectType == points.AnalogOutput {
 					_, err := inst.clients.edge28.WriteUO(point)
 					if err == nil {
 						inst.store.CompletePendingWriteCount(point)
+					} else {
+						log.Error(err)
 					}
 				}
 				if point.ObjectType == points.BinaryOutput {
 					_, err := inst.clients.edge28.WriteDO(point)
 					if err == nil {
 						inst.store.CompletePendingWriteCount(point)
+					} else {
+						log.Error(err)
 					}
 				}
 			}
 		}
+		time.Sleep(1000 * time.Millisecond)
 	}
 }
 
