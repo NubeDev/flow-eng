@@ -59,6 +59,7 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 		},
 		MaxNodeCount: 1,
 	}
+
 	body.Parameters = node.BuildParameters(parameters) // if node is already added then show the user
 	//body = buildSubNodes(body, childNodes)
 	body.IsParent = true
