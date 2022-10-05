@@ -7,39 +7,18 @@ import (
 
 var runnerDelay = time.Duration(100)
 
-type runnerStatus bool
-
-var mqttSubLoop runnerStatus
-var mqttPubLoop runnerStatus
-var modbusLoop runnerStatus
-var rubixIOLoop runnerStatus
-var edgeIOLoop runnerStatus
-
-func (inst *Server) protocolRunner() {
-	gt := inst.application
-
-	if !mqttPubLoop {
-		go inst.writeRunner()
-		mqttPubLoop = true
+func (inst *Server) protocolRunner(application names.ApplicationName) {
+	go inst.writeRunner()
+	go inst.writeRunner()
+	if application == names.Modbus {
+		go inst.modbusRunner()
 	}
-	if !modbusLoop {
-		if gt == names.Modbus {
-			go inst.modbusRunner()
-			modbusLoop = true
-		}
+	if application == names.RubixIO || application == names.RubixIOAndModbus {
+		go inst.rubixOutputsDispatch()
 	}
-	if !rubixIOLoop {
-		if gt == names.RubixIO || gt == names.RubixIOAndModbus {
-			go inst.rubixOutputsDispatch()
-			rubixIOLoop = true
-		}
-	}
-	if !edgeIOLoop {
-		if gt == names.Edge {
-			go inst.edge28OutputsDispatch()
-			go inst.edge28InputsRunner()
-			edgeIOLoop = true
-		}
+	if application == names.Edge {
+		go inst.edge28OutputsDispatch()
+		go inst.edge28InputsRunner()
 	}
 
 }

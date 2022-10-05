@@ -16,7 +16,6 @@ func (inst *Edge28) WriteUO(point *points.Point) (*points.Point, error) {
 			ioType = points.IoTypeDigital
 		}
 		writeValue, err := processOutput(pri.Value, string(ioType), isD)
-		fmt.Println(pri.Value, writeValue, ioNum, ioType, isD)
 		if err != nil {
 			return nil, err
 		}

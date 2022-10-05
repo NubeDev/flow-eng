@@ -9,23 +9,21 @@ import (
 )
 
 type Point struct {
-	UUID             string                `json:"uuid"`
-	Application      names.ApplicationName `json:"application"`
-	ObjectType       ObjectType            `json:"objectType"`
-	ObjectID         ObjectID
-	presentValue     *float64
-	priAndValue      *priAndValue
-	writeValue       float64
-	IoType           IoType
-	IsIO             bool // if it's an io-pin for a real device
-	IsWriteable      bool
-	Enable           bool
-	ValueFromRead    float64
-	ValueFromReadCOV float64
-	WriteValue       *PriArray
-	WriteCOV         float64
-	Sync             []*writeSync
-	CurrentSyncUUID  string
+	UUID               string                `json:"uuid"`
+	Application        names.ApplicationName `json:"application"`
+	ObjectType         ObjectType            `json:"objectType"`
+	ObjectID           ObjectID
+	presentValue       *float64
+	priAndValue        *priAndValue
+	writeValue         float64
+	IoType             IoType
+	IsIO               bool // if it's an io-pin for a real device
+	IsWriteable        bool
+	Enable             bool
+	ValueFromRead      float64
+	WriteValue         *PriArray
+	PendingWriteCount  uint64
+	PendingMQTTPublish bool
 }
 
 func (inst *Store) GetPoints() []*Point {
@@ -162,22 +160,50 @@ func (inst *Store) WriteValueFromRead(uuid string, value float64) bool {
 }
 
 //WritePointValue to is to be written to flow modbus or the wire-sheet @ priority 15
-func (inst *Store) WritePointValue(uuid string, value *PriArray, in14, in15 *float64) (cov bool) {
+func (inst *Store) WritePointValue(uuid string, value *PriArray, in14, in15 *float64) {
+	var cov bool
 	p := inst.GetPoint(uuid)
 	if p != nil {
 		if value == nil {
 			c := inst.mergePriority(p.WriteValue, in14, in15)
 			cov = !reflect.DeepEqual(c, p.WriteValue)
-			if !cov {
-				p.WriteValue = c
+			if cov {
+				inst.AddPendingWriteCount(p)
 			}
 			p.WriteValue = c
 		} else {
 			c := inst.mergePriority(value, in14, in15)
 			p.WriteValue = c
+			inst.AddPendingWriteCount(p)
 		}
 	}
-	return cov
+}
+
+func (inst *Store) SetPendingMQTTPublish(point *Point) {
+	point.PendingMQTTPublish = true
+}
+
+func (inst *Store) PendingMQTTPublish(point *Point) bool {
+	return point.PendingMQTTPublish
+}
+
+func (inst *Store) CompleteMQTTPublish(point *Point) {
+	point.PendingMQTTPublish = false
+}
+
+func (inst *Store) PendingWrite(point *Point) bool {
+	if point.PendingWriteCount > 0 {
+		return true
+	}
+	return false
+}
+
+func (inst *Store) AddPendingWriteCount(point *Point) {
+	point.PendingWriteCount++
+}
+func (inst *Store) CompletePendingWriteCount(point *Point) {
+	point.PendingWriteCount--
+	inst.SetPendingMQTTPublish(point)
 }
 
 func (inst *Store) GetByType(objectType ObjectType) (out []*Point, count int) {

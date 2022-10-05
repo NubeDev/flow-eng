@@ -13,22 +13,27 @@ func (inst *Server) edge28OutputsDispatch() {
 	for {
 		getPoints := inst.store.GetWriteablePointsByApplication(inst.application)
 		for _, point := range getPoints { //get the list of the points to update
-			sync := inst.store.GetLatestSyncValue(point.UUID, points.ToEdge28)
-			if sync != nil {
-				time.Sleep(1000 * time.Millisecond)
-				point.CurrentSyncUUID = sync.UUID
+			if inst.store.PendingWrite(point) {
 				if point.ObjectType == points.AnalogOutput {
-					inst.clients.edge28.WriteUO(point)
+					_, err := inst.clients.edge28.WriteUO(point)
+					if err == nil {
+						inst.store.CompletePendingWriteCount(point)
+					} else {
+						log.Error(err)
+					}
 				}
 				if point.ObjectType == points.BinaryOutput {
-					inst.clients.edge28.WriteDO(point)
+					_, err := inst.clients.edge28.WriteDO(point)
+					if err == nil {
+						inst.store.CompletePendingWriteCount(point)
+					} else {
+						log.Error(err)
+					}
 				}
-				inst.store.CompleteProtocolWrite(point.UUID, point.CurrentSyncUUID)
-				inst.store.DeleteSyncWrite(point.UUID, point.CurrentSyncUUID)
 			}
 		}
+		time.Sleep(1000 * time.Millisecond)
 	}
-
 }
 
 func (inst *Server) edge28InputsRunner() {
