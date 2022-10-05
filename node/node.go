@@ -30,6 +30,7 @@ type Node interface {
 	ReadPinAsString(name InputName) string
 	ReadPinAsInt(name InputName) int
 	ReadPinAsFloat(name InputName) float64
+	ReadPinAsFloatPointer(name InputName) *float64
 	ReadPin(InputName) interface{}
 	ReadMultiple(count int) []interface{}
 	WritePin(OutputName, interface{})

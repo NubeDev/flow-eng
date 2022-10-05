@@ -3,6 +3,7 @@ package points
 import (
 	"github.com/NubeDev/flow-eng/helpers"
 	"github.com/NubeDev/flow-eng/helpers/names"
+	log "github.com/sirupsen/logrus"
 	"sort"
 	"time"
 )
@@ -35,6 +36,43 @@ type writeSync struct {
 	Time        time.Time
 	SyncFrom    SyncFrom
 	SyncTo      *SyncList // modbus, rubix-io
+}
+
+func getToSync(application names.ApplicationName) SyncTo {
+	switch application {
+	case names.RubixIO:
+		return ToRubixIO
+	case names.RubixIOAndModbus:
+		return ToRubixIOModbus
+	case names.Edge:
+		return ToEdge28
+	}
+	return ""
+}
+
+// CreateSync can come from bacnet or the flow
+func (inst *Store) CreateSync(writeValue *PriArray, object ObjectType, id ObjectID, syncFrom SyncFrom, in14, in15 *float64) {
+	point := inst.GetPointByObject(object, id)
+	if object == "" {
+		log.Errorf("bacnet-server: object type type can not be empty")
+	}
+	if syncFrom == "" {
+		log.Errorf("bacnet-server: get sync from can not be empty")
+	}
+	sync := getToSync(inst.Application)
+	if sync == "" {
+		log.Errorf("bacnet-server: get sync type can not be empty")
+	}
+	if point != nil {
+		cov := inst.WritePointValue(point.UUID, writeValue, in14, in15)
+		if cov {
+			if writeValue == nil {
+				inst.AddSync(point.UUID, NewPriArray(in14, in15), syncFrom, sync, inst.Application)
+			} else {
+				inst.AddSync(point.UUID, writeValue, syncFrom, sync, inst.Application)
+			}
+		}
+	}
 }
 
 func (inst *Store) AddSync(pointUUID string, writeValue *PriArray, syncFrom SyncFrom, syncTo SyncTo, application names.ApplicationName) {

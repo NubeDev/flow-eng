@@ -53,7 +53,6 @@ func (inst *Store) GetWriteablePointsByApplication(name names.ApplicationName) [
 				}
 			}
 		}
-
 	}
 	return out
 }
@@ -63,6 +62,18 @@ func (inst *Store) GetPointsByApplication(name names.ApplicationName) []*Point {
 	for _, point := range inst.GetPoints() {
 		if point.Application == name {
 			out = append(out, point)
+		}
+	}
+	return out
+}
+
+func (inst *Store) GetPointsByApplicationAndType(name names.ApplicationName, t ObjectType) []*Point {
+	var out []*Point
+	for _, point := range inst.GetPoints() {
+		if point.Application == name {
+			if point.ObjectType == t {
+				out = append(out, point)
+			}
 		}
 	}
 	return out

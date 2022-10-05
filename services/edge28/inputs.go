@@ -1,6 +1,7 @@
 package edge28lib
 
 import (
+	"errors"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/services/clients/edgerest"
 	log "github.com/sirupsen/logrus"
@@ -68,7 +69,7 @@ func (inst *Edge28) GetUIs(p ...*points.Point) ([]*points.Point, error) {
 		if point.ObjectType == points.AnalogInput {
 			for i := 1; i < 8; i++ {
 				if point.ObjectID == points.ObjectID(i) {
-					pntReturn, _ := inputSelection(inputValueSelection(i, uiValues), point)
+					pntReturn, err := inputSelection(inputValueSelection(i, uiValues), point)
 					if err != nil {
 						log.Error(err)
 					}
@@ -126,5 +127,5 @@ func inputSelection(value float64, point *points.Point) (*points.Point, error) {
 		point.ValueFromRead = input
 		return point, err
 	}
-	return nil, nil
+	return nil, errors.New("failed to find a valid io-type")
 }
