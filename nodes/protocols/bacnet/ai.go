@@ -17,6 +17,7 @@ type AI struct {
 }
 
 func NewAI(body *node.Spec, opts *Bacnet) (node.Node, error) {
+	opts = bacnetOpts(opts)
 	var err error
 	body, err = nodeDefault(body, bacnetAI, category, opts.Application)
 	return &AI{
@@ -35,17 +36,17 @@ func (inst *AI) setObjectId() {
 
 func (inst *AI) Process() {
 	_, firstLoop := inst.Loop()
-	if !firstLoop {
+	if firstLoop {
 		inst.setObjectId()
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
-		ioType := points.IoTypeDigital // TODO make a setting
+		ioType := points.IoTypeTemp // TODO make a setting
 		point := addPoint(inst.application, ioType, objectType, inst.objectID, isWriteable, isIO, true)
 		point, err = inst.store.AddPoint(point, true)
 		if err != nil {
 			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
 		}
 	}
-	toFlow(inst, inst.objectID, inst.store)
+	toFlow(inst, points.AnalogInput, inst.objectID, inst.store)
 }
 
 func (inst *AI) Cleanup() {}

@@ -15,12 +15,8 @@ and disregard the existing
 */
 
 //toFlow write the value to the flow, as in a AI write the temp value
-func toFlow(body node.Node, id points.ObjectID, store *points.Store) {
-	objectType, _, _, err := getBacnetType(body.GetName())
-	if err != nil {
-		return
-	}
-	_, v, _ := store.GetValueFromReadByObject(objectType, id) // get the latest value from the point store
+func toFlow(body node.Node, objType points.ObjectType, id points.ObjectID, store *points.Store) {
+	_, v, _ := store.GetValueFromReadByObject(objType, id) // get the latest value from the point store
 	body.WritePin(node.Out, v)
 	//getServer().mqttPublish(p) // MQTT UPDATE
 }

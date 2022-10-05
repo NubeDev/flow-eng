@@ -17,6 +17,7 @@ type AO struct {
 }
 
 func NewAO(body *node.Spec, opts *Bacnet) (node.Node, error) {
+	opts = bacnetOpts(opts)
 	var err error
 	body, err = nodeDefault(body, bacnetAO, category, opts.Application)
 	return &AO{
@@ -33,7 +34,7 @@ func (inst *AO) setObjectId() {
 }
 func (inst *AO) Process() {
 	_, firstLoop := inst.Loop()
-	if !firstLoop {
+	if firstLoop {
 		inst.setObjectId()
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
 		ioType := points.IoTypeDigital // TODO make a setting
@@ -43,8 +44,8 @@ func (inst *AO) Process() {
 			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
 		}
 	}
-	toFlow(inst, inst.objectID, inst.store)
-
+	toFlow(inst, points.AnalogOutput, inst.objectID, inst.store)
+	fromFlow(inst, inst.objectID, inst.store)
 }
 
 func (inst *AO) Cleanup() {}

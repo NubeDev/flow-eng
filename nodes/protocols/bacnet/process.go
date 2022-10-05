@@ -1,7 +1,7 @@
 package bacnet
 
 import (
-	"github.com/NubeDev/flow-eng/helpers/conversions"
+	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/topics"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
@@ -20,23 +20,17 @@ func fromFlow(body node.Node, objectId points.ObjectID, store *points.Store) {
 	if err != nil {
 		return
 	}
-	var ok bool
 	var in14 *float64
 	var in15 *float64
 	if isWriteable {
-		in14, ok = conversions.GetFloatPointerOk(body.ReadPin(node.In14))
-		if !ok {
-			log.Errorf("bacnet-server: @14 failed to get node write value from node process")
-		}
-		in15, ok = conversions.GetFloatPointerOk(body.ReadPin(node.In15))
-		if !ok {
-			log.Errorf("bacnet-server:  @15 failed to get node write value from node process")
-		}
+		in14 = body.ReadPinAsFloatPointer(node.In14)
+		in15 = float.New(body.ReadPinAsFloat(node.In15))
 	}
 	if objectId == 0 {
 		log.Errorf("bacnet-server: failed to get object-id from node process")
 		return
 	}
+
 	store.CreateSync(nil, objectType, objectId, points.FromFlow, in14, in15)
 }
 

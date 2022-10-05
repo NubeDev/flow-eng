@@ -5,6 +5,7 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	log "github.com/sirupsen/logrus"
+	"time"
 )
 
 func (inst *Server) edge28OutputsDispatch() {
@@ -14,6 +15,7 @@ func (inst *Server) edge28OutputsDispatch() {
 		for _, point := range getPoints { //get the list of the points to update
 			sync := inst.store.GetLatestSyncValue(point.UUID, points.ToEdge28)
 			if sync != nil {
+				time.Sleep(1000 * time.Millisecond)
 				point.CurrentSyncUUID = sync.UUID
 				if point.ObjectType == points.AnalogOutput {
 					inst.clients.edge28.WriteUO(point)
@@ -30,16 +32,16 @@ func (inst *Server) edge28OutputsDispatch() {
 }
 
 func (inst *Server) edge28InputsRunner() {
-	analogPoint := inst.store.GetPointsByApplicationAndType(names.RubixIO, points.AnalogInput)
-	analogValues, err := inst.clients.edge28.GetUIs(analogPoint...)
-
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	for _, point := range analogValues {
-		fmt.Println(point.UUID, point.ValueFromRead)
-		inst.store.WriteValueFromRead(point.UUID, point.ValueFromRead)
+	for {
+		analogPoint := inst.store.GetPointsByApplicationAndType(names.Edge, points.AnalogInput)
+		analogValues, err := inst.clients.edge28.GetUIs(analogPoint...)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		for _, point := range analogValues {
+			inst.store.WriteValueFromRead(point.UUID, point.ValueFromRead)
+		}
+		time.Sleep(1000 * time.Millisecond)
 	}
 }

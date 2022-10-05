@@ -17,6 +17,7 @@ var edgeIOLoop runnerStatus
 
 func (inst *Server) protocolRunner() {
 	gt := inst.application
+
 	if !mqttPubLoop {
 		go inst.writeRunner()
 		mqttPubLoop = true

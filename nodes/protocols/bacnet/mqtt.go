@@ -43,7 +43,6 @@ func (inst *Server) mqttPublishPV(pnt *points.Point) {
 			return
 		}
 	}
-
 }
 
 func getTopic(msg interface{}) string {

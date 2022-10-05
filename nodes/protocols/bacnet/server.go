@@ -34,14 +34,16 @@ type clients struct {
 	edge28     *edge28lib.Edge28
 }
 
-//var db *points.Store
-//var mqttClient *mqttclient.Client
-//var inst *Server
-//var application = names.Edge
+func bacnetOpts(opts *Bacnet) *Bacnet {
+	if opts == nil {
+		return &Bacnet{}
+	}
+	return opts
+}
 
 func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
+	opts = bacnetOpts(opts)
 	var application = opts.Application
-	application = names.Edge
 	var err error
 	ip := "192.168.15.141"
 	body = node.Defaults(body, serverNode, category)
@@ -63,7 +65,7 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	body = node.BuildNode(body, inputs, outputs, nil)
 
 	clients := &clients{}
-	server := &Server{body, clients, false, false, false, opts.Store, opts.Application}
+	server := &Server{body, clients, false, false, false, opts.Store, application}
 	server.clients.mqttClient = opts.MqttClient
 	if application == names.RubixIO || application == names.RubixIOAndModbus {
 		rubixIOUICount, rubixIOUOCount := points.CalcPointCount(1, application)
@@ -82,7 +84,6 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 		server.clients.edge28 = edge28
 		log.Infof("bacnet-server: start application: %s device-ip: %s", application, ip)
 	}
-
 	return server, err
 }
 
@@ -117,28 +118,10 @@ func (inst *Server) mqttReconnect() {
 	}
 }
 
-//func getMqtt() *mqttclient.Client {
-//	return mqttClient
-//}
-//
-//func getStore() *points.Store {
-//	if db == nil {
-//		//log.Error("bacnet-server-node: store can not be empty")
-//		db = points.New(application, nil, 1, 200, 200)
-//	}
-//	return db
-//}
-//func getApplication() names.ApplicationName {
-//	if db != nil {
-//		return db.GetApplication()
-//	}
-//	return ""
-//}
-
 func (inst *Server) subscribeBroker(topic string) {
 	callback := func(client mqtt.Client, message mqtt.Message) {
 		rawData := message.Payload()
-		fmt.Println(message.Topic(), string(rawData))
+		fmt.Println("MQTT callback", message.Topic(), string(rawData))
 	}
 	err := inst.clients.mqttClient.Subscribe("test", mqttclient.AtLeastOnce, callback)
 	if err != nil {

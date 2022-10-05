@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/NubeDev/flow-eng/db"
-	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/helpers/timer"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/bool"
@@ -25,7 +24,6 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/notify/ping"
 	point "github.com/NubeDev/flow-eng/nodes/points"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet"
-	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/nodes/protocols/driver"
 	"github.com/NubeDev/flow-eng/nodes/protocols/flow"
 	"github.com/NubeDev/flow-eng/nodes/protocols/rest"
@@ -36,8 +34,6 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/tigger"
 	"github.com/NubeDev/flow-eng/nodes/timing"
 	"github.com/NubeDev/flow-eng/nodes/transformations"
-	"github.com/NubeDev/flow-eng/services/mqttclient"
-	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -323,7 +319,7 @@ func Builder(body *node.Spec, db db.DB, opts ...interface{}) (node.Node, error) 
 	if n != nil || err != nil {
 		return n, err
 	}
-	n, err = builderProtocols(body)
+	n, err = builderProtocols(body, opts)
 	if n != nil || err != nil {
 		return n, err
 	}
@@ -569,32 +565,38 @@ func builderTiming(body *node.Spec) (node.Node, error) {
 	return nil, nil
 }
 
-func builderProtocols(body *node.Spec) (node.Node, error) {
-	mqttClient, err := mqttclient.NewClient(mqttclient.ClientOptions{
-		Servers: []string{"tcp://0.0.0.0:1883"},
-	})
-	err = mqttClient.Connect()
-	if err != nil {
-		log.Error(err)
+func builderProtocols(body *node.Spec, opts []interface{}) (node.Node, error) {
+	//mqttClient, err := mqttclient.NewClient(mqttclient.ClientOptions{
+	//	Servers: []string{"tcp://0.0.0.0:1883"},
+	//})
+	//err = mqttClient.Connect()
+	//if err != nil {
+	//	log.Error(err)
+	//}
+	//
+	//opts := &bacnet.Bacnet{
+	//	Store:       points.New(names.Edge, nil, 0, 200, 200),
+	//	MqttClient:  mqttClient,
+	//	Application: names.Edge,
+	//}
+	bacOpts := &bacnet.Bacnet{}
+	if len(opts) > 0 {
+		bacOpts = opts[0].(*bacnet.Bacnet)
 	}
 
-	opts := &bacnet.Bacnet{
-		Store:       points.New(names.Edge, nil, 0, 200, 200),
-		MqttClient:  mqttClient,
-		Application: "",
-	}
+	//bacOpts := &bacnet.Bacnet{}
 
 	switch body.GetName() {
 	case bacnetServer:
-		return bacnet.NewServer(body, opts)
+		return bacnet.NewServer(body, bacOpts)
 	case bacnetAI:
-		return bacnet.NewAI(body, opts)
+		return bacnet.NewAI(body, bacOpts)
 	case bacnetAO:
-		return bacnet.NewAO(body, opts)
+		return bacnet.NewAO(body, bacOpts)
 	case bacnetAV:
-		return bacnet.NewAV(body, opts)
+		return bacnet.NewAV(body, bacOpts)
 	case bacnetBV:
-		return bacnet.NewBV(body, opts)
+		return bacnet.NewBV(body, bacOpts)
 
 	}
 

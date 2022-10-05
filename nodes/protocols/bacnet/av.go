@@ -18,7 +18,7 @@ type AV struct {
 
 func NewAV(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	var err error
-
+	opts = bacnetOpts(opts)
 	body, err = nodeDefault(body, bacnetAV, category, opts.Application)
 	return &AV{
 		body,
@@ -36,7 +36,7 @@ func (inst *AV) setObjectId() {
 
 func (inst *AV) Process() {
 	_, firstLoop := inst.Loop()
-	if !firstLoop {
+	if firstLoop {
 		inst.setObjectId()
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
 		ioType := points.IoTypeNumber // TODO make a setting
@@ -46,7 +46,7 @@ func (inst *AV) Process() {
 			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
 		}
 	}
-	toFlow(inst, inst.objectID, inst.store)
+	toFlow(inst, points.AnalogInput, inst.objectID, inst.store)
 
 }
 

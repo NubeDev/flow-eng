@@ -22,7 +22,7 @@ const (
 
 func NewBV(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	var err error
-
+	opts = bacnetOpts(opts)
 	body, err = nodeDefault(body, bacnetBV, category, opts.Application)
 	return &BV{
 		body,
@@ -40,7 +40,7 @@ func (inst *BV) setObjectId() {
 
 func (inst *BV) Process() {
 	_, firstLoop := inst.Loop()
-	if !firstLoop {
+	if firstLoop {
 		inst.setObjectId()
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
 		ioType := points.IoTypeNumber // TODO make a setting
@@ -50,7 +50,7 @@ func (inst *BV) Process() {
 			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
 		}
 	}
-	toFlow(inst, inst.objectID, inst.store)
+	toFlow(inst, points.AnalogInput, inst.objectID, inst.store)
 
 }
 
