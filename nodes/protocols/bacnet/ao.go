@@ -1,9 +1,11 @@
 package bacnet
 
 import (
+	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
+	"github.com/NubeDev/flow-eng/services/mqttclient"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -14,6 +16,7 @@ type AO struct {
 	pointUUID   string
 	store       *points.Store
 	application names.ApplicationName
+	mqttClient  *mqttclient.Client
 }
 
 func NewAO(body *node.Spec, opts *Bacnet) (node.Node, error) {
@@ -27,8 +30,22 @@ func NewAO(body *node.Spec, opts *Bacnet) (node.Node, error) {
 		"",
 		opts.Store,
 		opts.Application,
+		opts.MqttClient,
 	}, err
 }
+
+func (inst *AO) setName() {
+	// bacnet/ao/1/write/name
+	name := inst.ReadPinAsString(node.Name)
+	if name != "" {
+		topic := fmt.Sprintf("%s/write/name", topicBuilder(inst.objectType, inst.objectID))
+		err := inst.mqttClient.Publish(topic, mqttclient.AtMostOnce, true, name)
+		if err != nil {
+			return
+		}
+	}
+}
+
 func (inst *AO) setObjectId() {
 	inst.objectID = points.ObjectID(inst.ReadPinAsInt(node.ObjectId))
 }
@@ -36,6 +53,7 @@ func (inst *AO) Process() {
 	_, firstLoop := inst.Loop()
 	if firstLoop {
 		inst.setObjectId()
+		inst.setName()
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
 		ioType := points.IoTypeDigital // TODO make a setting
 		point := addPoint(inst.application, ioType, objectType, inst.objectID, isWriteable, isIO, true)

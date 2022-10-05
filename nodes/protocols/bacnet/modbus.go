@@ -25,7 +25,6 @@ func (inst *Server) modbusRunner() {
 	pointsList := inst.store.GetPointsByApplication(names.Modbus)
 	inst.modbusInputsRunner(init, pointsList) // process the inputs
 	time.Sleep(4 * time.Second)
-	modbusLoop = false
 }
 
 func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*points.Point) {

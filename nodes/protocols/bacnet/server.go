@@ -145,12 +145,12 @@ func (inst *Server) subscribeToRubixIO() {
 	}
 	objs := []string{"ai", "ao", "av", "bi", "bo", "bv"}
 	for _, obj := range objs {
-		topic := fmt.Sprintf("%s/+/pv", topicObjectBuilder(obj))
+		topic := fmt.Sprintf("%s/+/pv", topicObjectBuilder(points.ObjectType(obj)))
 		inst.subscribeBroker(topic)
 	}
 	objsOuts := []string{"ao", "av", "bo", "bv"}
 	for _, obj := range objsOuts {
-		topic := fmt.Sprintf("%s/+/pri", topicObjectBuilder(obj))
+		topic := fmt.Sprintf("%s/+/pri", topicObjectBuilder(points.ObjectType(obj)))
 		inst.subscribeBroker(topic)
 	}
 }

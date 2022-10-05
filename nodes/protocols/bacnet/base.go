@@ -113,21 +113,21 @@ func addPoint(application names.ApplicationName, ioType points.IoType, objectTyp
 }
 
 // topicBuilder bacnet/ObjectType
-func topicObjectBuilder(objectType string) string {
+func topicObjectBuilder(objectType points.ObjectType) string {
 	return fmt.Sprintf("bacnet/%s", objectType)
 }
 
 // topicBuilder bacnet/ao/1
-func topicBuilder(objectType string, address points.ObjectID) string {
+func topicBuilder(objectType points.ObjectType, address points.ObjectID) string {
 	return fmt.Sprintf("bacnet/%s/%d", objectType, address)
 }
 
 // TopicPresentValue bacnet/ao/1/pv
-func TopicPresentValue(objectType string, address points.ObjectID) string {
+func TopicPresentValue(objectType points.ObjectType, address points.ObjectID) string {
 	return fmt.Sprintf("%s/pv", topicBuilder(objectType, address))
 }
 
 // TopicPriority bacnet/ao/1/pri
-func TopicPriority(objectType string, address points.ObjectID) string {
+func TopicPriority(objectType points.ObjectType, address points.ObjectID) string {
 	return fmt.Sprintf("%s/pri", topicBuilder(objectType, address))
 }
