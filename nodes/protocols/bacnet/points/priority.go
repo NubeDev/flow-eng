@@ -3,6 +3,7 @@ package points
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/topics"
 	"strconv"
@@ -17,7 +18,7 @@ type BacnetPayload struct {
 type Payload struct {
 	topic       string
 	value       *float64
-	priAndValue *priAndValue
+	priAndValue *PriAndValue
 	priArray    *PriArray
 	objectID    ObjectID
 	objectType  ObjectType
@@ -37,7 +38,6 @@ func NewPayload() *Payload {
 func (inst *Payload) NewMessage(msg interface{}) error {
 	m, ok := msg.(*topics.Message)
 	if ok {
-		msgString := string(m.Msg.Payload())
 		var decoded *BacnetPayload
 		err := json.Unmarshal(m.Msg.Payload(), &decoded)
 		if decoded == nil || err != nil {
@@ -58,13 +58,13 @@ func (inst *Payload) NewMessage(msg interface{}) error {
 		inst.objectID = ObjectID(id)
 		inst.objectType = object(topic)
 		if topics.IsPV(inst.topic) {
-			v, err := strconv.ParseFloat(msgString, 64)
+			v, err := strconv.ParseFloat(fmt.Sprint(decoded.Value), 64)
 			if err != nil {
 				inst.value = float.New(v)
 			}
 		}
 		if topics.IsPri(inst.topic) {
-			inst.priArray = inst.cleanArray(msgString)
+			inst.priArray = inst.cleanArray(fmt.Sprint(decoded.Value))
 			inst.priAndValue = GetHighest(inst.priArray)
 		}
 	} else {
@@ -136,13 +136,13 @@ func set(part string) *float64 {
 	}
 }
 
-type priAndValue struct {
+type PriAndValue struct {
 	Number int
 	Value  float64
 }
 
-func getHighest(num int, val *float64) *priAndValue {
-	return &priAndValue{
+func getHighest(num int, val *float64) *PriAndValue {
+	return &PriAndValue{
 		Number: num,
 		Value:  float.NonNil(val),
 	}
@@ -164,7 +164,7 @@ func (inst *Payload) GetFullPriority() *PriArray {
 	return inst.priArray
 }
 
-func (inst *Payload) GetHighestPriority() *priAndValue {
+func (inst *Payload) GetHighestPriority() *PriAndValue {
 	return inst.priAndValue
 }
 
@@ -183,7 +183,7 @@ func GetWriteArrayValues(payload *PriArray) (in14, in15 *float64) {
 
 }
 
-func GetHighest(payload *PriArray) *priAndValue {
+func GetHighest(payload *PriArray) *PriAndValue {
 	if payload == nil {
 		payload = &PriArray{}
 	}
@@ -243,6 +243,7 @@ func (inst *Payload) cleanArray(payload string) *PriArray {
 	payload = strings.ReplaceAll(payload, "{", "")
 	payload = strings.ReplaceAll(payload, "}", "")
 	parts := strings.Split(payload, ",")
+
 	if len(parts) != 16 {
 		return nil
 	}

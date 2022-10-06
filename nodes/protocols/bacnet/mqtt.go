@@ -32,30 +32,8 @@ func (inst *Server) mqttReconnect() {
 }
 
 func (inst *Server) subscribeToRubixIO(topic string) {
-	fmt.Println("************************************** rubix-io")
 	callback := func(client mqtt.Client, message mqtt.Message) {
-		rawData := message.Payload()
-		fmt.Println("MQTT callback rubix-io", message.Topic(), string(rawData))
 		mes := &topics.Message{UUID: helpers.ShortUUID("bus"), Msg: message}
-		fmt.Println(2222, topics.IsPri(message.Topic()))
-		if topics.IsPri(message.Topic()) {
-			fromBacnet(mes, inst.store)
-		}
-	}
-	err := inst.clients.mqttClient.Subscribe(topic, mqttQOS, callback)
-	if err != nil {
-		log.Errorf("bacnet-server mqtt:%s", err.Error())
-		inst.pingFailed = false
-	}
-}
-
-func (inst *Server) subscribeToBacnetServer(topic string) {
-	fmt.Println("************************************** bacnmet")
-	callback := func(client mqtt.Client, message mqtt.Message) {
-		rawData := message.Payload()
-		fmt.Println("MQTT callback", message.Topic(), string(rawData))
-		mes := &topics.Message{UUID: helpers.ShortUUID("bus"), Msg: message}
-		fmt.Println(2222, topics.IsPri(message.Topic()))
 		if topics.IsPri(message.Topic()) {
 			err := fromBacnet(mes, inst.store)
 			if err != nil {
@@ -70,21 +48,34 @@ func (inst *Server) subscribeToBacnetServer(topic string) {
 	}
 }
 
+func (inst *Server) subscribeToBacnetServer() {
+	callback := func(client mqtt.Client, message mqtt.Message) {
+		mes := &topics.Message{UUID: helpers.ShortUUID("bus"), Msg: message}
+		if topics.IsPri(message.Topic()) {
+			err := fromBacnet(mes, inst.store)
+			if err != nil {
+				log.Error(err)
+			}
+		}
+	}
+	objsOuts := []string{"ao", "av", "bo", "bv"}
+	for _, obj := range objsOuts {
+		topic := fmt.Sprintf("%s/+/pri", topicObjectBuilder(points.ObjectType(obj)))
+		err := inst.clients.mqttClient.Subscribe(topic, mqttQOS, callback)
+		if err != nil {
+			log.Errorf("bacnet-server mqtt:%s", err.Error())
+
+		}
+	}
+	inst.pingFailed = false
+
+}
+
 func (inst *Server) subscribe() {
 	if inst.application == names.RubixIO {
 		inst.subscribeToRubixIO("rubixio/inputs/all")
 	}
-	//objs := []string{"ai", "ao", "av", "bi", "bo", "bv"}
-	//for _, obj := range objs {
-	//	topic := fmt.Sprintf("%s/+/pv", topicObjectBuilder(points.ObjectType(obj)))
-	//	//inst.subscribeBroker(topic)
-	//}
-	objsOuts := []string{"ao"}
-	//objsOuts := []string{"ao", "av", "bo", "bv"}
-	for _, obj := range objsOuts {
-		topic := fmt.Sprintf("%s/+/pri", topicObjectBuilder(points.ObjectType(obj)))
-		inst.subscribeToBacnetServer(topic)
-	}
+	inst.subscribeToBacnetServer()
 }
 
 // mqttPublish example for future MQTT write to the bacnet-server
@@ -94,27 +85,20 @@ func (inst *Server) mqttPublishPV(point *points.Point) error {
 	}
 	objectType := point.ObjectType
 	objectId := point.ObjectID
-	value := point.WriteValue
 	obj, err := points.ObjectSwitcher(objectType)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
-	v := points.GetHighest(value)
 	topic := fmt.Sprintf("bacnet/%s/%d/write/pv", obj, objectId) // bacnet/ao/1/write/pv
-	if v == nil {
-		return errors.New("failed to get mqtt payload from bacnet server GetHighest()")
-	}
-	payload := buildPayload("", v.Value)
+	payload := buildPayload("", point.PresentValue)
 	if payload != "" {
-		if v != nil {
-			err = inst.clients.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload)
-			if err != nil {
-				log.Errorf("bacnet-server: mqtt publish err: %s", err.Error())
-				return err
-			} else {
-				inst.store.CompleteMQTTPublish(point)
-			}
+		err = inst.clients.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload)
+		if err != nil {
+			log.Errorf("bacnet-server: mqtt publish err: %s", err.Error())
+			return err
+		} else {
+			inst.store.CompleteMQTTPublish(point)
 		}
 	}
 	return nil

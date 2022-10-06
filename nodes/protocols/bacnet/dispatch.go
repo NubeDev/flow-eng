@@ -32,7 +32,10 @@ func (inst *Server) writeRunner() {
 	for {
 		for _, point := range inst.store.GetPoints() {
 			if inst.store.PendingMQTTPublish(point) {
-				inst.mqttPublishPV(point)
+				err := inst.mqttPublishPV(point)
+				if err != nil {
+					log.Error(err)
+				}
 			}
 		}
 		time.Sleep(runnerDelay * time.Millisecond)

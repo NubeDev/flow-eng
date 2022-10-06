@@ -49,10 +49,6 @@ func fromBacnet(msg interface{}, store *points.Store) error {
 	}
 	if topics.IsPri(topic) {
 		value := payload.GetFullPriority()
-		highest := payload.GetHighestPriority()
-		if highest != nil {
-			return errors.New(fmt.Sprintf("mqtt-runner-subscribe point type:%s-%d value:%f", point.ObjectType, point.ObjectID, highest.Value))
-		}
 		store.CreateSync(value, objectType, objectId, points.FromMqttPriory, nil, nil)
 	}
 	return nil

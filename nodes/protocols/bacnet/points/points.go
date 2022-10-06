@@ -179,6 +179,7 @@ func (inst *Store) WriteValueFromRead(point *Point, value float64) bool {
 	if point != nil {
 		point.ValueFromRead = value
 		inst.SetPresentValue(point, value)
+		inst.SetPendingMQTTPublish(point)
 		return true
 	}
 	return false
