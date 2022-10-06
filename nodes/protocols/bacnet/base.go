@@ -6,6 +6,7 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/node"
 	points "github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
+	log "github.com/sirupsen/logrus"
 )
 
 /*
@@ -119,15 +120,9 @@ func topicObjectBuilder(objectType points.ObjectType) string {
 
 // topicBuilder bacnet/ao/1
 func topicBuilder(objectType points.ObjectType, address points.ObjectID) string {
-	return fmt.Sprintf("bacnet/%s/%d", objectType, address)
-}
-
-// TopicPresentValue bacnet/ao/1/pv
-func TopicPresentValue(objectType points.ObjectType, address points.ObjectID) string {
-	return fmt.Sprintf("%s/pv", topicBuilder(objectType, address))
-}
-
-// TopicPriority bacnet/ao/1/pri
-func TopicPriority(objectType points.ObjectType, address points.ObjectID) string {
-	return fmt.Sprintf("%s/pri", topicBuilder(objectType, address))
+	obj, err := points.ObjectSwitcher(objectType)
+	if err != nil {
+		log.Error(err)
+	}
+	return fmt.Sprintf("bacnet/%s/%d", obj, address)
 }

@@ -1,6 +1,8 @@
 package bacnet
 
 import (
+	"errors"
+	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/topics"
 	"github.com/NubeDev/flow-eng/node"
@@ -30,30 +32,28 @@ func fromFlow(body node.Node, objectId points.ObjectID, store *points.Store) {
 		log.Errorf("bacnet-server: failed to get object-id from node process")
 		return
 	}
-
 	store.CreateSync(nil, objectType, objectId, points.FromFlow, in14, in15)
 }
 
-func fromBacnet(msg interface{}, store *points.Store) {
+func fromBacnet(msg interface{}, store *points.Store) error {
 	payload := points.NewPayload()
 	err := payload.NewMessage(msg)
 	if err != nil {
-		log.Errorf("bacnet-sub-runner malformed mqtt message err:%s", err.Error())
-		return
+		return err
 	}
 	topic := payload.GetTopic()
 	objectType, objectId := payload.GetObjectID()
 	point := store.GetPointByObject(objectType, objectId)
 	if point == nil {
-		log.Errorf("mqtt-payload-priorty-array no point-found in store for type:%s-%d", objectType, objectId)
-		return
+		return errors.New(fmt.Sprintf("mqtt-payload-priorty-array no point-found in store for type:%s-%d", objectType, objectId))
 	}
 	if topics.IsPri(topic) {
 		value := payload.GetFullPriority()
 		highest := payload.GetHighestPriority()
 		if highest != nil {
-			log.Infof("mqtt-runner-subscribe point type:%s-%d value:%f", point.ObjectType, point.ObjectID, highest.Value)
+			return errors.New(fmt.Sprintf("mqtt-runner-subscribe point type:%s-%d value:%f", point.ObjectType, point.ObjectID, highest.Value))
 		}
 		store.CreateSync(value, objectType, objectId, points.FromMqttPriory, nil, nil)
 	}
+	return nil
 }

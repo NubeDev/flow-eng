@@ -78,7 +78,7 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 				if point.IoType == points.IoTypeVolts { // update anypoint that is type voltage
 					writeValue = voltList[io16Pin]
 				}
-				inst.store.WriteValueFromRead(p.UUID, writeValue)
+				inst.store.WriteValueFromRead(p, writeValue)
 			}
 		}
 	}

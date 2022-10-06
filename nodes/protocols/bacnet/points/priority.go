@@ -1,12 +1,18 @@
 package points
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/topics"
 	"strconv"
 	"strings"
 )
+
+type BacnetPayload struct {
+	Value string `json:"value"`
+	UUID  string `json:"uuid"`
+}
 
 type Payload struct {
 	topic       string
@@ -32,6 +38,14 @@ func (inst *Payload) NewMessage(msg interface{}) error {
 	m, ok := msg.(*topics.Message)
 	if ok {
 		msgString := string(m.Msg.Payload())
+		var decoded *BacnetPayload
+		err := json.Unmarshal(m.Msg.Payload(), &decoded)
+		if decoded == nil || err != nil {
+			return errors.New("mqtt bacnet message failed to decode")
+		}
+		if decoded.UUID != "" {
+			return errors.New("mqtt bacnet message came from flow (stopping infinite loop)")
+		}
 		topic := m.Msg.Topic()
 		inst.topic = topic
 		id, err := objectId(topic)

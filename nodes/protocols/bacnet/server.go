@@ -8,9 +8,7 @@ import (
 	edge28lib "github.com/NubeDev/flow-eng/services/edge28"
 	"github.com/NubeDev/flow-eng/services/mqttclient"
 	rubixIO "github.com/NubeDev/flow-eng/services/rubixio"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 	log "github.com/sirupsen/logrus"
-	"time"
 )
 
 type Bacnet struct {
@@ -22,7 +20,6 @@ type Bacnet struct {
 type Server struct {
 	*node.Spec
 	clients       *clients
-	firstLoop     bool
 	pingFailed    bool
 	pingLock      bool
 	runnersLock   bool
@@ -43,6 +40,9 @@ func bacnetOpts(opts *Bacnet) *Bacnet {
 	}
 	return opts
 }
+
+var mqttQOS = mqttclient.AtMostOnce
+var mqttRetain = false
 
 func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	opts = bacnetOpts(opts)
@@ -68,7 +68,7 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	body = node.BuildNode(body, inputs, outputs, nil)
 
 	clients := &clients{}
-	server := &Server{body, clients, false, false, false, false, false, opts.Store, application}
+	server := &Server{body, clients, false, false, false, false, opts.Store, application}
 	server.clients.mqttClient = opts.MqttClient
 	if application == names.RubixIO || application == names.RubixIOAndModbus {
 		rubixIOUICount, rubixIOUOCount := points.CalcPointCount(1, application)
@@ -91,67 +91,21 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 }
 
 func (inst *Server) Process() {
-	if !inst.firstLoop {
-		go inst.subscribeToRubixIO()
-		inst.firstLoop = true
+	_, firstLoop := inst.Loop()
+	if firstLoop {
+		fmt.Println("!!!!!!!!!!!!!!!")
+		go inst.subscribe()
+		go inst.mqttReconnect()
 	}
 	if inst.pingFailed || inst.reconnectedOk { // on failed resubscribe
-		go inst.subscribeToRubixIO()
+
 	}
 	if !inst.pingLock {
-		go inst.mqttReconnect()
+
 	}
 	if !inst.runnersLock {
 		go inst.protocolRunner(inst.application)
 		inst.runnersLock = true
-	}
-}
-
-func (inst *Server) mqttReconnect() {
-	var err error
-	inst.pingLock = true
-	err = inst.clients.mqttClient.Ping()
-	if err != nil {
-		log.Errorf("bacnet-server mqtt ping failed")
-		inst.pingFailed = true
-		err = inst.clients.mqttClient.Connect()
-		if err != nil {
-			log.Errorf("bacnet-server failed to reconnect with mqtt broker")
-			inst.reconnectedOk = false
-		} else {
-			inst.reconnectedOk = true
-		}
-	}
-	time.Sleep(1 * time.Minute)
-	inst.pingLock = false
-}
-
-func (inst *Server) subscribeBroker(topic string) {
-	callback := func(client mqtt.Client, message mqtt.Message) {
-		rawData := message.Payload()
-		fmt.Println("MQTT callback", message.Topic(), string(rawData))
-	}
-	err := inst.clients.mqttClient.Subscribe(topic, mqttclient.AtLeastOnce, callback)
-	if err != nil {
-		log.Errorf("bacnet-server mqtt:%s", err.Error())
-		inst.pingFailed = false
-	}
-
-}
-
-func (inst *Server) subscribeToRubixIO() {
-	if inst.application == names.RubixIO {
-		inst.subscribeBroker("rubixio/inputs/all")
-	}
-	objs := []string{"ai", "ao", "av", "bi", "bo", "bv"}
-	for _, obj := range objs {
-		topic := fmt.Sprintf("%s/+/pv", topicObjectBuilder(points.ObjectType(obj)))
-		inst.subscribeBroker(topic)
-	}
-	objsOuts := []string{"ao", "av", "bo", "bv"}
-	for _, obj := range objsOuts {
-		topic := fmt.Sprintf("%s/+/pri", topicObjectBuilder(points.ObjectType(obj)))
-		inst.subscribeBroker(topic)
 	}
 }
 

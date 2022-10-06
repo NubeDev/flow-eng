@@ -45,7 +45,7 @@ func (inst *Server) edge28InputsRunner() {
 			return
 		}
 		for _, point := range analogValues {
-			inst.store.WriteValueFromRead(point.UUID, point.ValueFromRead)
+			inst.store.WriteValueFromRead(point, point.ValueFromRead)
 		}
 		time.Sleep(1000 * time.Millisecond)
 	}
