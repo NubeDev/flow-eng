@@ -34,11 +34,8 @@ func (inst *Server) mqttReconnect() {
 func (inst *Server) subscribeToRubixIO(topic string) {
 	callback := func(client mqtt.Client, message mqtt.Message) {
 		mes := &topics.Message{UUID: helpers.ShortUUID("bus"), Msg: message}
-		if topics.IsPri(message.Topic()) {
-			err := fromBacnet(mes, inst.store)
-			if err != nil {
-				log.Error(err)
-			}
+		if topics.CheckRubixIO(message.Topic()) {
+			inst.rubixInputsRunner(mes)
 		}
 	}
 	err := inst.clients.mqttClient.Subscribe(topic, mqttQOS, callback)

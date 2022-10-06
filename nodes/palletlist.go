@@ -566,26 +566,10 @@ func builderTiming(body *node.Spec) (node.Node, error) {
 }
 
 func builderProtocols(body *node.Spec, opts []interface{}) (node.Node, error) {
-	//mqttClient, err := mqttclient.NewClient(mqttclient.ClientOptions{
-	//	Servers: []string{"tcp://0.0.0.0:1883"},
-	//})
-	//err = mqttClient.Connect()
-	//if err != nil {
-	//	log.Error(err)
-	//}
-	//
-	//opts := &bacnet.Bacnet{
-	//	Store:       points.New(names.Edge, nil, 0, 200, 200),
-	//	MqttClient:  mqttClient,
-	//	Application: names.Edge,
-	//}
 	bacOpts := &bacnet.Bacnet{}
 	if len(opts) > 0 {
 		bacOpts = opts[0].(*bacnet.Bacnet)
 	}
-
-	//bacOpts := &bacnet.Bacnet{}
-
 	switch body.GetName() {
 	case bacnetServer:
 		return bacnet.NewServer(body, bacOpts)
@@ -599,7 +583,6 @@ func builderProtocols(body *node.Spec, opts []interface{}) (node.Node, error) {
 		return bacnet.NewBV(body, bacOpts)
 
 	}
-
 	return nil, nil
 }
 

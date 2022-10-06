@@ -1,7 +1,6 @@
 package bacnet
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
@@ -48,7 +47,7 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	opts = bacnetOpts(opts)
 	var application = opts.Application
 	var err error
-	ip := "192.168.15.141"
+	ip := "192.168.15.173"
 	body = node.Defaults(body, serverNode, category)
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs))
 	outputBroker := node.BuildOutput(node.Msg, node.TypeString, nil, body.Outputs)
@@ -93,7 +92,6 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 func (inst *Server) Process() {
 	_, firstLoop := inst.Loop()
 	if firstLoop {
-		fmt.Println("!!!!!!!!!!!!!!!")
 		go inst.subscribe()
 		go inst.mqttReconnect()
 	}
