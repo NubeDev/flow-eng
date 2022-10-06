@@ -13,17 +13,16 @@ type Point struct {
 	Application        names.ApplicationName `json:"application"`
 	ObjectType         ObjectType            `json:"objectType"`
 	ObjectID           ObjectID
-	presentValue       *float64
-	priAndValue        *priAndValue
-	writeValue         float64
 	IoType             IoType
 	IsIO               bool // if it's an io-pin for a real device
 	IsWriteable        bool
 	Enable             bool
 	ValueFromRead      float64
+	PresentValue       float64
 	WriteValue         *PriArray
 	PendingWriteCount  uint64
 	PendingMQTTPublish bool
+	SyncFrom           SyncFrom
 }
 
 func (inst *Store) GetPoints() []*Point {
@@ -131,8 +130,34 @@ func (inst *Store) mergePriority(p2 *PriArray, in14, in15 *float64) *PriArray {
 	return out
 }
 
+//SetPresentValue set present value
+func (inst *Store) SetPresentValue(point *Point, value float64) bool {
+	if point != nil {
+		point.PresentValue = value
+	}
+	return false
+}
+
+//GetPresentValue get present value
+func (inst *Store) GetPresentValue(uuid string) (float64, bool) {
+	p := inst.GetPoint(uuid)
+	if p != nil {
+		return p.PresentValue, true
+	}
+	return 0, false
+}
+
+//GetPresentValueByObject get that value that has already been stored
+func (inst *Store) GetPresentValueByObject(t ObjectType, id ObjectID) (point *Point, value float64, found bool) {
+	p := inst.GetPointByObject(t, id)
+	if p != nil {
+		return p, p.PresentValue, true
+	}
+	return nil, 0, false
+}
+
 //GetValueFromReadByObject get that value that has already been stored
-func (inst *Store) GetValueFromReadByObject(t ObjectType, id ObjectID) (*Point, float64, bool) {
+func (inst *Store) GetValueFromReadByObject(t ObjectType, id ObjectID) (point *Point, value float64, found bool) {
 	p := inst.GetPointByObject(t, id)
 	if p != nil {
 		return p, p.ValueFromRead, true
@@ -150,31 +175,32 @@ func (inst *Store) GetValueFromRead(uuid string) (float64, bool) {
 }
 
 //WriteValueFromRead this is a value from a modbus input or rubix-io input
-func (inst *Store) WriteValueFromRead(uuid string, value float64) bool {
-	p := inst.GetPoint(uuid)
-	if p != nil {
-		p.ValueFromRead = value
+func (inst *Store) WriteValueFromRead(point *Point, value float64) bool {
+	if point != nil {
+		point.ValueFromRead = value
+		inst.SetPresentValue(point, value)
+		inst.SetPendingMQTTPublish(point)
 		return true
 	}
 	return false
 }
 
 //WritePointValue to is to be written to flow modbus or the wire-sheet @ priority 15
-func (inst *Store) WritePointValue(uuid string, value *PriArray, in14, in15 *float64) {
+func (inst *Store) WritePointValue(point *Point, value *PriArray, in14, in15 *float64, syncFrom SyncFrom) {
 	var cov bool
-	p := inst.GetPoint(uuid)
-	if p != nil {
+	if point != nil {
+		point.SyncFrom = syncFrom
 		if value == nil {
-			c := inst.mergePriority(p.WriteValue, in14, in15)
-			cov = !reflect.DeepEqual(c, p.WriteValue)
+			c := inst.mergePriority(point.WriteValue, in14, in15)
+			cov = !reflect.DeepEqual(c, point.WriteValue)
 			if cov {
-				inst.AddPendingWriteCount(p)
+				inst.AddPendingWriteCount(point)
 			}
-			p.WriteValue = c
+			point.WriteValue = c
 		} else {
 			c := inst.mergePriority(value, in14, in15)
-			p.WriteValue = c
-			inst.AddPendingWriteCount(p)
+			point.WriteValue = c
+			inst.AddPendingWriteCount(point)
 		}
 	}
 }
@@ -203,7 +229,14 @@ func (inst *Store) AddPendingWriteCount(point *Point) {
 }
 func (inst *Store) CompletePendingWriteCount(point *Point) {
 	point.PendingWriteCount--
-	inst.SetPendingMQTTPublish(point)
+	if point.SyncFrom != FromMqttPriory { // this is if the message came from bacnet-client so there is no need to republish
+		inst.SetPendingMQTTPublish(point)
+	}
+	pri := GetHighest(point.WriteValue)
+	if pri != nil {
+		inst.SetPresentValue(point, pri.Value)
+	}
+
 }
 
 func (inst *Store) GetByType(objectType ObjectType) (out []*Point, count int) {

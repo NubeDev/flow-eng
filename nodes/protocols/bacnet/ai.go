@@ -39,9 +39,11 @@ func (inst *AI) setName() {
 	name := inst.ReadPinAsString(node.Name)
 	if name != "" {
 		topic := fmt.Sprintf("%s/write/name", topicBuilder(inst.objectType, inst.objectID))
-		err := inst.mqttClient.Publish(topic, mqttclient.AtMostOnce, true, name)
-		if err != nil {
-			return
+		payload := buildPayload(name, 0)
+		if payload != "" {
+			err := inst.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload)
+			if err != nil {
+			}
 		}
 	}
 

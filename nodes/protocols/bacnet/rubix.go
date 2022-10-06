@@ -22,7 +22,7 @@ func (inst *Server) rubixInputsRunner(msg *topics.Message) {
 				log.Errorf("rubix-io inputs runner: %s", err.Error())
 				return
 			}
-			inst.store.WriteValueFromRead(point.UUID, value)
+			inst.store.WriteValueFromRead(point, value)
 		}
 	}
 

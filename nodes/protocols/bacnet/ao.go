@@ -39,9 +39,11 @@ func (inst *AO) setName() {
 	name := inst.ReadPinAsString(node.Name)
 	if name != "" {
 		topic := fmt.Sprintf("%s/write/name", topicBuilder(inst.objectType, inst.objectID))
-		err := inst.mqttClient.Publish(topic, mqttclient.AtMostOnce, true, name)
-		if err != nil {
-			return
+		payload := buildPayload(name, 0)
+		if payload != "" {
+			err := inst.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload)
+			if err != nil {
+			}
 		}
 	}
 }
@@ -53,7 +55,7 @@ func (inst *AO) Process() {
 	_, firstLoop := inst.Loop()
 	if firstLoop {
 		inst.setObjectId()
-		inst.setName()
+		go inst.setName()
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
 		ioType := points.IoTypeDigital // TODO make a setting
 		point := addPoint(inst.application, ioType, objectType, inst.objectID, isWriteable, isIO, true)

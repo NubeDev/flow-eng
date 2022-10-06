@@ -21,6 +21,6 @@ func (inst *Store) CreateSync(writeValue *PriArray, object ObjectType, id Object
 	if syncFrom == "" {
 		log.Errorf("bacnet-server: get sync from can not be empty")
 	}
-	inst.WritePointValue(point.UUID, writeValue, in14, in15)
+	inst.WritePointValue(point, writeValue, in14, in15, syncFrom)
 
 }
