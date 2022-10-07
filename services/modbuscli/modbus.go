@@ -1,6 +1,7 @@
 package modbuscli
 
 import (
+	"errors"
 	"github.com/NubeIO/nubeio-rubix-lib-modbus-go/modbus"
 )
 
@@ -8,6 +9,7 @@ type Modbus struct {
 	IsSerial    bool
 	Address     string
 	Port, Slave int
+	Serial      *modbus.Serial
 	client      *modbus.Client
 }
 
@@ -19,6 +21,7 @@ func (inst *Modbus) Init(opts *Modbus) (*Modbus, error) {
 		HostIP:   opts.Address,
 		HostPort: opts.Port,
 		IsSerial: opts.IsSerial,
+		Serial:   opts.Serial,
 	}
 	mbClient, err := mbClient.New()
 	if err != nil {
@@ -35,6 +38,13 @@ func (inst *Modbus) Init(opts *Modbus) (*Modbus, error) {
 }
 
 func (inst *Modbus) SetSlave(slave int) error {
-	inst.client.TCPClientHandler.SetSlave(byte(slave))
+	if slave == 0 {
+		return errors.New("no modbus slave address was passed in")
+	}
+	if inst.IsSerial {
+		inst.client.RTUClientHandler.SetSlave(byte(slave))
+	} else {
+		inst.client.TCPClientHandler.SetSlave(byte(slave))
+	}
 	return nil
 }

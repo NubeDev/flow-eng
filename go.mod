@@ -6,7 +6,7 @@ require (
 	github.com/NubeIO/lib-goja v0.0.4
 	github.com/NubeIO/lib-schema v0.1.6
 	github.com/NubeIO/nubeio-rubix-lib-helpers-go v0.2.7
-	github.com/NubeIO/nubeio-rubix-lib-modbus-go v0.0.3
+	github.com/NubeIO/nubeio-rubix-lib-modbus-go v0.0.4
 	github.com/NubeIO/nubeio-rubix-lib-models-go v1.3.7
 	github.com/NubeIO/nubeio-rubix-lib-rest-go v1.0.8
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f

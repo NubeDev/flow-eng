@@ -3,7 +3,6 @@ package modbuscli
 import (
 	"errors"
 	"github.com/NubeIO/nubeio-rubix-lib-modbus-go/modbus"
-	log "github.com/sirupsen/logrus"
 )
 
 func tempRegs() (start int, finish int) {
@@ -33,6 +32,9 @@ func TempToDI(v float64) float64 {
 func (inst *Modbus) ReadTemps(slave int) (raw [8]float64, err error) {
 	start, finish := tempRegs()
 	registers, err := inst.readRegisters(slave, start, finish, false)
+	if err != nil {
+		return raw, err
+	}
 	if len(registers) < 8 {
 		return raw, errors.New("read length must be 8")
 	}
@@ -42,6 +44,9 @@ func (inst *Modbus) ReadTemps(slave int) (raw [8]float64, err error) {
 func (inst *Modbus) ReadVolts(slave int) (raw [8]float64, err error) {
 	start, finish := voltRegs()
 	registers, err := inst.readRegisters(slave, start, finish, false)
+	if err != nil {
+		return raw, err
+	}
 	if len(registers) < 8 {
 		return raw, errors.New("read length must be 8")
 	}
@@ -64,16 +69,9 @@ func (inst *Modbus) readRegisters(slave, start, finish int, holding bool) (raw [
 	}
 	if holding {
 		registers, _, err := inst.client.ReadHoldingRegisters(uint16(start), uint16(finish))
-		if err != nil {
-			log.Error(err)
-			return registers, err
-		}
+		return registers, err
 	} else {
 		registers, _, err := inst.client.ReadInputRegisters(uint16(start), uint16(finish))
-		if err != nil {
-			log.Error(err)
-			return registers, err
-		}
+		return registers, err
 	}
-	return nil, err
 }

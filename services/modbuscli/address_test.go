@@ -12,7 +12,7 @@ func Test_Modbus(t *testing.T) {
 
 func Test_Tests(t *testing.T) {
 
-	list, addr17 := InputAddress(4, 2)
+	list, addr17 := InputAddress(1, 1)
 
 	for _, addr := range list {
 		fmt.Println(addr)
