@@ -3,6 +3,39 @@
 
 ## node programming
 
+## null values
+
+```go
+func (inst *Not) Process() {
+	in, null := inst.ReadPinBoolOk(node.In)
+	if null { // if input is null then set output to nil
+		inst.WritePinNull(node.Out)
+		return
+	}
+	if in {
+		inst.WritePinFalse(node.Out)
+	} else {
+		inst.WritePinTrue(node.Out)
+	}
+}
+```
+
+### reading inputs
+```go
+inst.ReadPinFloatOk(name InputName) (value float46, null bool) // will return the value as a float and if its `null/nil` the `bool` `null` flag will be `true` 
+inst.ReadPinBoolOk(name InputName) (value bool, null bool) // same as above but value is a bool
+```
+
+### writing outputs
+
+```go
+inst.WritePinFloat(name OutputName, value float64)  // set output to number value (float64)
+inst.WritePinNull(node.Out) // set output to nil
+inst.WritePinTrue(node.Out) // set output to true
+inst.WritePinFalse(node.Out) // set output to false
+```
+
+
 [interface](https://github.com/NubeDev/flow-eng/blob/f8778ee7402691a75516acdb9eef355038c8b17a/node/node.go#L7)
 
 ### check if input value has been updated and boolCOV will let you know if an input went from false to true
