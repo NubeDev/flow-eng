@@ -34,7 +34,7 @@ func (inst *Server) rubixOutputsDispatch() {
 		var pointsToWrite []*points.Point
 		getPoints := inst.store.GetWriteablePointsByApplication(inst.application)
 		for _, point := range getPoints { //get the list of the points to update
-			if point.PendingWriteCount > 0 {
+			if inst.store.PendingWrite(point) {
 				pointsToWrite = append(pointsToWrite, point)
 			}
 		}
@@ -44,7 +44,7 @@ func (inst *Server) rubixOutputsDispatch() {
 				log.Error(err)
 			} else {
 				for _, point := range bulkPoints {
-					point.PendingWriteCount--
+					inst.store.CompletePendingWriteCount(point)
 				}
 			}
 		}

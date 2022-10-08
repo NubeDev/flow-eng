@@ -58,7 +58,7 @@ func (inst *AO) Process() {
 		go inst.setName()
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
 		ioType := points.IoTypeDigital // TODO make a setting
-		point := addPoint(inst.application, ioType, objectType, inst.objectID, isWriteable, isIO, true)
+		point := addPoint(ioType, objectType, inst.objectID, isWriteable, isIO, true)
 		point, err = inst.store.AddPoint(point, true)
 		if err != nil {
 			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)

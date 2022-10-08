@@ -99,9 +99,8 @@ func nodeDefault(body *node.Spec, nodeName, category string, application names.A
 	return body, err
 }
 
-func addPoint(application names.ApplicationName, ioType points.IoType, objectType points.ObjectType, id points.ObjectID, isWriteable, isIO, enable bool) *points.Point {
+func addPoint(ioType points.IoType, objectType points.ObjectType, id points.ObjectID, isWriteable, isIO, enable bool) *points.Point {
 	point := &points.Point{
-		Application: application,
 		ObjectType:  objectType,
 		ObjectID:    id,
 		IoType:      ioType,

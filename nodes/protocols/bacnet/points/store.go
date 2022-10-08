@@ -9,9 +9,10 @@ import (
 )
 
 type Store struct {
-	Application names.ApplicationName `json:"application"`
-	Store       *ObjectStore          `json:"store"`
-	Points      []*Point              `json:"points"`
+	Application       names.ApplicationName `json:"application"`
+	Store             *ObjectStore          `json:"store"`
+	Points            []*Point              `json:"points"`
+	ModbusDeviceCount int                   `json:"modbusDeviceCount"`
 }
 
 type pointAllowance struct {
@@ -148,8 +149,8 @@ func New(app names.ApplicationName, pStore *ObjectStore, deviceCount, avAllowanc
 	if pStore == nil {
 		pStore = &ObjectStore{}
 	}
-
-	CalcPointCount(deviceCount, app)
+	bacnetStore.ModbusDeviceCount = deviceCount
+	bacnetStore.Application = app
 
 	ai := pStore.AI
 	ao := pStore.AO
@@ -236,13 +237,40 @@ func (inst *Store) AddPoint(point *Point, ignoreError bool) (*Point, error) {
 	point.UUID = helpers.ShortUUID()
 	objectType := point.ObjectType
 	if point.ObjectType == "" {
-		if point == nil {
-			return nil, errors.New(fmt.Sprintf("store-add-point: point objectType can not be empty"))
-		}
+		return nil, errors.New(fmt.Sprintf("store-add-point: point objectType can not be empty"))
 	}
+
+	if inst.Application == names.RubixIOAndModbus || inst.Application == names.Modbus {
+		rubixUIStart, rubixUOStart := CalcPointCount(inst.ModbusDeviceCount, inst.Application)
+		// point.ObjectID 9 rubixUIStart 17 rubixUOStart 15 2 rubix-modbus
+		if point.ObjectType == AnalogInput {
+			if point.ObjectID < rubixUIStart {
+				addr, _ := ModbusBuildInput(point.IoType, point.ObjectID)
+				point.ModbusDevAddr = addr.DeviceAddr
+				point.Application = names.Modbus
+			} else {
+				point.Application = names.RubixIO
+			}
+
+		}
+		if point.ObjectID < rubixUOStart && point.ObjectType == AnalogOutput {
+			if point.ObjectID < rubixUOStart {
+				addr, _ := ModbusBuildOutput(point.IoType, point.ObjectID)
+				point.ModbusDevAddr = addr.DeviceAddr
+				point.Application = names.Modbus
+			} else {
+				point.Application = names.RubixIO
+			}
+
+		}
+
+	} else {
+		point.Application = inst.Application
+
+	}
+
 	var checked bool
 	log.Infof("bacnet-add-point type-%s:%d", point.ObjectType, point.ObjectID)
-
 	if objectType == AnalogInput {
 		checked = true
 		p := inst.Store.AI

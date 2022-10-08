@@ -2,28 +2,44 @@ package modbuscli
 
 import (
 	"fmt"
-	pprint "github.com/NubeDev/flow-eng/helpers/print"
+	"github.com/NubeDev/flow-eng/helpers/names"
+	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
+	"github.com/NubeIO/nubeio-rubix-lib-modbus-go/modbus"
 	"testing"
 )
 
-func Test_Modbus(t *testing.T) {
+func Test_Write(t *testing.T) {
 
-}
+	cli := &Modbus{
+		IsSerial: true,
+		Serial: &modbus.Serial{
+			SerialPort: "/dev/ttyUSB0",
+		},
+	}
+	init, err := cli.Init(cli)
+	s := points.New(names.Modbus, nil, 2, 200, 200)
+	fmt.Println(init)
 
-func Test_Tests(t *testing.T) {
-
-	list, addr17 := InputAddress(1, 1)
-
-	for _, addr := range list {
-		fmt.Println(addr)
+	s.AddPoint(&points.Point{
+		ObjectType:  points.AnalogOutput,
+		ObjectID:    1,
+		IoType:      points.IoTypeVolts,
+		IsIO:        true,
+		IsWriteable: true,
+	}, true)
+	if err != nil {
+		return
 	}
 
-	pprint.Print(list)
-	pprint.Print(addr17)
+	pointsList := s.GetPointsByApplication(names.Modbus)
+	//var pointsToWrite []*points.Point
+	for _, point := range pointsList {
+		fmt.Println(point)
 
-	listOuts, addr17Out := outputAddress(5, 19)
+	}
 
-	pprint.Print(listOuts)
-	pprint.Print(addr17Out)
+	var a [8]float64
+	a[0] = 11.1
+	fmt.Println(a)
 
 }

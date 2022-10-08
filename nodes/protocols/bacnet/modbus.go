@@ -27,7 +27,39 @@ func (inst *Server) modbusRunner() {
 	for {
 		pointsList := inst.store.GetPointsByApplication(names.Modbus)
 		inst.modbusInputsRunner(init, pointsList) // process the inputs
+		inst.modbusOutputsDispatch(init)          // process the outs
 		time.Sleep(1 * time.Second)
+	}
+}
+
+func modbusBulkWrite(pointsList []*points.Point) [8]float64 {
+	var out [8]float64
+	for i, point := range pointsList {
+		v := points.GetHighest(point.WriteValue)
+		if v != nil {
+			out[i] = v.Value
+		}
+	}
+	return out
+}
+
+func (inst *Server) modbusOutputsDispatch(cli *modbuscli.Modbus) {
+
+	pointsList := inst.store.GetModbusWriteablePoints()
+	if pointsList == nil {
+		//return
+	}
+	if len(pointsList.DeviceOne) > 0 {
+		err := cli.Write(1, modbusBulkWrite(pointsList.DeviceOne))
+		if err != nil {
+			log.Error(err)
+		}
+	}
+	if len(pointsList.DeviceTwo) > 0 {
+		err := cli.Write(2, modbusBulkWrite(pointsList.DeviceTwo))
+		if err != nil {
+			log.Error(err)
+		}
 	}
 
 }
@@ -40,7 +72,7 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 	var completedVolt bool
 	for _, point := range pointsList { // do modbus read
 		if !point.IsWriteable {
-			addr, _ := cli.BuildInput(point.IoType, point.ObjectID)
+			addr, _ := points.ModbusBuildInput(point.IoType, point.ObjectID)
 			slaveId := addr.DeviceAddr
 			if !completedTemp && (point.IoType == points.IoTypeTemp || point.IoType == points.IoTypeDigital) {
 				tempList, err = cli.ReadTemps(slaveId) // DO MODBUS READ FOR TEMPS
@@ -59,14 +91,14 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 		}
 	}
 	for _, point := range pointsList {
-		addr, _ := cli.BuildInput(point.IoType, point.ObjectID)
+		addr, _ := points.ModbusBuildInput(point.IoType, point.ObjectID)
 		objectId := addr.BacnetAddr
 		var returnedValue float64
 		if point.ObjectType == points.AnalogInput {
 			if point.ObjectID == points.ObjectID(objectId) {
 				p := inst.store.GetPointByObject(points.AnalogInput, point.ObjectID)
 				io16Pin := addr.IoPin - 1
-				if io16Pin < 0 {
+				if io16Pin < 0 || io16Pin > len(tempList) {
 					log.Errorf("modbus-polling failed to get correct io-pin")
 					continue
 				}
