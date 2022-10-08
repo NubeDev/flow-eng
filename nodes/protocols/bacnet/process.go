@@ -25,8 +25,18 @@ func fromFlow(body node.Node, objectId points.ObjectID, store *points.Store) {
 	var in14 *float64
 	var in15 *float64
 	if isWriteable {
-		in14 = body.ReadPinAsFloatPointer(node.In14)
-		in15 = float.New(body.ReadPinAsFloat(node.In15))
+		in14Value, in14Null := body.ReadPinAsFloatOk(node.In14)
+		if in14Null {
+			in14 = nil
+		} else {
+			in14 = float.New(in14Value)
+		}
+		in15Value, in15Null := body.ReadPinAsFloatOk(node.In15)
+		if in15Null {
+			in15 = nil
+		} else {
+			in15 = float.New(in15Value)
+		}
 	}
 	if objectId == 0 {
 		log.Errorf("bacnet-server: failed to get object-id from node process")

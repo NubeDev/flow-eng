@@ -13,7 +13,7 @@ func NewLoopCount(body *node.Spec) (node.Node, error) {
 	toggleOnCount := node.BuildInput(node.Count, node.TypeFloat, 10, body.Inputs) // will trigger every 10 loops
 	inputs := node.BuildInputs(toggleOnCount)
 	outNum := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
-	outToggle := node.BuildOutput(node.Toggle, node.TypeFloat, nil, body.Outputs)
+	outToggle := node.BuildOutput(node.Toggle, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(outNum, outToggle)
 	body = node.BuildNode(body, inputs, outputs, nil)
 	return &Loop{body}, nil
@@ -29,9 +29,9 @@ func (inst *Loop) Process() {
 	}
 	inst.WritePin(node.Out, counter)
 	if counter%toggleOnCount == 0 {
-		inst.WritePin(node.Toggle, 1)
+		inst.WritePinTrue(node.Toggle)
 	} else {
-		inst.WritePin(node.Toggle, 0)
+		inst.WritePinFalse(node.Toggle)
 	}
 }
 

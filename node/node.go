@@ -30,10 +30,18 @@ type Node interface {
 	ReadPinAsString(name InputName) string
 	ReadPinAsInt(name InputName) int
 	ReadPinAsFloat(name InputName) float64
+	ReadPinAsFloatOk(name InputName) (value float64, null bool)
 	ReadPinAsFloatPointer(name InputName) *float64
 	ReadPin(InputName) interface{}
 	ReadMultiple(count int) []interface{}
+	ReadMultipleFloatPointer(count int) []*float64
+	ReadMultipleFloat(count int) []float64
 	WritePin(OutputName, interface{})
+	WritePinFloat(OutputName, float64)
+	WritePinBool(OutputName, bool)
+	WritePinFalse(name OutputName)
+	WritePinTrue(name OutputName)
+	WritePinNull(OutputName)
 	OverrideInputValue(name InputName, value interface{}) error
 	GetMetadata() *Metadata
 	GetIsParent() bool

@@ -29,10 +29,12 @@ func NewLog(body *node.Spec) (node.Node, error) {
 
 func (inst *Log) Process() {
 	comment := inst.ReadPinAsString(node.Comment)
-	inNum := inst.ReadPin(node.InNumber)
+	inNum, nullNum := inst.ReadPinAsFloatOk(node.InNumber)
 	inStr := inst.ReadPin(node.InString)
 	inBool := inst.ReadPin(node.InBoolean)
-	if inNum != nil {
+	if nullNum {
+		log.Infof("log: comment: %v number: null", comment)
+	} else {
 		log.Infof("log: comment: %v number: %v", comment, inNum)
 	}
 	if inStr != nil {

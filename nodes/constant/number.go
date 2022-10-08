@@ -17,8 +17,13 @@ func NewNumber(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Number) Process() {
-	in1 := inst.ReadPin(node.In)
-	inst.WritePin(node.Out, in1)
+	in1, null := inst.ReadPinAsFloatOk(node.In)
+	if null {
+		inst.WritePinNull(node.Out)
+	} else {
+		inst.WritePinFloat(node.Out, in1)
+	}
+
 }
 
 func (inst *Number) Cleanup() {}

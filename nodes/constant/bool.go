@@ -17,7 +17,13 @@ func NewBoolean(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Boolean) Process() {
-	inst.WritePin(node.Out, inst.ReadPinBool(node.In))
+	v, null := inst.ReadPinBoolOk(node.In)
+	if null {
+		inst.WritePinNull(node.Out)
+	} else {
+		inst.WritePinBool(node.Out, v)
+	}
+
 }
 
 func (inst *Boolean) Cleanup() {}
