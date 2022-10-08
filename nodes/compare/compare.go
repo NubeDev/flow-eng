@@ -26,19 +26,19 @@ func (inst *Compare) Process() {
 	b := inst.ReadPinAsFloat(node.InputB)
 
 	if a > b {
-		inst.WritePin(node.GraterThan, true)
+		inst.WritePinTrue(node.GraterThan)
 	} else {
-		inst.WritePin(node.GraterThan, false)
+		inst.WritePinFalse(node.GraterThan)
 	}
 	if a < b {
-		inst.WritePin(node.LessThan, true)
+		inst.WritePinTrue(node.LessThan)
 	} else {
-		inst.WritePin(node.LessThan, false)
+		inst.WritePinFalse(node.LessThan)
 	}
 	if a == b {
-		inst.WritePin(node.Equal, true)
+		inst.WritePinTrue(node.Equal)
 	} else {
-		inst.WritePin(node.Equal, false)
+		inst.WritePinFalse(node.Equal)
 	}
 }
 

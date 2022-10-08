@@ -21,10 +21,10 @@ func NewBoolean(body *node.Spec) (node.Node, error) {
 func (inst *Boolean) Process() {
 	in1 := inst.ReadPinBool(node.In)
 	if in1 {
-		inst.WritePin(node.Float, 1)
+		inst.WritePinFloat(node.Float, 1)
 		inst.WritePin(node.String, "1")
 	} else {
-		inst.WritePin(node.Float, 0)
+		inst.WritePinFloat(node.Float, 0)
 		inst.WritePin(node.String, "0")
 	}
 }

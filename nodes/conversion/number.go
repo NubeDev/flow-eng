@@ -2,7 +2,6 @@ package conversion
 
 import (
 	"fmt"
-	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/node"
 )
 
@@ -21,18 +20,17 @@ func NewNumber(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Number) Process() {
-	in1 := inst.ReadPinAsFloat(node.In)
-	f, ok := conversions.GetFloatOk(in1)
-	if ok {
-		if f == 1 {
-			inst.WritePin(node.Boolean, true)
+	in1, null := inst.ReadPinAsFloatOk(node.In)
+	if !null {
+		if in1 == 1 {
+			inst.WritePinBool(node.Boolean, true)
 		} else {
-			inst.WritePin(node.Boolean, false)
+			inst.WritePinBool(node.Boolean, false)
 		}
-		inst.WritePin(node.String, fmt.Sprintf("%f", f))
+		inst.WritePin(node.String, fmt.Sprintf("%f", in1))
 	} else {
-		inst.WritePin(node.Boolean, nil)
-		inst.WritePin(node.String, nil)
+		inst.WritePinNull(node.Boolean)
+		inst.WritePinNull(node.String)
 	}
 }
 

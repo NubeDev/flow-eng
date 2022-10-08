@@ -42,9 +42,9 @@ func (inst *Hysteresis) Process() {
 		}
 	}
 	if out {
-		inst.WritePin(node.Out, true)
+		inst.WritePinTrue(node.Out)
 	} else {
-		inst.WritePin(node.Out, false)
+		inst.WritePinFalse(node.Out)
 	}
 
 }

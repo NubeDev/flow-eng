@@ -19,11 +19,15 @@ func NewNot(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Not) Process() {
-	in := inst.ReadPinBool(node.In)
+	in, null := inst.ReadPinBoolOk(node.In)
+	if null {
+		inst.WritePinNull(node.Out)
+		return
+	}
 	if in {
-		inst.WritePin(node.Out, false)
+		inst.WritePinFalse(node.Out)
 	} else {
-		inst.WritePin(node.Out, true)
+		inst.WritePinTrue(node.Out)
 	}
 }
 

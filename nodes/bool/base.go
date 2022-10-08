@@ -40,10 +40,9 @@ func Process(body node.Node) {
 	inputs := boolean.ConvertInterfaceToBoolMultiple(body.ReadMultiple(count))
 	output := operation(equation, inputs)
 	if output == nil {
-		body.WritePin(node.Out, nil)
+		body.WritePinNull(node.Out)
 	} else {
-		// log.Infof("bool: %s, result: %v", equation, *output)
-		body.WritePin(node.Out, boolean.NewFalse())
+		body.WritePinBool(node.Out, boolean.NonNil(output))
 	}
 }
 
