@@ -28,7 +28,7 @@ func NewLog(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Log) Process() {
-	comment := inst.ReadPinAsString(node.Comment)
+	comment, _ := inst.ReadPinAsString(node.Comment)
 	inNum, nullNum := inst.ReadPinAsFloat(node.InNumber)
 	inStr := inst.ReadPin(node.InString)
 	inBool := inst.ReadPin(node.InBoolean)

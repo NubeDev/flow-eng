@@ -22,7 +22,7 @@ func NewString(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *String) Process() {
-	in1 := inst.ReadPinAsString(node.In)
+	in1, _ := inst.ReadPinAsString(node.In)
 	f, ok := conversions.GetFloatOk(in1)
 	if ok { // to float
 		inst.WritePin(node.Float, fmt.Sprintf("%f", f))

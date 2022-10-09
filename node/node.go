@@ -4,6 +4,7 @@ import (
 	"github.com/NubeDev/flow-eng/db"
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/schemas"
+	"time"
 )
 
 type Node interface {
@@ -27,12 +28,12 @@ type Node interface {
 	InputHasConnection(name InputName) bool
 	InputsLen() int
 	OutputsLen() int
-	ReadPinAsString(name InputName) string
-	ReadPinAsInt(name InputName) int
+	ReadPin(InputName) interface{}
+	ReadPinAsString(name InputName) (value string, null bool)
+	ReadPinAsInt(name InputName) (value int, null bool)
 	ReadPinAsBool(name InputName) (value bool, null bool)
 	ReadPinAsFloat(name InputName) (value float64, null bool)
-	ReadPinAsFloatPointer(name InputName) *float64
-	ReadPin(InputName) interface{}
+	ReadPinAsDuration(name InputName) (value time.Duration, null bool)
 	ReadMultiple(count int) []interface{}
 	ReadMultipleFloatPointer(count int) []*float64
 	ReadMultipleFloat(count int) []float64

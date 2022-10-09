@@ -33,7 +33,8 @@ func NewNetwork(body *node.Spec, pool driver.Driver) (node.Node, error) {
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body.IsParent = true
 	body = node.BuildNode(body, inputs, outputs, nil)
-	return &Network{body, false, 0, body.ReadPinAsString(node.UUID), "", nil, nil, pool}, nil
+	n, _ := body.ReadPinAsString(node.UUID)
+	return &Network{body, false, 0, n, "", nil, nil, pool}, nil
 }
 
 func (inst *Network) getNetwork() driver.Driver {
@@ -56,10 +57,10 @@ func (inst *Network) setConnection() {
 		Ip:   connection.Host,
 		Port: connection.Port,
 	})
-
+	t, _ := inst.ReadPinAsString(node.Topic)
 	net := inst.pool.AddNetwork(&driver.Network{
 		UUID:           inst.networkUUID,
-		Name:           inst.ReadPinAsString(node.Topic),
+		Name:           t,
 		ConnectionUUID: connection.UUID,
 	})
 

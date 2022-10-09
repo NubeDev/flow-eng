@@ -40,7 +40,7 @@ func NewBV(body *node.Spec, opts *Bacnet) (node.Node, error) {
 
 func (inst *BV) setName() {
 	// bacnet/ao/1/write/name
-	name := inst.ReadPinAsString(node.Name)
+	name, _ := inst.ReadPinAsString(node.Name)
 	if name != "" {
 		topic := fmt.Sprintf("%s/write/name", topicBuilder(inst.objectType, inst.objectID))
 		payload := buildPayload(name, 0)
@@ -53,7 +53,8 @@ func (inst *BV) setName() {
 }
 
 func (inst *BV) setObjectId() {
-	inst.objectID = points.ObjectID(inst.ReadPinAsInt(node.ObjectId))
+	id, _ := inst.ReadPinAsInt(node.ObjectId)
+	inst.objectID = points.ObjectID(id)
 }
 
 func (inst *BV) Process() {

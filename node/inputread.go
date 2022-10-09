@@ -2,7 +2,6 @@ package node
 
 import (
 	"fmt"
-	"github.com/NubeDev/flow-eng/helpers/boolean"
 	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"strconv"
 	"time"
@@ -57,17 +56,12 @@ func (n *Spec) ReadPin(name InputName) interface{} {
 	return input.GetValue()
 }
 
-func (n *Spec) ReadPinAsFloatPointer(name InputName) *float64 {
-	r := n.ReadPin(name)
-	return conversions.GetFloatPointer(r)
-}
-
 func (n *Spec) ReadPinAsFloat(name InputName) (value float64, null bool) {
 	r := n.ReadPin(name)
-	if r != nil {
-		return conversions.GetFloat(r), false
+	if r == nil {
+		return 0, true
 	}
-	return 0, true
+	return conversions.GetFloat(r), false
 }
 
 func (n *Spec) readPinAsFloat(name InputName) (value float64) {
@@ -76,20 +70,29 @@ func (n *Spec) readPinAsFloat(name InputName) (value float64) {
 	return out
 }
 
-func (n *Spec) ReadPinAsDuration(name InputName) time.Duration {
+func (n *Spec) ReadPinAsDuration(name InputName) (value time.Duration, null bool) {
 	r := n.ReadPin(name)
-	return time.Duration(conversions.GetInt(r))
+	if r == nil {
+		return 0, true
+	}
+	return time.Duration(conversions.GetInt(r)), false
 }
 
-func (n *Spec) ReadPinAsUint64(name InputName) uint64 {
+func (n *Spec) ReadPinAsUint64(name InputName) (value uint64, null bool) {
 	r := n.ReadPin(name)
+	if r == nil {
+		return 0, true
+	}
 	out := uint64(conversions.GetFloat(r))
-	return out
+	return out, false
 }
 
-func (n *Spec) ReadPinAsString(name InputName) string {
+func (n *Spec) ReadPinAsString(name InputName) (value string, null bool) {
 	r := n.ReadPin(name)
-	return fmt.Sprintf("%v", r)
+	if r == nil {
+		return "", true
+	}
+	return fmt.Sprintf("%v", r), false
 }
 
 func (n *Spec) readPinBool(name InputName) bool {
@@ -100,23 +103,21 @@ func (n *Spec) readPinBool(name InputName) bool {
 
 func (n *Spec) ReadPinAsBool(name InputName) (value bool, null bool) {
 	r := n.ReadPin(name)
-	if r != nil {
-		result, _ := strconv.ParseBool(fmt.Sprintf("%v", r))
-		return result, false
+	if r == nil {
+		return false, true
 	}
-	return false, true
-}
-
-func (n *Spec) ReadPinBoolPointer(name InputName) *bool {
-	r := n.ReadPin(name)
 	result, _ := strconv.ParseBool(fmt.Sprintf("%v", r))
-	return boolean.New(result)
+	return result, false
 }
 
-func (n *Spec) ReadPinAsInt(name InputName) int {
+func (n *Spec) ReadPinAsInt(name InputName) (value int, null bool) {
 	r := n.ReadPin(name)
+	if r == nil {
+		return 0, true
+	}
 	out := conversions.GetInt(r)
-	return out
+	return out, false
+
 }
 
 func (n *Spec) ReadMultipleFloat(count int) []float64 {
@@ -129,11 +130,16 @@ func (n *Spec) ReadMultipleFloat(count int) []float64 {
 	return out
 }
 
+func (n *Spec) readPinAsFloatPointer(name InputName) *float64 {
+	r := n.ReadPin(name)
+	return conversions.GetFloatPointer(r)
+}
+
 func (n *Spec) ReadMultipleFloatPointer(count int) []*float64 {
 	var out []*float64
 	for i, input := range n.GetInputs() {
 		if i < count {
-			out = append(out, n.ReadPinAsFloatPointer(input.Name))
+			out = append(out, n.readPinAsFloatPointer(input.Name))
 		}
 	}
 	return out

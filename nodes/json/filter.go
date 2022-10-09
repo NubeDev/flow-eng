@@ -20,8 +20,8 @@ func NewFilter(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Filter) Process() {
-	in1 := inst.ReadPinAsString(node.In)
-	equation := inst.ReadPinAsString(node.Filter)
+	in1, _ := inst.ReadPinAsString(node.In)
+	equation, _ := inst.ReadPinAsString(node.Filter)
 	value := gjson.Get(in1, equation)
 	inst.WritePin(node.Out, value.Value())
 }

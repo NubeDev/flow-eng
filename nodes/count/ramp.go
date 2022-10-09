@@ -24,7 +24,7 @@ func NewRamp(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Ramp) run() {
-	duration := inst.ReadPinAsDuration(node.Duration)
+	duration, _ := inst.ReadPinAsDuration(node.Duration)
 	min, _ := inst.ReadPinAsFloat(node.Min)
 	max, _ := inst.ReadPinAsFloat(node.Max)
 	if !inst.breakLoop {

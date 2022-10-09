@@ -39,7 +39,7 @@ func (inst *Inject) run(interval int) {
 }
 
 func (inst *Inject) Process() {
-	interval := inst.ReadPinAsInt(node.Interval)
+	interval, _ := inst.ReadPinAsInt(node.Interval)
 	if !inst.triggered {
 		inst.run(interval)
 	}

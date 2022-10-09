@@ -32,8 +32,8 @@ func NewGet(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Get) do() {
-	url := inst.ReadPinAsString(node.URL)
-	filter := inst.ReadPinAsString(node.Filter)
+	url, _ := inst.ReadPinAsString(node.URL)
+	filter, _ := inst.ReadPinAsString(node.Filter)
 	client := resty.New()
 	resp, err := client.R().
 		EnableTrace().

@@ -83,8 +83,8 @@ func (inst *MqttSub) connect(ip string) {
 }
 
 func (inst *MqttSub) Process() {
-	top := inst.ReadPinAsString(node.Topic)
-	ip := inst.ReadPinAsString(node.Ip)
+	top, _ := inst.ReadPinAsString(node.Topic)
+	ip, _ := inst.ReadPinAsString(node.Ip)
 
 	if !inst.connected {
 		go inst.connect(ip)

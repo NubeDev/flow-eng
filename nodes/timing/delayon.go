@@ -32,7 +32,7 @@ func duration(f int) time.Duration {
 }
 
 func (inst *DelayOn) Process() {
-	timeDelay := inst.ReadPinAsInt(node.DelaySeconds)
+	timeDelay, _ := inst.ReadPinAsInt(node.DelaySeconds)
 
 	in1, _ := inst.ReadPinAsFloat(node.In)
 
