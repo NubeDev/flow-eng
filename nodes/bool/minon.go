@@ -49,8 +49,8 @@ func (inst *MinOnOff) minOff(interval int) {
 
 func (inst *MinOnOff) Process() {
 	in, _ := inst.ReadPinAsBool(node.In)
-	onInterval := inst.ReadPinAsInt(node.OnInterval)
-	offInterval := inst.ReadPinAsInt(node.OffInterval)
+	onInterval, _ := inst.ReadPinAsInt(node.OnInterval)
+	offInterval, _ := inst.ReadPinAsInt(node.OffInterval)
 	if in {
 		if !inst.lockedMinOn && !inst.lockedMinOff && !inst.triggered {
 			go inst.minOn(onInterval) // trigger minOn

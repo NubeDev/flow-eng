@@ -23,7 +23,7 @@ var counter uint64
 
 func (inst *Loop) Process() {
 	counter++
-	toggleOnCount := inst.ReadPinAsUint64(node.Count)
+	toggleOnCount, _ := inst.ReadPinAsUint64(node.Count)
 	if toggleOnCount <= 0 {
 		toggleOnCount = 2
 	}

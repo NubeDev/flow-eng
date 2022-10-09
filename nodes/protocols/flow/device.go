@@ -20,15 +20,17 @@ func NewDevice(body *node.Spec, pool driver.Driver) (node.Node, error) {
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body.IsParent = true
 	body = node.BuildNode(body, inputs, outputs, nil)
-	return &Device{body, false, body.ReadPinAsString(node.UUID), pool}, nil
+	n, _ := body.ReadPinAsString(node.UUID)
+	return &Device{body, false, n, pool}, nil
 }
 
 func (inst *Device) setConnection() {
 	net := inst.pool.GetNetwork(inst.networkUUID)
 	if net != nil {
+		n, _ := inst.ReadPinAsString(node.Name)
 		inst.pool.AddDevice(inst.networkUUID, &driver.Device{
-			UUID: inst.ReadPinAsString(node.Name),
-			Name: inst.ReadPinAsString(node.Name),
+			UUID: n,
+			Name: n,
 		})
 		inst.firstLoop = true
 	} else {

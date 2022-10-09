@@ -1,7 +1,6 @@
 package flow
 
 import (
-	"fmt"
 	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/driver"
@@ -21,16 +20,17 @@ func NewPoint(body *node.Spec, pool driver.Driver) (node.Node, error) {
 	inputs := node.BuildInputs(name, deviceUUID)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
-	return &Point{body, false, body.ReadPinAsString(node.UUID), pool}, nil
+	n, _ := body.ReadPinAsString(node.UUID)
+	return &Point{body, false, n, pool}, nil
 }
 
 func (inst *Point) setConnection() {
 	dev := inst.pool.GetDevice(inst.deviceUUID)
 	if dev != nil {
-		fmt.Println("******************")
+		n, _ := inst.ReadPinAsString(node.Name)
 		pnt := inst.pool.AddPoint(inst.deviceUUID, &driver.Point{
 			UUID: inst.GetID(),
-			Name: inst.ReadPinAsString(node.Name),
+			Name: n,
 		})
 		inst.firstLoop = true
 		pprint.Print(pnt)

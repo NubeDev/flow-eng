@@ -31,7 +31,7 @@ func NewHttpWrite(body *node.Spec) (node.Node, error) {
 func (inst *HttpWrite) request(method, body interface{}) (resp *resty.Response, err error) {
 	resp = &resty.Response{}
 	client := inst.getClient()
-	url := inst.ReadPinAsString(node.URL)
+	url, _ := inst.ReadPinAsString(node.URL)
 	if method == patch {
 		resp, err = client.R().
 			EnableTrace().
@@ -44,8 +44,8 @@ func (inst *HttpWrite) request(method, body interface{}) (resp *resty.Response, 
 }
 
 func (inst *HttpWrite) do() {
-	filter := inst.ReadPinAsString(node.Filter)
-	reqBody := inst.ReadPinAsString(node.Body)
+	filter, _ := inst.ReadPinAsString(node.Filter)
+	reqBody, _ := inst.ReadPinAsString(node.Body)
 	method, err := getSettings(inst.GetSettings())
 	if method == "" {
 		method = patch

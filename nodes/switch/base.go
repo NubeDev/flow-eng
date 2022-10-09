@@ -40,7 +40,7 @@ func process(body node.Node) {
 	op := body.GetName()
 	count := body.InputsLen()
 	inputs := body.ReadMultiple(count)
-	selection := body.ReadPinAsInt(node.Selection)
+	selection, _ := body.ReadPinAsInt(node.Selection)
 	if op == selectNum {
 		output := selectValue(selection, inputs)
 		if output == nil {
