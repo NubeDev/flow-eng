@@ -9,7 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type AV struct {
+type BO struct {
 	*node.Spec
 	objectID    points.ObjectID
 	objectType  points.ObjectType
@@ -19,14 +19,14 @@ type AV struct {
 	mqttClient  *mqttclient.Client
 }
 
-func NewAV(body *node.Spec, opts *Bacnet) (node.Node, error) {
+func NewBO(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	var err error
 	opts = bacnetOpts(opts)
-	body, err = nodeDefault(body, bacnetAV, category, opts.Application)
-	return &AV{
+	body, err = nodeDefault(body, bacnetBO, category, opts.Application)
+	return &BV{
 		body,
 		0,
-		points.AnalogVariable,
+		points.BinaryOutput,
 		"",
 		opts.Store,
 		opts.Application,
@@ -34,7 +34,7 @@ func NewAV(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	}, err
 }
 
-func (inst *AV) setName() {
+func (inst *BO) setName() {
 	name, null := inst.ReadPinAsString(node.Name)
 	if null {
 		name = fmt.Sprintf("%s_%d", inst.objectType, inst.objectID)
@@ -48,26 +48,26 @@ func (inst *AV) setName() {
 	}
 }
 
-func (inst *AV) setObjectId() {
+func (inst *BO) setObjectId() {
 	id, _ := inst.ReadPinAsInt(node.ObjectId)
 	inst.objectID = points.ObjectID(id)
 }
 
-func (inst *AV) Process() {
+func (inst *BO) Process() {
 	_, firstLoop := inst.Loop()
 	if firstLoop {
 		inst.setObjectId()
 		inst.setName()
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
-		ioType := points.IoTypeNumber // TODO make a setting
+		ioType := points.IoTypeDigital
 		point := addPoint(ioType, objectType, inst.objectID, isWriteable, isIO, true)
 		point, err = inst.store.AddPoint(point, true)
 		if err != nil {
 			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
 		}
 	}
-	toFlow(inst, points.AnalogInput, inst.objectID, inst.store)
+	toFlow(inst, points.BinaryOutput, inst.objectID, inst.store)
 
 }
 
-func (inst *AV) Cleanup() {}
+func (inst *BO) Cleanup() {}

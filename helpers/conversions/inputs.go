@@ -80,6 +80,12 @@ func GetFloatPointerOk(in interface{}) (val *float64, ok bool) {
 
 func GetFloat(in interface{}) (val float64) {
 	switch i := in.(type) {
+	case bool:
+		if i {
+			val = 1
+		} else {
+			val = 0
+		}
 	case int:
 		val = float64(i)
 	case float64:
@@ -125,6 +131,12 @@ func GetFloatOk(in interface{}) (val float64, ok bool) {
 
 func GetInt(in interface{}) (val int) {
 	switch i := in.(type) {
+	case bool:
+		if i {
+			val = 1
+		} else {
+			val = 0
+		}
 	case int:
 		val = i
 	case float64:

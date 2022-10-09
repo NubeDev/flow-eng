@@ -35,18 +35,17 @@ func NewAI(body *node.Spec, opts *Bacnet) (node.Node, error) {
 }
 
 func (inst *AI) setName() {
-	// bacnet/ao/1/write/name
-	name, _ := inst.ReadPinAsString(node.Name)
-	if name != "" {
-		topic := fmt.Sprintf("%s/write/name", topicBuilder(inst.objectType, inst.objectID))
-		payload := buildPayload(name, 0)
-		if payload != "" {
-			err := inst.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload)
-			if err != nil {
-			}
+	name, null := inst.ReadPinAsString(node.Name)
+	if null {
+		name = fmt.Sprintf("%s_%d", inst.objectType, inst.objectID)
+	}
+	topic := fmt.Sprintf("%s/write/name", topicBuilder(inst.objectType, inst.objectID))
+	payload := buildPayload(name, 0)
+	if payload != "" {
+		err := inst.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload)
+		if err != nil {
 		}
 	}
-
 }
 
 func (inst *AI) setObjectId() {

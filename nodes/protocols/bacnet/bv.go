@@ -39,15 +39,15 @@ func NewBV(body *node.Spec, opts *Bacnet) (node.Node, error) {
 }
 
 func (inst *BV) setName() {
-	// bacnet/ao/1/write/name
-	name, _ := inst.ReadPinAsString(node.Name)
-	if name != "" {
-		topic := fmt.Sprintf("%s/write/name", topicBuilder(inst.objectType, inst.objectID))
-		payload := buildPayload(name, 0)
-		if payload != "" {
-			err := inst.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload)
-			if err != nil {
-			}
+	name, null := inst.ReadPinAsString(node.Name)
+	if null {
+		name = fmt.Sprintf("%s_%d", inst.objectType, inst.objectID)
+	}
+	topic := fmt.Sprintf("%s/write/name", topicBuilder(inst.objectType, inst.objectID))
+	payload := buildPayload(name, 0)
+	if payload != "" {
+		err := inst.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload)
+		if err != nil {
 		}
 	}
 }
@@ -63,14 +63,14 @@ func (inst *BV) Process() {
 		inst.setObjectId()
 		inst.setName()
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
-		ioType := points.IoTypeNumber // TODO make a setting
+		ioType := points.IoTypeDigital
 		point := addPoint(ioType, objectType, inst.objectID, isWriteable, isIO, true)
 		point, err = inst.store.AddPoint(point, true)
 		if err != nil {
 			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
 		}
 	}
-	toFlow(inst, points.AnalogInput, inst.objectID, inst.store)
+	toFlow(inst, points.BinaryVariable, inst.objectID, inst.store)
 
 }
 
