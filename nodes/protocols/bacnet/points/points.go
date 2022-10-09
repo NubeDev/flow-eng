@@ -62,7 +62,7 @@ type ModbusPoints struct {
 	DeviceFour  []*Point
 }
 
-func (inst *Store) GetModbusWriteablePoints() *ModbusPoints {
+func (inst *Store) GetModbusWriteablePoints(pendingWrite bool) *ModbusPoints {
 	out := &ModbusPoints{
 		DeviceOne:   []*Point{},
 		DeviceTwo:   []*Point{},
@@ -72,22 +72,46 @@ func (inst *Store) GetModbusWriteablePoints() *ModbusPoints {
 	for _, point := range inst.GetPoints() {
 		if point.ModbusDevAddr == 1 {
 			if point.IsWriteable {
-				out.DeviceOne = append(out.DeviceOne, point)
+				if pendingWrite {
+					if inst.PendingWrite(point) {
+						out.DeviceOne = append(out.DeviceOne, point)
+					}
+				} else {
+					out.DeviceOne = append(out.DeviceOne, point)
+				}
 			}
 		}
 		if point.ModbusDevAddr == 2 {
 			if point.IsWriteable {
-				out.DeviceTwo = append(out.DeviceTwo, point)
+				if pendingWrite {
+					if inst.PendingWrite(point) {
+						out.DeviceOne = append(out.DeviceTwo, point)
+					}
+				} else {
+					out.DeviceOne = append(out.DeviceTwo, point)
+				}
 			}
 		}
 		if point.ModbusDevAddr == 3 {
 			if point.IsWriteable {
-				out.DeviceThree = append(out.DeviceThree, point)
+				if pendingWrite {
+					if inst.PendingWrite(point) {
+						out.DeviceOne = append(out.DeviceThree, point)
+					}
+				} else {
+					out.DeviceOne = append(out.DeviceThree, point)
+				}
 			}
 		}
 		if point.ModbusDevAddr == 4 {
 			if point.IsWriteable {
-				out.DeviceFour = append(out.DeviceFour, point)
+				if pendingWrite {
+					if inst.PendingWrite(point) {
+						out.DeviceOne = append(out.DeviceFour, point)
+					}
+				} else {
+					out.DeviceOne = append(out.DeviceFour, point)
+				}
 			}
 		}
 	}
@@ -217,9 +241,11 @@ func (inst *Store) GetValueFromRead(uuid string) (float64, bool) {
 //WriteValueFromRead this is a value from a modbus input or rubix-io input
 func (inst *Store) WriteValueFromRead(point *Point, value float64) bool {
 	if point != nil {
-		point.ValueFromRead = value
 		inst.SetPresentValue(point, value)
-		inst.SetPendingMQTTPublish(point)
+		if point.ValueFromRead != value { // cov event
+			inst.SetPendingMQTTPublish(point)
+		}
+		point.ValueFromRead = value
 		return true
 	}
 	return false

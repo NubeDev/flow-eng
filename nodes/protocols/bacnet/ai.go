@@ -59,7 +59,7 @@ func (inst *AI) Process() {
 		inst.setObjectId()
 		inst.setName()
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
-		ioType := points.IoTypeTemp // TODO make a setting
+		ioType := points.IoTypeDigital // TODO make a setting
 		point := addPoint(ioType, objectType, inst.objectID, isWriteable, isIO, true)
 		point, err = inst.store.AddPoint(point, true)
 		if err != nil {

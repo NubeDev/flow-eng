@@ -88,7 +88,9 @@ func (inst *Server) mqttPublishPV(point *points.Point) error {
 		return err
 	}
 	topic := fmt.Sprintf("bacnet/%s/%d/write/pv", obj, objectId) // bacnet/ao/1/write/pv
+	//topic := fmt.Sprintf("bacnet/%s/%d/write/pri/15", obj, objectId) // bacnet/ao/1/write/pv
 	payload := buildPayload("", point.PresentValue)
+	log.Infof("topic: %s -> value: %s", topic, payload)
 	if payload != "" {
 		err = inst.clients.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload)
 		if err != nil {

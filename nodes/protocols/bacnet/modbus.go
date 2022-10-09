@@ -45,7 +45,7 @@ func modbusBulkWrite(pointsList []*points.Point) [8]float64 {
 
 func (inst *Server) modbusOutputsDispatch(cli *modbuscli.Modbus) {
 
-	pointsList := inst.store.GetModbusWriteablePoints()
+	pointsList := inst.store.GetModbusWriteablePoints(true)
 	if pointsList == nil {
 		//return
 	}
@@ -54,11 +54,17 @@ func (inst *Server) modbusOutputsDispatch(cli *modbuscli.Modbus) {
 		if err != nil {
 			log.Error(err)
 		}
+		for _, point := range pointsList.DeviceOne {
+			inst.store.CompletePendingWriteCount(point)
+		}
 	}
 	if len(pointsList.DeviceTwo) > 0 {
 		err := cli.Write(2, modbusBulkWrite(pointsList.DeviceTwo))
 		if err != nil {
 			log.Error(err)
+		}
+		for _, point := range pointsList.DeviceOne {
+			inst.store.CompletePendingWriteCount(point)
 		}
 	}
 
