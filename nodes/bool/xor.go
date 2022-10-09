@@ -20,8 +20,8 @@ func NewXor(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Xor) Process() {
-	in1 := inst.ReadPinBool(node.In1)
-	in2 := inst.ReadPinBool(node.In2)
+	in1, _ := inst.ReadPinAsBool(node.In1)
+	in2, _ := inst.ReadPinAsBool(node.In2)
 
 	if (in1 && in2 != false) || (in1 != false && in2 == false) {
 		inst.WritePin(node.Out, true)

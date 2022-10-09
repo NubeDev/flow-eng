@@ -22,8 +22,8 @@ func NewNumLatch(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *NumLatch) Process() {
-	input := inst.ReadPinAsFloat(node.In)
-	latch := inst.ReadPinAsFloat(node.Latch)
+	input, _ := inst.ReadPinAsFloat(node.In)
+	latch, _ := inst.ReadPinAsFloat(node.Latch)
 	latchBool := latch == 1
 
 	if latchBool && !inst.lastTrigger {

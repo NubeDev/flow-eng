@@ -23,11 +23,11 @@ func NewScale(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Scale) Process() {
-	in := inst.ReadPinAsFloat(node.In)
-	minIn := inst.ReadPinAsFloat(node.InMin)
-	maxIn := inst.ReadPinAsFloat(node.InMax)
-	minOut := inst.ReadPinAsFloat(node.OutMin)
-	maxOut := inst.ReadPinAsFloat(node.OutMax)
+	in, _ := inst.ReadPinAsFloat(node.In)
+	minIn, _ := inst.ReadPinAsFloat(node.InMin)
+	maxIn, _ := inst.ReadPinAsFloat(node.InMax)
+	minOut, _ := inst.ReadPinAsFloat(node.OutMin)
+	maxOut, _ := inst.ReadPinAsFloat(node.OutMax)
 	inst.WritePin(node.Out, float.Scale(in, minIn, maxIn, minOut, maxOut))
 }
 

@@ -35,8 +35,8 @@ func NewFlatline(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Flatline) Process() {
-	in := inst.ReadPinAsFloat(node.In) // TODO: input value should be allowed to be nil
-	if in != inst.lastVal {            // COV
+	in, _ := inst.ReadPinAsFloat(node.In) // TODO: input value should be allowed to be nil
+	if in != inst.lastVal {               // COV
 		inst.lastVal = in
 		inst.WritePin(node.FlatLine, 0)
 		inst.alertStatus = false

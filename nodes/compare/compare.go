@@ -22,8 +22,8 @@ func NewCompare(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Compare) Process() {
-	a := inst.ReadPinAsFloat(node.InputA)
-	b := inst.ReadPinAsFloat(node.InputB)
+	a, _ := inst.ReadPinAsFloat(node.InputA)
+	b, _ := inst.ReadPinAsFloat(node.InputB)
 
 	if a > b {
 		inst.WritePinTrue(node.GraterThan)

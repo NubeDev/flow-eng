@@ -23,7 +23,7 @@ func NewStringLatch(body *node.Spec) (node.Node, error) {
 
 func (inst *StringLatch) Process() {
 	input := inst.ReadPinAsString(node.In)
-	latch := inst.ReadPinAsFloat(node.Latch)
+	latch, _ := inst.ReadPinAsFloat(node.Latch)
 	latchBool := latch == 1
 
 	if latchBool && !inst.lastTrigger {

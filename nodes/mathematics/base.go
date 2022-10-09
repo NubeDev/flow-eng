@@ -43,7 +43,7 @@ func process(body node.Node) {
 	if function == "" {
 		function = acos
 	}
-	in := body.ReadPinAsFloat(node.In)
+	in, _ := body.ReadPinAsFloat(node.In)
 	output, err := mathFunc(function, in)
 	if err != nil {
 		body.WritePin(node.Result, 0)

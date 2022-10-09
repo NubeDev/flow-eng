@@ -25,13 +25,13 @@ func fromFlow(body node.Node, objectId points.ObjectID, store *points.Store) {
 	var in14 *float64
 	var in15 *float64
 	if isWriteable {
-		in14Value, in14Null := body.ReadPinAsFloatOk(node.In14)
+		in14Value, in14Null := body.ReadPinAsFloat(node.In14)
 		if in14Null {
 			in14 = nil
 		} else {
 			in14 = float.New(in14Value)
 		}
-		in15Value, in15Null := body.ReadPinAsFloatOk(node.In15)
+		in15Value, in15Null := body.ReadPinAsFloat(node.In15)
 		if in15Null {
 			in15 = nil
 		} else {

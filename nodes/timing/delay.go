@@ -22,7 +22,7 @@ func NewDelay(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
 }
 
 func (inst *Delay) Process() {
-	in := inst.ReadPinAsFloat(node.In)
+	in, _ := inst.ReadPinAsFloat(node.In)
 	interval := inst.ReadPinAsInt(node.Interval)
 	if !inst.timer.WaitFor(time.Duration(interval) * time.Second) {
 		inst.WritePin(node.Out, inst.lastValue)

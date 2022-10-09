@@ -29,8 +29,8 @@ type Node interface {
 	OutputsLen() int
 	ReadPinAsString(name InputName) string
 	ReadPinAsInt(name InputName) int
-	ReadPinAsFloat(name InputName) float64
-	ReadPinAsFloatOk(name InputName) (value float64, null bool)
+	ReadPinAsBool(name InputName) (value bool, null bool)
+	ReadPinAsFloat(name InputName) (value float64, null bool)
 	ReadPinAsFloatPointer(name InputName) *float64
 	ReadPin(InputName) interface{}
 	ReadMultiple(count int) []interface{}

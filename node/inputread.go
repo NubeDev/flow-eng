@@ -62,7 +62,7 @@ func (n *Spec) ReadPinAsFloatPointer(name InputName) *float64 {
 	return conversions.GetFloatPointer(r)
 }
 
-func (n *Spec) ReadPinAsFloatOk(name InputName) (value float64, null bool) {
+func (n *Spec) ReadPinAsFloat(name InputName) (value float64, null bool) {
 	r := n.ReadPin(name)
 	if r != nil {
 		return conversions.GetFloat(r), false
@@ -70,7 +70,7 @@ func (n *Spec) ReadPinAsFloatOk(name InputName) (value float64, null bool) {
 	return 0, true
 }
 
-func (n *Spec) ReadPinAsFloat(name InputName) (value float64) {
+func (n *Spec) readPinAsFloat(name InputName) (value float64) {
 	r := n.ReadPin(name)
 	out := conversions.GetFloat(r)
 	return out
@@ -92,13 +92,13 @@ func (n *Spec) ReadPinAsString(name InputName) string {
 	return fmt.Sprintf("%v", r)
 }
 
-func (n *Spec) ReadPinBool(name InputName) bool {
+func (n *Spec) readPinBool(name InputName) bool {
 	r := n.ReadPin(name)
 	result, _ := strconv.ParseBool(fmt.Sprintf("%v", r))
 	return result
 }
 
-func (n *Spec) ReadPinBoolOk(name InputName) (value bool, null bool) {
+func (n *Spec) ReadPinAsBool(name InputName) (value bool, null bool) {
 	r := n.ReadPin(name)
 	if r != nil {
 		result, _ := strconv.ParseBool(fmt.Sprintf("%v", r))
@@ -123,7 +123,7 @@ func (n *Spec) ReadMultipleFloat(count int) []float64 {
 	var out []float64
 	for i, input := range n.GetInputs() {
 		if i < count {
-			out = append(out, n.ReadPinAsFloat(input.Name))
+			out = append(out, n.readPinAsFloat(input.Name))
 		}
 	}
 	return out

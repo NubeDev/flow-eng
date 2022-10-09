@@ -24,7 +24,7 @@ func process(body node.Node) {
 	//
 	//setting.Properties
 
-	in := body.ReadPinAsFloat(node.In)
+	in, _ := body.ReadPinAsFloat(node.In)
 	output, ok := operation("ceil", in)
 	if !ok {
 		body.WritePin(node.Result, nil)

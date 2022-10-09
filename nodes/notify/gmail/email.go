@@ -89,7 +89,7 @@ func (inst *Gmail) Process() {
 	// if trigger == true then set triggered to true
 	// if trigger == false && triggered == true then rest triggered to false
 	// now we can send gmail again
-	trigger := inst.ReadPinBool(node.TriggerInput)
+	trigger, _ := inst.ReadPinAsBool(node.TriggerInput)
 	if trigger {
 		fmt.Println("TRIGGER EMAIL")
 		inst.triggered = true

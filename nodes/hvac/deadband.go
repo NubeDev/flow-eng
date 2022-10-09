@@ -21,10 +21,10 @@ func NewDeadBand(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *DeadBand) Process() {
-	input := inst.ReadPinAsFloat(node.In)
+	input, _ := inst.ReadPinAsFloat(node.In)
 	var out bool
-	setPoint := inst.ReadPinAsFloat(node.SetPoint)
-	deadBand := inst.ReadPinAsFloat(node.DeadBand)
+	setPoint, _ := inst.ReadPinAsFloat(node.SetPoint)
+	deadBand, _ := inst.ReadPinAsFloat(node.DeadBand)
 	risingEdge := setPoint + deadBand/2
 	fallingEdge := deadBand - deadBand/2
 

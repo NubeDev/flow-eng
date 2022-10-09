@@ -28,9 +28,9 @@ func NewBetween(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Between) Process() {
-	in := inst.ReadPinAsFloat(node.In)
-	from := inst.ReadPinAsFloat(node.From)
-	to := inst.ReadPinAsFloat(node.To)
+	in, _ := inst.ReadPinAsFloat(node.In)
+	from, _ := inst.ReadPinAsFloat(node.From)
+	to, _ := inst.ReadPinAsFloat(node.To)
 
 	between, below, above := array.Between(in, from, to)
 	inst.WritePin(node.Out, between)

@@ -20,7 +20,7 @@ func NewNumber(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Number) Process() {
-	in1, null := inst.ReadPinAsFloatOk(node.In)
+	in1, null := inst.ReadPinAsFloat(node.In)
 	if !null {
 		if in1 == 1 {
 			inst.WritePinBool(node.Boolean, true)
