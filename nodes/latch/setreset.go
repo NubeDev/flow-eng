@@ -21,8 +21,8 @@ func NewSetResetLatch(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *SetResetLatch) Process() {
-	set := inst.ReadPinAsFloat(node.Set)
-	reset := inst.ReadPinAsFloat(node.Reset)
+	set, _ := inst.ReadPinAsFloat(node.Set)
+	reset, _ := inst.ReadPinAsFloat(node.Reset)
 	allowResetOnSetTrue := false
 
 	if set == 1 && reset != 1 {

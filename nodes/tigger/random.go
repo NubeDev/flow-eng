@@ -20,8 +20,8 @@ func NewRandom(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Random) Process() {
-	min := inst.ReadPinAsFloat(node.Min)
-	max := inst.ReadPinAsFloat(node.Max)
+	min, _ := inst.ReadPinAsFloat(node.Min)
+	max, _ := inst.ReadPinAsFloat(node.Max)
 	inst.WritePin(node.Out, float.RandFloat(min, max))
 
 }

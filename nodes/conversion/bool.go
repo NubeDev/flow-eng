@@ -19,7 +19,7 @@ func NewBoolean(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Boolean) Process() {
-	in1 := inst.ReadPinBool(node.In)
+	in1, _ := inst.ReadPinAsBool(node.In)
 	if in1 {
 		inst.WritePinFloat(node.Float, 1)
 		inst.WritePin(node.String, "1")

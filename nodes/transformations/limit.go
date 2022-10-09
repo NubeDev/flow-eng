@@ -21,9 +21,9 @@ func NewLimit(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Limit) Process() {
-	in := inst.ReadPinAsFloat(node.In)
-	min := inst.ReadPinAsFloat(node.Min)
-	max := inst.ReadPinAsFloat(node.Max)
+	in, _ := inst.ReadPinAsFloat(node.In)
+	min, _ := inst.ReadPinAsFloat(node.Min)
+	max, _ := inst.ReadPinAsFloat(node.Max)
 	inst.WritePin(node.Out, float.LimitToRange(in, min, max))
 }
 

@@ -21,9 +21,9 @@ func NewSwitch(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Switch) Process() {
-	inSwitch := inst.ReadPinAsFloat(node.Switch)
-	inTrue := inst.ReadPinAsFloat(node.InTrue)
-	inFalse := inst.ReadPinAsFloat(node.InFalse)
+	inSwitch, _ := inst.ReadPinAsFloat(node.Switch)
+	inTrue, _ := inst.ReadPinAsFloat(node.InTrue)
+	inFalse, _ := inst.ReadPinAsFloat(node.InFalse)
 
 	inSwitchAsBool := inSwitch == 1
 

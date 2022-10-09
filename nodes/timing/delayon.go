@@ -34,7 +34,7 @@ func duration(f int) time.Duration {
 func (inst *DelayOn) Process() {
 	timeDelay := inst.ReadPinAsInt(node.DelaySeconds)
 
-	in1 := inst.ReadPinAsFloat(node.In)
+	in1, _ := inst.ReadPinAsFloat(node.In)
 
 	if in1 >= 1 && inst.active { // timer has gone to true and input is still true
 		inst.WritePin(node.Out, 1)

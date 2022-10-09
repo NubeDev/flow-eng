@@ -22,8 +22,8 @@ func (inst *Not) Process() {
 
 ### reading inputs
 ```go
-inst.ReadPinFloatOk(name InputName) (value float46, null bool) // will return the value as a float and if its `null/nil` the `bool` `null` flag will be `true` 
-inst.ReadPinBoolOk(name InputName) (value bool, null bool) // same as above but value is a bool
+inst.ReadPinFloat(name InputName) (value float46, null bool) // will return the value as a float and if its `null/nil` the `bool` `null` flag will be `true` 
+inst.ReadPinBool(name InputName) (value bool, null bool) // same as above but value is a bool
 ```
 
 ### writing outputs

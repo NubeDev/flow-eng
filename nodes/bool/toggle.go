@@ -21,7 +21,7 @@ func NewToggle(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Toggle) Process() {
-	in := inst.ReadPinBool(node.In)
+	in, _ := inst.ReadPinAsBool(node.In)
 	inAsBool := in == true
 	if inAsBool && !inst.lastIn {
 		inst.currentOut = !inst.currentOut

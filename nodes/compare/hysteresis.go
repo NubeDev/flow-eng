@@ -21,10 +21,10 @@ func NewHysteresis(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Hysteresis) Process() {
-	value := inst.ReadPinAsFloat(node.In)
+	value, _ := inst.ReadPinAsFloat(node.In)
 	var out bool
-	risingEdge := inst.ReadPinAsFloat(node.RisingEdge)
-	fallingEdge := inst.ReadPinAsFloat(node.FallingEdge)
+	risingEdge, _ := inst.ReadPinAsFloat(node.RisingEdge)
+	fallingEdge, _ := inst.ReadPinAsFloat(node.FallingEdge)
 
 	if risingEdge > fallingEdge {
 		if value <= fallingEdge {
