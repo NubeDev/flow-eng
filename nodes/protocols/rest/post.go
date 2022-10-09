@@ -39,7 +39,6 @@ func (inst *HttpWrite) request(method, body interface{}) (resp *resty.Response, 
 			Patch(url)
 		return resp, err
 	}
-
 	return resp, err
 }
 

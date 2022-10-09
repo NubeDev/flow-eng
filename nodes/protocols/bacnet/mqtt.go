@@ -61,7 +61,6 @@ func (inst *Server) subscribeToBacnetServer() {
 		err := inst.clients.mqttClient.Subscribe(topic, mqttQOS, callback)
 		if err != nil {
 			log.Errorf("bacnet-server mqtt:%s", err.Error())
-
 		}
 	}
 	inst.pingFailed = false

@@ -259,10 +259,10 @@ func (inst *Store) WritePointValue(point *Point, value *PriArray, in14, in15 *fl
 		if value == nil {
 			c := inst.mergePriority(point.WriteValue, in14, in15)
 			cov = !reflect.DeepEqual(c, point.WriteValue)
+			point.WriteValue = c
 			if cov {
 				inst.AddPendingWriteCount(point)
 			}
-			point.WriteValue = c
 		} else {
 			c := inst.mergePriority(value, in14, in15)
 			point.WriteValue = c
@@ -272,7 +272,9 @@ func (inst *Store) WritePointValue(point *Point, value *PriArray, in14, in15 *fl
 }
 
 func (inst *Store) SetPendingMQTTPublish(point *Point) {
-	point.PendingMQTTPublish = true
+	if point.SyncFrom != FromMqttPriory {
+		point.PendingMQTTPublish = true
+	}
 }
 
 func (inst *Store) PendingMQTTPublish(point *Point) bool {
@@ -291,18 +293,24 @@ func (inst *Store) PendingWrite(point *Point) bool {
 }
 
 func (inst *Store) AddPendingWriteCount(point *Point) {
-	point.PendingWriteCount++
+	if point.ObjectType == AnalogVariable || point.ObjectType == BinaryVariable {
+		point.PendingWriteCount++
+		pri := GetHighest(point.WriteValue)
+		if pri != nil {
+			inst.SetPendingMQTTPublish(point)
+			inst.SetPresentValue(point, pri.Value)
+		}
+	} else {
+		point.PendingWriteCount++
+	}
 }
 func (inst *Store) CompletePendingWriteCount(point *Point) {
 	point.PendingWriteCount--
-	if point.SyncFrom != FromMqttPriory { // this is if the message came from bacnet-client so there is no need to republish
-		inst.SetPendingMQTTPublish(point)
-	}
+	inst.SetPendingMQTTPublish(point)
 	pri := GetHighest(point.WriteValue)
 	if pri != nil {
 		inst.SetPresentValue(point, pri.Value)
 	}
-
 }
 
 func (inst *Store) GetByType(objectType ObjectType) (out []*Point, count int) {

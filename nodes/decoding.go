@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/node"
+	log "github.com/sirupsen/logrus"
 )
 
 func Decode(encodedNodes *NodesList) ([]*node.Spec, error) {
@@ -16,6 +17,7 @@ func Decode(encodedNodes *NodesList) ([]*node.Spec, error) {
 		decodedNode = node.New(id, name, "", encodedNode.Metadata, encodedNode.Settings) // create a blank node
 		newNode, err := Builder(decodedNode, nil)
 		if err != nil {
+			log.Error(err)
 			return nil, err
 		}
 		for _, input := range newNode.GetInputs() { // add the input connections as required
@@ -28,14 +30,12 @@ func Decode(encodedNodes *NodesList) ([]*node.Spec, error) {
 							input.Connection.NodeID = link.NodeId
 							input.Connection.NodePort = node.OutputName(link.Socket)
 						}
-
 					}
 				}
 			}
 		}
 		decodedNodes = append(decodedNodes, decodedNode)
 	}
-
 	return decodedNodes, nil
 }
 

@@ -7,10 +7,11 @@ type nodeValue struct {
 }
 
 type Values struct {
-	NodeName string       `json:"name"`
-	NodeID   string       `json:"nodeId"`
-	Outputs  []*nodeValue `json:"outputs"`
-	Inputs   []*nodeValue `json:"inputs"`
+	NodeName string                 `json:"name"`
+	NodeID   string                 `json:"nodeId"`
+	Settings map[string]interface{} `json:"settings,omitempty"`
+	Outputs  []*nodeValue           `json:"outputs"`
+	Inputs   []*nodeValue           `json:"inputs"`
 }
 
 // NodeValues get the node current values
@@ -18,6 +19,7 @@ func (n *Spec) NodeValues() *Values {
 	var out = &Values{
 		NodeName: n.GetName(),
 		NodeID:   n.GetID(),
+		Settings: n.GetSettings(),
 	}
 	for _, output := range n.Outputs {
 		v := &nodeValue{

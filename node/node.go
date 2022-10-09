@@ -56,7 +56,7 @@ type Node interface {
 }
 
 func New(id, name, nodeName string, meta *Metadata, settings map[string]interface{}) *Spec {
-	return &Spec{
+	n := &Spec{
 		Inputs:  nil,
 		Outputs: nil,
 		Info: Info{
@@ -67,13 +67,14 @@ func New(id, name, nodeName string, meta *Metadata, settings map[string]interfac
 		Metadata: meta,
 		Settings: settings,
 	}
+	return n
 }
 
 type Spec struct {
 	Inputs        []*Input               `json:"inputs,omitempty"`
 	Outputs       []*Output              `json:"outputs,omitempty"`
 	Info          Info                   `json:"info"`
-	Settings      map[string]interface{} `json:"settings,omitempty"`
+	Settings      map[string]interface{} `json:"settings"`
 	AllowSettings bool                   `json:"allowSettings"`
 	Metadata      *Metadata              `json:"metadata,omitempty"`
 	Parameters    *Parameters            `json:"parameters,omitempty"`

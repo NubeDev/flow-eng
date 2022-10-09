@@ -9,7 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type AI struct {
+type BI struct {
 	*node.Spec
 	objectID    points.ObjectID
 	objectType  points.ObjectType
@@ -19,15 +19,15 @@ type AI struct {
 	mqttClient  *mqttclient.Client
 }
 
-func NewAI(body *node.Spec, opts *Bacnet) (node.Node, error) {
+func NewBI(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	opts = bacnetOpts(opts)
 	var err error
-	body, err = nodeDefault(body, bacnetAI, category, opts.Application)
+	body, err = nodeDefault(body, bacnetBI, category, opts.Application)
 	body.SetSchema(buildSchemaUI())
-	return &AI{
+	return &BI{
 		body,
 		0,
-		points.AnalogInput,
+		points.BinaryInput,
 		"",
 		opts.Store,
 		opts.Application,
@@ -35,7 +35,7 @@ func NewAI(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	}, err
 }
 
-func (inst *AI) setName() {
+func (inst *BI) setName() {
 	name, null := inst.ReadPinAsString(node.Name)
 	if null {
 		name = fmt.Sprintf("%s_%d", inst.objectType, inst.objectID)
@@ -49,29 +49,26 @@ func (inst *AI) setName() {
 	}
 }
 
-func (inst *AI) setObjectId() {
+func (inst *BI) setObjectId() {
 	id, _ := inst.ReadPinAsInt(node.ObjectId)
 	inst.objectID = points.ObjectID(id)
 }
 
-func (inst *AI) Process() {
+func (inst *BI) Process() {
 	_, firstLoop := inst.Loop()
 
 	if firstLoop {
 		inst.setObjectId()
 		inst.setName()
-		ioType, err := getSettings(inst.GetSettings())
-		if ioType == "" {
-			ioType = string(points.IoTypeVolts)
-		}
+		ioType := points.IoTypeDigital
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
-		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true)
+		point := addPoint(ioType, objectType, inst.objectID, isWriteable, isIO, true)
 		point, err = inst.store.AddPoint(point, true)
 		if err != nil {
 			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
 		}
 	}
-	toFlow(inst, points.AnalogInput, inst.objectID, inst.store)
+	toFlow(inst, points.BinaryInput, inst.objectID, inst.store)
 }
 
-func (inst *AI) Cleanup() {}
+func (inst *BI) Cleanup() {}

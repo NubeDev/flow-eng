@@ -102,7 +102,7 @@ func nodeDefault(body *node.Spec, nodeName, category string, application names.A
 		},
 	}
 	body.Parameters = node.BuildParameters(parameters)
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return body, err
 }
 

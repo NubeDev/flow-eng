@@ -62,7 +62,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	max, _ := statistics.NewMax(nil)
 
 	// streams
-	flatline, _ := streams.NewFlatline(nil)
+	flatLine, _ := streams.NewFlatline(nil)
 
 	flowNetwork, _ := flow.NewNetwork(nil, nil)
 	flowDevice, _ := flow.NewDevice(nil, nil)
@@ -127,6 +127,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	bacPointAV, _ := bacnet.NewAV(nil, nil)
 	bacPointBV, _ := bacnet.NewBV(nil, nil)
 	bacPointBO, _ := bacnet.NewBO(nil, nil)
+	bacPointBI, _ := bacnet.NewBI(nil, nil)
 
 	// pointbus
 	mqttSub, _ := broker.NewMqttSub(nil)
@@ -198,7 +199,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(randomFloat),
 		node.ConvertToSpec(inject),
 
-		node.ConvertToSpec(flatline),
+		node.ConvertToSpec(flatLine),
 
 		node.ConvertToSpec(countNode),
 		node.ConvertToSpec(rampNode),
@@ -219,6 +220,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(bacPointAI),
 		node.ConvertToSpec(bacPointAO),
 		node.ConvertToSpec(bacPointAV),
+		node.ConvertToSpec(bacPointBI),
 		node.ConvertToSpec(bacPointBV),
 		node.ConvertToSpec(bacPointBO),
 
@@ -585,6 +587,8 @@ func builderProtocols(body *node.Spec, opts []interface{}) (node.Node, error) {
 		return bacnet.NewBV(body, bacOpts)
 	case bacnetBO:
 		return bacnet.NewBO(body, bacOpts)
+	case bacnetBI:
+		return bacnet.NewBI(body, bacOpts)
 
 	}
 	return nil, nil

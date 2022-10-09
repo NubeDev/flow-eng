@@ -23,6 +23,8 @@ func NewAO(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	opts = bacnetOpts(opts)
 	var err error
 	body, err = nodeDefault(body, bacnetAO, category, opts.Application)
+	body.SetSchema(buildSchemaUO())
+	body.SetSchema(buildSchemaUO())
 	return &AO{
 		body,
 		0,
@@ -58,8 +60,11 @@ func (inst *AO) Process() {
 		inst.setObjectId()
 		go inst.setName()
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
-		ioType := points.IoTypeDigital // TODO make a setting
-		point := addPoint(ioType, objectType, inst.objectID, isWriteable, isIO, true)
+		ioType, err := getSettings(inst.GetSettings())
+		if ioType == "" {
+			ioType = string(points.IoTypeVolts)
+		}
+		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true)
 		point, err = inst.store.AddPoint(point, true)
 		if err != nil {
 			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
