@@ -8,7 +8,7 @@ import (
 )
 
 type nodeSchema struct {
-	Sch schemas.EnumString `json:"io-type"`
+	Sch schemas.EnumString `json:"ioType"`
 }
 
 func buildSchemaUI() *schemas.Schema {
@@ -46,7 +46,7 @@ func buildSchemaUO() *schemas.Schema {
 }
 
 type nodeSettings struct {
-	IoType string `json:"io-type"`
+	IoType string `json:"ioType"`
 }
 
 func getSettings(body map[string]interface{}) (string, error) {

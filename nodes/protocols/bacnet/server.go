@@ -50,10 +50,9 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	ip := "0.0.0.0"
 	body = node.Defaults(body, serverNode, category)
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs))
-	outputBroker := node.BuildOutput(node.Msg, node.TypeString, nil, body.Outputs)
 	outputApplication := node.BuildOutput(node.Msg, node.TypeString, nil, body.Outputs)
 	outputErr := node.BuildOutput(node.ErrMsg, node.TypeString, nil, body.Outputs)
-	outputs := node.BuildOutputs(outputBroker, outputApplication, outputErr)
+	outputs := node.BuildOutputs(outputApplication, outputErr)
 	parameters := &node.Parameters{
 		Application: &node.Application{
 			Application: names.BACnet,
@@ -62,10 +61,8 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 		MaxNodeCount: 1,
 	}
 	body.Parameters = node.BuildParameters(parameters) // if node is already added then show the user
-	//body = buildSubNodes(body, childNodes)
 	body.IsParent = true
 	body = node.BuildNode(body, inputs, outputs, nil)
-
 	clients := &clients{}
 	server := &Server{body, clients, false, false, false, false, opts.Store, application}
 	server.clients.mqttClient = opts.MqttClient

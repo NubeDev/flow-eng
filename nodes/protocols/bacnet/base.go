@@ -92,9 +92,7 @@ func nodeDefault(body *node.Spec, nodeName, category string, application names.A
 		overrideInput := node.BuildInput(node.OverrideInput, node.TypeFloat, nil, body.Inputs)
 		inputs = node.BuildInputs(pointName, objectIDInput, overrideInput)
 	}
-
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
-
 	parameters := &node.Parameters{
 		Application: &node.Application{
 			Application: names.BACnet,
