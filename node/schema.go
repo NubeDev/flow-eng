@@ -10,16 +10,12 @@ type Schema struct {
 }
 
 type SchemaInputs struct {
-	Value interface{} `json:"value,omitempty"`
-	Links []struct {
-		NodeId string `json:"nodeId"`
-		Socket string `json:"socket"`
-	} `json:"links,omitempty"`
+	Value interface{}   `json:"value,omitempty"`
+	Links []SchemaLinks `json:"links"`
 }
 
 // SchemaLinks node links
 type SchemaLinks struct {
-	NodeId string      `json:"nodeId,omitempty"` // from node uuid
-	Socket OutputName  `json:"socket,omitempty"` // this is the port/pin name
-	Value  interface{} `json:"value"`
+	NodeId string `json:"nodeId,omitempty"` // from node uuid
+	Socket string `json:"socket,omitempty"` // this is the port/pin name
 }
