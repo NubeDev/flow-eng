@@ -39,24 +39,25 @@ func Encode(graph *flowctrl.Flow) (*NodesList, error) {
 				if destOutputName != "" {
 					link.Socket = string(input.Connection.NodePort)
 					link.NodeId = input.Connection.NodeID
-					//sourceNode := graph.GetNode(destNodeId)
-					//for _, output := range sourceNode.GetOutputs() {
-					inputsLinks.Links = append(inputsLinks.Links, link)
+					if len(inputsLinks.Links) > 0 {
+						for _, schemaLinks := range inputsLinks.Links {
+							if schemaLinks.Socket != link.Socket {
+								inputsLinks.Links = append(inputsLinks.Links, link)
+							}
+						}
+					} else {
+						inputsLinks.Links = append(inputsLinks.Links, link)
+					}
 					links[string(input.Name)] = inputsLinks
 					nodeSchema.Inputs = links
-
-					//}
 				} else {
 					if input.Connection.OverrideValue != nil {
-						//str := fmt.Sprintf("%v", input.Connection.OverrideValue)
-						//linkValue = map[string]map[string]string{string(inputName): {"value": str}}
-						//links[string(input.Name)] = node.SchemaLinks{
-						//	//Value: str,
-						//}
+						inputsLinks.Value = input.Connection.OverrideValue
+						links[string(input.Name)] = inputsLinks
+						nodeSchema.Inputs = links
 					}
 				}
 			}
-			//nodeSchema.Inputs = node.SchemaInputs{Links: links} // when a link is made
 			listSchema = append(listSchema, nodeSchema)
 		} else { // if a node has no input then add it here
 			listSchema = append(listSchema, nodeSchema)
