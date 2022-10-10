@@ -80,5 +80,3 @@ func (inst *MinOnOff) Process() {
 	}
 
 }
-
-func (inst *MinOnOff) Cleanup() {}

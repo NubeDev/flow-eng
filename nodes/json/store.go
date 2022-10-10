@@ -48,5 +48,3 @@ func (inst *Store) Process() {
 	value := gjson.ParseBytes(out)
 	inst.WritePin(node.Out, value.String())
 }
-
-func (inst *Store) Cleanup() {}

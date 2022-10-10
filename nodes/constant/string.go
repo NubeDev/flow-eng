@@ -20,5 +20,3 @@ func (inst *ConstString) Process() {
 	in1 := inst.ReadPin(node.In)
 	inst.WritePin(node.Out, in1)
 }
-
-func (inst *ConstString) Cleanup() {}

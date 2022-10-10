@@ -69,5 +69,3 @@ func (inst *AV) Process() {
 	toFlow(inst, points.AnalogVariable, inst.objectID, inst.store)
 	fromFlow(inst, inst.objectID, inst.store)
 }
-
-func (inst *AV) Cleanup() {}

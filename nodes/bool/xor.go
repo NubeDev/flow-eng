@@ -29,5 +29,3 @@ func (inst *Xor) Process() {
 		inst.WritePin(node.Out, false)
 	}
 }
-
-func (inst *Xor) Cleanup() {}

@@ -20,5 +20,3 @@ func NewSub(body *node.Spec) (node.Node, error) {
 func (inst *Sub) Process() {
 	process(inst)
 }
-
-func (inst *Sub) Cleanup() {}

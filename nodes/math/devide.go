@@ -20,5 +20,3 @@ func NewDivide(body *node.Spec) (node.Node, error) {
 func (inst *Divide) Process() {
 	process(inst)
 }
-
-func (inst *Divide) Cleanup() {}

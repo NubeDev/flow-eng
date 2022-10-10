@@ -33,4 +33,3 @@ func (inst *Count) Process() {
 	inst.WritePin(node.CountOut, inst.count)
 
 }
-func (inst *Count) Cleanup() {}

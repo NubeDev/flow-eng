@@ -81,5 +81,3 @@ let pri = {
 // need to stringify otherwise the node would output a map
 return JSON.stringify(pri)
 */
-
-func (inst *Func) Cleanup() {}

@@ -45,5 +45,3 @@ func (inst *Point) Process() {
 
 	}
 }
-
-func (inst *Point) Cleanup() {}

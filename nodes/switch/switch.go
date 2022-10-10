@@ -33,5 +33,3 @@ func (inst *Switch) Process() {
 		inst.WritePin(node.Out, inFalse)
 	}
 }
-
-func (inst *Switch) Cleanup() {}

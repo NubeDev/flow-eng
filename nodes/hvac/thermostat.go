@@ -54,5 +54,3 @@ func (inst *Thermostat) Process() {
 	}
 
 }
-
-func (inst *Thermostat) Cleanup() {}

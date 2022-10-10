@@ -43,4 +43,3 @@ func (inst *Device) Process() {
 		inst.setConnection()
 	}
 }
-func (inst *Device) Cleanup() {}

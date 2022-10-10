@@ -31,5 +31,3 @@ func NewMin(body *node.Spec) (node.Node, error) {
 func (inst *Min) Process() {
 	Process(inst)
 }
-
-func (inst *Min) Cleanup() {}

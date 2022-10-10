@@ -25,5 +25,3 @@ func (inst *Boolean) Process() {
 	}
 
 }
-
-func (inst *Boolean) Cleanup() {}

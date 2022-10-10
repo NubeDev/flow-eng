@@ -20,5 +20,3 @@ func NewMultiply(body *node.Spec) (node.Node, error) {
 func (inst *Multiply) Process() {
 	process(inst)
 }
-
-func (inst *Multiply) Cleanup() {}

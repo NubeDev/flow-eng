@@ -33,5 +33,3 @@ func (inst *StringLatch) Process() {
 
 	inst.WritePin(node.Out, inst.currentVal)
 }
-
-func (inst *StringLatch) Cleanup() {}

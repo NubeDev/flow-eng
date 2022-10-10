@@ -38,5 +38,3 @@ func (inst *Between) Process() {
 	inst.WritePin(node.Above, above)
 	inst.WritePin(node.Below, below)
 }
-
-func (inst *Between) Cleanup() {}

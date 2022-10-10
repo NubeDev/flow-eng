@@ -82,5 +82,3 @@ func (inst *Ping) Process() {
 	}
 
 }
-
-func (inst *Ping) Cleanup() {}

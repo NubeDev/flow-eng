@@ -82,5 +82,3 @@ func (inst *MqttPub) Process() {
 	}
 	inst.WritePin(node.Out1, val)
 }
-
-func (inst *MqttPub) Cleanup() {}

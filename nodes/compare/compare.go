@@ -41,5 +41,3 @@ func (inst *Compare) Process() {
 		inst.WritePinFalse(node.Equal)
 	}
 }
-
-func (inst *Compare) Cleanup() {}

@@ -77,5 +77,3 @@ func (inst *HttpWrite) Process() {
 	}
 
 }
-
-func (inst *HttpWrite) Cleanup() {}

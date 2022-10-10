@@ -27,4 +27,3 @@ func (inst *Boolean) Process() {
 		inst.WritePin(node.Out, in2)
 	}
 }
-func (inst *Boolean) Cleanup() {}

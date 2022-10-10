@@ -30,5 +30,3 @@ func (inst *Scale) Process() {
 	maxOut, _ := inst.ReadPinAsFloat(node.OutMax)
 	inst.WritePin(node.Out, float.Scale(in, minIn, maxIn, minOut, maxOut))
 }
-
-func (inst *Scale) Cleanup() {}

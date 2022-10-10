@@ -20,5 +20,3 @@ func NewOr(body *node.Spec) (node.Node, error) {
 func (inst *Or) Process() {
 	Process(inst)
 }
-
-func (inst *Or) Cleanup() {}

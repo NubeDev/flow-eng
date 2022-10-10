@@ -91,5 +91,3 @@ func (inst *Network) Process() {
 	inst.runner()
 
 }
-
-func (inst *Network) Cleanup() {}

@@ -86,6 +86,8 @@ type Spec struct {
 	db        db.DB
 }
 
+func (n *Spec) Cleanup() {}
+
 func (n *Spec) AddDB(d db.DB) {
 	n.db = d
 }

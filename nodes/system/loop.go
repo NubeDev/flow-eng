@@ -34,5 +34,3 @@ func (inst *Loop) Process() {
 		inst.WritePinFalse(node.Toggle)
 	}
 }
-
-func (inst *Loop) Cleanup() {}

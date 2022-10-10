@@ -31,4 +31,3 @@ func (inst *Number) Process() {
 	}
 	inst.WritePinNull(node.Out)
 }
-func (inst *Number) Cleanup() {}

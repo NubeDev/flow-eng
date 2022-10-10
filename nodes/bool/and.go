@@ -20,5 +20,3 @@ func NewAnd(body *node.Spec) (node.Node, error) {
 func (inst *And) Process() {
 	Process(inst)
 }
-
-func (inst *And) Cleanup() {}

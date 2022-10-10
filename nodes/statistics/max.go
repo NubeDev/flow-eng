@@ -31,5 +31,3 @@ func NewMax(body *node.Spec) (node.Node, error) {
 func (inst *Max) Process() {
 	Process(inst)
 }
-
-func (inst *Max) Cleanup() {}

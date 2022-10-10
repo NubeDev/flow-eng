@@ -27,5 +27,3 @@ func (inst *Output) Process() {
 	v, _ := getStore().Get(topic)
 	inst.WritePin(node.Out, v)
 }
-
-func (inst *Output) Cleanup() {}

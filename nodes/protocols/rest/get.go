@@ -60,5 +60,3 @@ func (inst *Get) Process() {
 	}
 
 }
-
-func (inst *Get) Cleanup() {}

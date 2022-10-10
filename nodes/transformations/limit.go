@@ -26,5 +26,3 @@ func (inst *Limit) Process() {
 	max, _ := inst.ReadPinAsFloat(node.Max)
 	inst.WritePin(node.Out, float.LimitToRange(in, min, max))
 }
-
-func (inst *Limit) Cleanup() {}

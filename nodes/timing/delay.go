@@ -32,5 +32,3 @@ func (inst *Delay) Process() {
 	}
 
 }
-
-func (inst *Delay) Cleanup() {}

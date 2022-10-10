@@ -101,5 +101,3 @@ func (inst *Server) Process() {
 		inst.runnersLock = true
 	}
 }
-
-func (inst *Server) Cleanup() {}

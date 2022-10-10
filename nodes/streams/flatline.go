@@ -57,5 +57,3 @@ func (inst *Flatline) Process() {
 	}
 	inst.WritePin(node.FlatLine, inst.alertStatus)
 }
-
-func (inst *Flatline) Cleanup() {}

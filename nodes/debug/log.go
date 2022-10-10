@@ -45,5 +45,3 @@ func (inst *Log) Process() {
 		log.Infof("log: comment: %s bool: %t", comment, inBool)
 	}
 }
-
-func (inst *Log) Cleanup() {}

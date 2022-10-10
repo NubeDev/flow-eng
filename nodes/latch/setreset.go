@@ -35,5 +35,3 @@ func (inst *SetResetLatch) Process() {
 
 	inst.WritePin(node.Out, inst.currentVal)
 }
-
-func (inst *SetResetLatch) Cleanup() {}

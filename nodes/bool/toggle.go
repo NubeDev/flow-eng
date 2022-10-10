@@ -34,5 +34,3 @@ func (inst *Toggle) Process() {
 		inst.WritePin(node.Out, false)
 	}
 }
-
-func (inst *Toggle) Cleanup() {}

@@ -71,7 +71,4 @@ func (inst *BV) Process() {
 		}
 	}
 	toFlow(inst, points.BinaryVariable, inst.objectID, inst.store)
-
 }
-
-func (inst *BV) Cleanup() {}

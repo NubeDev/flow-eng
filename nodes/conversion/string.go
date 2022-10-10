@@ -38,5 +38,3 @@ func (inst *String) Process() {
 	}
 
 }
-
-func (inst *String) Cleanup() {}

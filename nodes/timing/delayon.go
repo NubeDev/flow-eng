@@ -65,5 +65,3 @@ func (inst *DelayOn) Process() {
 	}
 
 }
-
-func (inst *DelayOn) Cleanup() {}

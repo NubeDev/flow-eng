@@ -17,7 +17,7 @@ if fail we keep trying but if a new value arrives to the store we will take the 
 and disregard the existing
 */
 
-//toFlow write the value to the flow, as in a AI write the temp value
+//toFlow write the value to the flow, as in an AI write the temp value
 func toFlow(body node.Node, objType points.ObjectType, id points.ObjectID, store *points.Store) {
 	_, v, found := store.GetPresentValueByObject(objType, id) // get the latest value from the point
 	if !found {

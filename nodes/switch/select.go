@@ -21,5 +21,3 @@ func (inst *SelectNum) Process() {
 	process(inst)
 	//go getPoints()
 }
-
-func (inst *SelectNum) Cleanup() {}

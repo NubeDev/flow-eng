@@ -25,5 +25,3 @@ func (inst *Number) Process() {
 	}
 
 }
-
-func (inst *Number) Cleanup() {}

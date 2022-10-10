@@ -25,4 +25,3 @@ func (inst *Random) Process() {
 	inst.WritePin(node.Out, float.RandFloat(min, max))
 
 }
-func (inst *Random) Cleanup() {}

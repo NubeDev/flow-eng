@@ -53,4 +53,3 @@ func (inst *Ramp) Process() {
 	}
 
 }
-func (inst *Ramp) Cleanup() {}

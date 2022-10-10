@@ -100,5 +100,3 @@ func (inst *Gmail) Process() {
 	}
 
 }
-
-func (inst *Gmail) Cleanup() {}

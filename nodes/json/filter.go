@@ -25,5 +25,3 @@ func (inst *Filter) Process() {
 	value := gjson.Get(in1, equation)
 	inst.WritePin(node.Out, value.Value())
 }
-
-func (inst *Filter) Cleanup() {}

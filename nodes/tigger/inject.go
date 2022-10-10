@@ -52,5 +52,3 @@ func (inst *Inject) Process() {
 	}
 
 }
-
-func (inst *Inject) Cleanup() {}

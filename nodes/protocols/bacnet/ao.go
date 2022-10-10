@@ -73,5 +73,3 @@ func (inst *AO) Process() {
 	toFlow(inst, points.AnalogOutput, inst.objectID, inst.store)
 	fromFlow(inst, inst.objectID, inst.store)
 }
-
-func (inst *AO) Cleanup() {}

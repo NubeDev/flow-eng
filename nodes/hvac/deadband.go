@@ -50,5 +50,3 @@ func (inst *DeadBand) Process() {
 	}
 
 }
-
-func (inst *DeadBand) Cleanup() {}

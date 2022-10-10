@@ -100,5 +100,3 @@ func (inst *MqttSub) Process() {
 		inst.WritePin(node.Out, nil)
 	}
 }
-
-func (inst *MqttSub) Cleanup() {}

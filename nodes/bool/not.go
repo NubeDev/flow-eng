@@ -30,5 +30,3 @@ func (inst *Not) Process() {
 		inst.WritePinTrue(node.Out)
 	}
 }
-
-func (inst *Not) Cleanup() {}

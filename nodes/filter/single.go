@@ -21,5 +21,3 @@ func (inst *Add) Process() {
 	process(inst)
 	//go getPoints()
 }
-
-func (inst *Add) Cleanup() {}

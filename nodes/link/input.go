@@ -29,5 +29,3 @@ func (inst *Input) Process() {
 	inst.WritePin(node.Out, in1)
 	getStore().Add(topic, in1)
 }
-
-func (inst *Input) Cleanup() {}

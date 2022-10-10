@@ -48,5 +48,3 @@ func (inst *Hysteresis) Process() {
 	}
 
 }
-
-func (inst *Hysteresis) Cleanup() {}

@@ -20,5 +20,3 @@ func NewAdvanced(body *node.Spec) (node.Node, error) {
 func (inst *Advanced) Process() {
 	process(inst)
 }
-
-func (inst *Advanced) Cleanup() {}

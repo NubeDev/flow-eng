@@ -33,5 +33,3 @@ func (inst *NumLatch) Process() {
 
 	inst.WritePin(node.Out, inst.currentVal)
 }
-
-func (inst *NumLatch) Cleanup() {}
