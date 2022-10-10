@@ -23,48 +23,43 @@ func Encode(graph *flowctrl.Flow) (*NodesList, error) {
 			return nil, err
 		}
 		nodeSchema = &node.Schema{
-			Id:   _node.GetID(),
-			Type: nodeType,
+			Id:       _node.GetID(),
+			Type:     nodeType,
+			Metadata: _node.GetMetadata(),
+			Settings: _node.GetSettings(),
 		}
 		if len(_node.GetInputs()) > 0 {
-			links := map[string]node.SchemaLinks{}
+			links := map[string]node.SchemaInputs{}
+			link := node.SchemaLinks{}
+			inputsLinks := node.SchemaInputs{}
 			// for a node we need its input and see if it has a link, if so we need the uuid of the node its link to
 			for _, input := range _node.GetInputs() {
 				// check the input has link
 				destOutputName := input.Connection.NodePort
 				if destOutputName != "" {
-					inputName := input.Name
-					destNodeId := input.Connection.NodeID
-					sourceNode := graph.GetNode(destNodeId)
-					for _, output := range sourceNode.GetOutputs() {
-						if output.Name == destOutputName {
-							links[string(inputName)] = node.SchemaLinks{
-								NodeId: destNodeId,
-								Socket: destOutputName,
+					link.Socket = string(input.Connection.NodePort)
+					link.NodeId = input.Connection.NodeID
+					if len(inputsLinks.Links) > 0 {
+						for _, schemaLinks := range inputsLinks.Links {
+							if schemaLinks.Socket != link.Socket {
+								inputsLinks.Links = append(inputsLinks.Links, link)
 							}
 						}
+					} else {
+						inputsLinks.Links = append(inputsLinks.Links, link)
 					}
+					links[string(input.Name)] = inputsLinks
+					nodeSchema.Inputs = links
 				} else {
 					if input.Connection.OverrideValue != nil {
-						str := fmt.Sprintf("%v", input.Connection.OverrideValue)
-						//linkValue = map[string]map[string]string{string(inputName): {"value": str}}
-						links[string(input.Name)] = node.SchemaLinks{
-							Value: str,
-						}
+						inputsLinks.Value = input.Connection.OverrideValue
+						links[string(input.Name)] = inputsLinks
+						nodeSchema.Inputs = links
 					}
 				}
 			}
-			nodeSchema.Metadata = &node.Metadata{
-				PositionX: "271.5",
-				PositionY: "-69",
-			}
-			//nodeSchema.Inputs = node.SchemaInputs{Links: links} // when a link is made
 			listSchema = append(listSchema, nodeSchema)
 		} else { // if a node has no input then add it here
-			nodeSchema.Metadata = &node.Metadata{
-				PositionX: "271.5",
-				PositionY: "-69",
-			}
 			listSchema = append(listSchema, nodeSchema)
 		}
 	}
