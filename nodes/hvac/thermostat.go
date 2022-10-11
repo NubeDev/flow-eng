@@ -25,7 +25,11 @@ func NewThermostat(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Thermostat) Process() {
-	input, _ := inst.ReadPinAsFloat(node.In)
+	input, null := inst.ReadPinAsFloat(node.In)
+	if null {
+		inst.WritePinNull(node.Out)
+		return
+	}
 	var out bool
 	setPoint, _ := inst.ReadPinAsFloat(node.SetPoint)
 	deadBand, _ := inst.ReadPinAsFloat(node.DeadBand)

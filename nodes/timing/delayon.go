@@ -15,10 +15,10 @@ type DelayOn struct {
 
 func NewDelayOn(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
 	body = node.Defaults(body, delayOn, category)
-	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs)
+	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs)
 	delayTime := node.BuildInput(node.DelaySeconds, node.TypeFloat, nil, body.Inputs)
 	body.Inputs = node.BuildInputs(delayTime, in)
-	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
+	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs))
 	return &DelayOn{body, timer, false, false}, nil
 }
 
@@ -27,41 +27,42 @@ if node input is true
 start delay, after the delay set the triggered to true
 */
 
-func duration(f int) time.Duration {
-	return time.Duration(f) * time.Second
+func duration(f time.Duration) time.Duration {
+	return f * time.Second
 }
 
 func (inst *DelayOn) Process() {
-	timeDelay, _ := inst.ReadPinAsInt(node.DelaySeconds)
+	timeDelay, _ := inst.ReadPinAsDuration(node.DelaySeconds)
 
-	in1, _ := inst.ReadPinAsFloat(node.In)
+	in1, null := inst.ReadPinAsBool(node.In)
+	if null {
+		inst.WritePinNull(node.Out)
+	}
 
-	if in1 >= 1 && inst.active { // timer has gone to true and input is still true
-		inst.WritePin(node.Out, 1)
+	if in1 && inst.active { // timer has gone to true and input is still true
+		inst.WritePinTrue(node.Out)
 		return
 	} else {
 		inst.active = false // timer is true and input went back to 0
 	}
 
-	if in1 < 1 && inst.triggered { // went true but not for long enough to finish the timeOn delay, so reset the timer
+	if !in1 && inst.triggered { // went true but not for long enough to finish the timeOn delay, so reset the timer
 		inst.timer.Stop()
 		inst.timer = timer.NewTimer()
 		inst.triggered = false
 	}
-	// fmt.Println(timeDelay, time.Duration(timeDelay)*time.Second, 99999, time.Duration(timeDelay).Seconds())
-
-	if in1 >= 1 {
+	if in1 {
 		if !inst.timer.WaitFor(duration(timeDelay)) {
-			inst.WritePin(node.Out, 0)
+			inst.WritePinFalse(node.Out)
 			inst.triggered = true
 			return
 		} else {
 			inst.active = true
-			inst.WritePin(node.Out, 1)
+			inst.WritePinTrue(node.Out)
 		}
 
 	} else {
-		inst.WritePin(node.Out, 0)
+		inst.WritePinFalse(node.Out)
 	}
 
 }

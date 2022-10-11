@@ -6,7 +6,7 @@ import (
 
 type SetResetLatch struct {
 	*node.Spec
-	currentVal float64
+	currentVal bool
 }
 
 func NewSetResetLatch(body *node.Spec) (node.Node, error) {
@@ -17,20 +17,24 @@ func NewSetResetLatch(body *node.Spec) (node.Node, error) {
 	inputs := node.BuildInputs(set, reset)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
-	return &SetResetLatch{body, 0}, nil
+	return &SetResetLatch{body, false}, nil
 }
 
 func (inst *SetResetLatch) Process() {
-	set, _ := inst.ReadPinAsFloat(node.Set)
-	reset, _ := inst.ReadPinAsFloat(node.Reset)
+	set, null := inst.ReadPinAsBool(node.Set)
+	if null {
+		inst.WritePinNull(node.Out)
+		return
+	}
+	reset, _ := inst.ReadPinAsBool(node.Reset)
 	allowResetOnSetTrue := false
 
-	if set == 1 && reset != 1 {
-		inst.currentVal = 1
-	} else if allowResetOnSetTrue && reset == 1 && inst.currentVal == 1 {
-		inst.currentVal = 0
-	} else if set != 1 && inst.currentVal == 1 && reset == 1 {
-		inst.currentVal = 0
+	if set && !reset {
+		inst.currentVal = true
+	} else if allowResetOnSetTrue && reset && inst.currentVal {
+		inst.currentVal = false
+	} else if !set && inst.currentVal && reset {
+		inst.currentVal = false
 	}
 
 	inst.WritePin(node.Out, inst.currentVal)
