@@ -3,18 +3,19 @@ package timing
 import (
 	"github.com/NubeDev/flow-eng/helpers/timer"
 	"github.com/NubeDev/flow-eng/node"
-	"time"
 )
 
-type DelayOn struct {
+type DelayOff struct {
 	*node.Spec
 	timer     timer.TimedDelay
 	triggered bool
 	active    bool
 }
 
-func NewDelayOn(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
-	body = node.Defaults(body, delayOn, category)
+// TODO code is copied from delayOn, so needs to be finished
+
+func NewDelayOff(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
+	body = node.Defaults(body, delayOff, category)
 	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs)
 	delayTime := node.BuildInput(node.DelaySeconds, node.TypeFloat, nil, body.Inputs)
 	body.Inputs = node.BuildInputs(delayTime, in)
@@ -22,18 +23,8 @@ func NewDelayOn(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
 	return &DelayOn{body, timer, false, false}, nil
 }
 
-/*
-if node input is true
-start delay, after the delay set the triggered to true
-*/
-
-func duration(f time.Duration) time.Duration {
-	return f * time.Second
-}
-
-func (inst *DelayOn) Process() {
+func (inst *DelayOff) Process() {
 	timeDelay, _ := inst.ReadPinAsDuration(node.DelaySeconds)
-
 	in1, null := inst.ReadPinAsBool(node.In)
 	if null {
 		inst.WritePinNull(node.Out)

@@ -71,6 +71,7 @@ const (
 
 	delay         = "delay"
 	delayOn       = "delayOn"
+	delayOff      = "delayOff"
 	delayMinOnOff = "min on off"
 
 	// switch
