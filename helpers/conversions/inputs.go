@@ -56,6 +56,8 @@ func GetFloatPointer(in interface{}) (val *float64) {
 		val = float.New(float64(i))
 	case int64:
 		val = float.New(float64(i))
+	case uint64:
+		val = float.New(float64(i))
 	default:
 		return nil
 	}
@@ -71,6 +73,8 @@ func GetFloatPointerOk(in interface{}) (val *float64, ok bool) {
 	case float32:
 		val = float.New(float64(i))
 	case int64:
+		val = float.New(float64(i))
+	case uint64:
 		val = float.New(float64(i))
 	default:
 		return nil, false
@@ -94,6 +98,8 @@ func GetFloat(in interface{}) (val float64) {
 		val = float64(i)
 	case int64:
 		val = float64(i)
+	case uint64:
+		val = float64(i)
 	case string:
 		if s, err := strconv.ParseFloat(fmt.Sprintf("%v", in), 64); err == nil {
 			val = s
@@ -115,6 +121,8 @@ func GetFloatOk(in interface{}) (val float64, ok bool) {
 	case float32:
 		val = float64(i)
 	case int64:
+		val = float64(i)
+	case uint64:
 		val = float64(i)
 	case string:
 		if s, err := strconv.ParseFloat(fmt.Sprintf("%v", in), 64); err == nil {
@@ -145,6 +153,8 @@ func GetInt(in interface{}) (val int) {
 		val = int(i)
 	case int64:
 		val = int(i)
+	case uint64:
+		val = int(i)
 	default:
 		return 0
 	}
@@ -160,6 +170,8 @@ func GetIntOk(in interface{}) (val int, ok bool) {
 	case float32:
 		val = int(i)
 	case int64:
+		val = int(i)
+	case uint64:
 		val = int(i)
 	default:
 		return 0, false

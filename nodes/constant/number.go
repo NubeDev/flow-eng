@@ -23,5 +23,4 @@ func (inst *Number) Process() {
 	} else {
 		inst.WritePinFloat(node.Out, in1)
 	}
-
 }
