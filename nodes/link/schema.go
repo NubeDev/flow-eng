@@ -38,7 +38,7 @@ func buildSchema() *schemas.Schema {
 }
 
 type nodeSettings struct {
-	Function string `json:"topic"`
+	Topic string `json:"topic"`
 }
 
 func getSettings(body map[string]interface{}) (string, error) {
@@ -48,7 +48,7 @@ func getSettings(body map[string]interface{}) (string, error) {
 		return "", err
 	}
 	if settings != nil {
-		return settings.Function, nil
+		return settings.Topic, nil
 	}
 	return "", nil
 }

@@ -13,7 +13,9 @@ func NewOutput(body *node.Spec, store *Store) (node.Node, error) {
 		store = getStore()
 	}
 	body = node.Defaults(body, linkOutput, category)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
+	out := node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs)
+	topic := node.BuildOutput(node.OutTopic, node.TypeString, nil, body.Outputs)
+	outputs := node.BuildOutputs(out, topic)
 	body = node.BuildNode(body, nil, outputs, body.Settings)
 	body.SetSchema(buildSchema())
 	return &Output{body}, nil
@@ -24,6 +26,7 @@ func (inst *Output) Process() {
 	v, found := getStore().Get(topic)
 	if found {
 		inst.WritePin(node.Out, v)
+		inst.WritePin(node.OutTopic, topic)
 	} else {
 		inst.WritePinNull(node.Out)
 	}

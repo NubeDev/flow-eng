@@ -131,6 +131,7 @@ const (
 
 	OutNot OutputName = "out not"
 
+	OutTopic OutputName = "topic"
 	Out      OutputName = "out"
 	CountOut OutputName = "count"
 
