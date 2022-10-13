@@ -1,7 +1,6 @@
 package conversion
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/node"
 	"strconv"
@@ -22,17 +21,21 @@ func NewString(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *String) Process() {
-	in1, _ := inst.ReadPinAsString(node.In)
+	in1, null := inst.ReadPinAsString(node.In)
+	if null {
+		inst.WritePinNull(node.Float)
+		inst.WritePinNull(node.Boolean)
+		return
+	}
 	f, ok := conversions.GetFloatOk(in1)
 	if ok { // to float
-		inst.WritePin(node.Float, fmt.Sprintf("%f", f))
+		inst.WritePin(node.Float, conversions.FloatToString(f))
 	} else {
-		inst.WritePin(node.Float, nil)
+		inst.WritePinNull(node.Float)
 	}
-
 	result, err := strconv.ParseBool(in1) // to bool
 	if err != nil {
-		inst.WritePin(node.Boolean, nil)
+		inst.WritePinNull(node.Boolean)
 	} else {
 		inst.WritePin(node.Boolean, result)
 	}

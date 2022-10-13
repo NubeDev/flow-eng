@@ -1,5 +1,7 @@
 package node
 
+import "github.com/NubeDev/flow-eng/helpers/conversions"
+
 func (n *Spec) WritePin(name OutputName, value interface{}) {
 	out := n.GetOutput(name)
 	if out == nil {
@@ -27,7 +29,7 @@ func (n *Spec) WritePinFloat(name OutputName, value float64) {
 		return
 	}
 	if name == out.Name {
-		out.Write(value)
+		out.Write(conversions.FloatToFixed(value, 2))
 	}
 }
 

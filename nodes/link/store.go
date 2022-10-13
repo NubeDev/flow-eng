@@ -9,6 +9,10 @@ type Store struct {
 	s []*values
 }
 
+func (inst *Store) GetAll() []*values {
+	return inst.s
+}
+
 func (inst *Store) Get(topic string) (value interface{}, found bool) {
 	for _, v := range inst.s {
 		if v.topic == topic {

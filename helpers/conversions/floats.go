@@ -3,8 +3,18 @@ package conversions
 import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/float"
+	"math"
 	"strconv"
 )
+
+func round(num float64) int {
+	return int(num + math.Copysign(0.5, num))
+}
+
+func FloatToFixed(num float64, precision int) float64 {
+	output := math.Pow(10, float64(precision))
+	return float64(round(num*output)) / output
+}
 
 type number interface {
 	int | int8 | int16 | int32 | int64 | float32 | float64

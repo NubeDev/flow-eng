@@ -1,7 +1,7 @@
 package conversion
 
 import (
-	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/node"
 )
 
@@ -27,7 +27,7 @@ func (inst *Number) Process() {
 		} else {
 			inst.WritePinBool(node.Boolean, false)
 		}
-		inst.WritePin(node.String, fmt.Sprintf("%f", in1))
+		inst.WritePin(node.String, conversions.FloatToString(in1))
 	} else {
 		inst.WritePinNull(node.Boolean)
 		inst.WritePinNull(node.String)

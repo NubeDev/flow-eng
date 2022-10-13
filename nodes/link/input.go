@@ -13,7 +13,6 @@ func NewInput(body *node.Spec, store *Store) (node.Node, error) {
 	if store == nil {
 		store = getStore()
 	}
-
 	body = node.Defaults(body, linkInput, category)
 	topic := node.BuildInput(node.Topic, node.TypeString, nil, body.Inputs)
 	value := node.BuildInput(node.In, node.TypeString, nil, body.Inputs)
