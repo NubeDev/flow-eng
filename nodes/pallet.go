@@ -16,9 +16,10 @@ type PalletOutputs struct {
 }
 
 type PalletNode struct {
-	Type          string           `json:"type"`
-	Category      string           `json:"category"`
-	IsParent      bool             `json:"isParent"`
+	Type     string `json:"type"`
+	Category string `json:"category"`
+	//IsParent      bool             `json:"isParent"`
+	AllowSettings bool             `json:"allowSettings"`
 	PalletInputs  []*PalletInputs  `json:"inputs"`
 	PalletOutputs []*PalletOutputs `json:"outputs"`
 }
@@ -52,7 +53,9 @@ func EncodePallet() ([]*PalletNode, error) {
 		if err != nil {
 			return nil, err
 		}
-		one.IsParent = spec.IsParent
+		if spec.GetSchema() != nil {
+			one.AllowSettings = true
+		}
 		one.Type = nodeType
 		one.Category = spec.Info.Category
 		one.PalletInputs = convertInputs(spec)
