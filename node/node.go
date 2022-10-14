@@ -38,7 +38,7 @@ type Node interface {
 	ReadMultipleFloatPointer(count int) []*float64
 	ReadMultipleFloat(count int) []float64
 	WritePin(OutputName, interface{})
-	WritePinFloat(OutputName, float64)
+	WritePinFloat(name OutputName, value float64, precision ...int)
 	WritePinBool(OutputName, bool)
 	WritePinFalse(name OutputName)
 	WritePinTrue(name OutputName)

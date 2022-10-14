@@ -7,21 +7,25 @@ import (
 
 type Random struct {
 	*node.Spec
+	precision int
 }
 
 func NewRandom(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, randomFloat, category)
 	min := node.BuildInput(node.Min, node.TypeFloat, nil, body.Inputs)
 	max := node.BuildInput(node.Max, node.TypeFloat, nil, body.Inputs)
-	body.Inputs = node.BuildInputs(min, max)
+	inputs := node.BuildInputs(min, max)
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
-	body.Outputs = node.BuildOutputs(out)
-	return &Random{body}, nil
+	outputs := node.BuildOutputs(out)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
+	body.SetSchema(buildSchema())
+	precision, _ := getSettings(body.GetSettings())
+	return &Random{body, precision}, nil
 }
 
 func (inst *Random) Process() {
 	min, _ := inst.ReadPinAsFloat(node.Min)
 	max, _ := inst.ReadPinAsFloat(node.Max)
-	inst.WritePin(node.Out, float.RandFloat(min, max))
-
+	f := float.RandFloat(min, max)
+	inst.WritePinFloat(node.Out, f, inst.precision)
 }

@@ -29,6 +29,7 @@ inst.ReadPinBool(name InputName) (value bool, null bool) // same as above but va
 ### writing outputs
 
 ```go
+inst.WritePinFloat(node.Out, f, inst.precision) // you can add number of decimal places 
 inst.WritePinFloat(name OutputName, value float64)  // set output to number value (float64)
 inst.WritePinNull(node.Out) // set output to nil
 inst.WritePinTrue(node.Out) // set output to true

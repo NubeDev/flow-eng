@@ -23,13 +23,17 @@ func (n *Spec) WritePinNull(name OutputName) {
 }
 
 // WritePinFloat write a float64 pointer
-func (n *Spec) WritePinFloat(name OutputName, value float64) {
+func (n *Spec) WritePinFloat(name OutputName, value float64, precision ...int) {
 	out := n.GetOutput(name)
 	if out == nil {
 		return
 	}
 	if name == out.Name {
-		out.Write(conversions.FloatToFixed(value, 2))
+		var p = 2
+		if len(precision) > 0 {
+			p = precision[0]
+		}
+		out.Write(conversions.FloatToFixed(value, p))
 	}
 }
 

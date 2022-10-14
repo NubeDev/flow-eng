@@ -12,6 +12,9 @@ func round(num float64) int {
 }
 
 func FloatToFixed(num float64, precision int) float64 {
+	if precision < 0 {
+		precision = 0
+	}
 	output := math.Pow(10, float64(precision))
 	return float64(round(num*output)) / output
 }
