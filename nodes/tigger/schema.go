@@ -12,12 +12,12 @@ type nodeSchema struct {
 
 func buildSchema() *schemas.Schema {
 	props := &nodeSchema{}
-	props.Value.Title = "Set output decimal places"
+	props.Value.Title = "set value"
 	props.Value.Default = 2
 	schema.Set(props)
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{
-			Title:      "set",
+			Title:      "Set output decimal places",
 			Properties: props,
 		},
 		UiSchema: nil,
