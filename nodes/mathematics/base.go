@@ -2,29 +2,12 @@ package mathematics
 
 import (
 	"github.com/NubeDev/flow-eng/node"
-	"github.com/mitchellh/mapstructure"
 )
 
 const (
 	category     = "math"
 	mathAdvanced = "advanced"
 )
-
-type nodeSettings struct {
-	Function string `json:"function"`
-}
-
-func getSettings(body map[string]interface{}) (string, error) {
-	settings := &nodeSettings{}
-	err := mapstructure.Decode(body, settings)
-	if err != nil {
-		return "", err
-	}
-	if settings != nil {
-		return settings.Function, nil
-	}
-	return "", nil
-}
 
 func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error) {
 	body = node.Defaults(body, nodeName, category)

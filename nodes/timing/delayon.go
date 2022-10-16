@@ -16,9 +16,10 @@ type DelayOn struct {
 func NewDelayOn(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
 	body = node.Defaults(body, delayOn, category)
 	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs)
-	delayTime := node.BuildInput(node.DelaySeconds, node.TypeFloat, nil, body.Inputs)
-	body.Inputs = node.BuildInputs(delayTime, in)
-	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs))
+	inputs := node.BuildInputs(in)
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs))
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
+	body.SetSchema(buildSchema())
 	return &DelayOn{body, timer, false, false}, nil
 }
 

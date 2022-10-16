@@ -70,8 +70,8 @@ const (
 	inject      = "inject"
 
 	delay         = "delay"
-	delayOn       = "delayOn"
-	delayOff      = "delayOff"
+	delayOn       = "delay-on"
+	delayOff      = "delay-off"
 	delayMinOnOff = "min on off"
 
 	// switch

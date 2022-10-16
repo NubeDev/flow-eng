@@ -1,6 +1,7 @@
 package gmail
 
 import (
+	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
 )
@@ -14,8 +15,8 @@ func buildSchema() *schemas.Schema {
 	props.Address.Title = "address"
 	props.Address.Default = "noreply@nube-io.com"
 	schema.Set(props)
-	var uiSchema = map[string]map[string]string{
-		"address": {
+	uiSchema := array.Map{
+		"address": array.Map{
 			"ui:widget": "password",
 		},
 	}

@@ -1,43 +1,52 @@
-package mathematics
+package timing
 
 import (
+	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
 	"github.com/mitchellh/mapstructure"
 )
 
 type nodeSchema struct {
-	Sch schemas.EnumString `json:"function"`
+	Time     schemas.EnumString `json:"time"`
+	Duration schemas.Number     `json:"function"`
 }
 
 // NODEs will single in/out
 const (
-	acos  = "acos"
-	asin  = "asin"
-	atan  = "atan"
-	cbrt  = "cbrt"
-	cos   = "cos"
-	exp   = "exp"
-	log   = "log"
-	log10 = "log10"
-	sin   = "sin"
-	sqrt  = "sqrt"
-	tan   = "tan"
+	ms  = "ms"
+	sec = "sec"
+	min = "min"
+	hr  = "hour"
 )
 
 func buildSchema() *schemas.Schema {
 	props := &nodeSchema{}
-	props.Sch.Title = "function"
-	props.Sch.Default = acos
-	props.Sch.Options = []string{acos, asin, atan, cbrt, cos, exp, log, log10, sin, sqrt, tan}
-	props.Sch.EnumName = []string{acos, asin, atan, cbrt, cos, exp, log, log10, sin, sqrt, tan}
+	// time selection
+	props.Duration.Title = "duration"
+	props.Duration.Default = 1
+
+	// time selection
+	props.Time.Title = "time"
+	props.Time.Default = sec
+	props.Time.Options = []string{ms, sec, min, hr}
+	props.Time.EnumName = []string{ms, sec, min, hr}
+
 	schema.Set(props)
+	uiSchema := array.Map{
+		"time": array.Map{
+			"ui:widget": "radio",
+			"ui:options": array.Map{
+				"inline": true,
+			},
+		},
+	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{
-			Title:      "function",
+			Title:      "Set delay time",
 			Properties: props,
 		},
-		UiSchema: nil,
+		UiSchema: uiSchema,
 	}
 	return s
 }

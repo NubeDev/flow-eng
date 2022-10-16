@@ -1,5 +1,8 @@
 package array
 
+type Map map[string]interface{}
+type Slice []interface{}
+
 func Between(x, min, max float64) (between, below, above bool) {
 	if (x >= min) && (x <= max) {
 		between = true
