@@ -27,6 +27,8 @@ func Encode(graph *flowctrl.Flow) (*NodesList, error) {
 			Type:     nodeType,
 			Metadata: _node.GetMetadata(),
 			Settings: _node.GetSettings(),
+			IsParent: _node.IsParent,
+			ParentId: _node.ParentId,
 		}
 		if len(_node.GetInputs()) > 0 {
 			links := map[string]node.SchemaInputs{}

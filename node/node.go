@@ -46,6 +46,7 @@ type Node interface {
 	OverrideInputValue(name InputName, value interface{}) error
 	GetMetadata() *Metadata
 	GetIsParent() bool
+	GetParentId() string
 	GetParameters() *Parameters
 	GetSubFlow() *SubFlow
 	GetSubFlowNodes() []*Spec
@@ -78,12 +79,12 @@ type Spec struct {
 	AllowSettings bool                   `json:"allowSettings"`
 	Metadata      *Metadata              `json:"metadata,omitempty"`
 	Parameters    *Parameters            `json:"parameters,omitempty"`
-	IsParent      bool                   `json:"isParent,omitempty"`
+	IsParent      bool                   `json:"isParent"`
+	ParentId      string                 `json:"parentId,omitempty"`
 	SubFlow       *SubFlow               `json:"subFlow,omitempty"`
-	//OnStart       bool                   `json:"-"` // used for see if it's the first loop of the runner, if false it's the first run
-	loopCount uint64
-	schema    *schemas.Schema
-	db        db.DB
+	loopCount     uint64
+	schema        *schemas.Schema
+	db            db.DB
 }
 
 func (n *Spec) Cleanup() {}
@@ -201,6 +202,10 @@ func (n *Spec) GetSubFlowNodes() []*Spec {
 
 func (n *Spec) DeleteSubFlowNodes() {
 	n.SubFlow.Nodes = nil
+}
+
+func (n *Spec) GetParentId() string {
+	return n.ParentId
 }
 
 func (n *Spec) GetMetadata() *Metadata {

@@ -7,6 +7,8 @@ type Schema struct {
 	Metadata *Metadata               `json:"metadata,omitempty"` // positions on the editor
 	Inputs   map[string]SchemaInputs `json:"inputs,omitempty"`
 	Settings map[string]interface{}  `json:"settings,omitempty"`
+	IsParent bool                    `json:"isParent"`
+	ParentId string                  `json:"parentId,omitempty"`
 }
 
 type SchemaInputs struct {
