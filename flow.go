@@ -26,6 +26,16 @@ func (p *Flow) GetNodes() []node.Node {
 	return p.nodes
 }
 
+// NodesValue get a single node value
+func (p *Flow) NodesValue(uuid string) (*node.Values, error) {
+	for _, n := range p.GetNodes() {
+		if uuid == n.GetID() {
+			return n.NodeValues(), nil
+		}
+	}
+	return nil, errors.New("node not found")
+}
+
 // NodesValues get all the node current values from the runtime
 func (p *Flow) NodesValues() []*node.Values {
 	var out []*node.Values
