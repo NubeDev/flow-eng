@@ -249,7 +249,7 @@ func Builder(body *node.Spec, db db.DB, opts ...interface{}) (node.Node, error) 
 	if n != nil || err != nil {
 		return n, err
 	}
-	n, err = builderFlowNetworks(body)
+	n, err = builderFlowNetworks(body, opts)
 	if n != nil || err != nil {
 		return n, err
 	}
@@ -400,8 +400,11 @@ func builderJson(body *node.Spec) (node.Node, error) {
 	return nil, nil
 }
 
-func builderFlowNetworks(body *node.Spec) (node.Node, error) {
-	networksPool := driver.New(&driver.Networks{})
+func builderFlowNetworks(body *node.Spec, opts []interface{}) (node.Node, error) {
+	var networksPool driver.Driver
+	if len(opts) > 0 {
+		networksPool = opts[0].(driver.Driver)
+	}
 	switch body.GetName() {
 	case flowNetwork:
 		return flow.NewNetwork(body, networksPool)

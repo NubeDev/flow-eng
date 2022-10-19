@@ -6,7 +6,9 @@ import (
 	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/driver"
+	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeDev/flow-eng/services/clients/ffclient"
+	log "github.com/sirupsen/logrus"
 )
 
 type Network struct {
@@ -28,13 +30,15 @@ func NewNetwork(body *node.Spec, pool driver.Driver) (node.Node, error) {
 	body = node.Defaults(body, flowNetwork, category)
 	connectionName := node.BuildInput(node.Connection, node.TypeString, nil, body.Inputs)
 	name := node.BuildInput(node.Name, node.TypeString, nil, body.Inputs)
-	networkUUID := node.BuildInput(node.UUID, node.TypeString, nil, body.Inputs)
-	inputs := node.BuildInputs(connectionName, name, networkUUID)
+	inputs := node.BuildInputs(connectionName, name)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body.IsParent = true
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	n, _ := body.ReadPinAsString(node.UUID)
-	return &Network{body, false, 0, n, "", nil, nil, pool}, nil
+	network := &Network{body, false, 0, n, "", nil, nil, pool}
+	body.SetSchema(network.buildSchema())
+	network.Spec = body
+	return network, nil
 }
 
 func (inst *Network) getNetwork() driver.Driver {
@@ -47,9 +51,11 @@ func (inst *Network) getInst() *Network {
 
 func (inst *Network) setConnection() {
 	fmt.Println("ADD NETWORK", inst.pool)
-	connection, err := inst.GetDB().GetConnection("con_1b8b9c8bd63f")
+
+	connection, err := inst.GetDB().GetConnection("con_db7de7598bba")
 	if err != nil {
 		inst.firstLoop = false // if fail try again
+		log.Error("add flow network failed to find connection")
 		return
 	}
 	inst.connectionUUID = connection.UUID
@@ -80,11 +86,14 @@ func (inst *Network) ping(loop uint64) {
 
 }
 
+func (inst *Network) GetSchema() *schemas.Schema {
+	return inst.buildSchema()
+}
+
 func (inst *Network) Process() {
 	inst.loopCount++
 	if !inst.firstLoop {
 		inst.setConnection()
-
 	}
 	inst.ping(inst.loopCount)
 
