@@ -38,3 +38,66 @@ func Decode(encodedNodes *NodesList) ([]*node.Spec, error) {
 	}
 	return decodedNodes, nil
 }
+
+type NodeFilter string
+
+const (
+	FilterIsParent      NodeFilter = "FilterIsParent"
+	FilterIsParentChild NodeFilter = "FilterIsParentChild" // when a node is a parent under another parent
+	FilterIsChild       NodeFilter = "FilterIsChild"
+	FilterNonContainer  NodeFilter = "FilterNonContainer" // when a node is not in a container node
+)
+
+// FilterNodes filter nodes that are a container node or inside a container node
+// 	- parentID:string if you want to filter nodes that are inside a container pass in the node container nodeID
+func FilterNodes(nodesList []*node.Spec, filter NodeFilter, parentID string) []*node.Spec {
+	var out []*node.Spec
+	if filter == FilterIsParent {
+		for _, n := range nodesList {
+			if n.IsParent {
+				if n.ParentId == "" {
+					out = append(out, n)
+				}
+			}
+		}
+	}
+	if filter == FilterIsParentChild {
+		for _, n := range nodesList {
+			if n.IsParent {
+				if n.ParentId != "" {
+					out = append(out, n)
+				}
+			}
+		}
+	}
+
+	if filter == FilterIsChild {
+		for _, n := range nodesList {
+			if !n.IsParent {
+				if n.ParentId != "" {
+					out = append(out, n)
+				}
+			}
+		}
+	}
+
+	if filter == FilterNonContainer {
+		for _, n := range nodesList {
+			if !n.IsParent {
+				if n.ParentId == "" {
+					out = append(out, n)
+				}
+			}
+		}
+	}
+
+	if parentID != "" { // get all the nodes that are inside a container
+		for _, n := range out {
+			if n.ParentId == parentID {
+				out = append(out, n)
+			}
+		}
+		return out
+	}
+	return out
+}

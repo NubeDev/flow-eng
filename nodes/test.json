@@ -1,23 +1,87 @@
 {
   "nodes": [
     {
-      "id": "01EAAE5F-E990-4E21-96A7-4B1F2DA63DD7",
-      "type": "math/add",
+      "id": "9B399FE9291547F78CFAFA789B330342",
+      "type": "flow/network",
       "metadata": {
-        "positionX": "492",
-        "positionY": "168"
+        "positionX": "804.3858391077342",
+        "positionY": "229.88486272550068"
       },
       "inputs": {
-        "a": {
-          "value": 0
+        "name": {
+          "value": ""
         },
-        "b": {
-          "value": 0
+        "topic": {
+          "value": ""
+        },
+        "uuid": {
+          "value": ""
+        }
+      },
+      "isParent": true
+    },
+    {
+      "id": "918A43845D264C34A79E62C464392342",
+      "type": "bacnet/server",
+      "metadata": {
+        "positionX": "343.6524054670256",
+        "positionY": "210.05840582637987"
+      },
+      "isParent": true
+    },
+    {
+      "id": "CF62EABC01FB4CC2A4BF1CACCAC3BC8B",
+      "type": "bacnet/binary-input",
+      "metadata": {
+        "positionX": "363.97283862853294",
+        "positionY": "323.3788389878872"
+      },
+      "inputs": {
+        "name": {
+          "value": ""
         }
       },
       "settings": {
-        "inputCount": 33
-      }
+        "selected": false
+      },
+      "isParent": false,
+      "parentId": "918A43845D264C34A79E62C464392342"
+    },
+    {
+      "id": "093EE93FC8BF4099A8CFF1729C443CA5",
+      "type": "flow/device",
+      "metadata": {
+        "positionX": "814.3858391077342",
+        "positionY": "365.8848627255007"
+      },
+      "inputs": {
+        "name": {
+          "value": ""
+        },
+        "uuid": {
+          "value": ""
+        }
+      },
+      "isParent": true,
+      "parentId": "9B399FE9291547F78CFAFA789B330342"
+    },
+    {
+      "id": "CC4A72B1C3B04C75AD4D5332FFE2EFC7",
+      "type": "flow/point",
+      "metadata": {
+        "positionX": "824.3858391077342",
+        "positionY": "468.8848627255007"
+      },
+      "inputs": {
+        "name": {
+          "value": ""
+        },
+        "uuid": {
+          "value": ""
+        }
+      },
+      "isParent": false,
+      "parentId": "093EE93FC8BF4099A8CFF1729C443CA5"
     }
   ]
 }

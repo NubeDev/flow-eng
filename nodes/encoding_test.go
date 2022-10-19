@@ -9,9 +9,7 @@ import (
 	"testing"
 )
 
-// if there is no link then its not an array
-
-func Test_test(t *testing.T) {
+func Test_Decode(t *testing.T) {
 
 	var nodesParsed *NodesList
 	jsonFile, err := os.Open("./test.json")
@@ -23,9 +21,8 @@ func Test_test(t *testing.T) {
 	defer jsonFile.Close()
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 	json.Unmarshal(byteValue, &nodesParsed)
-	//pprint.PrintJOSN(nodesParsed)
-
 	decode, err := Decode(nodesParsed)
-	pprint.PrintJOSN(decode)
+
+	pprint.PrintJOSN(FilterNodes(decode, FilterIsChild, ""))
 
 }
