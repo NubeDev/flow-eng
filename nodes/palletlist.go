@@ -403,7 +403,10 @@ func builderJson(body *node.Spec) (node.Node, error) {
 func builderFlowNetworks(body *node.Spec, opts []interface{}) (node.Node, error) {
 	var networksPool driver.Driver
 	if len(opts) > 0 {
-		networksPool = opts[0].(driver.Driver)
+		_, ok := opts[0].(driver.Driver)
+		if ok {
+			networksPool = opts[0].(driver.Driver)
+		}
 	}
 	switch body.GetName() {
 	case flowNetwork:
@@ -579,7 +582,10 @@ func builderTiming(body *node.Spec) (node.Node, error) {
 func builderProtocols(body *node.Spec, opts []interface{}) (node.Node, error) {
 	bacOpts := &bacnet.Bacnet{}
 	if len(opts) > 0 {
-		bacOpts = opts[0].(*bacnet.Bacnet)
+		_, ok := opts[0].(*bacnet.Bacnet)
+		if ok {
+			bacOpts = opts[0].(*bacnet.Bacnet)
+		}
 	}
 	switch body.GetName() {
 	case bacnetServer:
