@@ -10,7 +10,8 @@ func TestNew(t *testing.T) {
 
 	db := New("../flow.db")
 	connection, err := db.AddConnection(&Connection{
-		Application: "mqtt",
+		Name:        "test",
+		Application: "flow",
 	})
 	pprint.PrintJOSN(connection)
 	fmt.Println(err)
