@@ -14,6 +14,7 @@ type Bacnet struct {
 	Store       *points.Store
 	MqttClient  *mqttclient.Client
 	Application names.ApplicationName
+	Ip          string `json:"ip"`
 }
 
 type Server struct {
@@ -47,9 +48,11 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	opts = bacnetOpts(opts)
 	var application = opts.Application
 	var err error
-	ip := "0.0.0.0"
+	if opts.Ip == "" {
+		opts.Ip = "0.0.0.0"
+	}
 	body = node.Defaults(body, serverNode, category)
-	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs))
+	//inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs))
 	outputApplication := node.BuildOutput(node.Msg, node.TypeString, nil, body.Outputs)
 	outputErr := node.BuildOutput(node.ErrMsg, node.TypeString, nil, body.Outputs)
 	outputs := node.BuildOutputs(outputApplication, outputErr)
@@ -62,7 +65,7 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	}
 	body.Parameters = node.BuildParameters(parameters) // if node is already added then show the user
 	body.IsParent = true
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, nil, outputs, nil)
 	clients := &clients{}
 	server := &Server{body, clients, false, false, false, false, opts.Store, application}
 	server.clients.mqttClient = opts.MqttClient
@@ -70,18 +73,18 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 		rubixIOUICount, rubixIOUOCount := points.CalcPointCount(1, application)
 		rio := &rubixIO.RubixIO{}
 		rio = rubixIO.New(&rubixIO.RubixIO{
-			IP:          ip,
+			IP:          opts.Ip,
 			StartAddrUI: rubixIOUICount,
 			StartAddrUO: rubixIOUOCount,
 			StartAddrDO: 2,
 		})
 		server.clients.rio = rio
-		log.Infof("bacnet-server: start application: %s device-ip: %s", application, ip)
+		log.Infof("bacnet-server: start application: %s device-ip: %s", application, opts.Ip)
 	}
 	if application == names.Edge {
-		edge28 := edge28lib.New(ip)
+		edge28 := edge28lib.New(opts.Ip)
 		server.clients.edge28 = edge28
-		log.Infof("bacnet-server: start application: %s device-ip: %s", application, ip)
+		log.Infof("bacnet-server: start application: %s device-ip: %s", application, opts.Ip)
 	}
 	return server, err
 }

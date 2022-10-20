@@ -5,6 +5,7 @@ import (
 	"fmt"
 	flowctrl "github.com/NubeDev/flow-eng"
 	"github.com/NubeDev/flow-eng/node"
+	log "github.com/sirupsen/logrus"
 	"strings"
 )
 
@@ -19,7 +20,7 @@ func Encode(graph *flowctrl.Flow) (*NodesList, error) {
 		nodeSchema := &node.Schema{}
 		nodeType, err := setType(_node)
 		if err != nil {
-			fmt.Println(err)
+			log.Error(err)
 			return nil, err
 		}
 		nodeSchema = &node.Schema{
@@ -36,7 +37,7 @@ func Encode(graph *flowctrl.Flow) (*NodesList, error) {
 			inputsLinks := node.SchemaInputs{}
 			// for a node we need its input and see if it has a link, if so we need the uuid of the node its link to
 			for _, input := range _node.GetInputs() {
-				// check the input has link
+				// check the input has links
 				destOutputName := input.Connection.NodePort
 				if destOutputName != "" {
 					link.Socket = string(input.Connection.NodePort)
@@ -54,6 +55,7 @@ func Encode(graph *flowctrl.Flow) (*NodesList, error) {
 					nodeSchema.Inputs = links
 				} else {
 					if input.Connection.OverrideValue != nil {
+						inputsLinks = node.SchemaInputs{}
 						inputsLinks.Value = input.Connection.OverrideValue
 						links[string(input.Name)] = inputsLinks
 						nodeSchema.Inputs = links

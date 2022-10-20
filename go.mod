@@ -20,7 +20,6 @@ require (
 	github.com/sirupsen/logrus v1.9.0
 	github.com/tidwall/buntdb v1.2.8
 	github.com/tidwall/gjson v1.14.3
-	golang.org/x/exp v0.0.0-20220321173239-a90fa8a75705
 )
 
 require (

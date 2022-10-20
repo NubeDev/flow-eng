@@ -27,7 +27,10 @@ type Point struct {
 }
 
 func (inst *Store) GetPoints() []*Point {
-	return inst.Points
+	if inst.Points != nil {
+		return inst.Points
+	}
+	return nil
 }
 
 func (inst *Store) GetWriteablePointsByApplication(name names.ApplicationName) []*Point {

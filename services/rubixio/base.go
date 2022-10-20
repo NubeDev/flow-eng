@@ -7,6 +7,7 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/services/clients/rubixcli"
 	"github.com/NubeIO/nubeio-rubix-lib-rest-go/pkg/nube/rubixio"
+	"reflect"
 )
 
 type RubixIO struct {
@@ -139,7 +140,7 @@ func (inst *RubixIO) DecodeInputValue(point *points.Point, inputs *rubixio.Input
 }
 
 func (inst *RubixIO) getInputValue(ioNum string, ioType points.IoType, inputs *rubixio.Inputs) (float64, error) {
-	found, temp, voltage, current, _, digital, err := rubixio.GetInputValues(inputs, ioNum)
+	found, temp, voltage, current, _, digital, err := getInputValues(inputs, ioNum)
 	if err != nil {
 		return 0, errors.New("rubix-io inputs can not be empty")
 	}
@@ -167,4 +168,46 @@ func (inst *RubixIO) DecodeInputs(body []byte) (*rubixio.Inputs, error) {
 		return nil, errors.New(fmt.Sprintf("failed to decode rubix-io mqtt payload err:%s", err.Error()))
 	}
 	return data, nil
+}
+
+//getInputValues get all the input values by passing in the IONum (pass in UI as an example)
+func getInputValues(strut interface{}, key string) (found bool, temp, voltage, current, raw float64, digital int, err error) {
+	val := reflect.ValueOf(strut).Elem()
+	for i := 0; i < val.NumField(); i++ {
+		typeField := val.Type().Field(i)
+		if typeField.Name == key {
+			found = true
+			thermistor10KType2 := val.Field(i).FieldByName("Thermistor10KType2")
+			temp = float(thermistor10KType2)
+
+			voltageDc := val.Field(i).FieldByName("VoltageDc")
+			voltage = float(voltageDc)
+
+			rawVal := val.Field(i).FieldByName("Raw")
+			raw = float(rawVal)
+
+			currentVal := val.Field(i).FieldByName("Current")
+			current = float(currentVal)
+
+			digitalVal := val.Field(i).FieldByName("Digital")
+			digital = integer(digitalVal)
+		}
+	}
+	return
+}
+
+func float(v reflect.Value) float64 {
+	defer func() {
+		if r := recover(); r != nil {
+		}
+	}()
+	return v.Float()
+}
+
+func integer(v reflect.Value) int {
+	defer func() {
+		if r := recover(); r != nil {
+		}
+	}()
+	return int(v.Int())
 }

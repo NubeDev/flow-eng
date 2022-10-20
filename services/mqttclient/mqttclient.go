@@ -116,12 +116,14 @@ func (c *Client) Ping() (err error) {
 
 // Publish things
 func (c *Client) Publish(topic string, qos QOS, retain bool, payload interface{}) (err error) {
-	token := c.client.Publish(topic, byte(qos), retain, payload)
-	if token.WaitTimeout(2*time.Second) == false {
-		return errors.New("mqtt publish timout, after 2 seconds")
-	}
-	if token.Error() != nil {
-		return token.Error()
+	if c != nil {
+		token := c.client.Publish(topic, byte(qos), retain, payload)
+		if token.WaitTimeout(2*time.Second) == false {
+			return errors.New("mqtt publish timout, after 2 seconds")
+		}
+		if token.Error() != nil {
+			return token.Error()
+		}
 	}
 
 	return nil

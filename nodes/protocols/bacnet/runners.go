@@ -9,9 +9,11 @@ var runnerDelay = time.Duration(100)
 
 func (inst *Server) protocolRunner(application names.ApplicationName) {
 	go inst.writeRunner()
-	if application == names.RubixIO || application == names.RubixIOAndModbus {
-		//go inst.rubixOutputsDispatch()
+	if application == names.RubixIOAndModbus {
 		go inst.modbusRunner()
+	}
+	if application == names.RubixIO || application == names.RubixIOAndModbus {
+		go inst.rubixOutputsDispatch()
 	}
 	if application == names.Edge {
 		go inst.edge28OutputsDispatch()

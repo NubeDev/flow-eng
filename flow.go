@@ -61,6 +61,7 @@ func (p *Flow) GetNodeSpec(id string) *node.Spec {
 
 func (p *Flow) AddNodes(node ...node.Node) {
 	for _, n := range node {
+		log.Infof("add node: %s", n.GetName())
 		p.addNode(n)
 	}
 }
