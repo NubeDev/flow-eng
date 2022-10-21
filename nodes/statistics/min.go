@@ -11,7 +11,7 @@ type Min struct {
 func NewMin(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, min, category)
 	inputs := node.BuildInputs(node.DynamicInputs(node.TypeFloat, nil, 2, 2, 20, body.Inputs, node.ABCs)...)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Result, node.TypeFloat, nil, body.Outputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
 	return &Min{body}, nil
 }

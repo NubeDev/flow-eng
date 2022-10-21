@@ -20,9 +20,9 @@ func Process(body node.Node) {
 	inputs := float.ConvertInterfaceToFloatMultiple(body.ReadMultiple(count))
 	output := operation(equation, inputs)
 	if output == nil {
-		body.WritePinNull(node.Result)
+		body.WritePinNull(node.Out)
 	} else {
-		body.WritePin(node.Result, float.NonNil(output))
+		body.WritePin(node.Out, float.NonNil(output))
 	}
 
 }

@@ -30,8 +30,8 @@ func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error)
 	if settings != nil {
 		count = settings.InputCount
 	}
-	inputs := node.BuildInputs(node.DynamicInputs(node.TypeFloat, nil, count, 2, 20, body.Inputs, node.ABCs)...)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Result, node.TypeFloat, nil, body.Outputs))
+	inputs := node.BuildInputs(node.DynamicInputs(node.TypeFloat, nil, count, 2, 20, body.Inputs)...)
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(schemas.GetInputCount())
 	return body, nil
@@ -43,9 +43,9 @@ func process(body node.Node) {
 	inputs := body.ReadMultipleFloatPointer(count)
 	output := operation(equation, inputs)
 	if output == nil {
-		body.WritePinNull(node.Result)
+		body.WritePinNull(node.Out)
 	} else {
-		body.WritePinFloat(node.Result, float.NonNil(output))
+		body.WritePinFloat(node.Out, float.NonNil(output))
 	}
 
 }

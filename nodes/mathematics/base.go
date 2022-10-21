@@ -28,12 +28,12 @@ func process(body node.Node) {
 	}
 	in, null := body.ReadPinAsFloat(node.In)
 	if null {
-		body.WritePinNull(node.Result)
+		body.WritePinNull(node.Out)
 	}
 	output, err := mathFunc(function, in)
 	if err != nil {
-		body.WritePin(node.Result, 0)
+		body.WritePin(node.Out, 0)
 	} else {
-		body.WritePin(node.Result, output)
+		body.WritePin(node.Out, output)
 	}
 }

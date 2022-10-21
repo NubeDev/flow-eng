@@ -19,7 +19,7 @@ func build(body *node.Spec) *node.Spec {
 	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs)
 	inputs := node.BuildInputs(url, filter, trigger, enable)
 	// outs
-	out := node.BuildOutput(node.Result, node.TypeString, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 	return node.BuildNode(body, inputs, outputs, nil)
 
@@ -43,9 +43,9 @@ func (inst *Get) do() {
 	}
 	if filter != "" {
 		value := gjson.Get(resp.String(), filter)
-		inst.WritePin(node.Result, value.String())
+		inst.WritePin(node.Out, value.String())
 	} else {
-		inst.WritePin(node.Result, resp.String())
+		inst.WritePin(node.Out, resp.String())
 	}
 
 }
@@ -56,7 +56,7 @@ func (inst *Get) Process() {
 		go inst.do()
 
 	} else {
-		inst.WritePin(node.Result, nil)
+		inst.WritePin(node.Out, nil)
 	}
 
 }

@@ -31,7 +31,7 @@ func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error)
 	nodeInputs = append(nodeInputs, selection)
 	nodeInputs = append(nodeInputs, inputsCount...)
 	inputs := node.BuildInputs(nodeInputs...)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Result, node.TypeFloat, nil, body.Outputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
 	return body, nil
 }
@@ -44,9 +44,9 @@ func process(body node.Node) {
 	if op == selectNum {
 		output := selectValue(selection, inputs)
 		if output == nil {
-			body.WritePin(node.Result, nil)
+			body.WritePin(node.Out, nil)
 		} else {
-			body.WritePin(node.Result, conversions.GetFloat(output))
+			body.WritePin(node.Out, conversions.GetFloat(output))
 		}
 
 	}

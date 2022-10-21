@@ -20,7 +20,7 @@ func NewHttpWrite(body *node.Spec) (node.Node, error) {
 	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs)
 
 	inputs := node.BuildInputs(url, reqBody, filter, trigger, enable)
-	out := node.BuildOutput(node.Result, node.TypeString, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs)
 
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
@@ -51,14 +51,14 @@ func (inst *HttpWrite) do() {
 	}
 	resp, err := inst.request(method, reqBody)
 	if err != nil {
-		inst.WritePin(node.Result, nil)
+		inst.WritePin(node.Out, nil)
 		return
 	}
 	if filter != "" {
 		value := gjson.Get(resp.String(), filter)
-		inst.WritePin(node.Result, value.String())
+		inst.WritePin(node.Out, value.String())
 	} else {
-		inst.WritePin(node.Result, resp.String())
+		inst.WritePin(node.Out, resp.String())
 	}
 
 }
@@ -73,7 +73,7 @@ func (inst *HttpWrite) Process() {
 		go inst.do()
 
 	} else {
-		inst.WritePin(node.Result, nil)
+		inst.WritePin(node.Out, nil)
 	}
 
 }

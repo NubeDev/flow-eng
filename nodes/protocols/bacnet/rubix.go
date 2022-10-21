@@ -25,7 +25,6 @@ func (inst *Server) rubixInputsRunner(msg *topics.Message) {
 			inst.store.WriteValueFromRead(point, value)
 		}
 	}
-
 }
 
 func (inst *Server) rubixOutputsDispatch() {

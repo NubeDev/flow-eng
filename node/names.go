@@ -114,8 +114,8 @@ const (
 )
 
 const (
-	Ok     OutputName = "ok"
-	Result OutputName = "result"
+	Ok OutputName = "ok"
+	//Result OutputName = "result"
 
 	ErrMsg OutputName = "error"
 	Msg    OutputName = "message"
