@@ -74,4 +74,5 @@ func (inst *BV) Process() {
 		}
 	}
 	toFlow(inst, points.BinaryVariable, inst.objectID, inst.store, inst.toFlowOptions)
+	fromFlow(inst, inst.objectID, inst.store)
 }

@@ -25,9 +25,9 @@ type number interface {
 
 func BoolToNum(x bool) float64 {
 	if x {
-		return 0
+		return 1
 	}
-	return 1
+	return 0
 }
 
 func IsBool(value interface{}) bool {
@@ -61,6 +61,8 @@ func ToString(in interface{}) string {
 
 func GetFloatPointer(in interface{}) (val *float64) {
 	switch i := in.(type) {
+	case bool:
+		val = float.New(BoolToNum(i))
 	case int:
 		val = float.New(float64(i))
 	case float64:
@@ -79,6 +81,8 @@ func GetFloatPointer(in interface{}) (val *float64) {
 
 func GetFloatPointerOk(in interface{}) (val *float64, ok bool) {
 	switch i := in.(type) {
+	case bool:
+		val = float.New(BoolToNum(i))
 	case int:
 		val = float.New(float64(i))
 	case float64:
@@ -98,11 +102,7 @@ func GetFloatPointerOk(in interface{}) (val *float64, ok bool) {
 func GetFloat(in interface{}) (val float64) {
 	switch i := in.(type) {
 	case bool:
-		if i {
-			val = 1
-		} else {
-			val = 0
-		}
+		val = BoolToNum(i)
 	case int:
 		val = float64(i)
 	case float64:
@@ -127,6 +127,8 @@ func GetFloat(in interface{}) (val float64) {
 
 func GetFloatOk(in interface{}) (val float64, ok bool) {
 	switch i := in.(type) {
+	case bool:
+		val = BoolToNum(i)
 	case int:
 		val = float64(i)
 	case float64:
@@ -153,11 +155,7 @@ func GetFloatOk(in interface{}) (val float64, ok bool) {
 func GetInt(in interface{}) (val int) {
 	switch i := in.(type) {
 	case bool:
-		if i {
-			val = 1
-		} else {
-			val = 0
-		}
+		val = int(BoolToNum(i))
 	case int:
 		val = i
 	case float64:
@@ -176,6 +174,8 @@ func GetInt(in interface{}) (val int) {
 
 func GetIntOk(in interface{}) (val int, ok bool) {
 	switch i := in.(type) {
+	case bool:
+		val = int(BoolToNum(i))
 	case int:
 		val = i
 	case float64:

@@ -6,6 +6,7 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/services/rubixio"
 	log "github.com/sirupsen/logrus"
+	"time"
 )
 
 func (inst *Server) rubixInputsRunner(msg *topics.Message) {
@@ -47,5 +48,6 @@ func (inst *Server) rubixOutputsDispatch() {
 				}
 			}
 		}
+		time.Sleep(100 * time.Millisecond)
 	}
 }

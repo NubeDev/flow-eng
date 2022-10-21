@@ -25,7 +25,7 @@ func NewBO(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	opts = bacnetOpts(opts)
 	body, err = nodeDefault(body, bacnetBO, category, opts.Application)
 	flowOptions := &toFlowOptions{}
-	return &BV{
+	return &BO{
 		body,
 		0,
 		points.BinaryOutput,
@@ -70,5 +70,5 @@ func (inst *BO) Process() {
 		}
 	}
 	toFlow(inst, points.BinaryOutput, inst.objectID, inst.store, inst.toFlowOptions)
-
+	fromFlow(inst, inst.objectID, inst.store)
 }

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/names"
+	log "github.com/sirupsen/logrus"
 	"math"
 	"reflect"
 )
@@ -328,7 +329,9 @@ func (inst *Store) GetByType(objectType ObjectType) (out []*Point, count int) {
 
 func (inst *Store) CheckExistingPointErr(point *Point) error {
 	if inst.CheckExistingPoint(point) {
-		return errors.New(fmt.Sprintf("store-add-point: point is existing object-type:%s:%d", point.ObjectType, point.ObjectID))
+		errMsg := fmt.Sprintf("store-add-point: point is existing object-type:%s:%d", point.ObjectType, point.ObjectID)
+		log.Error(errMsg)
+		return errors.New(errMsg)
 	}
 	return nil
 }

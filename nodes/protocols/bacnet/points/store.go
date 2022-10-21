@@ -152,6 +152,8 @@ func New(app names.ApplicationName, pStore *ObjectStore, deviceCount, avAllowanc
 	bacnetStore.ModbusDeviceCount = deviceCount
 	bacnetStore.Application = app
 
+	CalcPointCount(deviceCount, app)
+
 	ai := pStore.AI
 	ao := pStore.AO
 	av := pStore.AV
@@ -222,6 +224,7 @@ func New(app names.ApplicationName, pStore *ObjectStore, deviceCount, avAllowanc
 		BV: bv,
 	}
 	bacnetStore.Store = store
+	log.Infof("bacnet-store AI:%d AO:%d AV:%d BI:%d BO:%d BV:%d", ai.Count, ao.Count, av.Count, bi.Count, bo.Count, bv.Count)
 	return bacnetStore
 }
 
@@ -270,7 +273,7 @@ func (inst *Store) AddPoint(point *Point, ignoreError bool) (*Point, error) {
 	}
 
 	var checked bool
-	log.Infof("bacnet-add-point type-%s:%d", point.ObjectType, point.ObjectID)
+
 	if objectType == AnalogInput {
 		checked = true
 		p := inst.Store.AI
@@ -359,23 +362,26 @@ func (inst *Store) AddPoint(point *Point, ignoreError bool) (*Point, error) {
 			}
 		}
 	}
-
 	if !checked {
-		return nil, errors.New(fmt.Sprintf("store-add-point: not type found for object type: %s", objectType))
+		errMsg := fmt.Sprintf("store-add-point: not type found for object type: %s", objectType)
+		log.Error(errMsg)
+		return nil, errors.New(errMsg)
 	}
+	log.Infof("bacnet-add-point type-%s:%d", point.ObjectType, point.ObjectID)
 	inst.Points = append(inst.Points, point)
 	return point, nil
 }
 
 func errNoObj(pnt interface{}, objectType ObjectType) error {
 	if pnt == nil {
-		return errors.New(fmt.Sprintf("store-add-point: the server does not support object type: %s", objectType))
+		errMsg := fmt.Sprintf("store-add-point: point cant not be empty")
+		log.Error(errMsg)
+		return errors.New(errMsg)
 	}
 	return nil
 }
 
 func (inst *Store) checkExisting(point *Point, from, to int) error {
-
 	err := inst.allowableCount(int(point.ObjectID), from, to)
 	if err != nil {
 		return err
@@ -390,7 +396,9 @@ func (inst *Store) checkExisting(point *Point, from, to int) error {
 
 func (inst *Store) allowableCount(objectID, from, count int) error {
 	if objectID > count { // is above what is allowed
-		return errors.New(fmt.Sprintf("store-add-point: the allowable max object-id is: %d and the current is: %d", count, objectID))
+		errMsg := fmt.Sprintf("store-add-point: the allowable max object-id is: %d and the current is: %d", count, objectID)
+		log.Error(errMsg)
+		return errors.New(errMsg)
 	}
 	return nil
 }

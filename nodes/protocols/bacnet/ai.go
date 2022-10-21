@@ -59,7 +59,6 @@ func (inst *AI) setObjectId() {
 
 func (inst *AI) Process() {
 	_, firstLoop := inst.Loop()
-
 	if firstLoop {
 		inst.setObjectId()
 		inst.setName()
@@ -71,11 +70,10 @@ func (inst *AI) Process() {
 		inst.toFlowOptions.precision = settings.Decimal
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
 		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true)
-		point, err = inst.store.AddPoint(point, true)
 		if err != nil {
-			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
+			log.Errorf("bacnet-server add new point type:%s-%d err:%s", objectType, inst.objectID, err.Error())
 		}
+		point, err = inst.store.AddPoint(point, true)
 	}
-
 	toFlow(inst, points.AnalogInput, inst.objectID, inst.store, inst.toFlowOptions)
 }
