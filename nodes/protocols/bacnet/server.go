@@ -35,6 +35,11 @@ type clients struct {
 }
 
 func bacnetOpts(opts *Bacnet) *Bacnet {
+	if opts != nil {
+		if opts.Store == nil {
+			log.Error("bacnet store can not be empty")
+		}
+	}
 	if opts == nil {
 		return &Bacnet{}
 	}

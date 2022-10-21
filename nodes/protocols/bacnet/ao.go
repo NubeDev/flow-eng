@@ -11,12 +11,13 @@ import (
 
 type AO struct {
 	*node.Spec
-	objectID    points.ObjectID
-	objectType  points.ObjectType
-	pointUUID   string
-	store       *points.Store
-	application names.ApplicationName
-	mqttClient  *mqttclient.Client
+	objectID      points.ObjectID
+	objectType    points.ObjectType
+	pointUUID     string
+	store         *points.Store
+	application   names.ApplicationName
+	mqttClient    *mqttclient.Client
+	toFlowOptions *toFlowOptions
 }
 
 func NewAO(body *node.Spec, opts *Bacnet) (node.Node, error) {
@@ -24,7 +25,7 @@ func NewAO(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	var err error
 	body, err = nodeDefault(body, bacnetAO, category, opts.Application)
 	body.SetSchema(buildSchemaUO())
-	body.SetSchema(buildSchemaUO())
+	flowOptions := &toFlowOptions{}
 	return &AO{
 		body,
 		0,
@@ -33,6 +34,7 @@ func NewAO(body *node.Spec, opts *Bacnet) (node.Node, error) {
 		opts.Store,
 		opts.Application,
 		opts.MqttClient,
+		flowOptions,
 	}, err
 }
 
@@ -60,16 +62,18 @@ func (inst *AO) Process() {
 		inst.setObjectId()
 		go inst.setName()
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
-		ioType, err := getSettings(inst.GetSettings())
+		settings, err := getSettings(inst.GetSettings())
+		ioType := settings.Io
 		if ioType == "" {
 			ioType = string(points.IoTypeVolts)
 		}
+		inst.toFlowOptions.precision = settings.Decimal
 		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true)
-		point, err = inst.store.AddPoint(point, true)
+		point, err = inst.store.AddPoint(point, false)
 		if err != nil {
 			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
 		}
 	}
-	toFlow(inst, points.AnalogOutput, inst.objectID, inst.store)
+	toFlow(inst, points.AnalogOutput, inst.objectID, inst.store, inst.toFlowOptions)
 	fromFlow(inst, inst.objectID, inst.store)
 }

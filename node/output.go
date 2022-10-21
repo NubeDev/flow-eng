@@ -5,7 +5,7 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/uuid"
 )
 
-var ErrTypesMismatch = errors.New("provided buffers types are different")
+var ErrTypesMismatch = errors.New("provided types are different")
 
 type Output struct {
 	Name        OutputName          `json:"name"` // out1
@@ -70,6 +70,7 @@ func (p *Output) Connect(inputs ...*Input) {
 		input := inputs[i]
 		if err := p.connectInput(input); err != nil {
 			panic(err)
+			//log.Error(err)
 		}
 	}
 }

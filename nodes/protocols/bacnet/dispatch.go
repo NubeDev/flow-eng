@@ -17,13 +17,25 @@ if fail we keep trying but if a new value arrives to the store we will take the 
 and disregard the existing
 */
 
+type toFlowOptions struct {
+	precision int
+}
+
 //toFlow write the value to the flow, as in an AI write the temp value
-func toFlow(body node.Node, objType points.ObjectType, id points.ObjectID, store *points.Store) {
+func toFlow(body node.Node, objType points.ObjectType, id points.ObjectID, store *points.Store, opts *toFlowOptions) {
+	if opts == nil {
+		opts = &toFlowOptions{
+			precision: 0,
+		}
+		if objType == points.AnalogInput || objType == points.AnalogOutput {
+			opts.precision = 2
+		}
+	}
 	_, v, found := store.GetPresentValueByObject(objType, id) // get the latest value from the point
 	if !found {
 		log.Error(fmt.Sprintf("bacnet send value to flow runtime failed to find point by object: %s-%d", objType, id))
 	}
-	body.WritePin(node.Out, v)
+	body.WritePinFloat(node.Out, v, opts.precision)
 }
 
 // mqttPubRunner send messages to the broker, as in read a modbus point and send it to the bacnet server

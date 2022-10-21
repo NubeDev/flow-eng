@@ -11,12 +11,13 @@ import (
 
 type BI struct {
 	*node.Spec
-	objectID    points.ObjectID
-	objectType  points.ObjectType
-	pointUUID   string
-	store       *points.Store
-	application names.ApplicationName
-	mqttClient  *mqttclient.Client
+	objectID      points.ObjectID
+	objectType    points.ObjectType
+	pointUUID     string
+	store         *points.Store
+	application   names.ApplicationName
+	mqttClient    *mqttclient.Client
+	toFlowOptions *toFlowOptions
 }
 
 func NewBI(body *node.Spec, opts *Bacnet) (node.Node, error) {
@@ -24,6 +25,7 @@ func NewBI(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	var err error
 	body, err = nodeDefault(body, bacnetBI, category, opts.Application)
 	body.SetSchema(buildSchemaUI())
+	flowOptions := &toFlowOptions{}
 	return &BI{
 		body,
 		0,
@@ -32,6 +34,7 @@ func NewBI(body *node.Spec, opts *Bacnet) (node.Node, error) {
 		opts.Store,
 		opts.Application,
 		opts.MqttClient,
+		flowOptions,
 	}, err
 }
 
@@ -68,5 +71,5 @@ func (inst *BI) Process() {
 			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
 		}
 	}
-	toFlow(inst, points.BinaryInput, inst.objectID, inst.store)
+	toFlow(inst, points.BinaryInput, inst.objectID, inst.store, inst.toFlowOptions)
 }

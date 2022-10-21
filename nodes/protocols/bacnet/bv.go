@@ -11,12 +11,13 @@ import (
 
 type BV struct {
 	*node.Spec
-	objectID    points.ObjectID
-	objectType  points.ObjectType
-	pointUUID   string
-	store       *points.Store
-	application names.ApplicationName
-	mqttClient  *mqttclient.Client
+	objectID      points.ObjectID
+	objectType    points.ObjectType
+	pointUUID     string
+	store         *points.Store
+	application   names.ApplicationName
+	mqttClient    *mqttclient.Client
+	toFlowOptions *toFlowOptions
 }
 
 const (
@@ -27,6 +28,7 @@ func NewBV(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	var err error
 	opts = bacnetOpts(opts)
 	body, err = nodeDefault(body, bacnetBV, category, opts.Application)
+	flowOptions := &toFlowOptions{}
 	return &BV{
 		body,
 		0,
@@ -35,6 +37,7 @@ func NewBV(body *node.Spec, opts *Bacnet) (node.Node, error) {
 		opts.Store,
 		opts.Application,
 		opts.MqttClient,
+		flowOptions,
 	}, err
 }
 
@@ -70,5 +73,5 @@ func (inst *BV) Process() {
 			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
 		}
 	}
-	toFlow(inst, points.BinaryVariable, inst.objectID, inst.store)
+	toFlow(inst, points.BinaryVariable, inst.objectID, inst.store, inst.toFlowOptions)
 }
