@@ -1,4 +1,4 @@
-package bacnet
+package bacnetio
 
 import (
 	"github.com/NubeDev/flow-eng/helpers/names"

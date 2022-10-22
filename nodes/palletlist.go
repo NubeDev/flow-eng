@@ -23,7 +23,7 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/notify/gmail"
 	"github.com/NubeDev/flow-eng/nodes/notify/ping"
 	point "github.com/NubeDev/flow-eng/nodes/points"
-	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet"
+	bacnetio "github.com/NubeDev/flow-eng/nodes/protocols/bacnet"
 	"github.com/NubeDev/flow-eng/nodes/protocols/driver"
 	"github.com/NubeDev/flow-eng/nodes/protocols/flow"
 	"github.com/NubeDev/flow-eng/nodes/protocols/rest"
@@ -122,13 +122,13 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	limitNode, _ := transformations.NewLimit(nil)
 
 	// bacnet
-	bacServer, _ := bacnet.NewServer(nil, nil)
-	bacPointAI, _ := bacnet.NewAI(nil, nil)
-	bacPointAO, _ := bacnet.NewAO(nil, nil)
-	bacPointAV, _ := bacnet.NewAV(nil, nil)
-	bacPointBV, _ := bacnet.NewBV(nil, nil)
-	bacPointBO, _ := bacnet.NewBO(nil, nil)
-	bacPointBI, _ := bacnet.NewBI(nil, nil)
+	bacServer, _ := bacnetio.NewServer(nil, nil)
+	bacPointAI, _ := bacnetio.NewAI(nil, nil)
+	bacPointAO, _ := bacnetio.NewAO(nil, nil)
+	bacPointAV, _ := bacnetio.NewAV(nil, nil)
+	bacPointBV, _ := bacnetio.NewBV(nil, nil)
+	bacPointBO, _ := bacnetio.NewBO(nil, nil)
+	bacPointBI, _ := bacnetio.NewBI(nil, nil)
 
 	// pointbus
 	mqttSub, _ := broker.NewMqttSub(nil)
@@ -580,28 +580,28 @@ func builderTiming(body *node.Spec) (node.Node, error) {
 }
 
 func builderProtocols(body *node.Spec, opts []interface{}) (node.Node, error) {
-	bacOpts := &bacnet.Bacnet{}
+	bacOpts := &bacnetio.Bacnet{}
 	if len(opts) > 0 {
-		_, ok := opts[0].(*bacnet.Bacnet)
+		_, ok := opts[0].(*bacnetio.Bacnet)
 		if ok {
-			bacOpts = opts[0].(*bacnet.Bacnet)
+			bacOpts = opts[0].(*bacnetio.Bacnet)
 		}
 	}
 	switch body.GetName() {
 	case bacnetServer:
-		return bacnet.NewServer(body, bacOpts)
+		return bacnetio.NewServer(body, bacOpts)
 	case bacnetAI:
-		return bacnet.NewAI(body, bacOpts)
+		return bacnetio.NewAI(body, bacOpts)
 	case bacnetAO:
-		return bacnet.NewAO(body, bacOpts)
+		return bacnetio.NewAO(body, bacOpts)
 	case bacnetAV:
-		return bacnet.NewAV(body, bacOpts)
+		return bacnetio.NewAV(body, bacOpts)
 	case bacnetBV:
-		return bacnet.NewBV(body, bacOpts)
+		return bacnetio.NewBV(body, bacOpts)
 	case bacnetBO:
-		return bacnet.NewBO(body, bacOpts)
+		return bacnetio.NewBO(body, bacOpts)
 	case bacnetBI:
-		return bacnet.NewBI(body, bacOpts)
+		return bacnetio.NewBI(body, bacOpts)
 
 	}
 	return nil, nil

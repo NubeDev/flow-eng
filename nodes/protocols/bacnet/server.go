@@ -1,4 +1,4 @@
-package bacnet
+package bacnetio
 
 import (
 	"github.com/NubeDev/flow-eng/helpers/names"
@@ -91,6 +91,7 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 		server.clients.edge28 = edge28
 		log.Infof("bacnet-server: start application: %s device-ip: %s", application, opts.Ip)
 	}
+	body.SetSchema(buildSchemaServer())
 	return server, err
 }
 
