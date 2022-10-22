@@ -88,9 +88,6 @@ var (
 )
 
 func CalcPointCount(deviceCount int, app names.ApplicationName) (rubixUIStart, rubixUOStart ObjectID) {
-	if deviceCount == 0 {
-		deviceCount = 1
-	}
 	if app == names.Edge {
 		return calcModbusRubix(deviceCount, false, false, true)
 	}
