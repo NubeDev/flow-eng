@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/NubeDev/flow-eng/db"
+	"github.com/NubeDev/flow-eng/helpers/store"
 	"github.com/NubeDev/flow-eng/helpers/timer"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/bool"
@@ -130,7 +131,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	bacPointBO, _ := bacnetio.NewBO(nil, nil)
 	bacPointBI, _ := bacnetio.NewBI(nil, nil)
 
-	// pointbus
+	mqttBroker, _ := broker.NewBroker(nil)
 	mqttSub, _ := broker.NewMqttSub(nil)
 	mqttPub, _ := broker.NewMqttPub(nil)
 
@@ -226,6 +227,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(bacPointBV),
 		node.ConvertToSpec(bacPointBO),
 
+		node.ConvertToSpec(mqttBroker),
 		node.ConvertToSpec(mqttSub),
 		node.ConvertToSpec(mqttPub),
 
@@ -239,8 +241,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	)
 }
 
-func Builder(body *node.Spec, db db.DB, opts ...interface{}) (node.Node, error) {
+func Builder(body *node.Spec, db db.DB, store *store.Store, opts ...interface{}) (node.Node, error) {
 	body.AddDB(db)
+	body.AddStore(store)
 	n, err := builderConst(body)
 	if n != nil || err != nil {
 		return n, err
@@ -609,6 +612,8 @@ func builderProtocols(body *node.Spec, opts []interface{}) (node.Node, error) {
 
 func builderMQTT(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
+	case mqttBroker:
+		return broker.NewBroker(body)
 	case mqttSub:
 		return broker.NewMqttSub(body)
 	case mqttPub:

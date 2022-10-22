@@ -2,6 +2,7 @@ package node
 
 import (
 	"github.com/NubeDev/flow-eng/db"
+	"github.com/NubeDev/flow-eng/helpers/store"
 	"github.com/NubeDev/flow-eng/schemas"
 	"time"
 )
@@ -12,6 +13,8 @@ type Node interface {
 	Loop() (count uint64, firstLoop bool)
 	AddDB(d db.DB)
 	GetDB() db.DB
+	AddStore(s *store.Store)
+	GetStore() *store.Store
 	SetSchema(schema *schemas.Schema)
 	GetSchema() *schemas.Schema
 	GetInfo() Info
@@ -85,6 +88,7 @@ type Spec struct {
 	loopCount     uint64
 	schema        *schemas.Schema
 	db            db.DB
+	store         *store.Store
 }
 
 func (n *Spec) Cleanup() {}
@@ -95,6 +99,14 @@ func (n *Spec) AddDB(d db.DB) {
 
 func (n *Spec) GetDB() db.DB {
 	return n.db
+}
+
+func (n *Spec) AddStore(s *store.Store) {
+	n.store = s
+}
+
+func (n *Spec) GetStore() *store.Store {
+	return n.store
 }
 
 // Loop will give you the loop count and a flag if it's the first loop

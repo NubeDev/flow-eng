@@ -89,8 +89,9 @@ const (
 	bacnetBO     = "binary-output"
 	bacnetBV     = "binary-variable"
 
-	mqttSub = "mqtt-subscribe"
-	mqttPub = "mqtt-publish"
+	mqttBroker = "mqtt-broker"
+	mqttSub    = "mqtt-subscribe"
+	mqttPub    = "mqtt-publish"
 
 	logNode = "log"
 )

@@ -6,7 +6,6 @@ import (
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/driver"
 	"github.com/NubeDev/flow-eng/schemas"
-	"github.com/NubeDev/flow-eng/services/clients/ffclient"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -17,11 +16,10 @@ type Broker struct {
 	networkUUID    string
 	connectionUUID string
 	connection     *db.Connection
-	client         *ffclient.Client
 	pool           driver.Driver
 }
 
-func NewBroker(body *node.Spec, pool driver.Driver) (node.Node, error) {
+func NewBroker(body *node.Spec) (node.Node, error) {
 	//var err error
 	body = node.Defaults(body, mqttBroker, category)
 	connectionName := node.BuildInput(node.Connection, node.TypeString, nil, body.Inputs)
@@ -31,10 +29,18 @@ func NewBroker(body *node.Spec, pool driver.Driver) (node.Node, error) {
 	body.IsParent = true
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	n, _ := body.ReadPinAsString(node.UUID)
-	network := &Broker{body, false, 0, n, "", nil, nil, pool}
+	network := &Broker{body, false, 0, n, "", nil, nil}
 	body.SetSchema(network.buildSchema())
 	network.Spec = body
 	return network, nil
+}
+
+func (inst *Broker) s() {
+	s := inst.GetStore()
+	s.Set("mqtt", &mqttStore{
+		brokerUUID: inst.GetID(),
+	}, 0)
+
 }
 
 func (inst *Broker) getBroker() driver.Driver {
@@ -55,10 +61,6 @@ func (inst *Broker) setConnection() {
 		return
 	}
 	inst.connectionUUID = connection.UUID
-	inst.client = ffclient.New(&ffclient.Connection{
-		Ip:   connection.Host,
-		Port: connection.Port,
-	})
 	//t, _ := inst.ReadPinAsString(node.Topic)
 	inst.firstLoop = true
 
@@ -67,10 +69,10 @@ func (inst *Broker) setConnection() {
 func (inst *Broker) ping(loop uint64) {
 	rePing := loop % 10
 	if rePing == 0 {
-		err := inst.client.Ping()
-		if err != nil {
-
-		}
+		//err := inst.client.Ping()
+		//if err != nil {
+		//
+		//}
 	}
 
 }

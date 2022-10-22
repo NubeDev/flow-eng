@@ -8,6 +8,8 @@ import (
 type Payload struct {
 	ValueFloat *float64 `json:"float,omitempty"`
 	BoolFloat  *bool    `json:"boolean,omitempty"`
+	String     *string  `json:"string,omitempty"`
+	Any        any      `json:"any,omitempty"`
 }
 
 func (n *Spec) SetPayload(body *Payload) {
