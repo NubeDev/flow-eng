@@ -7,9 +7,8 @@ type Status struct {
 }
 
 func (n *Spec) SetStatus(body *Status) {
-
+	n.Status = body
 }
 func (n *Spec) GetStatus() *Status {
-
-	return nil
+	return n.Status
 }

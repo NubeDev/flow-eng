@@ -25,15 +25,14 @@ func ConvertToSpec(n Node) *Spec {
 		return nil
 	}
 	return &Spec{
-		Inputs:     n.GetInputs(),
-		Outputs:    n.GetOutputs(),
-		Info:       n.GetInfo(),
-		Settings:   n.GetSettings(),
-		Metadata:   n.GetMetadata(),
-		Parameters: n.GetParameters(),
-		IsParent:   n.GetIsParent(),
-		ParentId:   n.GetParentId(),
-		schema:     n.GetSchema(),
+		Inputs:   n.GetInputs(),
+		Outputs:  n.GetOutputs(),
+		Info:     n.GetInfo(),
+		Settings: n.GetSettings(),
+		Metadata: n.GetMetadata(),
+		IsParent: n.GetIsParent(),
+		ParentId: n.GetParentId(),
+		schema:   n.GetSchema(),
 	}
 }
 

@@ -2,7 +2,6 @@ package node
 
 import (
 	"github.com/NubeDev/flow-eng/db"
-	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/schemas"
 	"time"
 )
@@ -47,14 +46,14 @@ type Node interface {
 	GetMetadata() *Metadata
 	GetIsParent() bool
 	GetParentId() string
-	GetParameters() *Parameters
-	GetSubFlowNodes() []*Spec
-	DeleteSubFlowNodes()
 	SetMetadata(m *Metadata)
 	GetSettings() map[string]interface{}
 	NodeValues() *Values
 	GetStatus() *Status
 	SetStatus(*Status)
+	GetPayload() *Payload
+	SetPayload(payload *Payload)
+	ReadPayloadAsFloat() (value float64, null bool)
 }
 
 func New(id, name, nodeName string, meta *Metadata, settings map[string]interface{}) *Spec {
@@ -79,10 +78,10 @@ type Spec struct {
 	Settings      map[string]interface{} `json:"settings"`
 	AllowSettings bool                   `json:"allowSettings"`
 	Metadata      *Metadata              `json:"metadata,omitempty"`
-	Parameters    *Parameters            `json:"parameters,omitempty"`
 	IsParent      bool                   `json:"isParent"`
 	ParentId      string                 `json:"parentId,omitempty"`
 	Status        *Status                `json:"status,omitempty"`
+	Payload       *Payload               `json:"payload,omitempty"`
 	loopCount     uint64
 	schema        *schemas.Schema
 	db            db.DB
@@ -181,10 +180,6 @@ func (n *Spec) GetOutput(name OutputName) *Output {
 	return nil
 }
 
-func (n *Spec) GetParameters() *Parameters {
-	return n.Parameters
-}
-
 func (n *Spec) InputsLen() int {
 	return len(n.Inputs)
 }
@@ -234,14 +229,4 @@ type OutputConnection struct {
 type Metadata struct {
 	PositionX string `json:"positionX"`
 	PositionY string `json:"positionY"`
-}
-
-type Application struct {
-	Application names.ApplicationName `json:"application,omitempty"` // eg: bacnet-point belongs to bacnet-server
-	IsChild     bool                  `json:"isChild"`
-}
-
-type Parameters struct {
-	Application  *Application `json:"application"`
-	MaxNodeCount int          `json:"maxNodeCount,omitempty"` // eg: bacnet-server node can only be added once
 }
