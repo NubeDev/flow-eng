@@ -12,6 +12,7 @@ type Values struct {
 	Settings map[string]interface{} `json:"settings,omitempty"`
 	Outputs  []*nodeValue           `json:"outputs"`
 	Inputs   []*nodeValue           `json:"inputs"`
+	Status   *Status                `json:"status,omitempty"`
 }
 
 // NodeValues get the node current values
@@ -20,6 +21,7 @@ func (n *Spec) NodeValues() *Values {
 		NodeName: n.GetName(),
 		NodeID:   n.GetID(),
 		Settings: n.GetSettings(),
+		Status:   n.GetStatus(),
 	}
 	for _, output := range n.Outputs {
 		v := &nodeValue{

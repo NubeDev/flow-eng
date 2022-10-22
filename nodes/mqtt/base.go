@@ -1,7 +1,8 @@
 package broker
 
 const (
-	category = "mqtt"
-	mqttSub  = "mqtt-subscribe"
-	mqttPub  = "mqtt-publish"
+	category   = "mqtt"
+	mqttBroker = "mqtt-broker"
+	mqttSub    = "mqtt-subscribe"
+	mqttPub    = "mqtt-publish"
 )

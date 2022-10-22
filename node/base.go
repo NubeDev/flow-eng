@@ -33,7 +33,6 @@ func ConvertToSpec(n Node) *Spec {
 		Parameters: n.GetParameters(),
 		IsParent:   n.GetIsParent(),
 		ParentId:   n.GetParentId(),
-		SubFlow:    n.GetSubFlow(),
 		schema:     n.GetSchema(),
 	}
 }

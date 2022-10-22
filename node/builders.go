@@ -40,8 +40,5 @@ func Defaults(body *Spec, nodeName, category string) *Spec {
 			MaxNodeCount: 0,
 		}
 	}
-	if body.SubFlow == nil {
-		body.SubFlow = &SubFlow{}
-	}
 	return body
 }

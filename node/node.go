@@ -48,12 +48,13 @@ type Node interface {
 	GetIsParent() bool
 	GetParentId() string
 	GetParameters() *Parameters
-	GetSubFlow() *SubFlow
 	GetSubFlowNodes() []*Spec
 	DeleteSubFlowNodes()
 	SetMetadata(m *Metadata)
 	GetSettings() map[string]interface{}
 	NodeValues() *Values
+	GetStatus() *Status
+	SetStatus(*Status)
 }
 
 func New(id, name, nodeName string, meta *Metadata, settings map[string]interface{}) *Spec {
@@ -81,7 +82,7 @@ type Spec struct {
 	Parameters    *Parameters            `json:"parameters,omitempty"`
 	IsParent      bool                   `json:"isParent"`
 	ParentId      string                 `json:"parentId,omitempty"`
-	SubFlow       *SubFlow               `json:"subFlow,omitempty"`
+	Status        *Status                `json:"status,omitempty"`
 	loopCount     uint64
 	schema        *schemas.Schema
 	db            db.DB
@@ -192,18 +193,6 @@ func (n *Spec) OutputsLen() int {
 	return len(n.Outputs)
 }
 
-func (n *Spec) GetSubFlow() *SubFlow {
-	return n.SubFlow
-}
-
-func (n *Spec) GetSubFlowNodes() []*Spec {
-	return n.SubFlow.Nodes
-}
-
-func (n *Spec) DeleteSubFlowNodes() {
-	n.SubFlow.Nodes = nil
-}
-
 func (n *Spec) GetParentId() string {
 	return n.ParentId
 }
@@ -245,11 +234,6 @@ type OutputConnection struct {
 type Metadata struct {
 	PositionX string `json:"positionX"`
 	PositionY string `json:"positionY"`
-}
-
-type SubFlow struct {
-	ParentID string  `json:"parentID,omitempty"` // nodeID eg: bacnet-server node
-	Nodes    []*Spec `json:"nodes,omitempty"`    // bacnet-point
 }
 
 type Application struct {
