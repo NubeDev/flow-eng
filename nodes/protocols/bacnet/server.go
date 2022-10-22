@@ -70,10 +70,11 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	}
 	body.Parameters = node.BuildParameters(parameters) // if node is already added then show the user
 	body.IsParent = true
-	body = node.BuildNode(body, nil, outputs, nil)
+	body = node.BuildNode(body, nil, outputs, body.Settings)
 	clients := &clients{}
 	server := &Server{body, clients, false, false, false, false, opts.Store, application}
 	server.clients.mqttClient = opts.MqttClient
+	body.SetSchema(BuildSchemaServer())
 	if application == names.RubixIO || application == names.RubixIOAndModbus {
 		rubixIOUICount, rubixIOUOCount := points.CalcPointCount(1, application)
 		rio := &rubixIO.RubixIO{}
@@ -91,7 +92,6 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 		server.clients.edge28 = edge28
 		log.Infof("bacnet-server: start application: %s device-ip: %s", application, opts.Ip)
 	}
-	body.SetSchema(buildSchemaServer())
 	return server, err
 }
 

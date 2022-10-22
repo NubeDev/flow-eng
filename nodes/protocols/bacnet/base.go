@@ -37,7 +37,7 @@ Address are the same as above the AI
 
 const (
 	category   = "bacnet"
-	serverNode = "server"
+	serverNode = "bacnet-server"
 	bacnetBI   = "binary-input"
 	bacnetBO   = "binary-output"
 	bacnetBV   = "binary-variable"

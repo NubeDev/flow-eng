@@ -16,7 +16,7 @@ type serverSchema struct {
 
 var serialPorts = []string{"RC5 485-1", "RC5 485-2", "RC5/RC-IO SIDE-485-PORT", "/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyAMA0"}
 
-func buildSchemaServer() *schemas.Schema {
+func BuildSchemaServer() *schemas.Schema {
 	props := &serverSchema{}
 	props.AppType.Title = "hardware-type"
 	props.AppType.Default = string(names.Modbus)
@@ -24,9 +24,9 @@ func buildSchemaServer() *schemas.Schema {
 	props.AppType.Options = []string{string(names.Modbus), string(names.RubixIO), string(names.RubixIOAndModbus), string(names.Edge)}
 
 	props.DeviceCount.Title = "IO-16-device-count"
-	props.DeviceCount.Default = string(names.Modbus)
-	props.DeviceCount.EnumName = []string{"1x IO-16", "2x IO-16", "3x IO-16", "4x IO-16"}
-	props.DeviceCount.Options = []string{"1", "2", "3", "4"}
+	props.DeviceCount.Default = "No IO-16s"
+	props.DeviceCount.EnumName = []string{"No IO-16s", "1x IO-16", "2x IO-16s", "3x IO-16s", "4x IO-16s"}
+	props.DeviceCount.Options = []string{"0", "2", "3", "4"}
 
 	props.Serial.Title = "serial-port (baud-rate:38400)"
 	props.Serial.Default = serialPorts[0]
@@ -49,7 +49,7 @@ type BacnetSchema struct {
 	Serial      string `json:"serial"`
 }
 
-func getBacnetSchema(body map[string]interface{}) (*BacnetSchema, error) {
+func GetBacnetSchema(body map[string]interface{}) (*BacnetSchema, error) {
 	settings := &BacnetSchema{}
 	err := mapstructure.Decode(body, settings)
 	if err != nil {

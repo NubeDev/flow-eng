@@ -81,7 +81,7 @@ const (
 	linkInput  = "link-input"
 	linkOutput = "link-output"
 
-	bacnetServer = "server"
+	bacnetServer = "bacnet-server"
 	bacnetAI     = "analog-input"
 	bacnetAO     = "analog-output"
 	bacnetAV     = "analog-variable"
