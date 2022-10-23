@@ -32,5 +32,7 @@ func (inst *Store) Get(key string) (interface{}, bool) {
 // (DefaultExpiration), the store's default expiration time is used.
 // If it is -1 (NoExpiration), the item never expires.
 func (inst *Store) Set(key string, value interface{}, d time.Duration) {
-	inst.Store.Set(key, value, d)
+	if key != "" {
+		inst.Store.Set(key, value, d)
+	}
 }

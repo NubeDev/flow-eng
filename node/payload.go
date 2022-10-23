@@ -29,3 +29,14 @@ func (n *Spec) ReadPayloadAsFloat() (value float64, null bool) {
 	}
 	return conversions.GetFloat(float.NonNil(r.ValueFloat)), false
 }
+
+func (n *Spec) ReadPayloadAsString() (value string, null bool) {
+	r := n.GetPayload()
+	if r == nil {
+		return "", true
+	}
+	if r.String == nil {
+		return "", true
+	}
+	return *r.String, false
+}

@@ -57,6 +57,9 @@ type Node interface {
 	GetPayload() *Payload
 	SetPayload(payload *Payload)
 	ReadPayloadAsFloat() (value float64, null bool)
+	GetNode(uuid string) Node
+	GetNodes() []Node
+	AddNodes(f []Node)
 }
 
 func New(id, name, nodeName string, meta *Metadata, settings map[string]interface{}) *Spec {
@@ -89,12 +92,30 @@ type Spec struct {
 	schema        *schemas.Schema
 	db            db.DB
 	store         *store.Store
+	nodes         []Node
 }
 
 func (n *Spec) Cleanup() {}
 
 func (n *Spec) AddDB(d db.DB) {
 	n.db = d
+}
+
+func (n *Spec) GetNode(uuid string) Node {
+	for _, node := range n.nodes {
+		if node.GetID() == uuid {
+			return node
+		}
+	}
+	return nil
+}
+
+func (n *Spec) GetNodes() []Node {
+	return n.nodes
+}
+
+func (n *Spec) AddNodes(f []Node) {
+	n.nodes = f
 }
 
 func (n *Spec) GetDB() db.DB {

@@ -218,11 +218,9 @@ func makeGraphs(runners []*node.Runner) []*graph.Ordered {
 			graphs = append(graphs, graph.NewOrdered(runner, mapped))
 		}
 	}
-
 	if len(graphs) == 0 {
 		// panic("circular flows are not supported")
 	}
-
 	return graphs
 }
 
@@ -240,7 +238,6 @@ func isRootNode(runner *node.Runner) bool {
 
 func mapRunners(runners []*node.Runner) map[uuid.Value]*node.Runner {
 	mapped := make(map[uuid.Value]*node.Runner)
-
 	// map output port UUIDs to runners
 	for i := 0; i < len(runners); i++ {
 		runner := runners[i]

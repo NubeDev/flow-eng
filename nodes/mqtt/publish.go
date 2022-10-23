@@ -18,18 +18,6 @@ type MqttPub struct {
 
 func NewMqttPub(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, mqttPub, category)
-	//_, setting, value, err := node.NewSetting(body, &node.SettingOptions{Type: node.String, Title: topic, Min: 1, Max: 200})
-	//if err != nil {
-	//	return nil, err
-	//}
-	//settings, err := node.BuildSettings(setting)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//mqttTopic, ok := value.(string)
-	//if !ok {
-	//	mqttTopic = ""
-	//}
 	inputs := node.BuildInputs(node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out1, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)

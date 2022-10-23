@@ -3,21 +3,25 @@ package broker
 import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/db"
+	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/node"
-	"github.com/NubeDev/flow-eng/nodes/protocols/driver"
 	"github.com/NubeDev/flow-eng/schemas"
+	"github.com/NubeDev/flow-eng/services/mqttclient"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 	log "github.com/sirupsen/logrus"
 )
 
 type Broker struct {
 	*node.Spec
-	firstLoop      bool
-	loopCount      uint64
-	networkUUID    string
-	connectionUUID string
-	connection     *db.Connection
-	pool           driver.Driver
+	firstLoop     bool
+	loopCount     uint64
+	connection    *db.Connection
+	mqttClient    *mqttclient.Client
+	mqttConnected bool
 }
+
+var mqttQOS = mqttclient.AtMostOnce
+var mqttRetain = false
 
 func NewBroker(body *node.Spec) (node.Node, error) {
 	//var err error
@@ -28,64 +32,89 @@ func NewBroker(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body.IsParent = true
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	n, _ := body.ReadPinAsString(node.UUID)
-	network := &Broker{body, false, 0, n, "", nil, nil}
-	body.SetSchema(network.buildSchema())
+	network := &Broker{body, false, 0, nil, nil, false}
+	//
 	network.Spec = body
 	return network, nil
 }
 
-func (inst *Broker) s() {
+func getPayloads(children interface{}, ok bool) []*mqttPayload {
+	if ok {
+		mqttData := children.(*mqttStore)
+		if mqttData != nil {
+			return mqttData.payloads
+		}
+	}
+	return nil
+}
+
+func (inst *Broker) subscribe() {
+	callback := func(client mqtt.Client, message mqtt.Message) {
+		s := inst.GetStore()
+		children, ok := s.Get(inst.GetID())
+		payloads := getPayloads(children, ok)
+		for _, payload := range payloads {
+			if payload.topic != "" {
+				n := inst.GetNode(payload.nodeUUID)
+				n.SetPayload(&node.Payload{
+					String: str.New(string(message.Payload())),
+				})
+			}
+		}
+	}
 	s := inst.GetStore()
-	s.Set("mqtt", &mqttStore{
-		brokerUUID: inst.GetID(),
-	}, 0)
-
-}
-
-func (inst *Broker) getBroker() driver.Driver {
-	return inst.pool
-}
-
-func (inst *Broker) getInst() *Broker {
-	return inst
+	children, ok := s.Get(inst.GetID())
+	payloads := getPayloads(children, ok)
+	for _, payload := range payloads {
+		if payload.topic != "" {
+			if inst.mqttClient != nil {
+				err := inst.mqttClient.Subscribe(payload.topic, mqttQOS, callback)
+				if err != nil {
+					log.Errorf("mqtt-broker subscribe:%s err:%s", payload.topic, err.Error())
+				} else {
+					log.Infof("mqtt-broker subscribe:%s", payload.topic)
+				}
+			}
+		}
+	}
 }
 
 func (inst *Broker) setConnection() {
-	fmt.Println("ADD NETWORK", inst.pool)
-
-	connection, err := inst.GetDB().GetConnection("con_db7de7598bba")
+	settings, err := getSettings(inst.GetSettings())
 	if err != nil {
-		inst.firstLoop = false // if fail try again
-		log.Error("add flow network failed to find connection")
+		log.Errorf("add mqtt broker failed to get settings err:%s", err.Error())
 		return
 	}
-	inst.connectionUUID = connection.UUID
-	//t, _ := inst.ReadPinAsString(node.Topic)
-	inst.firstLoop = true
-
-}
-
-func (inst *Broker) ping(loop uint64) {
-	rePing := loop % 10
-	if rePing == 0 {
-		//err := inst.client.Ping()
-		//if err != nil {
-		//
-		//}
+	connection, err := inst.GetDB().GetConnection(settings.Conn)
+	if err != nil {
+		log.Error("add mqtt broker failed to find connection")
+		return
+	}
+	inst.connection = connection
+	mqttClient, err := mqttclient.NewClient(mqttclient.ClientOptions{
+		Servers: []string{fmt.Sprintf("tcp://%s:%d", connection.Host, connection.Port)},
+	})
+	err = mqttClient.Connect()
+	if err != nil {
+		log.Error(err)
+	} else {
+		inst.mqttClient = mqttClient
+		inst.mqttConnected = true
 	}
 
 }
 
 func (inst *Broker) GetSchema() *schemas.Schema {
-	return inst.buildSchema()
+	s := inst.buildSchema()
+	return s
 }
 
 func (inst *Broker) Process() {
-	inst.loopCount++
-	if !inst.firstLoop {
-		inst.setConnection()
+	loopCount, firstLoop := inst.Loop()
+	if firstLoop {
+		go inst.setConnection()
 	}
-	inst.ping(inst.loopCount)
-
+	if loopCount == 2 {
+		go inst.subscribe()
+	}
 }
