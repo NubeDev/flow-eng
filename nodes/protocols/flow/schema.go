@@ -1,10 +1,10 @@
 package flow
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
-	"github.com/mitchellh/mapstructure"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -38,14 +38,15 @@ func (inst *Network) buildSchema() *schemas.Schema {
 	props.Conn.Title = "connections"
 	if len(names) > 0 {
 		props.Conn.Default = names[0]
+	} else {
+		names = append(names, "no connection has been added")
 	}
-
 	props.Conn.Options = uuids
 	props.Conn.EnumName = names
 	schema.Set(props)
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{
-			Title:      "connections",
+			Title:      "settings",
 			Properties: props,
 		},
 		UiSchema: nil,
@@ -57,14 +58,12 @@ type nodeSettings struct {
 	Conn string `json:"connections"`
 }
 
-func getSettings(body map[string]interface{}) (string, error) {
+func getSettings(body map[string]interface{}) (*nodeSettings, error) {
 	settings := &nodeSettings{}
-	err := mapstructure.Decode(body, settings)
+	marshal, err := json.Marshal(body)
 	if err != nil {
-		return "", err
+		return settings, err
 	}
-	if settings != nil {
-		return settings.Conn, nil
-	}
-	return "", nil
+	err = json.Unmarshal(marshal, &settings)
+	return settings, err
 }

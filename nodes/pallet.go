@@ -56,6 +56,9 @@ func EncodePallet() ([]*PalletNode, error) {
 		if spec.GetSchema() != nil {
 			one.AllowSettings = true
 		}
+		if spec.AllowSettings {
+			one.AllowSettings = true
+		}
 		one.Type = nodeType
 		one.Category = spec.Info.Category
 		one.IsParent = spec.IsParent
