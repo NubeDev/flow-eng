@@ -133,6 +133,9 @@ const (
 
 	OutTopic OutputName = "topic"
 	Out      OutputName = "out"
+
+	Connected OutputName = "connected"
+
 	CountOut OutputName = "count"
 
 	MinOn  OutputName = "min-on"

@@ -13,9 +13,10 @@ type mqttStore struct {
 }
 
 type mqttPayload struct {
-	nodeUUID string
-	topic    string
-	payload  string
+	nodeUUID    string
+	topic       string
+	payload     string
+	isPublisher bool
 }
 
 func addUpdatePayload(nodeUUID string, p *mqttStore, newPayload *mqttPayload) (data *mqttStore, found bool) {

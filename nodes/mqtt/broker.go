@@ -26,10 +26,8 @@ var mqttRetain = false
 func NewBroker(body *node.Spec) (node.Node, error) {
 	//var err error
 	body = node.Defaults(body, mqttBroker, category)
-	connectionName := node.BuildInput(node.Connection, node.TypeString, nil, body.Inputs)
-	name := node.BuildInput(node.Name, node.TypeString, nil, body.Inputs)
-	inputs := node.BuildInputs(connectionName, name)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
+	inputs := node.BuildInputs()
+	outputs := node.BuildOutputs(node.BuildOutput(node.Connected, node.TypeBool, nil, body.Outputs))
 	body.IsParent = true
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	network := &Broker{body, false, 0, nil, nil, false}
@@ -54,7 +52,7 @@ func (inst *Broker) subscribe() {
 		children, ok := s.Get(inst.GetID())
 		payloads := getPayloads(children, ok)
 		for _, payload := range payloads {
-			if payload.topic != "" {
+			if payload.topic == message.Topic() {
 				n := inst.GetNode(payload.nodeUUID)
 				n.SetPayload(&node.Payload{
 					String: str.New(string(message.Payload())),
@@ -73,6 +71,34 @@ func (inst *Broker) subscribe() {
 					log.Errorf("mqtt-broker subscribe:%s err:%s", payload.topic, err.Error())
 				} else {
 					log.Infof("mqtt-broker subscribe:%s", payload.topic)
+				}
+			}
+		}
+	}
+}
+
+func (inst *Broker) publish() {
+	s := inst.GetStore()
+	children, ok := s.Get(inst.GetID())
+	payloads := getPayloads(children, ok)
+	for _, payload := range payloads {
+		if !payload.isPublisher {
+			continue
+		}
+		n := inst.GetNode(payload.nodeUUID)
+		t, _ := n.ReadPinAsString(node.Topic)
+		p, _ := n.ReadPinAsString(node.Message)
+		if p != "" {
+			if t == payload.topic {
+				if inst.mqttClient != nil {
+					updated, _ := n.InputUpdated(node.Message)
+					if updated {
+						err := inst.mqttClient.Publish(t, mqttQOS, mqttRetain, p)
+						if err != nil {
+							log.Errorf("mqtt-broker publish err:%s", err.Error())
+						}
+					}
+
 				}
 			}
 		}
@@ -116,5 +142,13 @@ func (inst *Broker) Process() {
 	}
 	if loopCount == 2 {
 		go inst.subscribe()
+	}
+	if inst.mqttConnected {
+		inst.WritePinTrue(node.Connected)
+	} else {
+		inst.WritePinFalse(node.Connected)
+	}
+	if loopCount > 1 {
+		go inst.publish()
 	}
 }

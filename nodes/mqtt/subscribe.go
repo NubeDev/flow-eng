@@ -1,31 +1,21 @@
 package broker
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/node"
-	"github.com/NubeDev/flow-eng/services/mqttclient"
 )
 
 type MqttSub struct {
 	*node.Spec
-	client     *mqttclient.Client
-	connected  bool
-	subscribed bool
-	topic      string
+	topic string
 }
-
-const (
-	topic = "topic"
-)
 
 func NewMqttSub(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, mqttSub, category)
 	top := node.BuildInput(node.Topic, node.TypeString, nil, body.Inputs)
-	ip := node.BuildInput(node.Ip, node.TypeString, nil, body.Inputs)
-	inputs := node.BuildInputs(top, ip)
+	inputs := node.BuildInputs(top)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
-	return &MqttSub{body, nil, false, false, ""}, nil
+	return &MqttSub{body, ""}, nil
 }
 
 func (inst *MqttSub) set() {
@@ -54,9 +44,18 @@ func (inst *MqttSub) set() {
 }
 
 func (inst *MqttSub) Process() {
-	topic, _ := inst.ReadPinAsString(node.Topic)
-	inst.topic = topic
-	inst.set()
-	v, null := inst.ReadPayloadAsString()
-	fmt.Println("MQTT-SUB Process()", v, null)
+	_, firstLoop := inst.Loop()
+	if firstLoop {
+		topic, null := inst.ReadPinAsString(node.Topic)
+		if !null {
+			inst.topic = topic
+			inst.set()
+		}
+	}
+	val, null := inst.ReadPayloadAsString()
+	if null {
+		inst.WritePinNull(node.Out)
+	} else {
+		inst.WritePin(node.Out, val)
+	}
 }
