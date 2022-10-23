@@ -1,7 +1,6 @@
 package link
 
 import (
-	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/node"
 )
 
@@ -23,8 +22,10 @@ func NewInput(body *node.Spec, store *Store) (node.Node, error) {
 }
 
 func (inst *Input) Process() {
-	topic := conversions.ToString(inst.ReadPin(node.Topic))
 	in1 := inst.ReadPin(node.In)
 	inst.WritePin(node.Out, in1)
-	getStore().Add(topic, in1)
+	topic, _ := inst.ReadPinAsString(node.Topic)
+	if topic != "" {
+		getStore().Add(topic, in1)
+	}
 }

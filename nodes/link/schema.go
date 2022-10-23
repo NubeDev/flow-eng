@@ -19,7 +19,7 @@ func options() []string {
 	return out
 }
 
-func buildSchema() *schemas.Schema {
+func (inst *Output) buildSchema() *schemas.Schema {
 	opts := options()
 	props := &nodeSchema{}
 	props.Sch.Title = "Select Topic"

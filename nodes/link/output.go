@@ -2,6 +2,7 @@ package link
 
 import (
 	"github.com/NubeDev/flow-eng/node"
+	"github.com/NubeDev/flow-eng/schemas"
 )
 
 type Output struct {
@@ -17,7 +18,6 @@ func NewOutput(body *node.Spec, store *Store) (node.Node, error) {
 	topic := node.BuildOutput(node.OutTopic, node.TypeString, nil, body.Outputs)
 	outputs := node.BuildOutputs(out, topic)
 	body = node.BuildNode(body, nil, outputs, body.Settings)
-	body.SetSchema(buildSchema())
 	return &Output{body}, nil
 }
 
@@ -30,4 +30,8 @@ func (inst *Output) Process() {
 	} else {
 		inst.WritePinNull(node.Out)
 	}
+}
+
+func (inst *Output) GetSchema() *schemas.Schema {
+	return inst.buildSchema()
 }
