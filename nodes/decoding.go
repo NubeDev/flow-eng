@@ -15,7 +15,7 @@ func Decode(encodedNodes *NodesList) ([]*node.Spec, error) {
 		decodedNode = node.New(id, name, "", encodedNode.Metadata, encodedNode.Settings) // create a blank node
 		decodedNode.IsParent = encodedNode.IsParent
 		decodedNode.ParentId = encodedNode.ParentId
-		newNode, err := Builder(decodedNode, nil)
+		newNode, err := Builder(decodedNode, nil, nil)
 		if err != nil {
 			log.Error(err)
 			return nil, err

@@ -61,14 +61,6 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	outputApplication := node.BuildOutput(node.Msg, node.TypeString, nil, body.Outputs)
 	outputErr := node.BuildOutput(node.ErrMsg, node.TypeString, nil, body.Outputs)
 	outputs := node.BuildOutputs(outputApplication, outputErr)
-	parameters := &node.Parameters{
-		Application: &node.Application{
-			Application: names.BACnet,
-			IsChild:     false,
-		},
-		MaxNodeCount: 1,
-	}
-	body.Parameters = node.BuildParameters(parameters) // if node is already added then show the user
 	body.IsParent = true
 	body = node.BuildNode(body, nil, outputs, body.Settings)
 	clients := &clients{}

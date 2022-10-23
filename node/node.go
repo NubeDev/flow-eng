@@ -2,7 +2,7 @@ package node
 
 import (
 	"github.com/NubeDev/flow-eng/db"
-	"github.com/NubeDev/flow-eng/helpers/names"
+	"github.com/NubeDev/flow-eng/helpers/store"
 	"github.com/NubeDev/flow-eng/schemas"
 	"time"
 )
@@ -13,6 +13,8 @@ type Node interface {
 	Loop() (count uint64, firstLoop bool)
 	AddDB(d db.DB)
 	GetDB() db.DB
+	AddStore(s *store.Store)
+	GetStore() *store.Store
 	SetSchema(schema *schemas.Schema)
 	GetSchema() *schemas.Schema
 	GetInfo() Info
@@ -47,13 +49,17 @@ type Node interface {
 	GetMetadata() *Metadata
 	GetIsParent() bool
 	GetParentId() string
-	GetParameters() *Parameters
-	GetSubFlow() *SubFlow
-	GetSubFlowNodes() []*Spec
-	DeleteSubFlowNodes()
 	SetMetadata(m *Metadata)
 	GetSettings() map[string]interface{}
 	NodeValues() *Values
+	GetStatus() *Status
+	SetStatus(*Status)
+	GetPayload() *Payload
+	SetPayload(payload *Payload)
+	ReadPayloadAsFloat() (value float64, null bool)
+	GetNode(uuid string) Node
+	GetNodes() []Node
+	AddNodes(f []Node)
 }
 
 func New(id, name, nodeName string, meta *Metadata, settings map[string]interface{}) *Spec {
@@ -78,13 +84,15 @@ type Spec struct {
 	Settings      map[string]interface{} `json:"settings"`
 	AllowSettings bool                   `json:"allowSettings"`
 	Metadata      *Metadata              `json:"metadata,omitempty"`
-	Parameters    *Parameters            `json:"parameters,omitempty"`
 	IsParent      bool                   `json:"isParent"`
 	ParentId      string                 `json:"parentId,omitempty"`
-	SubFlow       *SubFlow               `json:"subFlow,omitempty"`
+	Status        *Status                `json:"status,omitempty"`
+	Payload       *Payload               `json:"payload,omitempty"`
 	loopCount     uint64
 	schema        *schemas.Schema
 	db            db.DB
+	store         *store.Store
+	nodes         []Node
 }
 
 func (n *Spec) Cleanup() {}
@@ -93,8 +101,33 @@ func (n *Spec) AddDB(d db.DB) {
 	n.db = d
 }
 
+func (n *Spec) GetNode(uuid string) Node {
+	for _, node := range n.nodes {
+		if node.GetID() == uuid {
+			return node
+		}
+	}
+	return nil
+}
+
+func (n *Spec) GetNodes() []Node {
+	return n.nodes
+}
+
+func (n *Spec) AddNodes(f []Node) {
+	n.nodes = f
+}
+
 func (n *Spec) GetDB() db.DB {
 	return n.db
+}
+
+func (n *Spec) AddStore(s *store.Store) {
+	n.store = s
+}
+
+func (n *Spec) GetStore() *store.Store {
+	return n.store
 }
 
 // Loop will give you the loop count and a flag if it's the first loop
@@ -180,28 +213,12 @@ func (n *Spec) GetOutput(name OutputName) *Output {
 	return nil
 }
 
-func (n *Spec) GetParameters() *Parameters {
-	return n.Parameters
-}
-
 func (n *Spec) InputsLen() int {
 	return len(n.Inputs)
 }
 
 func (n *Spec) OutputsLen() int {
 	return len(n.Outputs)
-}
-
-func (n *Spec) GetSubFlow() *SubFlow {
-	return n.SubFlow
-}
-
-func (n *Spec) GetSubFlowNodes() []*Spec {
-	return n.SubFlow.Nodes
-}
-
-func (n *Spec) DeleteSubFlowNodes() {
-	n.SubFlow.Nodes = nil
 }
 
 func (n *Spec) GetParentId() string {
@@ -245,19 +262,4 @@ type OutputConnection struct {
 type Metadata struct {
 	PositionX string `json:"positionX"`
 	PositionY string `json:"positionY"`
-}
-
-type SubFlow struct {
-	ParentID string  `json:"parentID,omitempty"` // nodeID eg: bacnet-server node
-	Nodes    []*Spec `json:"nodes,omitempty"`    // bacnet-point
-}
-
-type Application struct {
-	Application names.ApplicationName `json:"application,omitempty"` // eg: bacnet-point belongs to bacnet-server
-	IsChild     bool                  `json:"isChild"`
-}
-
-type Parameters struct {
-	Application  *Application `json:"application"`
-	MaxNodeCount int          `json:"maxNodeCount,omitempty"` // eg: bacnet-server node can only be added once
 }

@@ -26,6 +26,21 @@ func (p *Flow) GetNodes() []node.Node {
 	return p.nodes
 }
 
+type Message struct {
+	Message string `json:"message"`
+}
+
+// SetNodePayload write value to a node from an api
+func (p *Flow) SetNodePayload(uuid string, payload *node.Payload) (*Message, error) {
+	for _, n := range p.GetNodes() {
+		if uuid == n.GetID() {
+			n.SetPayload(payload)
+			return &Message{Message: "ok"}, nil
+		}
+	}
+	return nil, errors.New("node not found")
+}
+
 // NodesValue get a single node value
 func (p *Flow) NodesValue(uuid string) (*node.Values, error) {
 	for _, n := range p.GetNodes() {
@@ -203,11 +218,9 @@ func makeGraphs(runners []*node.Runner) []*graph.Ordered {
 			graphs = append(graphs, graph.NewOrdered(runner, mapped))
 		}
 	}
-
 	if len(graphs) == 0 {
 		// panic("circular flows are not supported")
 	}
-
 	return graphs
 }
 
@@ -225,7 +238,6 @@ func isRootNode(runner *node.Runner) bool {
 
 func mapRunners(runners []*node.Runner) map[uuid.Value]*node.Runner {
 	mapped := make(map[uuid.Value]*node.Runner)
-
 	// map output port UUIDs to runners
 	for i := 0; i < len(runners); i++ {
 		runner := runners[i]
