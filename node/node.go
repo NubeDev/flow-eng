@@ -50,6 +50,8 @@ type Node interface {
 	GetIsParent() bool
 	GetParentId() string
 	SetMetadata(m *Metadata)
+	GetAllowSettings() bool
+	SetAllowSettings()
 	GetSettings() map[string]interface{}
 	NodeValues() *Values
 	GetStatus() *Status
@@ -143,6 +145,14 @@ func (n *Spec) Loop() (loopCount uint64, firstLoop bool) {
 
 func (n *Spec) GetSchema() *schemas.Schema {
 	return n.schema
+}
+
+func (n *Spec) GetAllowSettings() bool {
+	return n.AllowSettings
+}
+
+func (n *Spec) SetAllowSettings() {
+	n.AllowSettings = true
 }
 
 func (n *Spec) SetSchema(schema *schemas.Schema) {

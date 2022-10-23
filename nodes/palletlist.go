@@ -25,7 +25,6 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/notify/ping"
 	point "github.com/NubeDev/flow-eng/nodes/points"
 	bacnetio "github.com/NubeDev/flow-eng/nodes/protocols/bacnet"
-	"github.com/NubeDev/flow-eng/nodes/protocols/driver"
 	"github.com/NubeDev/flow-eng/nodes/protocols/flow"
 	"github.com/NubeDev/flow-eng/nodes/protocols/rest"
 	"github.com/NubeDev/flow-eng/nodes/statistics"
@@ -65,9 +64,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	// streams
 	flatLine, _ := streams.NewFlatline(nil)
 
-	flowNetwork, _ := flow.NewNetwork(nil, nil)
-	flowDevice, _ := flow.NewDevice(nil, nil)
-	flowPoint, _ := flow.NewPoint(nil, nil)
+	flowNetwork, _ := flow.NewNetwork(nil)
+	flowPoint, _ := flow.NewPoint(nil)
 
 	flowLoopCount, _ := system.NewLoopCount(nil)
 
@@ -180,7 +178,6 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(flowLoopCount),
 
 		node.ConvertToSpec(flowNetwork),
-		node.ConvertToSpec(flowDevice),
 		node.ConvertToSpec(flowPoint),
 
 		node.ConvertToSpec(deadBand),
@@ -404,20 +401,11 @@ func builderJson(body *node.Spec) (node.Node, error) {
 }
 
 func builderFlowNetworks(body *node.Spec, opts []interface{}) (node.Node, error) {
-	var networksPool driver.Driver
-	if len(opts) > 0 {
-		_, ok := opts[0].(driver.Driver)
-		if ok {
-			networksPool = opts[0].(driver.Driver)
-		}
-	}
 	switch body.GetName() {
 	case flowNetwork:
-		return flow.NewNetwork(body, networksPool)
-	case flowDevice:
-		return flow.NewDevice(body, networksPool)
+		return flow.NewNetwork(body)
 	case flowPoint:
-		return flow.NewPoint(body, networksPool)
+		return flow.NewPoint(body)
 	}
 	return nil, nil
 }
