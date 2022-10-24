@@ -100,7 +100,6 @@ func GetFloatPointerOk(in interface{}) (val *float64, ok bool) {
 }
 
 func GetFloat(in interface{}) (val float64) {
-	fmt.Println(1111, in, fmt.Sprintf("%v", in))
 	switch i := in.(type) {
 	case bool:
 		val = BoolToNum(i)
