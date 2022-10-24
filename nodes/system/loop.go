@@ -19,10 +19,8 @@ func NewLoopCount(body *node.Spec) (node.Node, error) {
 	return &Loop{body}, nil
 }
 
-var counter uint64
-
 func (inst *Loop) Process() {
-	counter++
+	counter, _ := inst.Loop()
 	toggleOnCount, _ := inst.ReadPinAsUint64(node.Count)
 	if toggleOnCount <= 0 {
 		toggleOnCount = 2

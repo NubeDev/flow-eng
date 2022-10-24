@@ -8,11 +8,21 @@ import (
 	"strings"
 )
 
+func fixTopic(topic string) string {
+	parts := strings.Split(topic, "/")
+	if len(parts) == 12 {
+		parts[6] = "+"
+		parts[8] = "+"
+		parts[10] = "+"
+		return strings.Join(parts, "/")
+	}
+	return ""
+}
+
 func pointTopic(selected string) string {
 	parts := strings.Split(selected, ":")
 	if len(parts) >= 3 {
-		return fmt.Sprintf("+/+/+/+/+/+/rubix/points/value/cov/all/%s/+/%s/+/%s/+/%s", parts[0], parts[1], parts[2], parts[3])
-		// na/na/na/na/Ugbo2JjAnfc939rRBTpuoT/na/rubix/points/value/cov/all/system/net_ebc64b5754674378/net/dev_21223294a79742a1/dev/pnt_94ea3ea254dc440a/pnt
+		return fmt.Sprintf("rubix/points/value/cov/all/%s/+/%s/+/%s/+/%s", parts[0], parts[1], parts[2], parts[3])
 	}
 	return ""
 }

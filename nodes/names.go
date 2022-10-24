@@ -36,8 +36,9 @@ const (
 	dataStore  = "data-store"
 	jsonFilter = "json-filter"
 
-	flowNetwork = "flow-network"
-	flowPoint   = "flow-point"
+	flowNetwork    = "flow-network"
+	flowPoint      = "flow-point"
+	flowPointWrite = "flow-point-write"
 
 	flowLoopCount = "flow-loop-count"
 

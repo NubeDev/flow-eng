@@ -5,22 +5,23 @@ import (
 	"github.com/NubeDev/flow-eng/node"
 )
 
-type Point struct {
+type PointPointWrite struct {
 	*node.Spec
-	topic       string
-	lastPayload *covPayload
+	topic string
 }
 
-func NewPoint(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, flowPoint, category)
-	inputs := node.BuildInputs()
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
+func NewPointWrite(body *node.Spec) (node.Node, error) {
+	body = node.Defaults(body, flowPointWrite, category)
+	in15 := node.BuildInput(node.In15, node.TypeFloat, nil, body.Inputs)
+	in16 := node.BuildInput(node.In16, node.TypeFloat, nil, body.Inputs)
+	inputs := node.BuildInputs(in15, in16)
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body.SetAllowSettings()
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	return &Point{body, "", nil}, nil
+	return &PointPointWrite{body, ""}, nil
 }
 
-func (inst *Point) set() {
+func (inst *PointPointWrite) set() {
 	s := inst.GetStore()
 	parentId := inst.GetParentId()
 	nodeUUID := inst.GetID()
@@ -30,31 +31,31 @@ func (inst *Point) set() {
 		s.Set(parentId, &pointStore{
 			parentID: parentId,
 			payloads: []*pointDetails{&pointDetails{
-				nodeUUID: nodeUUID,
-				topic:    inst.topic,
+				nodeUUID:       nodeUUID,
+				netDevPntNames: inst.topic,
+				isWriteable:    true,
 			}},
 		}, 0)
 	} else {
 		mqttData = d.(*pointStore)
 		payload := &pointDetails{
-			nodeUUID: nodeUUID,
-			topic:    inst.topic,
+			nodeUUID:       nodeUUID,
+			netDevPntNames: inst.topic,
+			isWriteable:    true,
 		}
 		mqttData, _ = addUpdatePayload(nodeUUID, mqttData, payload)
 		s.Set(parentId, mqttData, 0)
 	}
 }
 
-func (inst *Point) Process() {
+func (inst *PointPointWrite) Process() {
 	_, firstLoop := inst.Loop()
 	if firstLoop {
 		topic, err := getPointSettings(inst.GetSettings())
-		fmt.Println("SETTINGS", topic.Point, inst.GetSettings(), err)
 		if err == nil {
 			if topic.Point != "" {
-				t := pointTopic(topic.Point)
-				if t != "" {
-					inst.topic = t
+				if topic.Point != "" {
+					inst.topic = topic.Point
 					inst.set()
 				}
 			}
@@ -65,11 +66,7 @@ func (inst *Point) Process() {
 		inst.WritePinNull(node.Out)
 	} else {
 		p, err := parseCOV(val)
-		if err == nil && p != nil {
-			inst.lastPayload = p
-			inst.WritePinFloat(node.Out, p.Value, 2)
-		} else {
-			inst.WritePinNull(node.Out)
-		}
+		fmt.Println(p, err)
+		inst.WritePin(node.Out, val)
 	}
 }
