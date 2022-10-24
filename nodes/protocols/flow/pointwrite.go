@@ -3,9 +3,10 @@ package flow
 import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/node"
+	"github.com/NubeDev/flow-eng/schemas"
 )
 
-type PointPointWrite struct {
+type PointWrite struct {
 	*node.Spec
 	topic string
 }
@@ -18,10 +19,10 @@ func NewPointWrite(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body.SetAllowSettings()
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	return &PointPointWrite{body, ""}, nil
+	return &PointWrite{body, ""}, nil
 }
 
-func (inst *PointPointWrite) set() {
+func (inst *PointWrite) set() {
 	s := inst.GetStore()
 	parentId := inst.GetParentId()
 	nodeUUID := inst.GetID()
@@ -48,7 +49,7 @@ func (inst *PointPointWrite) set() {
 	}
 }
 
-func (inst *PointPointWrite) Process() {
+func (inst *PointWrite) Process() {
 	_, firstLoop := inst.Loop()
 	if firstLoop {
 		topic, err := getPointSettings(inst.GetSettings())
@@ -69,4 +70,9 @@ func (inst *PointPointWrite) Process() {
 		fmt.Println(p, err)
 		inst.WritePin(node.Out, val)
 	}
+}
+
+func (inst *PointWrite) GetSchema() *schemas.Schema {
+	s := inst.buildSchema()
+	return s
 }

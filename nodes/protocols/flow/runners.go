@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/node"
-	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	log "github.com/sirupsen/logrus"
 	"strings"
@@ -67,12 +66,14 @@ func (inst *Network) pointsList() {
 }
 
 func spitPointNames(names string) []string {
-	s := strings.Split(names, "/")
+	s := strings.Split(names, ":")
 	if len(s) == 4 {
 		return s
 	}
 	return nil
 }
+
+const fetchPointsTopicWrite = "rubix/platform/points/write"
 
 func (inst *Network) publish() {
 	s := inst.GetStore()
@@ -86,10 +87,11 @@ func (inst *Network) publish() {
 		if len(names) != 4 {
 			continue
 		}
+
 		n := inst.GetNode(payload.nodeUUID)
 		value, _ := n.ReadPinAsFloat(node.In16)
 		priority := map[string]*float64{"_16": &value}
-		pointWriter := &model.PointWriter{Priority: &priority}
+		pointWriter := &PointWriter{Priority: &priority}
 		body := &MqttPoint{
 			NetworkName: names[1],
 			DeviceName:  names[2],
@@ -101,11 +103,11 @@ func (inst *Network) publish() {
 			log.Errorf("flow-network-broker publish err:%s", err.Error())
 			continue
 		}
-
 		if inst.mqttClient != nil {
 			updated, _ := n.InputUpdated(node.In16)
+
 			if updated {
-				err := inst.mqttClient.Publish("t", mqttQOS, mqttRetain, string(data))
+				err := inst.mqttClient.Publish(fetchPointsTopicWrite, mqttQOS, mqttRetain, string(data))
 				if err != nil {
 					log.Errorf("flow-network-broker publish err:%s", err.Error())
 				}

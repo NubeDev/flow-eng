@@ -69,6 +69,37 @@ func (inst *Point) buildSchema() *schemas.Schema {
 	return sch
 }
 
+func (inst *PointWrite) buildSchema() *schemas.Schema {
+	s := inst.GetStore()
+	if s == nil {
+		return nil
+	}
+	data, ok := s.Get(fmt.Sprintf("pointsList_%s", inst.GetParentId()))
+	if !ok {
+		return nil
+	}
+	d, _ := data.([]*point)
+	names := getPoints(d)
+	props := &pointNodeSchema{}
+	props.Point.Title = "point"
+	if len(names) > 0 {
+		props.Point.Default = names[0]
+	} else {
+		names = append(names, "no connection has been added")
+	}
+	props.Point.Options = names
+	props.Point.EnumName = names
+	schema.Set(props)
+	sch := &schemas.Schema{
+		Schema: schemas.SchemaBody{
+			Title:      "settings",
+			Properties: props,
+		},
+		UiSchema: nil,
+	}
+	return sch
+}
+
 type pointSettings struct {
 	Point string `json:"point"`
 }
@@ -81,9 +112,4 @@ func getPointSettings(body map[string]interface{}) (*pointSettings, error) {
 	}
 	err = json.Unmarshal(marshal, &settings)
 	return settings, err
-}
-
-func (inst *Point) GetSchema() *schemas.Schema {
-	s := inst.buildSchema()
-	return s
 }

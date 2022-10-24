@@ -2,7 +2,6 @@ package flow
 
 import (
 	"encoding/json"
-	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
 )
 
 const (
@@ -19,13 +18,17 @@ type covPayload struct {
 	Priority int     `json:"priority"`
 }
 
+type PointWriter struct {
+	Priority *map[string]*float64 `json:"priority"`
+}
+
 // MqttPoint body for getting points from FF over mqtt (can get by name's or uuid, publish on topic rubix/platform/list/points)
 type MqttPoint struct {
-	NetworkName string             `json:"network_name,omitempty"`
-	DeviceName  string             `json:"device_name,omitempty"`
-	PointName   string             `json:"point_name,omitempty"`
-	PointUUID   string             `json:"point_uuid,omitempty"`
-	Priority    *model.PointWriter `json:"priority,omitempty"`
+	NetworkName string       `json:"network_name,omitempty"`
+	DeviceName  string       `json:"device_name,omitempty"`
+	PointName   string       `json:"point_name,omitempty"`
+	PointUUID   string       `json:"point_uuid,omitempty"`
+	Priority    *PointWriter `json:"priority,omitempty"`
 }
 
 type point struct {

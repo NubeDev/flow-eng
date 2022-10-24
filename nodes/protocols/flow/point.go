@@ -3,6 +3,7 @@ package flow
 import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/node"
+	"github.com/NubeDev/flow-eng/schemas"
 )
 
 type Point struct {
@@ -72,4 +73,9 @@ func (inst *Point) Process() {
 			inst.WritePinNull(node.Out)
 		}
 	}
+}
+
+func (inst *Point) GetSchema() *schemas.Schema {
+	s := inst.buildSchema()
+	return s
 }
