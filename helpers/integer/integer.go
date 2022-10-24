@@ -1,9 +1,40 @@
 package integer
 
 import (
+	"fmt"
 	"math/rand"
+	"strconv"
 	"time"
 )
+
+func GetUnit64(in interface{}) (val uint64) {
+	switch i := in.(type) {
+	case bool:
+		if i {
+			return 1
+		}
+		return 0
+	case int:
+		val = uint64(i)
+	case float64:
+		val = uint64(i)
+	case float32:
+		val = uint64(i)
+	case int64:
+		val = uint64(i)
+	case uint64:
+		val = i
+	case string:
+		if s, err := strconv.ParseUint(fmt.Sprintf("%v", in), 10, 64); err == nil {
+			val = s
+		} else {
+			val = 0
+		}
+	default:
+		return 0
+	}
+	return val
+}
 
 func New(value int) *int {
 	return &value

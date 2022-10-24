@@ -38,9 +38,10 @@ const (
 	Interval    InputName = "interval"
 	Duration    InputName = "duration"
 
-	Count     InputName = "count"
-	CountUp   InputName = "count-up"
-	CountDown InputName = "count-down"
+	TriggerOnCount InputName = "trigger on count"
+	Count          InputName = "count"
+	CountUp        InputName = "count-up"
+	CountDown      InputName = "count-down"
 
 	Min InputName = "min"
 	Max InputName = "max"
