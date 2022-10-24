@@ -66,6 +66,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	flowNetwork, _ := flow.NewNetwork(nil)
 	flowPoint, _ := flow.NewPoint(nil)
+	flowPointWrite, _ := flow.NewPointWrite(nil)
 
 	flowLoopCount, _ := system.NewLoopCount(nil)
 
@@ -179,6 +180,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(flowNetwork),
 		node.ConvertToSpec(flowPoint),
+		node.ConvertToSpec(flowPointWrite),
 
 		node.ConvertToSpec(deadBand),
 
@@ -406,6 +408,8 @@ func builderFlowNetworks(body *node.Spec, opts []interface{}) (node.Node, error)
 		return flow.NewNetwork(body)
 	case flowPoint:
 		return flow.NewPoint(body)
+	case flowPointWrite:
+		return flow.NewPointWrite(body)
 	}
 	return nil, nil
 }

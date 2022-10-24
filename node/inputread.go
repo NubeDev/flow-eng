@@ -3,6 +3,7 @@ package node
 import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/conversions"
+	"github.com/NubeDev/flow-eng/helpers/integer"
 	"strconv"
 	"time"
 )
@@ -83,7 +84,7 @@ func (n *Spec) ReadPinAsUint64(name InputName) (value uint64, null bool) {
 	if r == nil {
 		return 0, true
 	}
-	out := uint64(conversions.GetFloat(r))
+	out := integer.GetUnit64(r)
 	return out, false
 }
 
