@@ -61,13 +61,11 @@ func (inst *Point) Process() {
 			}
 		}
 	}
-	val, null := inst.ReadPayloadAsString()
+	val, null := inst.GetPayloadNull()
 	if null {
 		inst.WritePinNull(node.Out)
 	} else {
-		//fmt.Println(val, null)
 		p, err := parseCOV(val)
-		//fmt.Println(p, err)
 		if err == nil && p != nil {
 			inst.lastPayload = p
 			inst.WritePinFloat(node.Out, p.Value, 2)

@@ -19,6 +19,13 @@ func (n *Spec) GetPayload() *Payload {
 	return n.Payload
 }
 
+func (n *Spec) GetPayloadNull() (value any, null bool) {
+	if n.Payload == nil {
+		return nil, true
+	}
+	return n.Payload.Any, false
+}
+
 func (n *Spec) ReadPayloadAsFloat() (value float64, null bool) {
 	r := n.GetPayload()
 	if r == nil {

@@ -3,7 +3,6 @@ package flow
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/node"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	log "github.com/sirupsen/logrus"
@@ -19,7 +18,8 @@ func (inst *Network) subscribe() {
 			if payload.topic == fixTopic(message.Topic()) {
 				n := inst.GetNode(payload.nodeUUID)
 				n.SetPayload(&node.Payload{
-					String: str.New(string(message.Payload())),
+					Any: message,
+					//String: str.New(string(message.Payload())),
 				})
 			}
 		}
@@ -75,7 +75,7 @@ func spitPointNames(names string) []string {
 
 const fetchPointsTopicWrite = "rubix/platform/points/write"
 
-func (inst *Network) publish() {
+func (inst *Network) publish(loopCount uint64) {
 	s := inst.GetStore()
 	children, ok := s.Get(inst.GetID())
 	payloads := getPayloads(children, ok)
@@ -87,9 +87,11 @@ func (inst *Network) publish() {
 		if len(names) != 4 {
 			continue
 		}
-
 		n := inst.GetNode(payload.nodeUUID)
-		value, _ := n.ReadPinAsFloat(node.In16)
+		value, valueNull := n.ReadPinAsFloat(node.In16)
+		if valueNull {
+			continue
+		}
 		priority := map[string]*float64{"_16": &value}
 		pointWriter := &PointWriter{Priority: &priority}
 		body := &MqttPoint{
@@ -105,8 +107,7 @@ func (inst *Network) publish() {
 		}
 		if inst.mqttClient != nil {
 			updated, _ := n.InputUpdated(node.In16)
-
-			if updated {
+			if updated || loopCount == 2 {
 				err := inst.mqttClient.Publish(fetchPointsTopicWrite, mqttQOS, mqttRetain, string(data))
 				if err != nil {
 					log.Errorf("flow-network-broker publish err:%s", err.Error())

@@ -10,7 +10,7 @@ type Switch struct {
 
 func NewSwitch(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, switchNode, category)
-	inSwitch := node.BuildInput(node.Switch, node.TypeFloat, nil, body.Inputs) // TODO: this input shouldn't have a manual override value
+	inSwitch := node.BuildInput(node.Switch, node.TypeBool, nil, body.Inputs) // TODO: this input shouldn't have a manual override value
 	inTrue := node.BuildInput(node.InTrue, node.TypeFloat, nil, body.Inputs)
 	inFalse := node.BuildInput(node.InFalse, node.TypeFloat, nil, body.Inputs)
 
@@ -21,15 +21,17 @@ func NewSwitch(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Switch) Process() {
-	inSwitch, _ := inst.ReadPinAsFloat(node.Switch)
+	inSwitch, _ := inst.ReadPinAsBool(node.Switch)
 	inTrue, _ := inst.ReadPinAsFloat(node.InTrue)
-	inFalse, _ := inst.ReadPinAsFloat(node.InFalse)
+	inFalse, inFalseNull := inst.ReadPinAsFloat(node.InFalse)
 
-	inSwitchAsBool := inSwitch == 1
-
-	if inSwitchAsBool {
+	if inSwitch {
 		inst.WritePin(node.Out, inTrue)
 	} else {
+		if inFalseNull {
+			inst.WritePinNull(node.Out)
+			return
+		}
 		inst.WritePin(node.Out, inFalse)
 	}
 }

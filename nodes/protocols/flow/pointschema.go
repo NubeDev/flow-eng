@@ -76,7 +76,7 @@ func (inst *PointWrite) buildSchema() *schemas.Schema {
 	}
 	data, ok := s.Get(fmt.Sprintf("pointsList_%s", inst.GetParentId()))
 	if !ok {
-		return nil
+		//return nil
 	}
 	d, _ := data.([]*point)
 	names := getPoints(d)

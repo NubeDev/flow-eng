@@ -71,7 +71,7 @@ func (inst *Network) Process() {
 	if loopCount == 2 {
 		go inst.subscribe()
 		go inst.pointsList()
-		go inst.publish()
+		go inst.publish(loopCount)
 	}
 	if inst.mqttConnected {
 		inst.WritePinTrue(node.Connected)
@@ -79,6 +79,6 @@ func (inst *Network) Process() {
 		inst.WritePinFalse(node.Connected)
 	}
 	if loopCount > 1 {
-		go inst.publish()
+		go inst.publish(loopCount)
 	}
 }

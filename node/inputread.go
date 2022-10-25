@@ -11,7 +11,6 @@ import (
 // InputUpdated if true means that the node input value has updated
 func (n *Spec) InputUpdated(name InputName) (updated bool, boolCOV bool) {
 	input := n.GetInput(name)
-
 	if input.values.Length() > 1 { // work out if the input has updated
 		input.values.RemoveFirst()
 		input.values.Add(input.value)
@@ -24,7 +23,6 @@ func (n *Spec) InputUpdated(name InputName) (updated bool, boolCOV bool) {
 		input.updated = false
 	}
 	if input != nil {
-
 		isBool, val := conversions.IsBoolWithValue(input.GetValue())
 		if input.updated && isBool && val {
 			boolCOV = true

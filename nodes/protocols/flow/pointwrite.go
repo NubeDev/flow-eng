@@ -53,6 +53,7 @@ func (inst *PointWrite) Process() {
 	_, firstLoop := inst.Loop()
 	if firstLoop {
 		topic, err := getPointSettings(inst.GetSettings())
+		fmt.Println("point write", topic.Point)
 		if err == nil {
 			if topic.Point != "" {
 				if topic.Point != "" {

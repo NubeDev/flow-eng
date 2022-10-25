@@ -2,6 +2,8 @@ package flow
 
 import (
 	"encoding/json"
+	"errors"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 const (
@@ -51,13 +53,13 @@ type pointDetails struct {
 	isWriteable    bool
 }
 
-func parseCOV(body string) (*covPayload, error) {
-	marshal, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
+func parseCOV(body any) (*covPayload, error) {
+	a, ok := body.(mqtt.Message)
+	if !ok {
+		return nil, errors.New("failed to parse mqtt cov payload")
 	}
-	payload := &covPayload{}
-	err = json.Unmarshal(marshal, &payload)
+	var payload *covPayload
+	err := json.Unmarshal(a.Payload(), &payload)
 	if err != nil {
 		return nil, err
 	}

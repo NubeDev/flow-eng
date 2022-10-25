@@ -59,6 +59,7 @@ type Node interface {
 	GetPayload() *Payload
 	SetPayload(payload *Payload)
 	ReadPayloadAsFloat() (value float64, null bool)
+	GetPayloadNull() (value any, null bool)
 	GetNode(uuid string) Node
 	GetNodes() []Node
 	AddNodes(f []Node)
