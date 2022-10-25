@@ -9,6 +9,7 @@ type nodeValue struct {
 type Values struct {
 	NodeName string                 `json:"name"`
 	NodeID   string                 `json:"nodeId"`
+	Info     Info                   `json:"info,omitempty"`
 	Settings map[string]interface{} `json:"settings,omitempty"`
 	Outputs  []*nodeValue           `json:"outputs"`
 	Inputs   []*nodeValue           `json:"inputs"`
@@ -20,6 +21,7 @@ func (n *Spec) NodeValues() *Values {
 	var out = &Values{
 		NodeName: n.GetName(),
 		NodeID:   n.GetID(),
+		Info:     n.GetInfo(),
 		Settings: n.GetSettings(),
 		Status:   n.GetStatus(),
 	}

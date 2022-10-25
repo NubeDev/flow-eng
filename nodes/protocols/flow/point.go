@@ -65,7 +65,9 @@ func (inst *Point) Process() {
 	if null {
 		inst.WritePinNull(node.Out)
 	} else {
+		//fmt.Println(val, null)
 		p, err := parseCOV(val)
+		//fmt.Println(p, err)
 		if err == nil && p != nil {
 			inst.lastPayload = p
 			inst.WritePinFloat(node.Out, p.Value, 2)

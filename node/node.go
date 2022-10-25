@@ -62,6 +62,8 @@ type Node interface {
 	GetNode(uuid string) Node
 	GetNodes() []Node
 	AddNodes(f []Node)
+	SetDisplay(string)
+	GetDisplay() string
 }
 
 func New(id, name, nodeName string, meta *Metadata, settings map[string]interface{}) *Spec {
@@ -243,14 +245,23 @@ func (n *Spec) SetMetadata(m *Metadata) {
 	n.Metadata = m
 }
 
+func (n *Spec) GetDisplay() string {
+	return n.Info.Display
+}
+
+func (n *Spec) SetDisplay(body string) {
+	n.Info.Display = body
+}
+
 type Info struct {
 	NodeID      string `json:"nodeID"`             // a123
-	Name        string `json:"name"`               // add, or
+	Name        string `json:"name,omitempty"`     // add, or
 	NodeName    string `json:"nodeName,omitempty"` // my-node-abc
 	Category    string `json:"category,omitempty"`
-	Type        string `json:"type"`
+	Type        string `json:"type,omitempty"`
 	Description string `json:"description,omitempty"`
 	Version     string `json:"version,omitempty"`
+	Display     string `json:"display,omitempty"`
 }
 
 type InputConnection struct {
