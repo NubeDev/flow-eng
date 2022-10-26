@@ -18,7 +18,9 @@ func NewPoint(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body.SetAllowSettings()
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	return &Point{body, "", nil}, nil
+	pnt := &Point{body, "", nil}
+	body.SetSchema(pnt.buildSchema())
+	return pnt, nil
 }
 
 func (inst *Point) set() {

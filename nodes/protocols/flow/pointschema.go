@@ -40,15 +40,16 @@ type pointNodeSchema struct {
 
 func (inst *Point) buildSchema() *schemas.Schema {
 	s := inst.GetStore()
-	if s == nil {
-		return nil
+	var data interface{}
+	var ok bool
+	var names []string
+	if s != nil {
+		data, ok = s.Get(fmt.Sprintf("pointsList_%s", inst.GetParentId()))
+		if ok {
+			d, _ := data.([]*point)
+			names = getPoints(d)
+		}
 	}
-	data, ok := s.Get(fmt.Sprintf("pointsList_%s", inst.GetParentId()))
-	if !ok {
-		//return nil
-	}
-	d, _ := data.([]*point)
-	names := getPoints(d)
 	props := &pointNodeSchema{}
 	props.Point.Title = "point"
 	if len(names) > 0 {
@@ -76,15 +77,16 @@ func (inst *Point) buildSchema() *schemas.Schema {
 
 func (inst *PointWrite) buildSchema() *schemas.Schema {
 	s := inst.GetStore()
-	if s == nil {
-		return nil
+	var data interface{}
+	var ok bool
+	var names []string
+	if s != nil {
+		data, ok = s.Get(fmt.Sprintf("pointsList_%s", inst.GetParentId()))
+		if ok {
+			d, _ := data.([]*point)
+			names = getPoints(d)
+		}
 	}
-	data, ok := s.Get(fmt.Sprintf("pointsList_%s", inst.GetParentId()))
-	if !ok {
-		//return nil
-	}
-	d, _ := data.([]*point)
-	names := getPoints(d)
 	props := &pointNodeSchema{}
 	props.Point.Title = "point"
 	if len(names) > 0 {
