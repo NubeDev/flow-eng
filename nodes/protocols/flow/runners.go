@@ -2,7 +2,6 @@ package flow
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	log "github.com/sirupsen/logrus"
@@ -17,10 +16,12 @@ func (inst *Network) subscribe() {
 		for _, payload := range payloads {
 			if payload.topic == fixTopic(message.Topic()) {
 				n := inst.GetNode(payload.nodeUUID)
-				n.SetPayload(&node.Payload{
-					Any: message,
-					//String: str.New(string(message.Payload())),
-				})
+				if n != nil {
+					n.SetPayload(&node.Payload{
+						Any: message,
+					})
+				}
+
 			}
 		}
 	}
@@ -48,13 +49,16 @@ func (inst *Network) pointsList() {
 		if err == nil {
 			if points != nil {
 				s := inst.GetStore()
-				s.Set(fmt.Sprintf("pointsList_%s", inst.GetID()), points, 0)
+				if s != nil {
+					//s.Set(fmt.Sprintf("pointsList_%s", inst.GetID()), points, 0)
+				}
+
 			}
 		} else {
 			log.Errorf("failed to get flow-framework points list err:%s", err.Error())
 		}
 	}
-	var topic = "+/+/+/+/+/+/rubix/points/value/points"
+	var topic = "rubix/points/value/points"
 	if inst.mqttClient != nil {
 		err := inst.mqttClient.Subscribe(topic, mqttQOS, callback)
 		if err != nil {

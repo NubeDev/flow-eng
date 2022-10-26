@@ -52,9 +52,14 @@ func (inst *Point) buildSchema() *schemas.Schema {
 	props := &pointNodeSchema{}
 	props.Point.Title = "point"
 	if len(names) > 0 {
-		props.Point.Default = names[0]
-	} else {
-		names = append(names, "no connection has been added")
+		if len(names) < 1 {
+			props.Point.Default = names[0]
+		} else {
+			names = append(names, "na")
+			if len(names) == 1 {
+				names = append(names, "na-")
+			}
+		}
 	}
 	props.Point.Options = names
 	props.Point.EnumName = names
@@ -83,9 +88,14 @@ func (inst *PointWrite) buildSchema() *schemas.Schema {
 	props := &pointNodeSchema{}
 	props.Point.Title = "point"
 	if len(names) > 0 {
-		props.Point.Default = names[0]
-	} else {
-		names = append(names, "no connection has been added")
+		if len(names) < 1 {
+			props.Point.Default = names[0]
+		} else {
+			names = append(names, "na")
+			if len(names) == 1 {
+				names = append(names, "na-")
+			}
+		}
 	}
 	props.Point.Options = names
 	props.Point.EnumName = names
