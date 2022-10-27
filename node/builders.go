@@ -35,3 +35,22 @@ func Defaults(body *Spec, nodeName, category string) *Spec {
 	body.Info.NodeID = SetUUID(body.Info.NodeID)
 	return body
 }
+
+const noParent = "please add node to a flow-network node"
+
+func SetNoParent(body *Spec) *Spec {
+	if body.ParentId == "" {
+		body.SetStatusError(noParent)
+	}
+	return body
+}
+
+func SetError(body *Spec, message string) *Spec {
+	body.SetStatusError(message)
+	return body
+}
+
+func SetStatus(body *Spec, message string) *Spec {
+	body.SetStatusMessage(message)
+	return body
+}

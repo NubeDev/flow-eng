@@ -12,7 +12,11 @@ type nodeSchema struct {
 	Conn schemas.EnumString `json:"connections"`
 }
 
+const selectConnection = "Please add/select a MQTT connection"
+
 func (inst *Network) getConnectionsNames() (names []string, uuids []string) {
+	names = append(names, selectConnection)
+	uuids = append(uuids, selectConnection)
 	db := inst.GetDB()
 	if db != nil {
 		connections, err := inst.GetDB().GetConnections()

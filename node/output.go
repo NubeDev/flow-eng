@@ -10,7 +10,7 @@ var ErrTypesMismatch = errors.New("provided types are different")
 type Output struct {
 	Name        OutputName          `json:"name"` // out1
 	DataType    DataTypes           `json:"type"` // int8
-	Connections []*OutputConnection `json:"connections"`
+	Connections []*OutputConnection `json:"connections,omitempty"`
 	value       interface{}
 	uuid        uuid.Value
 	direction   Direction

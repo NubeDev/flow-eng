@@ -18,8 +18,8 @@ func NewPoint(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body.SetAllowSettings()
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
+	body = node.SetNoParent(body)
 	pnt := &Point{body, "", nil}
-	body.SetSchema(pnt.buildSchema())
 	return pnt, nil
 }
 
@@ -52,14 +52,18 @@ func (inst *Point) Process() {
 	_, firstLoop := inst.Loop()
 	if firstLoop {
 		topic, err := getPointSettings(inst.GetSettings())
-		fmt.Println("SETTINGS", topic.Point, inst.GetSettings(), err)
-		if err == nil {
+		fmt.Println("SETTINGS", topic, inst.GetSettings(), err)
+		if err == nil && topic != nil {
 			if topic.Point != "" {
 				t := pointTopic(topic.Point)
 				if t != "" {
 					inst.topic = t
 					inst.set()
 				}
+			}
+		} else {
+			if inst.ParentId != "" {
+				inst.SetWaringMessage("no point has been selected")
 			}
 		}
 	}

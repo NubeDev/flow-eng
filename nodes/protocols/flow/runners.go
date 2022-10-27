@@ -2,6 +2,7 @@ package flow
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	log "github.com/sirupsen/logrus"
@@ -50,9 +51,9 @@ func (inst *Network) pointsList() {
 			if points != nil {
 				s := inst.GetStore()
 				if s != nil {
-					//s.Set(fmt.Sprintf("pointsList_%s", inst.GetID()), points, 0)
+					//fmt.Println(string(message.Payload()))
+					s.Set(fmt.Sprintf("pointsList_%s", inst.GetID()), points, 0)
 				}
-
 			}
 		} else {
 			log.Errorf("failed to get flow-framework points list err:%s", err.Error())

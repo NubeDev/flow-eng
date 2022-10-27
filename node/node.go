@@ -56,6 +56,10 @@ type Node interface {
 	NodeValues() *Values
 	GetStatus() *Status
 	SetStatus(*Status)
+	SetStatusError(message string)
+	SetStatusMessage(message string)
+	SetNotifyMessage(message string)
+	SetWaringMessage(message string)
 	GetPayload() *Payload
 	SetPayload(payload *Payload)
 	ReadPayloadAsFloat() (value float64, null bool)
@@ -65,6 +69,10 @@ type Node interface {
 	AddNodes(f []Node)
 	SetDisplay(string)
 	GetDisplay() string
+	SetHelp(string)
+	GetHelp() string
+	SetAllowWrite()
+	GetAllowWrite() bool
 }
 
 func New(id, name, nodeName string, meta *Metadata, settings map[string]interface{}) *Spec {
@@ -92,7 +100,9 @@ type Spec struct {
 	IsParent      bool                   `json:"isParent"`
 	ParentId      string                 `json:"parentId,omitempty"`
 	Status        *Status                `json:"status,omitempty"`
+	AllowWrite    bool                   `json:"allowWrite"` // allow payload write
 	Payload       *Payload               `json:"payload,omitempty"`
+	Help          string                 `json:"help"`
 	loopCount     uint64
 	schema        *schemas.Schema
 	db            db.DB
@@ -100,7 +110,9 @@ type Spec struct {
 	nodes         []Node
 }
 
-func (n *Spec) Cleanup() {}
+func (n *Spec) Cleanup() {
+
+}
 
 func (n *Spec) AddDB(d db.DB) {
 	n.db = d
@@ -167,12 +179,28 @@ func (n *Spec) GetInfo() Info {
 	return n.Info
 }
 
+func (n *Spec) SetHelp(body string) {
+	n.Help = body
+}
+
+func (n *Spec) GetHelp() string {
+	return n.Help
+}
+
 func (n *Spec) GetID() string {
 	return n.Info.NodeID
 }
 
 func (n *Spec) GetName() string {
 	return n.Info.Name
+}
+
+func (n *Spec) SetAllowWrite() {
+	n.AllowWrite = true
+}
+
+func (n *Spec) GetAllowWrite() bool {
+	return n.AllowWrite
 }
 
 func (n *Spec) GetIsParent() bool {

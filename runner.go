@@ -1,6 +1,7 @@
 package flowctrl
 
 import (
+	"errors"
 	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 )
@@ -22,15 +23,17 @@ func (runner *SerialRunner) Process() (e error) {
 
 	for i := 0; i < len(runner.flow.Graphs); i++ {
 		graph := runner.flow.Graphs[i]
+		var lastNode string
 		for j := 0; j < len(graph.Runners); j++ {
 			runner := graph.Runners[j]
+			lastNode = runner.Name()
 			err := runner.Process()
 			if err != nil {
 				// node was no triggered, not all input ports were written by dependent nodes
 				if err == node.ErrNoInputData {
 					continue
 				}
-				e = err
+				e = errors.New(fmt.Sprintf("node: %s err:%s", lastNode, err.Error()))
 				return
 			}
 		}

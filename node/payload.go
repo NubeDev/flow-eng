@@ -1,15 +1,12 @@
 package node
 
 import (
+	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/conversions"
-	"github.com/NubeDev/flow-eng/helpers/float"
 )
 
 type Payload struct {
-	ValueFloat *float64 `json:"float,omitempty"`
-	BoolFloat  *bool    `json:"boolean,omitempty"`
-	String     *string  `json:"string,omitempty"`
-	Any        any      `json:"any,omitempty"`
+	Any any `json:"any,omitempty"`
 }
 
 func (n *Spec) SetPayload(body *Payload) {
@@ -31,10 +28,10 @@ func (n *Spec) ReadPayloadAsFloat() (value float64, null bool) {
 	if r == nil {
 		return 0, true
 	}
-	if r.ValueFloat == nil {
+	if r.Any == nil {
 		return 0, true
 	}
-	return conversions.GetFloat(float.NonNil(r.ValueFloat)), false
+	return conversions.GetFloat(r.Any), false
 }
 
 func (n *Spec) ReadPayloadAsString() (value string, null bool) {
@@ -42,8 +39,8 @@ func (n *Spec) ReadPayloadAsString() (value string, null bool) {
 	if r == nil {
 		return "", true
 	}
-	if r.String == nil {
+	if r.Any == nil {
 		return "", true
 	}
-	return *r.String, false
+	return fmt.Sprint(r.Any), false
 }

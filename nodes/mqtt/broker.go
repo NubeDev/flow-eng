@@ -55,7 +55,7 @@ func (inst *Broker) subscribe() {
 			if payload.topic == message.Topic() {
 				n := inst.GetNode(payload.nodeUUID)
 				n.SetPayload(&node.Payload{
-					String: str.New(string(message.Payload())),
+					Any: str.New(string(message.Payload())),
 				})
 			}
 		}

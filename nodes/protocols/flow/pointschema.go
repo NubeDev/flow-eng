@@ -27,7 +27,10 @@ func pointTopic(selected string) string {
 	return ""
 }
 
+const selectAPoint = "Select a point"
+
 func getPoints(points []*point) (names []string) {
+	names = append(names, selectAPoint)
 	for _, p := range points {
 		names = append(names, p.Name)
 	}
@@ -49,18 +52,13 @@ func (inst *Point) buildSchema() *schemas.Schema {
 			d, _ := data.([]*point)
 			names = getPoints(d)
 		}
+	} else {
+		names = getPoints(nil)
 	}
 	props := &pointNodeSchema{}
 	props.Point.Title = "point"
 	if len(names) > 0 {
-		if len(names) < 1 {
-			props.Point.Default = names[0]
-		} else {
-			names = append(names, "na")
-			if len(names) == 1 {
-				names = append(names, "na-")
-			}
-		}
+		props.Point.Default = names[0]
 	}
 	props.Point.Options = names
 	props.Point.EnumName = names
@@ -86,18 +84,14 @@ func (inst *PointWrite) buildSchema() *schemas.Schema {
 			d, _ := data.([]*point)
 			names = getPoints(d)
 		}
+	} else {
+		names = getPoints(nil)
 	}
 	props := &pointNodeSchema{}
 	props.Point.Title = "point"
+	props.Point.Title = "point"
 	if len(names) > 0 {
-		if len(names) < 1 {
-			props.Point.Default = names[0]
-		} else {
-			names = append(names, "na")
-			if len(names) == 1 {
-				names = append(names, "na-")
-			}
-		}
+		props.Point.Default = names[0]
 	}
 	props.Point.Options = names
 	props.Point.EnumName = names

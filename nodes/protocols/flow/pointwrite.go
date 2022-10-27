@@ -19,6 +19,7 @@ func NewPointWrite(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body.SetAllowSettings()
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
+	body = node.SetNoParent(body)
 	return &PointWrite{body, ""}, nil
 }
 
@@ -54,7 +55,7 @@ func (inst *PointWrite) Process() {
 	if firstLoop {
 		topic, err := getPointSettings(inst.GetSettings())
 		fmt.Println("point write", topic.Point)
-		if err == nil {
+		if err == nil && topic != nil {
 			if topic.Point != "" {
 				if topic.Point != "" {
 					inst.topic = topic.Point

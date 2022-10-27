@@ -3,8 +3,14 @@ package flow
 import (
 	"encoding/json"
 	"errors"
+	"github.com/NubeDev/flow-eng/node"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
+
+func setError(body *node.Spec, message string) *node.Spec {
+	body.SetStatusError(message)
+	return body
+}
 
 const (
 	category       = "flow"
