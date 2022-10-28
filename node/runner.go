@@ -2,6 +2,7 @@ package node
 
 import (
 	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/global"
 	"github.com/NubeDev/flow-eng/helpers/uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -23,7 +24,7 @@ func NewRunner(node Node) *Runner {
 	info := node.GetInfo()
 	nodeID := node.GetID()
 	id := uuid.New()
-	name := fmt.Sprintf("%s_%s_%d", info.Name, info.Version, id)
+	name := fmt.Sprintf("%s_%d_%s", info.Name, id, nodeID)
 	return &Runner{id, nodeID, name, node, inputs, outputs, connectors}
 }
 
@@ -42,7 +43,6 @@ func (runner *Runner) UUID() uuid.Value {
 func (runner *Runner) Process() error {
 	// trigger all connectors to input ports
 	err := runner.processConnectors()
-
 	if err != nil {
 		log.Errorf("RUNNER node:%s name-name%s err:%s", runner.node.GetNodeName(), runner.node.GetName(), err.Error())
 		return err
@@ -75,7 +75,16 @@ func (runner *Runner) processConnectors() error {
 	}
 	for i := 0; i < connectorsCount; i++ {
 		conn := runner.connectors[i]
-		err := conn.Trigger()
+		debug := &global.Debug{}
+		if global.DebugConnections {
+			debug = &global.Debug{
+				NodeUUID:   runner.NodeId(),
+				NodeName:   runner.Name(),
+				FromOutput: string(conn.from.Name),
+				ToInput:    string(conn.to.Name),
+			}
+		}
+		err := conn.Trigger(debug)
 		if err != nil {
 			log.Errorf(fmt.Sprintf("err from runner:%s from:%s to:%s", err.Error(), conn.from.Name, conn.to.Name))
 			return err

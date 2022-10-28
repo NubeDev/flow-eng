@@ -41,6 +41,9 @@ func (inst *Network) setConnection() {
 		inst.SetStatusError(errMes)
 		return
 	}
+	if settings == nil {
+		return
+	}
 	connection, err := inst.GetDB().GetConnection(settings.Conn)
 	if err != nil {
 		errMes := fmt.Sprintf("flow-network error in getting connection err:%s", err.Error())

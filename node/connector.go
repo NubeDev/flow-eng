@@ -2,6 +2,7 @@ package node
 
 import (
 	"errors"
+	"github.com/NubeDev/flow-eng/helpers/global"
 	"github.com/NubeDev/flow-eng/helpers/uuid"
 )
 
@@ -31,14 +32,14 @@ func (connector *Connector) ToUUID() uuid.Value {
 	return connector.to.UUID()
 }
 
-func (connector *Connector) Trigger() error {
+func (connector *Connector) Trigger(debug *global.Debug) error {
 	// exit if no new conversions was received
 	if !connector.written {
 		return ErrNoInputData
 	}
 
 	// move conversions to destination port
-	err := connector.from.Copy(connector.to)
+	err := connector.from.Copy(connector.to, debug)
 	return err
 }
 

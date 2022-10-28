@@ -28,7 +28,6 @@ func (inst *Count) Process() {
 	if countDownUpdated {
 		inst.count = inst.count - 1
 	}
-
 	inst.WritePin(node.CountOut, inst.count)
 
 }

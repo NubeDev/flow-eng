@@ -2,6 +2,8 @@ package node
 
 import (
 	"errors"
+	"github.com/NubeDev/flow-eng/helpers/global"
+	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/helpers/uuid"
 )
 
@@ -57,9 +59,13 @@ func (p *Output) SetValue(value interface{}) {
 	p.value = value
 }
 
-func (p *Output) Copy(other *Input) error {
+func (p *Output) Copy(other *Input, debug *global.Debug) error {
 	if p.DataType != other.DataType {
 		return ErrTypesMismatch
+	}
+	if global.DebugConnections {
+		debug.OutputValue = p.GetValue()
+		pprint.PrintJOSN(debug)
 	}
 	other.SetValue(p.GetValue())
 	return nil

@@ -76,7 +76,7 @@ func (p *Flow) GetNodeSpec(id string) *node.Spec {
 
 func (p *Flow) AddNodes(node ...node.Node) {
 	for _, n := range node {
-		log.Infof("add node: %s", n.GetName())
+		log.Infof("add node: %s %s", n.GetID(), n.GetName())
 		p.addNode(n)
 	}
 }
@@ -84,22 +84,24 @@ func (p *Flow) AddNodes(node ...node.Node) {
 func (p *Flow) addNode(node node.Node) *Flow {
 	flows := p.Get()
 	flows.nodes = append(flows.nodes, node)
+	return flows
+}
+
+func (p *Flow) MakeGraph() *Flow {
+	flows := p.Get()
 	runners := makeRunners(flows.nodes)
 	ordered := makeGraphs(runners)
 	flows.Graphs = ordered
 	return flows
 }
 
-// ReBuildFlow makes all the node connections
-func (p *Flow) ReBuildFlow(makeConnection bool) {
+// MakeNodeConnections makes all the node connections
+func (p *Flow) MakeNodeConnections(makeConnection bool) {
 	for _, n := range p.GetNodes() {
 		err := p.nodeConnector(n.GetID(), makeConnection)
 		if err != nil {
 			log.Errorf(fmt.Sprintf("rebuild-flow: node-id:%s node-name:%s err%s", n.GetID(), n.GetID(), err.Error()))
 		}
-	}
-	for _, n := range p.GetNodes() {
-		p.rebuildNode(n)
 	}
 }
 
@@ -144,26 +146,6 @@ func (p *Flow) GetNodeRunner(id string) *node.Runner {
 	return nil
 }
 
-// ManualNodeConnector this node is just to really be used at the moment when testing the framework by making building the flow through code and not the json import
-func (p *Flow) ManualNodeConnector(outputNode node.Node, outPort node.OutputName, inputNode node.Node, inPort node.InputName) error {
-	for _, input := range inputNode.GetInputs() {
-		if input.Name == inPort {
-			for _, output := range outputNode.GetOutputs() {
-				if output.Name == outPort {
-					output.Connect(input)
-					log.Infof("manual-link: source-node:%s dest-node:%s source-port:%s dest-port:%s", inputNode.GetNodeName(), outputNode.GetNodeName(), outPort, inPort)
-					input.Connection.NodeID = outputNode.GetID()
-					input.Connection.NodePort = outPort
-					return nil // link was made so return
-				}
-			}
-		}
-	}
-	return errors.New(fmt.Sprintf("failed to connect source-node:%s dest-node:%s source-port:%s dest-port:%s", inputNode.GetNodeName(), outputNode.GetNodeName(), outPort, inPort))
-}
-
-// we need the output name and the link output name from the node with the input link
-
 // nodeConnector will make the connections from nodeA to nodeA
 // for example we will make a link from the math-const node to the math add-node
 //	-makeConnection if false will not make the link, this would be set to false only when you want a snapshot of the current flow
@@ -185,7 +167,7 @@ func (p *Flow) nodeConnector(nodeId string, makeConnection bool) error {
 						if makeConnection {
 							output.Connect(input)
 						}
-						log.Infof("make node connections: node-%s:%s -> node-%s:%s", outputNode.GetNodeName(), output.Name, getNode.GetNodeName(), input.Name)
+						log.Infof("make node connections: %s:%s -> %s:%s", outputNode.GetName(), output.Name, getNode.GetName(), input.Name)
 					}
 
 				}
@@ -219,7 +201,7 @@ func makeGraphs(runners []*node.Runner) []*graph.Ordered {
 		}
 	}
 	if len(graphs) == 0 {
-		// panic("circular flows are not supported")
+		//panic("circular flows are not supported")
 	}
 	return graphs
 }
