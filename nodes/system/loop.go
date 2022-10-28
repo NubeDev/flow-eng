@@ -6,8 +6,6 @@ import (
 
 type Loop struct {
 	*node.Spec
-	toggle bool
-	count  int
 }
 
 func NewLoopCount(body *node.Spec) (node.Node, error) {
@@ -19,7 +17,7 @@ func NewLoopCount(body *node.Spec) (node.Node, error) {
 	outToggle2 := node.BuildOutput(node.Toggle, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(outNum, outToggle, outToggle2)
 	body = node.BuildNode(body, inputs, outputs, nil)
-	return &Loop{body, false, 0}, nil
+	return &Loop{body}, nil
 }
 
 func (inst *Loop) Process() {
@@ -30,18 +28,13 @@ func (inst *Loop) Process() {
 		toggleOnCount = 1
 	}
 	if toggleOnCount == 1 {
-		if inst.toggle {
-			inst.WritePinTrue(node.Trigger)
-			inst.toggle = false
-		} else {
-			inst.WritePinFalse(node.Trigger)
-			inst.toggle = true
-		}
+		inst.WritePinTrue(node.Trigger)
 		return
 	}
 	t := counter % toggleOnCount / (toggleOnCount / 2)
 	if t == 1 {
 		inst.WritePinTrue(node.Toggle)
+
 	} else {
 		inst.WritePinFalse(node.Toggle)
 	}

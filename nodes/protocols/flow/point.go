@@ -1,7 +1,6 @@
 package flow
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 )
@@ -25,6 +24,9 @@ func NewPoint(body *node.Spec) (node.Node, error) {
 
 func (inst *Point) set() {
 	s := inst.GetStore()
+	if s == nil {
+		return
+	}
 	parentId := inst.GetParentId()
 	nodeUUID := inst.GetID()
 	d, ok := s.Get(parentId)
@@ -51,33 +53,37 @@ func (inst *Point) set() {
 func (inst *Point) Process() {
 	_, firstLoop := inst.Loop()
 	if firstLoop {
-		topic, err := getPointSettings(inst.GetSettings())
-		fmt.Println("SETTINGS", topic, inst.GetSettings(), err)
-		if err == nil && topic != nil {
-			if topic.Point != "" {
-				t := pointTopic(topic.Point)
-				if t != "" {
-					inst.topic = t
-					inst.set()
+		selectedPoint, err := getPointSettings(inst.GetSettings())
+		var setTopic bool
+		if selectedPoint != nil && err == nil {
+			if selectedPoint.Point != "" {
+				if selectedPoint.Point != "" {
+					t := makePointTopic(selectedPoint.Point)
+					if t != "" {
+						inst.topic = t
+						inst.set()
+					}
 				}
 			}
-		} else {
-			if inst.ParentId != "" {
-				inst.SetWaringMessage("no point has been selected")
-			}
+		}
+		if !setTopic {
+			inst.SetWaringMessage("no point has been selected")
 		}
 	}
 	val, null := inst.GetPayloadNull()
+	var wroteValue bool
 	if null {
 		inst.WritePinNull(node.Out)
 	} else {
-		p, err := parseCOV(val)
+		p, value, _, err := parseCOV(val)
 		if err == nil && p != nil {
 			inst.lastPayload = p
-			inst.WritePinFloat(node.Out, p.Value, 2)
-		} else {
-			inst.WritePinNull(node.Out)
+			wroteValue = true
+			inst.WritePinFloat(node.Out, value, 2)
 		}
+	}
+	if !wroteValue {
+		inst.WritePinNull(node.Out)
 	}
 }
 

@@ -18,11 +18,11 @@ func (inst *Network) subscribe() {
 			if payload.topic == fixTopic(message.Topic()) {
 				n := inst.GetNode(payload.nodeUUID)
 				if n != nil {
+					//fmt.Println(string(message.Payload()), payload.nodeUUID, n.GetName())
 					n.SetPayload(&node.Payload{
 						Any: message,
 					})
 				}
-
 			}
 		}
 	}
@@ -43,6 +43,18 @@ func (inst *Network) subscribe() {
 	}
 }
 
+func (inst *Network) fetchPointsList() {
+	var topic = "rubix/platform/points"
+	if inst.mqttClient != nil {
+		err := inst.mqttClient.Publish(topic, mqttQOS, false, "")
+		if err != nil {
+			log.Errorf("flow-network-broker subscribe:%s err:%s", topic, err.Error())
+		} else {
+			log.Infof("flow-network-broker subscribe:%s", topic)
+		}
+	}
+}
+
 func (inst *Network) pointsList() {
 	callback := func(client mqtt.Client, message mqtt.Message) {
 		var points []*point
@@ -59,7 +71,7 @@ func (inst *Network) pointsList() {
 			log.Errorf("failed to get flow-framework points list err:%s", err.Error())
 		}
 	}
-	var topic = "rubix/points/value/points"
+	var topic = "rubix/platform/points/publish"
 	if inst.mqttClient != nil {
 		err := inst.mqttClient.Subscribe(topic, mqttQOS, callback)
 		if err != nil {
@@ -78,10 +90,14 @@ func spitPointNames(names string) []string {
 	return nil
 }
 
-const fetchPointsTopicWrite = "rubix/platform/points/write"
+const pointWriteTopic = "rubix/platform/point/write"
 
 func (inst *Network) publish(loopCount uint64) {
 	s := inst.GetStore()
+	if s == nil {
+		log.Errorf("flow-network-point publish faild to get point store")
+		return
+	}
 	children, ok := s.Get(inst.GetID())
 	payloads := getPayloads(children, ok)
 	for _, payload := range payloads {
@@ -90,11 +106,17 @@ func (inst *Network) publish(loopCount uint64) {
 		}
 		names := spitPointNames(payload.netDevPntNames)
 		if len(names) != 4 {
+			log.Errorf("flow-network-point publish failed to get point name")
 			continue
 		}
 		n := inst.GetNode(payload.nodeUUID)
+		if n == nil {
+			log.Errorf("flow-network-point publish failed to get point node")
+			continue
+		}
 		value, valueNull := n.ReadPinAsFloat(node.In16)
 		if valueNull {
+			log.Errorf("flow-network-point publish failed to get point input value")
 			continue
 		}
 		priority := map[string]*float64{"_16": &value}
@@ -113,7 +135,8 @@ func (inst *Network) publish(loopCount uint64) {
 		if inst.mqttClient != nil {
 			updated, _ := n.InputUpdated(node.In16)
 			if updated || loopCount == 2 {
-				err := inst.mqttClient.Publish(fetchPointsTopicWrite, mqttQOS, mqttRetain, string(data))
+				//fmt.Println("MQTT publish", string(data))
+				err := inst.mqttClient.Publish(pointWriteTopic, mqttQOS, mqttRetain, data)
 				if err != nil {
 					log.Errorf("flow-network-broker publish err:%s", err.Error())
 				}

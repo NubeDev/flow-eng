@@ -59,18 +59,17 @@ type pointDetails struct {
 	isWriteable    bool
 }
 
-func parseCOV(body any) (*covPayload, error) {
-	a, ok := body.(mqtt.Message)
+func parseCOV(body any) (payload *covPayload, value float64, priorty int, err error) {
+	msg, ok := body.(mqtt.Message)
 	if !ok {
-		return nil, errors.New("failed to parse mqtt cov payload")
+		return nil, 0, 0, errors.New("failed to parse mqtt cov payload")
 	}
-	var payload *covPayload
-	err := json.Unmarshal(a.Payload(), &payload)
+	payload = &covPayload{}
+	err = json.Unmarshal(msg.Payload(), &payload)
 	if err != nil {
-		return nil, err
+		return nil, 0, 0, err
 	}
-	return payload, nil
-
+	return payload, payload.Value, payload.Priority, nil
 }
 
 func getPayloads(children interface{}, ok bool) []*pointDetails {

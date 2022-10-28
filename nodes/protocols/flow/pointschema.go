@@ -19,7 +19,7 @@ func fixTopic(topic string) string {
 	return ""
 }
 
-func pointTopic(selected string) string {
+func makePointTopic(selected string) string {
 	parts := strings.Split(selected, ":")
 	if len(parts) >= 3 {
 		return fmt.Sprintf("rubix/points/value/cov/all/%s/+/%s/+/%s/+/%s", parts[0], parts[1], parts[2], parts[3])
@@ -114,8 +114,11 @@ func getPointSettings(body map[string]interface{}) (*pointSettings, error) {
 	settings := &pointSettings{}
 	marshal, err := json.Marshal(body)
 	if err != nil {
-		return settings, err
+		return nil, err
 	}
 	err = json.Unmarshal(marshal, &settings)
+	if err != nil {
+		return nil, err
+	}
 	return settings, err
 }

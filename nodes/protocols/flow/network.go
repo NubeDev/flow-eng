@@ -36,12 +36,22 @@ func NewNetwork(body *node.Spec) (node.Node, error) {
 func (inst *Network) setConnection() {
 	settings, err := getSettings(inst.GetSettings())
 	if err != nil {
-		log.Errorf("add mqtt broker failed to get settings err:%s", err.Error())
+		errMes := fmt.Sprintf("flow-network add mqtt broker failed to get settings err:%s", err.Error())
+		log.Errorf(errMes)
+		inst.SetStatusError(errMes)
 		return
 	}
 	connection, err := inst.GetDB().GetConnection(settings.Conn)
 	if err != nil {
-		log.Error("flow-network add mqtt broker failed to find connection")
+		errMes := fmt.Sprintf("flow-network error in getting connection err:%s", err.Error())
+		log.Errorf(errMes)
+		inst.SetStatusError(errMes)
+		return
+	}
+	if connection == nil {
+		errMes := fmt.Sprintf("no flow-network mqtt connection, please select a connection")
+		log.Errorf(errMes)
+		inst.SetStatusError(errMes)
 		return
 	}
 	inst.connection = connection
@@ -50,7 +60,9 @@ func (inst *Network) setConnection() {
 	})
 	err = mqttClient.Connect()
 	if err != nil {
-		log.Error(err)
+		errMes := fmt.Sprintf("flow-network mqtt connect err: %s", err.Error())
+		log.Error(errMes)
+		inst.SetStatusError(errMes)
 	} else {
 		inst.mqttClient = mqttClient
 		inst.mqttConnected = true
@@ -81,4 +93,8 @@ func (inst *Network) Process() {
 	if loopCount > 1 {
 		go inst.publish(loopCount)
 	}
+	if loopCount%50 == 0 { // get the points every 50 loops
+		inst.fetchPointsList()
+	}
+
 }

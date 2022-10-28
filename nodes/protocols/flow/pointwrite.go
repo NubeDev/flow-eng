@@ -1,14 +1,14 @@
 package flow
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 )
 
 type PointWrite struct {
 	*node.Spec
-	topic string
+	topic          string
+	netDevicePoint string
 }
 
 func NewPointWrite(body *node.Spec) (node.Node, error) {
@@ -20,11 +20,14 @@ func NewPointWrite(body *node.Spec) (node.Node, error) {
 	body.SetAllowSettings()
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body = node.SetNoParent(body)
-	return &PointWrite{body, ""}, nil
+	return &PointWrite{body, "", ""}, nil
 }
 
 func (inst *PointWrite) set() {
 	s := inst.GetStore()
+	if s == nil {
+		return
+	}
 	parentId := inst.GetParentId()
 	nodeUUID := inst.GetID()
 	d, ok := s.Get(parentId)
@@ -34,7 +37,8 @@ func (inst *PointWrite) set() {
 			parentID: parentId,
 			payloads: []*pointDetails{&pointDetails{
 				nodeUUID:       nodeUUID,
-				netDevPntNames: inst.topic,
+				topic:          inst.topic,
+				netDevPntNames: inst.netDevicePoint,
 				isWriteable:    true,
 			}},
 		}, 0)
@@ -42,7 +46,8 @@ func (inst *PointWrite) set() {
 		mqttData = d.(*pointStore)
 		payload := &pointDetails{
 			nodeUUID:       nodeUUID,
-			netDevPntNames: inst.topic,
+			topic:          inst.topic,
+			netDevPntNames: inst.netDevicePoint,
 			isWriteable:    true,
 		}
 		mqttData, _ = addUpdatePayload(nodeUUID, mqttData, payload)
@@ -53,24 +58,38 @@ func (inst *PointWrite) set() {
 func (inst *PointWrite) Process() {
 	_, firstLoop := inst.Loop()
 	if firstLoop {
-		topic, err := getPointSettings(inst.GetSettings())
-		fmt.Println("point write", topic.Point)
-		if err == nil && topic != nil {
-			if topic.Point != "" {
-				if topic.Point != "" {
-					inst.topic = topic.Point
+		selectedPoint, err := getPointSettings(inst.GetSettings())
+		var setTopic bool
+		if selectedPoint != nil && err == nil {
+
+			if selectedPoint.Point != "" {
+				t := makePointTopic(selectedPoint.Point)
+				if t != "" {
+					inst.topic = t
+					inst.netDevicePoint = selectedPoint.Point
 					inst.set()
+					setTopic = true
 				}
 			}
 		}
+		if !setTopic {
+			inst.SetWaringMessage("no point has been selected")
+		}
 	}
-	val, null := inst.ReadPayloadAsString()
+
+	val, null := inst.GetPayloadNull()
+	var wroteValue bool
 	if null {
 		inst.WritePinNull(node.Out)
 	} else {
-		p, err := parseCOV(val)
-		fmt.Println(p, err)
-		inst.WritePin(node.Out, val)
+		_, value, _, err := parseCOV(val)
+		if err == nil {
+			wroteValue = true
+			inst.WritePin(node.Out, value)
+		}
+	}
+	if !wroteValue {
+		inst.WritePinNull(node.Out)
 	}
 }
 
