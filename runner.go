@@ -20,15 +20,13 @@ func (runner *SerialRunner) Process() (e error) {
 			e = fmt.Errorf("flow processing error: %v", recovered)
 		}
 	}()
-	for _, n := range runner.flow.GetNodes() {
-		n.Process() // run each node's process
-	}
 	for i := 0; i < len(runner.flow.Graphs); i++ {
 		graph := runner.flow.Graphs[i]
 		var lastNode string
 		for j := 0; j < len(graph.Runners); j++ {
 			runner := graph.Runners[j]
 			lastNode = runner.Name()
+			//fmt.Println("node", lastNode, len(graph.Runners))
 			err := runner.Process()
 			if err != nil {
 				// node was no triggered, not all input ports were written by dependent nodes
@@ -39,19 +37,18 @@ func (runner *SerialRunner) Process() (e error) {
 				return
 			}
 		}
-		for j := 0; j < len(graph.Runners); j++ { // TODO Binod should the reset be moved to the bottom
+		//for j := 0; j < len(graph.Runners); j++ { // TODO Binod should the reset be moved to the bottom
+		//	runner := graph.Runners[j]
+		//	runner.Reset()
+		//}
+	}
+	for i := 0; i < len(runner.flow.Graphs); i++ { // TODO Binod
+		graph := runner.flow.Graphs[i]
+		for j := 0; j < len(graph.Runners); j++ {
 			runner := graph.Runners[j]
+			//fmt.Println("Reset", runner.Name())
 			runner.Reset()
 		}
 	}
-
-	//for i := 0; i < len(runner.flow.Graphs); i++ {  // TODO Binod
-	//	graph := runner.flow.Graphs[i]
-	//	for j := 0; j < len(graph.Runners); j++ {
-	//		runner := graph.Runners[j]
-	//		//fmt.Println("Reset", runner.Name())
-	//		runner.Reset()
-	//	}
-	//}
 	return
 }

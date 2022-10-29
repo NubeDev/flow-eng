@@ -1,18 +1,18 @@
 package timing
 
 import (
+	"encoding/json"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
-	"github.com/mitchellh/mapstructure"
+	"time"
 )
 
 type nodeSchema struct {
 	Time     schemas.EnumString `json:"time"`
-	Duration schemas.Number     `json:"function"`
+	Duration schemas.Number     `json:"duration"`
 }
 
-// NODEs will single in/out
 const (
 	ms  = "ms"
 	sec = "sec"
@@ -52,17 +52,16 @@ func buildSchema() *schemas.Schema {
 }
 
 type nodeSettings struct {
-	Function string `json:"function"`
+	Time     string        `json:"time"`
+	Duration time.Duration `json:"duration"`
 }
 
-func getSettings(body map[string]interface{}) (string, error) {
+func getSettings(body map[string]interface{}) (*nodeSettings, error) {
 	settings := &nodeSettings{}
-	err := mapstructure.Decode(body, settings)
+	marshal, err := json.Marshal(body)
 	if err != nil {
-		return "", err
+		return settings, err
 	}
-	if settings != nil {
-		return settings.Function, nil
-	}
-	return "", nil
+	err = json.Unmarshal(marshal, &settings)
+	return settings, err
 }

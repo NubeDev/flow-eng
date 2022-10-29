@@ -3,7 +3,6 @@ package timing
 import (
 	"github.com/NubeDev/flow-eng/helpers/timer"
 	"github.com/NubeDev/flow-eng/node"
-	"time"
 )
 
 type DelayOn struct {
@@ -28,18 +27,12 @@ if node input is true
 start delay, after the delay set the triggered to true
 */
 
-func duration(f time.Duration) time.Duration {
-	return f * time.Second
-}
-
 func (inst *DelayOn) Process() {
-	timeDelay, _ := inst.ReadPinAsDuration(node.DelaySeconds)
-
+	settings, _ := getSettings(inst.GetSettings())
 	in1, null := inst.ReadPinAsBool(node.In)
 	if null {
 		inst.WritePinNull(node.Out)
 	}
-
 	if in1 && inst.active { // timer has gone to true and input is still true
 		inst.WritePinTrue(node.Out)
 		return
@@ -53,7 +46,7 @@ func (inst *DelayOn) Process() {
 		inst.triggered = false
 	}
 	if in1 {
-		if !inst.timer.WaitFor(duration(timeDelay)) {
+		if !inst.timer.WaitFor(duration(settings.Duration, settings.Time)) {
 			inst.WritePinFalse(node.Out)
 			inst.triggered = true
 			return

@@ -9,6 +9,9 @@ import (
 
 type Node interface {
 	Process() // runs the bool of the node
+	ResetProcessed()
+	SetProcessed()
+	GetProcessed() bool
 	Cleanup()
 	Loop() (count uint64, firstLoop bool)
 	AddDB(d db.DB)
@@ -108,10 +111,22 @@ type Spec struct {
 	db            db.DB
 	store         *store.Store
 	nodes         []Node
+	processed     bool
 }
 
 func (n *Spec) Cleanup() {
 
+}
+func (n *Spec) ResetProcessed() {
+	n.processed = false
+}
+
+func (n *Spec) SetProcessed() {
+	n.processed = true
+}
+
+func (n *Spec) GetProcessed() bool {
+	return n.processed
 }
 
 func (n *Spec) AddDB(d db.DB) {

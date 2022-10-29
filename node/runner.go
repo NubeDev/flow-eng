@@ -48,12 +48,16 @@ func (runner *Runner) Process() error {
 		return err
 	}
 	// run processing node
-	//runner.node.Process()  // TODO Binod this was calling the node process for each graph
+	if !runner.node.GetProcessed() {
+		runner.node.Process() // TODO Binod this was calling the node process for each graph
+		runner.node.SetProcessed()
+	}
 	return nil
 }
 
 func (runner *Runner) Reset() {
 	runner.resetConnectors()
+	runner.node.ResetProcessed()
 }
 
 func (runner *Runner) Outputs() []Port {

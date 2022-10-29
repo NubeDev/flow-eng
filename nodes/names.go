@@ -63,7 +63,8 @@ const (
 	flatLine = "flatLine"
 
 	// count
-	countNode = "count"
+	countNode    = "count"
+	countCOVNode = "count-cov"
 
 	// trigger
 	randomFloat = "random-number"

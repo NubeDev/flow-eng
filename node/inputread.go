@@ -71,9 +71,11 @@ func (n *Spec) readPinAsFloat(name InputName) (value float64) {
 
 func (n *Spec) ReadPinAsDuration(name InputName) (value time.Duration, null bool) {
 	r := n.ReadPin(name)
+	fmt.Println(r, 888)
 	if r == nil {
 		return 0, true
 	}
+	fmt.Println(r)
 	return time.Duration(conversions.GetInt(r)), false
 }
 

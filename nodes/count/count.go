@@ -6,7 +6,7 @@ import (
 
 type Count struct {
 	*node.Spec
-	count uint64
+	count float64
 }
 
 func NewCount(body *node.Spec) (node.Node, error) {
@@ -22,12 +22,12 @@ func NewCount(body *node.Spec) (node.Node, error) {
 func (inst *Count) Process() {
 	_, countUpUpdated := inst.InputUpdated(node.CountUp)
 	if countUpUpdated {
-		inst.count = inst.count + 1
+		inst.count++
 	}
 	_, countDownUpdated := inst.InputUpdated(node.CountDown)
 	if countDownUpdated {
-		inst.count = inst.count - 1
+		inst.count--
 	}
-	inst.WritePin(node.CountOut, inst.count)
+	inst.WritePinFloat(node.CountOut, inst.count)
 
 }

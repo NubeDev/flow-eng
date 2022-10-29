@@ -24,7 +24,7 @@ func NewDelayOff(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
 }
 
 func (inst *DelayOff) Process() {
-	timeDelay, _ := inst.ReadPinAsDuration(node.DelaySeconds)
+	settings, _ := getSettings(inst.GetSettings())
 	in1, null := inst.ReadPinAsBool(node.In)
 	if null {
 		inst.WritePinNull(node.Out)
@@ -43,7 +43,7 @@ func (inst *DelayOff) Process() {
 		inst.triggered = false
 	}
 	if in1 {
-		if !inst.timer.WaitFor(duration(timeDelay)) {
+		if !inst.timer.WaitFor(duration(settings.Duration, settings.Time)) {
 			inst.WritePinFalse(node.Out)
 			inst.triggered = true
 			return
