@@ -67,6 +67,7 @@ func (p *Output) Copy(other *Input, debug *global.Debug) error {
 		debug.OutputValue = p.GetValue()
 		pprint.PrintJOSN(debug)
 	}
+	// pass the ouput value to the input
 	other.SetValue(p.GetValue())
 	return nil
 }

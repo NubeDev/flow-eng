@@ -48,7 +48,7 @@ func (runner *Runner) Process() error {
 		return err
 	}
 	// run processing node
-	runner.node.Process()
+	//runner.node.Process()  // TODO Binod this was calling the node process for each graph
 	return nil
 }
 

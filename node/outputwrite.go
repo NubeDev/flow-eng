@@ -1,6 +1,9 @@
 package node
 
-import "github.com/NubeDev/flow-eng/helpers/conversions"
+import (
+	"github.com/NubeDev/flow-eng/helpers/conversions"
+	log "github.com/sirupsen/logrus"
+)
 
 func (n *Spec) WritePin(name OutputName, value interface{}) {
 	out := n.GetOutput(name)
@@ -40,6 +43,7 @@ func (n *Spec) WritePinFloat(name OutputName, value float64, precision ...int) {
 func (n *Spec) WritePinFalse(name OutputName) {
 	out := n.GetOutput(name)
 	if out == nil {
+		log.Errorf("failed to find node to write oputput value FALSE node: %s", n.GetName())
 		return
 	}
 	if name == out.Name {
@@ -50,6 +54,7 @@ func (n *Spec) WritePinFalse(name OutputName) {
 func (n *Spec) WritePinTrue(name OutputName) {
 	out := n.GetOutput(name)
 	if out == nil {
+		log.Errorf("failed to find node to write oputput value TRUE node: %s", n.GetName())
 		return
 	}
 	if name == out.Name {
