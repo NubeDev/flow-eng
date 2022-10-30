@@ -4,22 +4,22 @@ import (
 	"github.com/NubeDev/flow-eng/node"
 )
 
-type Count struct {
+type CountBool struct {
 	*node.Spec
 	count float64
 }
 
-func NewCount(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, countNode, category)
+func NewCountBool(body *node.Spec) (node.Node, error) {
+	body = node.Defaults(body, countBoolNode, category)
 	countUp := node.BuildInput(node.CountUp, node.TypeBool, nil, body.Inputs)
 	countDown := node.BuildInput(node.CountDown, node.TypeBool, nil, body.Inputs)
 	body.Inputs = node.BuildInputs(countUp, countDown)
 	out := node.BuildOutput(node.CountOut, node.TypeFloat, nil, body.Outputs)
 	body.Outputs = node.BuildOutputs(out)
-	return &Count{body, 0}, nil
+	return &CountBool{body, 0}, nil
 }
 
-func (inst *Count) Process() {
+func (inst *CountBool) Process() {
 	_, countUpUpdated := inst.InputUpdated(node.CountUp)
 	if countUpUpdated {
 		inst.count++

@@ -4,26 +4,36 @@ import (
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
 	"github.com/mitchellh/mapstructure"
+	"strings"
 )
 
 type nodeSchema struct {
 	Sch schemas.EnumString `json:"topic"`
 }
 
-func options() []string {
+func options(nodeType string) []string {
 	s := getStore()
 	var out []string
+	out = append(out, "select a topic")
 	for _, v := range s.GetAll() {
-		out = append(out, v.topic)
+		parts := strings.Split(v.topic, "-")
+		if len(parts) > 0 {
+			if parts[0] == nodeType {
+				out = append(out, v.topic)
+			}
+		}
+
 	}
 	return out
 }
 
-func (inst *Output) buildSchema() *schemas.Schema {
-	opts := options()
+func buildSchema(nodeType string) *schemas.Schema {
+	opts := options(nodeType)
 	props := &nodeSchema{}
 	props.Sch.Title = "Select Topic"
-	props.Sch.Default = ""
+	if len(opts) > 0 {
+		props.Sch.Default = opts[0]
+	}
 	props.Sch.Options = opts
 	props.Sch.EnumName = opts
 	schema.Set(props)

@@ -53,13 +53,16 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	toggle, _ := bool.NewToggle(nil)
 	delayMinOnOff, _ := bool.NewMinOnOff(nil, nil)
 	// compare
-	comp, _ := compare.NewCompare(nil)
+	comp, _ := compare.NewCompareGreater(nil)
+	compLess, _ := compare.NewCompareLess(nil)
+	logicCompareEqual, _ := compare.NewCompareEqual(nil)
 	between, _ := compare.NewBetween(nil)
 	hysteresis, _ := compare.NewHysteresis(nil)
 
 	// statistics
 	min, _ := statistics.NewMin(nil)
 	max, _ := statistics.NewMax(nil)
+	avg, _ := statistics.NewAvg(nil)
 
 	// streams
 	flatLine, _ := streams.NewFlatline(nil)
@@ -94,7 +97,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	switchNode, _ := switches.NewSwitch(nil)
 
 	linkInput, _ := link.NewInput(nil, nil)
+	linkInputNum, _ := link.NewInputNum(nil, nil)
 	linkOutput, _ := link.NewOutput(nil, nil)
+	linkOutputNum, _ := link.NewOutputNum(nil, nil)
 
 	// math
 	add, _ := math.NewAdd(nil)
@@ -105,8 +110,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	mathAdvanced, _ := mathematics.NewAdvanced(nil)
 
 	// trigger
-	countNode, _ := count.NewCount(nil)
-	countCOVNode, _ := count.NewCountCOV(nil)
+	countBool, _ := count.NewCountBool(nil)
+	countNum, _ := count.NewCountNum(nil)
+	countString, _ := count.NewCountString(nil)
 	rampNode, _ := count.NewRamp(nil)
 
 	// trigger
@@ -168,11 +174,14 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(delayMinOnOff),
 
 		node.ConvertToSpec(comp),
+		node.ConvertToSpec(compLess),
+		node.ConvertToSpec(logicCompareEqual),
 		node.ConvertToSpec(between),
 		node.ConvertToSpec(hysteresis),
 
 		node.ConvertToSpec(min),
 		node.ConvertToSpec(max),
+		node.ConvertToSpec(avg),
 
 		node.ConvertToSpec(gmailNode),
 		node.ConvertToSpec(pingNode),
@@ -204,8 +213,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(flatLine),
 
-		node.ConvertToSpec(countNode),
-		node.ConvertToSpec(countCOVNode),
+		node.ConvertToSpec(countBool),
+		node.ConvertToSpec(countNum),
+		node.ConvertToSpec(countString),
 
 		node.ConvertToSpec(rampNode),
 
@@ -219,7 +229,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(conversionBool),
 
 		node.ConvertToSpec(linkInput),
+		node.ConvertToSpec(linkInputNum),
 		node.ConvertToSpec(linkOutput),
+		node.ConvertToSpec(linkOutputNum),
 
 		node.ConvertToSpec(bacServer),
 		node.ConvertToSpec(bacPointAI),
@@ -352,6 +364,10 @@ func builderMisc(body *node.Spec) (node.Node, error) {
 		return link.NewInput(body, con)
 	case linkOutput:
 		return link.NewOutput(body, con)
+	case linkInputNum:
+		return link.NewInputNum(body, con)
+	case linkOutputNum:
+		return link.NewOutputNum(body, con)
 	}
 
 	return nil, nil
@@ -515,8 +531,12 @@ func builderBoolean(body *node.Spec) (node.Node, error) {
 
 func builderCompare(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
-	case logicCompare:
-		return compare.NewCompare(body)
+	case logicCompareGreater:
+		return compare.NewCompareGreater(body)
+	case logicCompareLess:
+		return compare.NewCompareLess(body)
+	case logicCompareEqual:
+		return compare.NewCompareEqual(body)
 	case between:
 		return compare.NewBetween(body)
 	case hysteresis:
@@ -531,6 +551,8 @@ func builderStatistics(body *node.Spec) (node.Node, error) {
 		return statistics.NewMin(body)
 	case max:
 		return statistics.NewMax(body)
+	case avg:
+		return statistics.NewAvg(body)
 	}
 	return nil, nil
 }
@@ -547,10 +569,12 @@ func builderPoints(body *node.Spec) (node.Node, error) {
 
 func builderCount(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
-	case countNode:
-		return count.NewCount(body)
-	case countCOVNode:
-		return count.NewCountCOV(body)
+	case countBoolNode:
+		return count.NewCountBool(body)
+	case countNumNode:
+		return count.NewCountNum(body)
+	case countStringNode:
+		return count.NewCountString(body)
 	case rampNode:
 		return count.NewRamp(body)
 	}

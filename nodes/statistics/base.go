@@ -43,6 +43,8 @@ func operation(operation string, values []*float64) *float64 {
 		output = array.MinFloat64(nonNilValues)
 	case max:
 		output = array.MaxFloat64(nonNilValues)
+	case avg:
+		output = average(nonNilValues)
 	}
 	return &output
 }

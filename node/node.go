@@ -59,6 +59,7 @@ type Node interface {
 	NodeValues() *Values
 	GetStatus() *Status
 	SetStatus(*Status)
+	SetSubTitle(message string)
 	SetStatusError(message string)
 	SetStatusMessage(message string)
 	SetNotifyMessage(message string)
@@ -70,8 +71,8 @@ type Node interface {
 	GetNode(uuid string) Node
 	GetNodes() []Node
 	AddNodes(f []Node)
-	SetDisplay(string)
-	GetDisplay() string
+	SetIcon(icon string)
+	GetIcon() string
 	SetHelp(string)
 	GetHelp() string
 	SetAllowWrite()
@@ -127,6 +128,14 @@ func (n *Spec) SetProcessed() {
 
 func (n *Spec) GetProcessed() bool {
 	return n.processed
+}
+
+func (n *Spec) SetIcon(icon string) {
+	n.Info.Icon = icon
+}
+
+func (n *Spec) GetIcon() string {
+	return n.Info.Icon
 }
 
 func (n *Spec) AddDB(d db.DB) {
@@ -303,6 +312,7 @@ type Info struct {
 	NodeName    string `json:"nodeName,omitempty"` // my-node-abc
 	Category    string `json:"category,omitempty"`
 	Type        string `json:"type,omitempty"`
+	Icon        string `json:"icon,omitempty"`
 	Description string `json:"description,omitempty"`
 	Version     string `json:"version,omitempty"`
 	Display     string `json:"display,omitempty"`

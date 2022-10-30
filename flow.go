@@ -81,6 +81,10 @@ func (p *Flow) AddNodes(node ...node.Node) {
 	}
 }
 
+func (p *Flow) AddNode(node node.Node) *Flow {
+	return p.addNode(node)
+}
+
 func (p *Flow) addNode(node node.Node) *Flow {
 	flows := p.Get()
 	flows.nodes = append(flows.nodes, node)
@@ -182,7 +186,6 @@ func makeRunners(nodes []node.Node) []*node.Runner {
 	runners := make([]*node.Runner, 0, nodesCount)
 	for i := 0; i < nodesCount; i++ {
 		n := nodes[i]
-
 		runner := node.NewRunner(n)
 		runners = append(runners, runner)
 	}

@@ -47,10 +47,12 @@ const (
 
 	deadBandNode = "dead-band"
 
-	logicCompare = "compare"
-	between      = "between"
-	hysteresis   = "hysteresis"
-	funcNode     = "func"
+	logicCompareGreater = "compare-greater"
+	logicCompareLess    = "compare-less"
+	logicCompareEqual   = "compare-equal"
+	between             = "between"
+	hysteresis          = "hysteresis"
+	funcNode            = "func"
 
 	conversionString = "conversion-string"
 	conversionNum    = "conversion-number"
@@ -63,8 +65,9 @@ const (
 	flatLine = "flatLine"
 
 	// count
-	countNode    = "count"
-	countCOVNode = "count-cov"
+	countBoolNode   = "count-bool"
+	countNumNode    = "count-number"
+	countStringNode = "count-string"
 
 	// trigger
 	randomFloat = "random-number"
@@ -79,8 +82,10 @@ const (
 	switchNode = "switch"
 	selectNum  = "select-numeric"
 
-	linkInput  = "link-input"
-	linkOutput = "link-output"
+	linkInput     = "link-input-string"
+	linkOutput    = "link-output-string"
+	linkInputNum  = "link-input-number"
+	linkOutputNum = "link-output-number"
 
 	bacnetServer = "bacnet-server"
 	bacnetAI     = "analog-input"

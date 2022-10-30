@@ -11,6 +11,7 @@ require (
 	github.com/NubeIO/nubeio-rubix-lib-rest-go v1.0.8
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f
 	github.com/eclipse/paho.mqtt.golang v1.4.1
+	github.com/enescakir/emoji v1.0.0
 	github.com/go-co-op/gocron v1.17.0
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible

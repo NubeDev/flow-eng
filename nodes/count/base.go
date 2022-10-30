@@ -1,8 +1,9 @@
 package count
 
 const (
-	category     = "counters"
-	countNode    = "count"
-	countCOVNode = "count-cov"
-	rampNode     = "ramp"
+	category        = "counters"
+	countBoolNode   = "count-bool"
+	countNumNode    = "count-number"
+	countStringNode = "count-string"
+	rampNode        = "ramp"
 )

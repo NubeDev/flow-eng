@@ -150,7 +150,9 @@ const (
 	Above OutputName = "above"
 	Below OutputName = "below"
 
-	GraterThan OutputName = "grater"
-	LessThan   OutputName = "less"
-	Equal      OutputName = "equal"
+	GreaterThan      OutputName = "greater"
+	GreaterThanEqual OutputName = "greater or equal"
+	LessThanEqual    OutputName = "less or equal"
+	LessThan         OutputName = "less"
+	Equal            OutputName = "equal"
 )
