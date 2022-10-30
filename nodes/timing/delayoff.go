@@ -7,20 +7,17 @@ import (
 
 type DelayOff struct {
 	*node.Spec
-	timer     timer.TimedDelay
-	triggered bool
-	active    bool
+	timer   timer.TimedDelay
+	wasTrue bool
 }
-
-// TODO code is copied from delayOn, so needs to be finished
 
 func NewDelayOff(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
 	body = node.Defaults(body, delayOff, category)
 	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs)
-	delayTime := node.BuildInput(node.DelaySeconds, node.TypeFloat, nil, body.Inputs)
-	body.Inputs = node.BuildInputs(delayTime, in)
+	body.Inputs = node.BuildInputs(in)
 	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs))
-	return &DelayOn{body, timer, false, false}, nil
+	body.SetSchema(buildSchema())
+	return &DelayOff{body, timer, false}, nil
 }
 
 func (inst *DelayOff) Process() {
@@ -29,30 +26,22 @@ func (inst *DelayOff) Process() {
 	if null {
 		inst.WritePinNull(node.Out)
 	}
-
-	if in1 && inst.active { // timer has gone to true and input is still true
+	if in1 { // is true
+		inst.wasTrue = true
 		inst.WritePinTrue(node.Out)
-		return
-	} else {
-		inst.active = false // timer is true and input went back to 0
 	}
 
-	if !in1 && inst.triggered { // went true but not for long enough to finish the timeOn delay, so reset the timer
-		inst.timer.Stop()
-		inst.timer = timer.NewTimer()
-		inst.triggered = false
-	}
-	if in1 {
-		if !inst.timer.WaitFor(duration(settings.Duration, settings.Time)) {
+	if !in1 && inst.wasTrue { // was true and now is false
+		if inst.timer.WaitFor(duration(settings.Duration, settings.Time)) {
 			inst.WritePinFalse(node.Out)
-			inst.triggered = true
+			inst.wasTrue = false
 			return
 		} else {
-			inst.active = true
 			inst.WritePinTrue(node.Out)
+			return
 		}
-
-	} else {
+	}
+	if !in1 {
 		inst.WritePinFalse(node.Out)
 	}
 

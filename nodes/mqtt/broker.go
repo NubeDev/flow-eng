@@ -3,7 +3,6 @@ package broker
 import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/db"
-	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeDev/flow-eng/services/mqttclient"
@@ -55,7 +54,7 @@ func (inst *Broker) subscribe() {
 			if payload.topic == message.Topic() {
 				n := inst.GetNode(payload.nodeUUID)
 				n.SetPayload(&node.Payload{
-					Any: str.New(string(message.Payload())),
+					Any: string(message.Payload()),
 				})
 			}
 		}
