@@ -3,6 +3,7 @@ package flow
 import (
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
+	"github.com/enescakir/emoji"
 )
 
 type Point struct {
@@ -68,6 +69,7 @@ func (inst *Point) Process() {
 		}
 		if !setTopic {
 			inst.SetWaringMessage("no point has been selected")
+			inst.SetWaringIcon(string(emoji.OrangeCircle))
 		}
 	}
 	val, null := inst.GetPayloadNull()

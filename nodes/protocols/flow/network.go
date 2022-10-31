@@ -6,6 +6,7 @@ import (
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeDev/flow-eng/services/mqttclient"
+	"github.com/enescakir/emoji"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -39,6 +40,7 @@ func (inst *Network) setConnection() {
 		errMes := fmt.Sprintf("flow-network add mqtt broker failed to get settings err:%s", err.Error())
 		log.Errorf(errMes)
 		inst.SetStatusError(errMes)
+		inst.SetErrorIcon(string(emoji.RedCircle))
 		return
 	}
 	if settings == nil {
@@ -49,12 +51,14 @@ func (inst *Network) setConnection() {
 		errMes := fmt.Sprintf("flow-network error in getting connection err:%s", err.Error())
 		log.Errorf(errMes)
 		inst.SetStatusError(errMes)
+		inst.SetErrorIcon(string(emoji.RedCircle))
 		return
 	}
 	if connection == nil {
 		errMes := fmt.Sprintf("no flow-network mqtt connection, please select a connection")
 		log.Errorf(errMes)
 		inst.SetStatusError(errMes)
+		inst.SetErrorIcon(string(emoji.RedCircle))
 		return
 	}
 	inst.connection = connection
@@ -66,6 +70,7 @@ func (inst *Network) setConnection() {
 		errMes := fmt.Sprintf("flow-network mqtt connect err: %s", err.Error())
 		log.Error(errMes)
 		inst.SetStatusError(errMes)
+		inst.SetErrorIcon(string(emoji.RedCircle))
 	} else {
 		inst.mqttClient = mqttClient
 		inst.mqttConnected = true

@@ -64,6 +64,9 @@ type Node interface {
 	SetStatusMessage(message string)
 	SetNotifyMessage(message string)
 	SetWaringMessage(message string)
+	SetErrorIcon(icon string)
+	SetNotifyIcon(icon string)
+	SetWaringIcon(icon string)
 	GetPayload() *Payload
 	SetPayload(payload *Payload)
 	ReadPayloadAsFloat() (value float64, null bool)

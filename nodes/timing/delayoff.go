@@ -26,7 +26,7 @@ func (inst *DelayOff) Process() {
 	if null {
 		inst.WritePinNull(node.Out)
 	}
-	if in1 { // is true
+	if in1 {
 		inst.wasTrue = true
 		inst.WritePinTrue(node.Out)
 	}

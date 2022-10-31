@@ -2,6 +2,7 @@ package node
 
 import (
 	"github.com/NubeDev/flow-eng/helpers"
+	"github.com/enescakir/emoji"
 )
 
 func BuildNodes(body ...*Spec) []*Spec {
@@ -41,6 +42,7 @@ const noParent = "please add node to a flow-network node"
 func SetNoParent(body *Spec) *Spec {
 	if body.ParentId == "" {
 		body.SetStatusError(noParent)
+		body.SetErrorIcon(string(emoji.RedCircle))
 	}
 	return body
 }

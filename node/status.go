@@ -1,21 +1,45 @@
 package node
 
-import "fmt"
-
 type Status struct {
 	SubTitle      string `json:"subTitle,omitempty"`
-	InError       bool   `json:"inError,omitempty"`
+	ActiveMessage bool   `json:"activeMessage,omitempty"`
 	Message       string `json:"message,omitempty"`
 	ErrorMessage  string `json:"errorMessage,omitempty"`
+	ErrorIcon     string `json:"errorIcon,omitempty"`
 	WaringMessage string `json:"waringMessage,omitempty"`
+	WaringIcon    string `json:"waringIcon,omitempty"`
 	NotifyMessage string `json:"notifyMessage,omitempty"`
+	NotifyIcon    string `json:"notifyIcon,omitempty"`
+}
+
+func (n *Spec) SetErrorIcon(icon string) {
+	if n.Status == nil {
+		n.Status = &Status{}
+	}
+	n.Status.ActiveMessage = true
+	n.Status.ErrorIcon = icon
+}
+
+func (n *Spec) SetNotifyIcon(icon string) {
+	if n.Status == nil {
+		n.Status = &Status{}
+	}
+	n.Status.ActiveMessage = true
+	n.Status.NotifyIcon = icon
+}
+
+func (n *Spec) SetWaringIcon(icon string) {
+	if n.Status == nil {
+		n.Status = &Status{}
+	}
+	n.Status.ActiveMessage = true
+	n.Status.WaringIcon = icon
 }
 
 func (n *Spec) SetSubTitle(message string) {
 	if n.Status == nil {
 		n.Status = &Status{}
 	}
-	message = fmt.Sprintf("%s %s", n.Info.Category, message)
 	n.Status.SubTitle = message
 }
 
@@ -23,7 +47,7 @@ func (n *Spec) SetStatusError(message string) {
 	if n.Status == nil {
 		n.Status = &Status{}
 	}
-	n.Status.InError = true
+	n.Status.ActiveMessage = true
 	n.Status.ErrorMessage = message
 }
 
@@ -38,6 +62,7 @@ func (n *Spec) SetWaringMessage(message string) {
 	if n.Status == nil {
 		n.Status = &Status{}
 	}
+	n.Status.ActiveMessage = true
 	n.Status.WaringMessage = message
 }
 
@@ -45,6 +70,7 @@ func (n *Spec) SetStatusMessage(message string) {
 	if n.Status == nil {
 		n.Status = &Status{}
 	}
+	n.Status.ActiveMessage = true
 	n.Status.Message = message
 }
 

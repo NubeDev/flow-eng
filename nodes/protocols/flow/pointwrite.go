@@ -3,6 +3,7 @@ package flow
 import (
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
+	"github.com/enescakir/emoji"
 )
 
 type PointWrite struct {
@@ -61,7 +62,6 @@ func (inst *PointWrite) Process() {
 		selectedPoint, err := getPointSettings(inst.GetSettings())
 		var setTopic bool
 		if selectedPoint != nil && err == nil {
-
 			if selectedPoint.Point != "" {
 				t := makePointTopic(selectedPoint.Point)
 				if t != "" {
@@ -74,6 +74,8 @@ func (inst *PointWrite) Process() {
 		}
 		if !setTopic {
 			inst.SetWaringMessage("no point has been selected")
+			inst.SetWaringIcon(string(emoji.OrangeCircle))
+
 		}
 	}
 

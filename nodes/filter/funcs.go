@@ -2,7 +2,6 @@ package filter
 
 import (
 	"errors"
-	"math"
 )
 
 // NODEs will single in/out
@@ -22,23 +21,23 @@ const (
 	preventNull = "preventNull"
 )
 
-func mathFunc(def string, x float64) (float64, error) {
+func mathFunc(def string, x bool) (bool, error) {
 	switch def {
 	case onlyTrue:
 		return onlyTrueFunc(x), nil
 	case onlyFalse:
-		return math.Tan(x), nil
+		return !onlyTrueFunc(x), nil
 	case preventNull:
-		return math.Tan(x), nil
+
 	}
-	return 0, errors.New("math function not found")
+	return false, errors.New("math function not found")
 }
 
-func onlyTrueFunc(v float64) float64 {
-	if v >= 1 {
-		return 1
+func onlyTrueFunc(v bool) bool {
+	if v {
+		return v
 	}
-	return 0
+	return v
 }
 
 func onlyFalseFunc(v float64) float64 {
