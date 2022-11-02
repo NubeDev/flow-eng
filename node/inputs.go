@@ -2,7 +2,28 @@ package node
 
 import "fmt"
 
-func BuildInput(portName InputName, dataType DataTypes, fallback interface{}, inputs []*Input) *Input {
+type InputsOpts struct {
+	Help InputHelp
+}
+
+func SetInputHelp(help InputHelp) *InputsOpts {
+	return &InputsOpts{
+		Help: help,
+	}
+}
+
+func inputsOptions(opts ...*InputsOpts) *InputsOpts {
+	if len(opts) > 0 {
+		return opts[0]
+	}
+	return &InputsOpts{}
+}
+
+func inputHelp(opts ...*InputsOpts) (help InputHelp) {
+	return inputsOptions(opts...).Help
+}
+
+func BuildInput(portName InputName, dataType DataTypes, fallback interface{}, inputs []*Input, opts ...*InputsOpts) *Input {
 	port := &Input{
 		Name:       portName,
 		DataType:   dataType,
@@ -29,6 +50,7 @@ func BuildInput(portName InputName, dataType DataTypes, fallback interface{}, in
 	if !addConnections {
 		port.Connection = &InputConnection{}
 	}
+	port.Help = inputHelp(opts...)
 	return port
 }
 

@@ -15,7 +15,7 @@ type Inject struct {
 
 func NewInject(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, inject, category)
-	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs)
+	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, node.SetInputHelp(node.IntervalInputHelp))
 	body.Inputs = node.BuildInputs(interval)
 	trigger := node.BuildOutput(node.Toggle, node.TypeBool, nil, body.Outputs)
 	body.Outputs = node.BuildOutputs(trigger)

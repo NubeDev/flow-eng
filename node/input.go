@@ -15,6 +15,7 @@ type Input struct {
 	uuid       uuid.Value
 	direction  Direction
 	connector  *Connector
+	Help       InputHelp `json:"help"`
 }
 
 func newInput(body *Input) *Input {
@@ -29,6 +30,7 @@ func newInput(body *Input) *Input {
 		uuid.New(),
 		DirectionInput,
 		nil,
+		"",
 	}
 }
 

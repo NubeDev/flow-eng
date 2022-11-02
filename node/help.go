@@ -32,3 +32,11 @@ func (n *Spec) NodeHelp() *Help {
 	}
 	return out
 }
+
+const (
+	IntervalInputHelp InputHelp = "interval"
+)
+
+const (
+	IntervalOutputHelp OutputHelp = "interval"
+)

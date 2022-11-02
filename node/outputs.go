@@ -2,7 +2,22 @@ package node
 
 import "fmt"
 
-func BuildOutput(portName OutputName, dataType DataTypes, fallback interface{}, outputs []*Output) *Output {
+type OutputOpts struct {
+	Help OutputHelp
+}
+
+func outputOptions(opts ...*OutputOpts) *OutputOpts {
+	if len(opts) > 0 {
+		return opts[0]
+	}
+	return &OutputOpts{}
+}
+
+func outputHelp(opts ...*OutputOpts) (help OutputHelp) {
+	return outputOptions(opts...).Help
+}
+
+func BuildOutput(portName OutputName, dataType DataTypes, fallback interface{}, outputs []*Output, opts ...*OutputOpts) *Output {
 	var connections []*OutputConnection
 	port := &Output{
 		Name:        portName,
@@ -20,6 +35,7 @@ func BuildOutput(portName OutputName, dataType DataTypes, fallback interface{}, 
 		}
 	}
 	port.Connections = connections
+	port.Help = outputHelp(opts...)
 	return port
 }
 
