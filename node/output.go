@@ -17,6 +17,7 @@ type Output struct {
 	uuid        uuid.Value
 	direction   Direction
 	connectors  []*Connector
+	Help        OutputHelp `json:"help"`
 }
 
 func newOutput(body *Output) *Output {
@@ -28,6 +29,7 @@ func newOutput(body *Output) *Output {
 		uuid.New(),
 		DirectionOutput,
 		make([]*Connector, 0, 1),
+		"",
 	}
 }
 

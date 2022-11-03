@@ -1,6 +1,8 @@
 package node
 
-import "github.com/NubeDev/flow-eng/schemas"
+import (
+	"github.com/NubeDev/flow-eng/schemas"
+)
 
 type Help struct {
 	NodeName   string          `json:"name"`
@@ -32,3 +34,16 @@ func (n *Spec) NodeHelp() *Help {
 	}
 	return out
 }
+
+const (
+	ConstHelp string = "This node can outputs a fixed numeric, string or boolean value. The output (out) value is set from input (in) value"
+)
+
+const (
+	InHelp            InputHelp = "interval"
+	IntervalInputHelp InputHelp = "interval"
+)
+
+const (
+	IntervalOutputHelp OutputHelp = "interval"
+)

@@ -2,6 +2,8 @@ package node
 
 type DataTypes string
 type InputName string
+type InputHelp string
+type OutputHelp string
 type OutputName string
 
 const (
@@ -36,7 +38,8 @@ const (
 	OnInterval  InputName = "on-interval"
 	OffInterval InputName = "off-interval"
 	Interval    InputName = "interval"
-	Duration    InputName = "duration"
+
+	Duration InputName = "duration"
 
 	TriggerOnCount InputName = "trigger on count"
 	Count          InputName = "count"
