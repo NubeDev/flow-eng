@@ -10,9 +10,10 @@ type Boolean struct {
 
 func NewBoolean(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, constBool, category)
-	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeBool, nil, body.Inputs))
+	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeBool, nil, body.Inputs, node.SetInputHelp(node.IntervalInputHelp)))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
+	body.SetHelp(node.ConstHelp)
 	return &Boolean{body}, nil
 }
 

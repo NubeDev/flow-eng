@@ -34,6 +34,7 @@ func ConvertToSpec(n Node) *Spec {
 		AllowSettings: n.GetAllowSettings(),
 		ParentId:      n.GetParentId(),
 		schema:        n.GetSchema(),
+		Help:          n.GetHelp(),
 	}
 }
 

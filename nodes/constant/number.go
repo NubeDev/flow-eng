@@ -13,6 +13,7 @@ func NewNumber(body *node.Spec) (node.Node, error) {
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
+	body.SetHelp(node.ConstHelp)
 	return &Number{body}, nil
 }
 
