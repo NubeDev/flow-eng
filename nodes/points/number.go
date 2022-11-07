@@ -2,6 +2,7 @@ package point
 
 import (
 	"github.com/NubeDev/flow-eng/node"
+	"github.com/enescakir/emoji"
 )
 
 type Number struct {
@@ -15,12 +16,20 @@ func NewNumber(body *node.Spec) (node.Node, error) {
 	body.Inputs = node.BuildInputs(in1, in2)
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	body.Outputs = node.BuildOutputs(out)
+	body.SetAllowPayload()
+	body.SetPayloadType(node.TypeNumber)
+	body.SetIcon(string(emoji.Label))
 	return &Number{body}, nil
 }
 
 func (inst *Number) Process() {
 	in1, in1Null := inst.ReadPinAsFloat(node.In1)
 	in2, in2Null := inst.ReadPinAsFloat(node.In2)
+	payload, payloadIsNul := inst.ReadPayloadAsFloat()
+	if payloadIsNul {
+		inst.WritePinFloat(node.Out, payload)
+		return
+	}
 	if !in1Null {
 		inst.WritePinFloat(node.Out, in1)
 		return

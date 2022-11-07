@@ -15,6 +15,10 @@ type PalletOutputs struct {
 	ValueType string `json:"valueType"`
 }
 
+type Info struct {
+	Icon string `json:"icon,omitempty"`
+}
+
 type PalletNode struct {
 	Type          string           `json:"type"`
 	Category      string           `json:"category"`
@@ -22,6 +26,9 @@ type PalletNode struct {
 	AllowSettings bool             `json:"allowSettings"`
 	PalletInputs  []*PalletInputs  `json:"inputs"`
 	PalletOutputs []*PalletOutputs `json:"outputs"`
+	Info          Info             `json:"info"`
+	PayloadType   string           `json:"payloadType"`
+	AllowPayload  bool             `json:"allowPayload"`
 }
 
 func convertOutputs(node *node.Spec) []*PalletOutputs {
@@ -45,6 +52,12 @@ func convertInputs(node *node.Spec) []*PalletInputs {
 	return all
 }
 
+func convertInfo(nodeInfo node.Info) Info {
+	return Info{
+		Icon: nodeInfo.Icon,
+	}
+}
+
 func EncodePallet() ([]*PalletNode, error) {
 	var all []*PalletNode
 	for _, spec := range All() {
@@ -64,8 +77,10 @@ func EncodePallet() ([]*PalletNode, error) {
 		one.IsParent = spec.IsParent
 		one.PalletInputs = convertInputs(spec)
 		one.PalletOutputs = convertOutputs(spec)
+		one.Info = convertInfo(spec.GetInfo())
+		one.AllowPayload = spec.GetAllowPayload()
+		one.PayloadType = string(spec.GetPayloadType())
 		all = append(all, one)
-
 	}
 	return all, nil
 }

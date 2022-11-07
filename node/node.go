@@ -78,8 +78,10 @@ type Node interface {
 	GetIcon() string
 	SetHelp(string)
 	GetHelp() string
-	SetAllowWrite()
-	GetAllowWrite() bool
+	SetAllowPayload()
+	GetAllowPayload() bool
+	SetPayloadType(t DataTypes)
+	GetPayloadType() DataTypes
 }
 
 func New(id, name, nodeName string, meta *Metadata, settings map[string]interface{}) *Spec {
@@ -107,7 +109,8 @@ type Spec struct {
 	IsParent      bool                   `json:"isParent"`
 	ParentId      string                 `json:"parentId,omitempty"`
 	Status        *Status                `json:"status,omitempty"`
-	AllowWrite    bool                   `json:"allowWrite"` // allow payload write
+	AllowPayload  bool                   `json:"allowPayload"` // allow payload write
+	PayloadType   DataTypes              `json:"payloadType"`
 	Payload       *Payload               `json:"payload,omitempty"`
 	Help          string                 `json:"help"`
 	loopCount     uint64
@@ -222,12 +225,20 @@ func (n *Spec) GetName() string {
 	return n.Info.Name
 }
 
-func (n *Spec) SetAllowWrite() {
-	n.AllowWrite = true
+func (n *Spec) SetAllowPayload() {
+	n.AllowPayload = true
 }
 
-func (n *Spec) GetAllowWrite() bool {
-	return n.AllowWrite
+func (n *Spec) GetAllowPayload() bool {
+	return n.AllowPayload
+}
+
+func (n *Spec) SetPayloadType(t DataTypes) {
+	n.PayloadType = t
+}
+
+func (n *Spec) GetPayloadType() DataTypes {
+	return n.PayloadType
 }
 
 func (n *Spec) GetIsParent() bool {

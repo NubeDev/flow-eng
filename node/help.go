@@ -5,13 +5,14 @@ import (
 )
 
 type Help struct {
-	NodeName   string          `json:"name"`
-	Help       string          `json:"help"`
-	Info       Info            `json:"info,omitempty"`
-	AllowWrite bool            `json:"allowWrite"`
-	Inputs     []*Input        `json:"inputs,omitempty"`
-	Outputs    []*Output       `json:"outputs,omitempty"`
-	Settings   *schemas.Schema `json:"settings,omitempty"`
+	NodeName     string          `json:"name"`
+	Help         string          `json:"help"`
+	Info         Info            `json:"info,omitempty"`
+	AllowPayload bool            `json:"allowPayload"`
+	PayloadType  string          `json:"payloadType"`
+	Inputs       []*Input        `json:"inputs,omitempty"`
+	Outputs      []*Output       `json:"outputs,omitempty"`
+	Settings     *schemas.Schema `json:"settings,omitempty"`
 }
 
 func (n *Spec) NodeHelp() *Help {
@@ -24,13 +25,14 @@ func (n *Spec) NodeHelp() *Help {
 		output.Connections = nil
 	}
 	var out = &Help{
-		NodeName:   n.GetName(),
-		Info:       n.GetInfo(),
-		Help:       n.GetHelp(),
-		AllowWrite: n.GetAllowWrite(),
-		Inputs:     inputs,
-		Outputs:    outputs,
-		Settings:   n.GetSchema(),
+		NodeName:     n.GetName(),
+		Info:         n.GetInfo(),
+		Help:         n.GetHelp(),
+		AllowPayload: n.GetAllowPayload(),
+		PayloadType:  string(n.GetPayloadType()),
+		Inputs:       inputs,
+		Outputs:      outputs,
+		Settings:     n.GetSchema(),
 	}
 	return out
 }
