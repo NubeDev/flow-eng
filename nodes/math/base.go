@@ -34,6 +34,7 @@ func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(schemas.GetInputCount())
+	body.SetDynamicInputs()
 	return body, nil
 }
 

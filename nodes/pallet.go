@@ -27,6 +27,7 @@ type PalletNode struct {
 	PalletInputs  []*PalletInputs  `json:"inputs"`
 	PalletOutputs []*PalletOutputs `json:"outputs"`
 	Info          Info             `json:"info"`
+	Metadata      *node.Metadata   `json:"metadata,omitempty"`
 	PayloadType   string           `json:"payloadType"`
 	AllowPayload  bool             `json:"allowPayload"`
 }
@@ -75,6 +76,7 @@ func EncodePallet() ([]*PalletNode, error) {
 		one.Type = nodeType
 		one.Category = spec.Info.Category
 		one.IsParent = spec.IsParent
+		one.Metadata = spec.GetMetadata()
 		one.PalletInputs = convertInputs(spec)
 		one.PalletOutputs = convertOutputs(spec)
 		one.Info = convertInfo(spec.GetInfo())

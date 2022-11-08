@@ -82,6 +82,8 @@ type Node interface {
 	GetAllowPayload() bool
 	SetPayloadType(t DataTypes)
 	GetPayloadType() DataTypes
+	SetDynamicInputs()
+	SetDynamicOutputs()
 }
 
 func New(id, name, nodeName string, meta *Metadata, settings map[string]interface{}) *Spec {
@@ -105,7 +107,7 @@ type Spec struct {
 	Info          Info                   `json:"info"`
 	Settings      map[string]interface{} `json:"settings"`
 	AllowSettings bool                   `json:"allowSettings"`
-	Metadata      *Metadata              `json:"metadata,omitempty"`
+	Metadata      *Metadata              `json:"metadata"`
 	IsParent      bool                   `json:"isParent"`
 	ParentId      string                 `json:"parentId,omitempty"`
 	Status        *Status                `json:"status,omitempty"`
@@ -304,14 +306,6 @@ func (n *Spec) GetParentId() string {
 	return n.ParentId
 }
 
-func (n *Spec) GetMetadata() *Metadata {
-	return n.Metadata
-}
-
-func (n *Spec) SetMetadata(m *Metadata) {
-	n.Metadata = m
-}
-
 func (n *Spec) GetDisplay() string {
 	return n.Info.Display
 }
@@ -338,17 +332,19 @@ type InputConnection struct {
 	OverrideValue interface{} `json:"overrideValue,omitempty"` // used for when the user has no node link and writes the value direct (or can be used to override a value)
 	CurrentValue  interface{} `json:"currentValue,omitempty"`
 	FallbackValue interface{} `json:"fallbackValue,omitempty"`
-	Disable       *bool       `json:"disable,omitempty"`
+	Disable       bool        `json:"disable,omitempty"`
 }
 
 type OutputConnection struct {
 	OverrideValue interface{} `json:"overrideValue,omitempty"` // used for when the user has no node link and writes the value direct (or can be used to override a value)
 	CurrentValue  interface{} `json:"currentValue,omitempty"`
 	FallbackValue interface{} `json:"fallbackValue,omitempty"`
-	Disable       *bool       `json:"disable,omitempty"`
+	Disable       bool        `json:"disable,omitempty"`
 }
 
 type Metadata struct {
-	PositionX string `json:"positionX"`
-	PositionY string `json:"positionY"`
+	PositionX      string `json:"positionX,omitempty"`
+	PositionY      string `json:"positionY,omitempty"`
+	DynamicInputs  bool   `json:"dynamicInputs"`
+	DynamicOutputs bool   `json:"dynamicOutputs"`
 }
