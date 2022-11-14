@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/NubeDev/flow-eng/helpers/global"
 	"github.com/NubeDev/flow-eng/helpers/uuid"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -26,7 +27,8 @@ func compatibleTypes(from DataTypes, to DataTypes) bool {
 
 func NewConnector(from *Output, to *Input) *Connector {
 	if !compatibleTypes(from.DataType, to.DataType) {
-		panic(ErrIncompatiblePortsTypes)
+		//panic(ErrIncompatiblePortsTypes)
+		log.Error(ErrIncompatiblePortsTypes)
 	}
 	return &Connector{uuid.New(), from, to, false}
 }
