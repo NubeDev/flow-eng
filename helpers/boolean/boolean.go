@@ -1,5 +1,9 @@
 package boolean
 
+import (
+	"github.com/NubeDev/flow-eng/helpers/conversions"
+)
+
 func New(value bool) *bool {
 	b := value
 	return &b
@@ -52,10 +56,20 @@ func ConvertInterfaceToBool(value interface{}) *bool {
 	if value == nil {
 		return nil
 	}
+	v, ok := conversions.GetFloatOk(value)
+	if ok {
+		if v == 1 {
+			return NewTrue()
+		}
+		if v == 0 {
+			return NewFalse()
+		}
+	}
 	output, ok := value.(bool)
 	if ok {
 		return &output
 	}
+
 	return nil
 }
 
