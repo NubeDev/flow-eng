@@ -26,6 +26,7 @@ func Encode(graph *flowctrl.Flow) (*NodesList, error) {
 		nodeSchema = &node.Schema{
 			Id:       _node.GetID(),
 			Type:     nodeType,
+			NodeName: _node.GetNodeName(),
 			Metadata: _node.GetMetadata(),
 			Settings: _node.GetSettings(),
 			IsParent: _node.IsParent,

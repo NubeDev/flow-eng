@@ -24,6 +24,7 @@ type Node interface {
 	GetID() string       // node_abc123
 	GetName() string     // AND, OR
 	GetNodeName() string // my-node
+	SetNodeName(string)  // my-node
 	GetNodeValues() []*PortValues
 	GetInputs() []*Input
 	GetInput(name InputName) *Input
@@ -128,6 +129,10 @@ func (n *Spec) Cleanup() {
 }
 func (n *Spec) ResetProcessed() {
 	n.processed = false
+}
+
+func (n *Spec) SetNodeName(name string) {
+	n.Info.NodeName = name
 }
 
 func (n *Spec) SetProcessed() {

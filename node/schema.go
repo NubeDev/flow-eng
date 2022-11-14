@@ -4,6 +4,7 @@ package node
 type Schema struct {
 	Id       string                  `json:"id"`   // node uuid
 	Type     string                  `json:"type"` // math/add
+	NodeName string                  `json:"nodeName,omitempty"`
 	Icon     string                  `json:"icon,omitempty"`
 	Metadata *Metadata               `json:"metadata,omitempty"` // positions on the editor
 	Inputs   map[string]SchemaInputs `json:"inputs,omitempty"`

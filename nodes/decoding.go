@@ -16,6 +16,7 @@ func Decode(encodedNodes *NodesList) ([]*node.Spec, error) {
 		decodedNode.IsParent = encodedNode.IsParent
 		decodedNode.ParentId = encodedNode.ParentId
 		decodedNode.Info.Icon = encodedNode.Icon
+		decodedNode.Info.NodeName = encodedNode.NodeName
 
 		if encodedNode.Payload != nil {
 			decodedNode.Payload = &node.Payload{Any: encodedNode.Payload}

@@ -15,9 +15,9 @@ type PalletOutputs struct {
 	ValueType string `json:"valueType"`
 }
 
-type Info struct {
-	Icon string `json:"icon,omitempty"`
-}
+//type Info struct {
+//	Icon string `json:"icon,omitempty"`
+//}
 
 type PalletNode struct {
 	Type          string           `json:"type"`
@@ -26,7 +26,7 @@ type PalletNode struct {
 	AllowSettings bool             `json:"allowSettings"`
 	PalletInputs  []*PalletInputs  `json:"inputs"`
 	PalletOutputs []*PalletOutputs `json:"outputs"`
-	Info          Info             `json:"info"`
+	Info          node.Info        `json:"info"`
 	Metadata      *node.Metadata   `json:"metadata,omitempty"`
 	PayloadType   string           `json:"payloadType"`
 	AllowPayload  bool             `json:"allowPayload"`
@@ -53,8 +53,8 @@ func convertInputs(node *node.Spec) []*PalletInputs {
 	return all
 }
 
-func convertInfo(nodeInfo node.Info) Info {
-	return Info{
+func convertInfo(nodeInfo node.Info) node.Info {
+	return node.Info{
 		Icon: nodeInfo.Icon,
 	}
 }
