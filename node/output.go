@@ -62,14 +62,14 @@ func (p *Output) SetValue(value interface{}) {
 }
 
 func (p *Output) Copy(other *Input, debug *global.Debug) error {
-	if p.DataType != other.DataType {
+	if !compatibleTypes(p.DataType, other.DataType) {
 		return ErrTypesMismatch
 	}
 	if global.DebugConnections {
 		debug.OutputValue = p.GetValue()
 		pprint.PrintJOSN(debug)
 	}
-	// pass the ouput value to the input
+	// pass the output value to the input
 	other.SetValue(p.GetValue())
 	return nil
 }

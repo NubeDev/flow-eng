@@ -17,8 +17,15 @@ type Connector struct {
 	written bool
 }
 
+func compatibleTypes(from DataTypes, to DataTypes) bool {
+	if from == TypeString && to != TypeString {
+		return false
+	}
+	return true
+}
+
 func NewConnector(from *Output, to *Input) *Connector {
-	if from.DataType != to.DataType {
+	if !compatibleTypes(from.DataType, to.DataType) {
 		panic(ErrIncompatiblePortsTypes)
 	}
 	return &Connector{uuid.New(), from, to, false}
