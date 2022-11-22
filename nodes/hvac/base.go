@@ -5,5 +5,13 @@ const (
 )
 
 const (
-	deadBandNode = "dead-band"
+	deadBandNode   = "dead-band"
+	pacControlNode = "pac-control"
+
+	// methods
+	get        = "GET"
+	post       = "POST"
+	patch      = "PATCH"
+	put        = "PUT"
+	httpDelete = "DELETE"
 )
