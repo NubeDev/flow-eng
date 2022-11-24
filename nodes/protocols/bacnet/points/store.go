@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers"
 	"github.com/NubeDev/flow-eng/helpers/names"
-	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -62,21 +61,6 @@ type ObjectStore struct {
 }
 
 var (
-	edgeUICount = 8
-	edgeUOCount = 8
-	edgeDICount = 8
-	edgeDOCount = 8 // 6DOs and r1, r2
-)
-
-// if modbus and rubix-io modbus will still start and 1 and then the last modbus addr,
-// is where the rubix addr will start (but if the user add a new modbus device the rubix-io address's will be push back)
-var (
-	rubixUICount = 8
-	rubixUOCount = 6 // 6UOs and DO1, DO2
-	rubixDOCount = 2
-)
-
-var (
 	io16UICount = 8
 	io16UOCount = 8
 )
@@ -89,55 +73,20 @@ var (
 )
 
 func CalcPointCount(deviceCount int, app names.ApplicationName) (rubixUIStart, rubixUOStart ObjectID) {
-	if app == names.Edge {
-		return calcModbusRubix(deviceCount, false, false, true)
-	}
 	if app == names.Modbus {
-		return calcModbusRubix(deviceCount, true, false, false)
-	}
-	if app == names.RubixIOAndModbus {
-		return calcModbusRubix(deviceCount, true, true, false)
-	}
-	if app == names.RubixIO {
-		return calcModbusRubix(deviceCount, false, true, false)
+		return calcModbusRubix(deviceCount)
 	}
 	return 0, 0
 
 }
 
-func calcModbusRubix(deviceCount int, isModbus, isRubix, isEdge bool) (rubixUIStart, rubixUOStart ObjectID) {
-	if isEdge { // edge
-		calculatedUICount = edgeUICount
-		calculatedUOCount = edgeUOCount
-		calculatedDICount = edgeDICount
-		calculatedDOCount = edgeDOCount
-		log.Infof(" calculated bacnet point EDGE-28 -> calculatedUICount:%d, calculatedUOCount:%d, calculatedDICount:%d, calculatedDOCount:%d,", calculatedUICount, calculatedUOCount, calculatedDICount, calculatedDOCount)
-		return 0, 0
-	}
-	if isRubix && !isModbus { // just rubix
-		calculatedUICount = rubixUICount
-		calculatedUOCount = rubixUOCount
-		calculatedDOCount = rubixDOCount
-		log.Infof(" calculated bacnet point RUBIX-IO -> calculatedUICount:%d, calculatedUOCount:%d, calculatedDICount:%d, calculatedDOCount:%d,", calculatedUICount, calculatedUOCount, calculatedDICount, calculatedDOCount)
-		return 1, 1
-	}
+func calcModbusRubix(deviceCount int) (rubixUIStart, rubixUOStart ObjectID) {
 
-	if !isRubix && isModbus { // just modbus
-		calculatedUICount = io16UICount * deviceCount
-		calculatedUOCount = io16UOCount * deviceCount
-		log.Infof(" calculated bacnet point MODBUS -> calculatedUICount:%d, calculatedUOCount:%d, calculatedDICount:%d, calculatedDOCount:%d,", calculatedUICount, calculatedUOCount, calculatedDICount, calculatedDOCount)
-		return 0, 0
-	}
-
-	if isRubix && isModbus { // rubix & modbus
-		calculatedUICount = io16UICount*deviceCount + rubixUICount
-		calculatedUOCount = io16UOCount*deviceCount + rubixUOCount
-		calculatedDOCount = rubixDOCount
-		log.Infof(" calculated bacnet point MODBUS & RUBIX-IO -> calculatedUICount:%d, calculatedUOCount:%d, calculatedDICount:%d, calculatedDOCount:%d,", calculatedUICount, calculatedUOCount, calculatedDICount, calculatedDOCount)
-		return ObjectID(calculatedUICount - 7), ObjectID(calculatedUOCount - 7)
-	}
-
+	calculatedUICount = io16UICount * deviceCount
+	calculatedUOCount = io16UOCount * deviceCount
+	log.Infof(" calculated bacnet point MODBUS -> calculatedUICount:%d, calculatedUOCount:%d, calculatedDICount:%d, calculatedDOCount:%d,", calculatedUICount, calculatedUOCount, calculatedDICount, calculatedDOCount)
 	return 0, 0
+
 }
 
 func New(app names.ApplicationName, pStore *ObjectStore, deviceCount, avAllowance, bvAllowance int) *Store {
@@ -240,37 +189,23 @@ func (inst *Store) AddPoint(point *Point, ignoreError bool) (*Point, error) {
 	if point.ObjectType == "" {
 		return nil, errors.New(fmt.Sprintf("store-add-point: point objectType can not be empty"))
 	}
-	fmt.Println(11111, inst.Application, point.Application)
-
-	if inst.Application == names.RubixIOAndModbus || inst.Application == names.Modbus {
-		rubixUIStart, rubixUOStart := CalcPointCount(inst.ModbusDeviceCount, inst.Application)
-		fmt.Println(2222, rubixUIStart, rubixUOStart, point.ObjectID < rubixUIStart, point.ObjectType == AnalogInput)
-		fmt.Println(22222222, point.Application, point.ObjectType, point.ObjectID, rubixUIStart)
-		if point.ObjectType == AnalogInput {
-			if point.ObjectID > rubixUIStart {
-				addr, _ := ModbusBuildInput(point.IoType, point.ObjectID)
-				point.ModbusDevAddr = addr.DeviceAddr
-				point.Application = names.Modbus
-				fmt.Println(22222222, point.Application)
-			} else {
-				point.Application = names.RubixIO
-				fmt.Println(33333, point.Application)
-			}
-
-		}
-		if point.ObjectID < rubixUOStart && point.ObjectType == AnalogOutput {
-			if point.ObjectID > rubixUOStart {
-				addr, _ := ModbusBuildOutput(point.IoType, point.ObjectID)
-				point.ModbusDevAddr = addr.DeviceAddr
-				point.Application = names.Modbus
-			} else {
-				point.Application = names.RubixIO
-			}
-
+	rubixUIStart, rubixUOStart := CalcPointCount(inst.ModbusDeviceCount, inst.Application)
+	if point.ObjectType == AnalogInput {
+		if point.ObjectID > rubixUIStart {
+			addr, _ := ModbusBuildInput(point.IoType, point.ObjectID)
+			point.ModbusDevAddr = addr.DeviceAddr
+			point.Application = names.Modbus
+		} else {
+			point.Application = names.Modbus
 		}
 
-	} else {
-		point.Application = inst.Application
+	}
+	if point.ObjectID < rubixUOStart && point.ObjectType == AnalogOutput {
+		if point.ObjectID > rubixUOStart {
+			addr, _ := ModbusBuildOutput(point.IoType, point.ObjectID)
+			point.ModbusDevAddr = addr.DeviceAddr
+			point.Application = names.Modbus
+		}
 
 	}
 
@@ -371,7 +306,7 @@ func (inst *Store) AddPoint(point *Point, ignoreError bool) (*Point, error) {
 	}
 	log.Infof("bacnet-add-point type-%s:%d application-type %s", point.ObjectType, point.ObjectID, point.Application)
 	inst.Points = append(inst.Points, point)
-	pprint.PrintJOSN(inst.Points)
+
 	return point, nil
 }
 

@@ -4,9 +4,7 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
-	edge28lib "github.com/NubeDev/flow-eng/services/edge28"
 	"github.com/NubeDev/flow-eng/services/mqttclient"
-	rubixIO "github.com/NubeDev/flow-eng/services/rubixio"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -30,8 +28,6 @@ type Server struct {
 
 type clients struct {
 	mqttClient *mqttclient.Client
-	rio        *rubixIO.RubixIO
-	edge28     *edge28lib.Edge28
 }
 
 func bacnetOpts(opts *Bacnet) *Bacnet {
@@ -67,21 +63,7 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	server := &Server{body, clients, false, false, false, false, opts.Store, application}
 	server.clients.mqttClient = opts.MqttClient
 	body.SetSchema(BuildSchemaServer())
-	if application == names.RubixIO || application == names.RubixIOAndModbus {
-		rubixIOUICount, rubixIOUOCount := points.CalcPointCount(1, application)
-		rio := &rubixIO.RubixIO{}
-		rio = rubixIO.New(&rubixIO.RubixIO{
-			IP:          opts.Ip,
-			StartAddrUI: rubixIOUICount,
-			StartAddrUO: rubixIOUOCount,
-			StartAddrDO: 2,
-		})
-		server.clients.rio = rio
-		log.Infof("bacnet-server: start application: %s device-ip: %s", application, opts.Ip)
-	}
-	if application == names.Edge {
-		edge28 := edge28lib.New(opts.Ip)
-		server.clients.edge28 = edge28
+	if application == names.Modbus {
 		log.Infof("bacnet-server: start application: %s device-ip: %s", application, opts.Ip)
 	}
 	return server, err
@@ -98,7 +80,7 @@ func (inst *Server) Process() {
 	if !inst.pingLock {
 	}
 	if !inst.runnersLock {
-		go inst.protocolRunner(inst.application)
+		go inst.protocolRunner()
 		inst.runnersLock = true
 	}
 }

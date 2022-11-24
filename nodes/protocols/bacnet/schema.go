@@ -1,7 +1,6 @@
 package bacnetio
 
 import (
-	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
@@ -9,7 +8,6 @@ import (
 )
 
 type serverSchema struct {
-	AppType     schemas.EnumString `json:"appType"`
 	DeviceCount schemas.EnumString `json:"deviceCount"`
 	Serial      schemas.EnumString `json:"serial"`
 }
@@ -18,15 +16,10 @@ var serialPorts = []string{"RC5 485-1", "RC5 485-2", "RC5/RC-IO SIDE-485-PORT", 
 
 func BuildSchemaServer() *schemas.Schema {
 	props := &serverSchema{}
-	props.AppType.Title = "hardware-type"
-	props.AppType.Default = string(names.Modbus)
-	props.AppType.EnumName = []string{string(names.Modbus), string(names.RubixIO), string(names.RubixIOAndModbus), string(names.Edge)}
-	props.AppType.Options = []string{string(names.Modbus), string(names.RubixIO), string(names.RubixIOAndModbus), string(names.Edge)}
-
 	props.DeviceCount.Title = "IO-16-device-count"
 	props.DeviceCount.Default = "No IO-16s"
 	props.DeviceCount.EnumName = []string{"No IO-16s", "1x IO-16", "2x IO-16s", "3x IO-16s", "4x IO-16s"}
-	props.DeviceCount.Options = []string{"0", "2", "3", "4"}
+	props.DeviceCount.Options = []string{"0", "1", "2", "3", "4"}
 
 	props.Serial.Title = "serial-port (baud-rate:38400)"
 	props.Serial.Default = serialPorts[0]
@@ -44,7 +37,6 @@ func BuildSchemaServer() *schemas.Schema {
 }
 
 type BacnetSchema struct {
-	AppType     string `json:"appType"`
 	DeviceCount string `json:"deviceCount"`
 	Serial      string `json:"serial"`
 }

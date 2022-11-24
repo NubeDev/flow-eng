@@ -44,7 +44,7 @@ func typeSelect(objectType IoType, write bool) model.ObjectType {
 func InputAddress(deviceCount int, filterByBacnet int) ([]ModbusInputAddr, ModbusInputAddr) {
 	var ioNumber = 1
 	var temp = 1
-	var volt = 250
+	var volt = 201
 	var current = 301
 	var count = 0
 	var innerCount = 0

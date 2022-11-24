@@ -60,7 +60,6 @@ func modbusBulkWrite(pointsList []*points.Point) [8]float64 {
 }
 
 func (inst *Server) modbusOutputsDispatch(cli *modbuscli.Modbus) {
-
 	pointsList := inst.store.GetModbusWriteablePoints(true)
 	if pointsList == nil {
 		//return
@@ -92,8 +91,7 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 	var voltList [8]float64
 	var completedTemp bool
 	var completedVolt bool
-	fmt.Println(222, len(pointsList), pointsList[0].IoType)
-	pprint.PrintJOSN(pointsList[0])
+
 	for _, point := range pointsList { // do modbus read
 		if !point.IsWriteable {
 			addr, _ := points.ModbusBuildInput(point.IoType, point.ObjectID)

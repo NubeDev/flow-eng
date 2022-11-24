@@ -36,11 +36,8 @@ func (inst *Store) GetPoints() []*Point {
 
 func (inst *Store) GetWriteablePointsByApplication(name names.ApplicationName) []*Point {
 	var out []*Point
-	app := inst.GetApplication()
 	var rubix bool
-	if app == names.RubixIO || app == names.RubixIOAndModbus {
-		rubix = true
-	}
+	rubix = true
 	for _, point := range inst.GetPoints() {
 		if rubix {
 			if point.Application == name {
