@@ -84,6 +84,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	// hvac
 	deadBand, _ := hvac.NewDeadBand(nil)
+	pacControl, _ := hvac.NewPACControl(nil)
 
 	gmailNode, _ := gmail.NewGmail(nil)
 	pingNode, _ := ping.NewPing(nil)
@@ -193,6 +194,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(flowPointWrite),
 
 		node.ConvertToSpec(deadBand),
+		node.ConvertToSpec(pacControl),
 
 		node.ConvertToSpec(pointNum),
 		node.ConvertToSpec(pointBool),
@@ -435,8 +437,10 @@ func builderFlowNetworks(body *node.Spec, opts []interface{}) (node.Node, error)
 
 func builderHVAC(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
-	case constNum:
+	case deadBandNode:
 		return hvac.NewDeadBand(body)
+	case pacControlNode:
+		return hvac.NewPACControl(body)
 	}
 	return nil, nil
 }
