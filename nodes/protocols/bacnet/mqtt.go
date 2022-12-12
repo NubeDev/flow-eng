@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers"
-	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/helpers/topics"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -31,20 +30,6 @@ func (inst *Server) mqttReconnect() {
 	inst.pingLock = false
 }
 
-func (inst *Server) subscribeToRubixIO(topic string) {
-	callback := func(client mqtt.Client, message mqtt.Message) {
-		mes := &topics.Message{UUID: helpers.ShortUUID("bus"), Msg: message}
-		if topics.CheckRubixIO(message.Topic()) {
-			inst.rubixInputsRunner(mes)
-		}
-	}
-	err := inst.clients.mqttClient.Subscribe(topic, mqttQOS, callback)
-	if err != nil {
-		log.Errorf("bacnet-server mqtt:%s", err.Error())
-		inst.pingFailed = false
-	}
-}
-
 func (inst *Server) subscribeToBacnetServer() {
 	callback := func(client mqtt.Client, message mqtt.Message) {
 		mes := &topics.Message{UUID: helpers.ShortUUID("bus"), Msg: message}
@@ -68,9 +53,6 @@ func (inst *Server) subscribeToBacnetServer() {
 }
 
 func (inst *Server) subscribe() {
-	if inst.application == names.RubixIO {
-		inst.subscribeToRubixIO("rubixio/inputs/all")
-	}
 	inst.subscribeToBacnetServer()
 }
 
