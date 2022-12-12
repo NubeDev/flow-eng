@@ -34,24 +34,10 @@ func (inst *Store) GetPoints() []*Point {
 	return nil
 }
 
-func (inst *Store) GetWriteablePointsByApplication(name names.ApplicationName) []*Point {
+func (inst *Store) GetWriteablePoints() []*Point {
 	var out []*Point
-	var rubix bool
-	rubix = true
 	for _, point := range inst.GetPoints() {
-		if rubix {
-			if point.Application == name {
-				if point.IsWriteable {
-					out = append(out, point)
-				}
-			}
-		} else {
-			if point.Application == name {
-				if point.IsWriteable {
-					out = append(out, point)
-				}
-			}
-		}
+		out = append(out, point)
 	}
 	return out
 }
@@ -63,7 +49,7 @@ type ModbusPoints struct {
 	DeviceFour  []*Point
 }
 
-func (inst *Store) GetModbusWriteablePoints(pendingWrite bool) *ModbusPoints {
+func (inst *Store) GetModbusWriteablePoints() *ModbusPoints {
 	out := &ModbusPoints{
 		DeviceOne:   []*Point{},
 		DeviceTwo:   []*Point{},
@@ -73,46 +59,22 @@ func (inst *Store) GetModbusWriteablePoints(pendingWrite bool) *ModbusPoints {
 	for _, point := range inst.GetPoints() {
 		if point.ModbusDevAddr == 1 {
 			if point.IsWriteable {
-				if pendingWrite {
-					if inst.PendingWrite(point) {
-						out.DeviceOne = append(out.DeviceOne, point)
-					}
-				} else {
-					out.DeviceOne = append(out.DeviceOne, point)
-				}
+				out.DeviceOne = append(out.DeviceOne, point)
 			}
 		}
 		if point.ModbusDevAddr == 2 {
 			if point.IsWriteable {
-				if pendingWrite {
-					if inst.PendingWrite(point) {
-						out.DeviceOne = append(out.DeviceTwo, point)
-					}
-				} else {
-					out.DeviceOne = append(out.DeviceTwo, point)
-				}
+				out.DeviceTwo = append(out.DeviceTwo, point)
 			}
 		}
 		if point.ModbusDevAddr == 3 {
 			if point.IsWriteable {
-				if pendingWrite {
-					if inst.PendingWrite(point) {
-						out.DeviceOne = append(out.DeviceThree, point)
-					}
-				} else {
-					out.DeviceOne = append(out.DeviceThree, point)
-				}
+				out.DeviceThree = append(out.DeviceThree, point)
 			}
 		}
 		if point.ModbusDevAddr == 4 {
 			if point.IsWriteable {
-				if pendingWrite {
-					if inst.PendingWrite(point) {
-						out.DeviceOne = append(out.DeviceFour, point)
-					}
-				} else {
-					out.DeviceOne = append(out.DeviceFour, point)
-				}
+				out.DeviceFour = append(out.DeviceFour, point)
 			}
 		}
 	}
@@ -120,13 +82,7 @@ func (inst *Store) GetModbusWriteablePoints(pendingWrite bool) *ModbusPoints {
 }
 
 func (inst *Store) GetPointsByApplication(name names.ApplicationName) []*Point {
-	var out []*Point
-	for _, point := range inst.GetPoints() {
-		if point.Application == name {
-			out = append(out, point)
-		}
-	}
-	return out
+	return inst.GetPoints()
 }
 
 func (inst *Store) GetPointsByApplicationAndType(name names.ApplicationName, t ObjectType) []*Point {
@@ -196,9 +152,12 @@ func (inst *Store) mergePriority(p2 *PriArray, in14, in15 *float64) *PriArray {
 }
 
 //SetPresentValue set present value
-func (inst *Store) SetPresentValue(point *Point, value float64) bool {
-	if point != nil {
-		point.PresentValue = value
+func (inst *Store) SetPresentValue(p *Point, value float64) bool {
+	if p != nil {
+		point := inst.GetPoint(p.UUID)
+		if point != nil {
+			point.PresentValue = value
+		}
 	}
 	return false
 }

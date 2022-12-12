@@ -1,9 +1,7 @@
 package bacnetio
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/names"
-	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/services/modbuscli"
 	"github.com/NubeIO/nubeio-rubix-lib-modbus-go/modbus"
@@ -39,7 +37,6 @@ func (inst *Server) modbusRunner(settings map[string]interface{}) {
 	var count int
 	for {
 		log.Infof("modbus polling loop count: %d application-type: %s", count, inst.application)
-		fmt.Println(names.Modbus)
 		pointsList := inst.store.GetPointsByApplication(names.Modbus)
 		inst.modbusInputsRunner(init, pointsList) // process the inputs
 		inst.modbusOutputsDispatch(init)          // process the outs
@@ -60,7 +57,7 @@ func modbusBulkWrite(pointsList []*points.Point) [8]float64 {
 }
 
 func (inst *Server) modbusOutputsDispatch(cli *modbuscli.Modbus) {
-	pointsList := inst.store.GetModbusWriteablePoints(true)
+	pointsList := inst.store.GetModbusWriteablePoints()
 	if pointsList == nil {
 		//return
 	}
@@ -91,52 +88,37 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 	var voltList [8]float64
 	var completedTemp bool
 	var completedVolt bool
-
+	var returnedValue float64
 	for _, point := range pointsList { // do modbus read
 		if !point.IsWriteable {
 			addr, _ := points.ModbusBuildInput(point.IoType, point.ObjectID)
-			pprint.PrintJOSN(addr)
 			slaveId := addr.DeviceAddr
+			p := inst.store.GetPointByObject(points.AnalogInput, point.ObjectID)
 			if !completedTemp && (point.IoType == points.IoTypeTemp || point.IoType == points.IoTypeDigital) {
 				tempList, err = cli.ReadTemps(slaveId) // DO MODBUS READ FOR TEMPS
 				if err != nil {
 					log.Errorf("modbus read temp %s", err.Error())
 				}
-				completedTemp = true
 			}
 			if !completedVolt && point.IoType == points.IoTypeVolts {
 				voltList, err = cli.ReadVolts(slaveId) // DO MODBUS READ FOR VOLTS
 				if err != nil {
 					log.Errorf("modbus read voltages %s", err.Error())
 				}
-				completedVolt = true
 			}
-		}
-	}
-	for _, point := range pointsList {
-		addr, _ := points.ModbusBuildInput(point.IoType, point.ObjectID)
-		objectId := addr.BacnetAddr
-		var returnedValue float64
-		if point.ObjectType == points.AnalogInput {
-			if point.ObjectID == points.ObjectID(objectId) {
-				p := inst.store.GetPointByObject(points.AnalogInput, point.ObjectID)
-				io16Pin := addr.IoPin - 1
-				if io16Pin < 0 || io16Pin > len(tempList) {
-					log.Errorf("modbus-polling failed to get correct io-pin")
-					continue
+			// update the store
+			io16Pin := addr.IoPin - 1
+			if point.IoType == points.IoTypeTemp || point.IoType == points.IoTypeDigital { // update anypoint that is type temp
+				if point.IoType == points.IoTypeDigital {
+					returnedValue = modbuscli.TempToDI(tempList[io16Pin]) // covert them temp value to a DI value
+				} else {
+					returnedValue = tempList[io16Pin]
 				}
-				if point.IoType == points.IoTypeTemp || point.IoType == points.IoTypeDigital { // update anypoint that is type temp
-					if point.IoType == points.IoTypeDigital {
-						returnedValue = modbuscli.TempToDI(tempList[io16Pin]) // covert them temp value to a DI value
-					} else {
-						returnedValue = tempList[io16Pin]
-					}
-				}
-				if point.IoType == points.IoTypeVolts { // update anypoint that is type voltage
-					returnedValue = voltList[io16Pin]
-				}
-				inst.store.WriteValueFromRead(p, returnedValue)
 			}
+			if point.IoType == points.IoTypeVolts { // update anypoint that is type voltage
+				returnedValue = voltList[io16Pin]
+			}
+			inst.store.WriteValueFromRead(p, returnedValue)
 		}
 	}
 

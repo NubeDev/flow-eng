@@ -81,7 +81,6 @@ func CalcPointCount(deviceCount int, app names.ApplicationName) (rubixUIStart, r
 }
 
 func calcModbusRubix(deviceCount int) (rubixUIStart, rubixUOStart ObjectID) {
-
 	calculatedUICount = io16UICount * deviceCount
 	calculatedUOCount = io16UOCount * deviceCount
 	log.Infof(" calculated bacnet point MODBUS -> calculatedUICount:%d, calculatedUOCount:%d, calculatedDICount:%d, calculatedDOCount:%d,", calculatedUICount, calculatedUOCount, calculatedDICount, calculatedDOCount)
@@ -189,55 +188,47 @@ func (inst *Store) AddPoint(point *Point, ignoreError bool) (*Point, error) {
 	if point.ObjectType == "" {
 		return nil, errors.New(fmt.Sprintf("store-add-point: point objectType can not be empty"))
 	}
-	rubixUIStart, rubixUOStart := CalcPointCount(inst.ModbusDeviceCount, inst.Application)
+	//rubixUIStart, rubixUOStart := CalcPointCount(inst.ModbusDeviceCount, inst.Application)
 	if point.ObjectType == AnalogInput {
-		if point.ObjectID > rubixUIStart {
-			addr, _ := ModbusBuildInput(point.IoType, point.ObjectID)
-			point.ModbusDevAddr = addr.DeviceAddr
-			point.Application = names.Modbus
-		} else {
-			point.Application = names.Modbus
-		}
-
+		addr, _ := ModbusBuildInput(point.IoType, point.ObjectID)
+		point.ModbusDevAddr = addr.DeviceAddr
+		point.Application = names.Modbus
 	}
-	if point.ObjectID < rubixUOStart && point.ObjectType == AnalogOutput {
-		if point.ObjectID > rubixUOStart {
-			addr, _ := ModbusBuildOutput(point.IoType, point.ObjectID)
-			point.ModbusDevAddr = addr.DeviceAddr
-			point.Application = names.Modbus
-		}
+	if point.ObjectType == AnalogOutput {
+		addr, _ := ModbusBuildOutput(point.IoType, point.ObjectID)
+		point.ModbusDevAddr = addr.DeviceAddr
+		point.Application = names.Modbus
 
 	}
 
 	var checked bool
-
 	if objectType == AnalogInput {
 		checked = true
-		p := inst.Store.AI
-		err = errNoObj(p, objectType)
-		if err != nil {
-			return nil, err
-		}
-		err = inst.checkExisting(point, p.From, p.Count)
-		if err != nil {
-			if !ignoreError {
-				return nil, err
-			}
-		}
+		//p := inst.Store.AI
+		//err = errNoObj(p, objectType)
+		//if err != nil {
+		//	return nil, err
+		//}
+		//err = inst.checkExisting(point, p.From, p.Count)
+		//if err != nil {
+		//	if !ignoreError {
+		//		return nil, err
+		//	}
+		//}
 	}
 	if objectType == AnalogOutput {
 		checked = true
-		p := inst.Store.AO
-		err = errNoObj(p, objectType)
-		if err != nil {
-			return nil, err
-		}
-		err = inst.checkExisting(point, p.From, p.Count)
-		if err != nil {
-			if !ignoreError {
-				return nil, err
-			}
-		}
+		//p := inst.Store.AO
+		//err = errNoObj(p, objectType)
+		//if err != nil {
+		//	return nil, err
+		//}
+		//err = inst.checkExisting(point, p.From, p.Count)
+		//if err != nil {
+		//	if !ignoreError {
+		//		return nil, err
+		//	}
+		//}
 	}
 
 	if objectType == AnalogVariable {
@@ -255,35 +246,35 @@ func (inst *Store) AddPoint(point *Point, ignoreError bool) (*Point, error) {
 		}
 	}
 
-	if objectType == BinaryInput {
-		checked = true
-		p := inst.Store.BI
-		err = errNoObj(p, objectType)
-		if err != nil {
-			return nil, err
-		}
-		err = inst.checkExisting(point, p.From, p.Count)
-		if err != nil {
-			if !ignoreError {
-				return nil, err
-			}
-		}
-	}
-
-	if objectType == BinaryOutput {
-		checked = true
-		p := inst.Store.BO
-		err = errNoObj(p, objectType)
-		if err != nil {
-			return nil, err
-		}
-		err = inst.checkExisting(point, p.From, p.Count)
-		if err != nil {
-			if !ignoreError {
-				return nil, err
-			}
-		}
-	}
+	//if objectType == BinaryInput {
+	//	checked = true
+	//	p := inst.Store.BI
+	//	err = errNoObj(p, objectType)
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//	err = inst.checkExisting(point, p.From, p.Count)
+	//	if err != nil {
+	//		if !ignoreError {
+	//			return nil, err
+	//		}
+	//	}
+	//}
+	//
+	//if objectType == BinaryOutput {
+	//	checked = true
+	//	p := inst.Store.BO
+	//	err = errNoObj(p, objectType)
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//	err = inst.checkExisting(point, p.From, p.Count)
+	//	if err != nil {
+	//		if !ignoreError {
+	//			return nil, err
+	//		}
+	//	}
+	//}
 
 	if objectType == BinaryVariable {
 		checked = true

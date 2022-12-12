@@ -1,10 +1,10 @@
 package bacnetio
 
 import (
+	"encoding/json"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
-	"github.com/mitchellh/mapstructure"
 )
 
 type serverSchema struct {
@@ -12,7 +12,7 @@ type serverSchema struct {
 	Serial      schemas.EnumString `json:"serial"`
 }
 
-var serialPorts = []string{"RC5 485-1", "RC5 485-2", "RC5/RC-IO SIDE-485-PORT", "/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyAMA0"}
+var serialPorts = []string{"485-1", "485-2", "SIDE-485-PORT", "/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyAMA0"}
 
 func BuildSchemaServer() *schemas.Schema {
 	props := &serverSchema{}
@@ -43,14 +43,12 @@ type BacnetSchema struct {
 
 func GetBacnetSchema(body map[string]interface{}) (*BacnetSchema, error) {
 	settings := &BacnetSchema{}
-	err := mapstructure.Decode(body, settings)
+	marshal, err := json.Marshal(body)
 	if err != nil {
 		return settings, err
 	}
-	if settings != nil {
-		return settings, nil
-	}
-	return settings, nil
+	err = json.Unmarshal(marshal, &settings)
+	return settings, err
 }
 
 type nodeSchema struct {
@@ -103,12 +101,10 @@ type nodeSettings struct {
 
 func getSettings(body map[string]interface{}) (*nodeSettings, error) {
 	settings := &nodeSettings{}
-	err := mapstructure.Decode(body, settings)
+	marshal, err := json.Marshal(body)
 	if err != nil {
 		return settings, err
 	}
-	if settings != nil {
-		return settings, nil
-	}
-	return settings, nil
+	err = json.Unmarshal(marshal, &settings)
+	return settings, err
 }

@@ -20,11 +20,12 @@ type Server struct {
 	clients       *clients
 	pingFailed    bool
 	pingLock      bool
-	runnersLock   bool
 	reconnectedOk bool
 	store         *points.Store
 	application   names.ApplicationName
 }
+
+var runnersLock bool
 
 type clients struct {
 	mqttClient *mqttclient.Client
@@ -49,9 +50,6 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	opts = bacnetOpts(opts)
 	var application = opts.Application
 	var err error
-	if opts.Ip == "" {
-		opts.Ip = "0.0.0.0"
-	}
 	body = node.Defaults(body, serverNode, category)
 	//inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs))
 	outputApplication := node.BuildOutput(node.Msg, node.TypeString, nil, body.Outputs)
@@ -60,7 +58,7 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	body.IsParent = true
 	body = node.BuildNode(body, nil, outputs, body.Settings)
 	clients := &clients{}
-	server := &Server{body, clients, false, false, false, false, opts.Store, application}
+	server := &Server{body, clients, false, false, false, opts.Store, application}
 	server.clients.mqttClient = opts.MqttClient
 	body.SetSchema(BuildSchemaServer())
 	if application == names.Modbus {
@@ -79,8 +77,8 @@ func (inst *Server) Process() {
 	}
 	if !inst.pingLock {
 	}
-	if !inst.runnersLock {
+	if !runnersLock {
 		go inst.protocolRunner()
-		inst.runnersLock = true
+		runnersLock = true
 	}
 }
