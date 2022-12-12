@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers"
 	"github.com/NubeDev/flow-eng/helpers/names"
+	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -239,22 +240,26 @@ func (inst *Store) AddPoint(point *Point, ignoreError bool) (*Point, error) {
 	if point.ObjectType == "" {
 		return nil, errors.New(fmt.Sprintf("store-add-point: point objectType can not be empty"))
 	}
+	fmt.Println(11111, inst.Application, point.Application)
 
 	if inst.Application == names.RubixIOAndModbus || inst.Application == names.Modbus {
 		rubixUIStart, rubixUOStart := CalcPointCount(inst.ModbusDeviceCount, inst.Application)
-		// point.ObjectID 9 rubixUIStart 17 rubixUOStart 15 2 rubix-modbus
+		fmt.Println(2222, rubixUIStart, rubixUOStart, point.ObjectID < rubixUIStart, point.ObjectType == AnalogInput)
+		fmt.Println(22222222, point.Application, point.ObjectType, point.ObjectID, rubixUIStart)
 		if point.ObjectType == AnalogInput {
-			if point.ObjectID < rubixUIStart {
+			if point.ObjectID > rubixUIStart {
 				addr, _ := ModbusBuildInput(point.IoType, point.ObjectID)
 				point.ModbusDevAddr = addr.DeviceAddr
 				point.Application = names.Modbus
+				fmt.Println(22222222, point.Application)
 			} else {
 				point.Application = names.RubixIO
+				fmt.Println(33333, point.Application)
 			}
 
 		}
 		if point.ObjectID < rubixUOStart && point.ObjectType == AnalogOutput {
-			if point.ObjectID < rubixUOStart {
+			if point.ObjectID > rubixUOStart {
 				addr, _ := ModbusBuildOutput(point.IoType, point.ObjectID)
 				point.ModbusDevAddr = addr.DeviceAddr
 				point.Application = names.Modbus
@@ -364,8 +369,9 @@ func (inst *Store) AddPoint(point *Point, ignoreError bool) (*Point, error) {
 		log.Error(errMsg)
 		return nil, errors.New(errMsg)
 	}
-	log.Infof("bacnet-add-point type-%s:%d", point.ObjectType, point.ObjectID)
+	log.Infof("bacnet-add-point type-%s:%d application-type %s", point.ObjectType, point.ObjectID, point.Application)
 	inst.Points = append(inst.Points, point)
+	pprint.PrintJOSN(inst.Points)
 	return point, nil
 }
 

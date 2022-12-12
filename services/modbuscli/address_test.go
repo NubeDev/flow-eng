@@ -2,13 +2,11 @@ package modbuscli
 
 import (
 	"fmt"
-	"github.com/NubeDev/flow-eng/helpers/names"
-	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeIO/nubeio-rubix-lib-modbus-go/modbus"
 	"testing"
 )
 
-func Test_Write(t *testing.T) {
+func Test_Read(t *testing.T) {
 
 	cli := &Modbus{
 		IsSerial: true,
@@ -17,29 +15,15 @@ func Test_Write(t *testing.T) {
 		},
 	}
 	init, err := cli.Init(cli)
-	s := points.New(names.Modbus, nil, 2, 200, 200)
-	fmt.Println(init)
-
-	s.AddPoint(&points.Point{
-		ObjectType:  points.AnalogOutput,
-		ObjectID:    1,
-		IoType:      points.IoTypeVolts,
-		IsIO:        true,
-		IsWriteable: true,
-	}, true)
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
-
-	pointsList := s.GetPointsByApplication(names.Modbus)
-	//var pointsToWrite []*points.Point
-	for _, point := range pointsList {
-		fmt.Println(point)
-
+	registers, err := init.readRegisters(1, 200, 2, false)
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
-
-	var a [8]float64
-	a[0] = 11.1
-	fmt.Println(a)
+	fmt.Println(registers)
 
 }

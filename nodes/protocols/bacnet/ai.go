@@ -69,7 +69,7 @@ func (inst *AI) Process() {
 		}
 		inst.toFlowOptions.precision = settings.Decimal
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
-		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true)
+		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true, inst.application)
 		if err != nil {
 			log.Errorf("bacnet-server add new point type:%s-%d err:%s", objectType, inst.objectID, err.Error())
 		}

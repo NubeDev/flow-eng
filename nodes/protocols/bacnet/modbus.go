@@ -1,7 +1,9 @@
 package bacnetio
 
 import (
+	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/names"
+	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/services/modbuscli"
 	"github.com/NubeIO/nubeio-rubix-lib-modbus-go/modbus"
@@ -11,24 +13,38 @@ import (
 
 // modbus will come from polling
 // this is to only work for the IO-16
-func (inst *Server) modbusRunner() {
+func (inst *Server) modbusRunner(settings map[string]interface{}) {
 	log.Info("start modbus-runner")
+	schema, err := GetBacnetSchema(settings)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	port := "/dev/ttyUSB0"
+	if schema.Serial != "" {
+		port = schema.Serial
+	}
 	cli := &modbuscli.Modbus{
 		IsSerial: true,
 		Serial: &modbus.Serial{
-			SerialPort: "/dev/ttyUSB0",
+			SerialPort: port,
 		},
 	}
+	log.Infof("start modbus polling on port: %s", port)
 	init, err := cli.Init(cli)
 	if err != nil {
 		log.Error(err)
 		return
 	}
+	var count int
 	for {
+		log.Infof("modbus polling loop count: %d application-type: %s", count, inst.application)
+		fmt.Println(names.Modbus)
 		pointsList := inst.store.GetPointsByApplication(names.Modbus)
 		inst.modbusInputsRunner(init, pointsList) // process the inputs
 		inst.modbusOutputsDispatch(init)          // process the outs
 		time.Sleep(1 * time.Second)
+		count++
 	}
 }
 
@@ -76,21 +92,24 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 	var voltList [8]float64
 	var completedTemp bool
 	var completedVolt bool
+	fmt.Println(222, len(pointsList), pointsList[0].IoType)
+	pprint.PrintJOSN(pointsList[0])
 	for _, point := range pointsList { // do modbus read
 		if !point.IsWriteable {
 			addr, _ := points.ModbusBuildInput(point.IoType, point.ObjectID)
+			pprint.PrintJOSN(addr)
 			slaveId := addr.DeviceAddr
 			if !completedTemp && (point.IoType == points.IoTypeTemp || point.IoType == points.IoTypeDigital) {
 				tempList, err = cli.ReadTemps(slaveId) // DO MODBUS READ FOR TEMPS
 				if err != nil {
-					log.Error(err)
+					log.Errorf("modbus read temp %s", err.Error())
 				}
 				completedTemp = true
 			}
 			if !completedVolt && point.IoType == points.IoTypeVolts {
 				voltList, err = cli.ReadVolts(slaveId) // DO MODBUS READ FOR VOLTS
 				if err != nil {
-					log.Error(err)
+					log.Errorf("modbus read voltages %s", err.Error())
 				}
 				completedVolt = true
 			}

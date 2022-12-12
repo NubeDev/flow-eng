@@ -2,17 +2,23 @@ package modbuscli
 
 import (
 	"errors"
+	"fmt"
 	"github.com/NubeIO/nubeio-rubix-lib-modbus-go/modbus"
 )
 
-func tempRegs() (start int, finish int) {
+func tempRegs() (start int, count int) {
 	start = 0
 	return start, start + 8
 }
 
-func voltRegs() (start int, finish int) {
-	start = 250
-	return start, start + 8
+func voltRegs() (start int, count int) {
+	start = 201
+	return start, 8
+}
+
+func currentRegs() (start int, count int) {
+	start = 301
+	return start, 8
 }
 
 //DecodeUI use this for when reading as a temp, voltage or amps
@@ -30,8 +36,8 @@ func TempToDI(v float64) float64 {
 }
 
 func (inst *Modbus) ReadTemps(slave int) (raw [8]float64, err error) {
-	start, finish := tempRegs()
-	registers, err := inst.readRegisters(slave, start, finish, false)
+	start, count := tempRegs()
+	registers, err := inst.readRegisters(slave, start, count, false)
 	if err != nil {
 		return raw, err
 	}
@@ -42,8 +48,20 @@ func (inst *Modbus) ReadTemps(slave int) (raw [8]float64, err error) {
 }
 
 func (inst *Modbus) ReadVolts(slave int) (raw [8]float64, err error) {
-	start, finish := voltRegs()
-	registers, err := inst.readRegisters(slave, start, finish, false)
+	start, count := voltRegs()
+	registers, err := inst.readRegisters(slave, start, count, false)
+	if err != nil {
+		return raw, err
+	}
+	if len(registers) < 8 {
+		return raw, errors.New("read length must be 8")
+	}
+	return convert(registers), err
+}
+
+func (inst *Modbus) ReadCurrent(slave int) (raw [8]float64, err error) {
+	start, count := currentRegs()
+	registers, err := inst.readRegisters(slave, start, count, false)
 	if err != nil {
 		return raw, err
 	}
@@ -62,16 +80,17 @@ func convert(raw []byte) [8]float64 {
 	return out
 }
 
-func (inst *Modbus) readRegisters(slave, start, finish int, holding bool) (raw []byte, err error) {
+func (inst *Modbus) readRegisters(slave, start, count int, holding bool) (raw []byte, err error) {
 	err = inst.SetSlave(slave)
 	if err != nil {
 		return nil, err
 	}
 	if holding {
-		registers, _, err := inst.client.ReadHoldingRegisters(uint16(start), uint16(finish))
+		registers, _, err := inst.client.ReadHoldingRegisters(uint16(start), uint16(count))
 		return registers, err
 	} else {
-		registers, _, err := inst.client.ReadInputRegisters(uint16(start), uint16(finish))
+		fmt.Println("READ INPUTS", slave, uint16(start), uint16(count))
+		registers, _, err := inst.client.ReadInputRegisters(uint16(start), uint16(count))
 		return registers, err
 	}
 }

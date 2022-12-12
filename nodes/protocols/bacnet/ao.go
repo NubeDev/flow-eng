@@ -68,7 +68,7 @@ func (inst *AO) Process() {
 			ioType = string(points.IoTypeVolts)
 		}
 		inst.toFlowOptions.precision = settings.Decimal
-		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true)
+		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true, inst.application)
 		point, err = inst.store.AddPoint(point, false)
 		if err != nil {
 			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
