@@ -109,11 +109,12 @@ func (inst *Store) GetPointByObject(t ObjectType, id ObjectID) *Point {
 }
 
 func (inst *Store) GetPoint(uuid string) *Point {
-	for _, point := range inst.GetPoints() {
-		if point.UUID == uuid {
-			return point
-		}
-	}
+	//for _, point := range inst.GetPoints() {
+	//	if point.UUID == uuid {
+	//		return point
+	//	}
+	//}
+
 	return nil
 }
 
