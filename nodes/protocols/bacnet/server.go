@@ -1,6 +1,7 @@
 package bacnetio
 
 import (
+	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
@@ -81,4 +82,39 @@ func (inst *Server) Process() {
 		go inst.protocolRunner()
 		runnersLock = true
 	}
+
+}
+
+func setUUID(objType points.ObjectType, id points.ObjectID) string {
+	return fmt.Sprintf("%s:%d", objType, id)
+}
+
+func (inst *Server) writePV(objType points.ObjectType, id points.ObjectID) error {
+	//pnt, ok := inst.getPoint(objType, id)
+	//if ok {
+	//	//pnt.WriteValue = 11.0
+	//}
+	return nil
+
+}
+
+func (inst *Server) setPoint(objType points.ObjectType, id points.ObjectID, point *points.Point) error {
+	s := inst.GetStore()
+	if s == nil {
+		return nil
+	}
+	s.Set(setUUID(objType, id), point, 0)
+	return nil
+}
+
+func (inst *Server) getPoint(objType points.ObjectType, id points.ObjectID) (*points.Point, bool) {
+	s := inst.GetStore()
+	if s == nil {
+		return nil, false
+	}
+	d, ok := s.Get(fmt.Sprintf("%s:%d", objType, id))
+	if ok {
+		return d.(*points.Point), true
+	}
+	return nil, false
 }
