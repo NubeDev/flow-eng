@@ -11,14 +11,16 @@ import (
 
 type AI struct {
 	*node.Spec
-	objectID      points.ObjectID
-	objectType    points.ObjectType
-	pointUUID     string
-	store         *points.Store
+	objectID   points.ObjectID
+	objectType points.ObjectType
+	pointUUID  string
+	//store         *points.Store
 	application   names.ApplicationName
 	mqttClient    *mqttclient.Client
 	toFlowOptions *toFlowOptions
 }
+
+var store *points.Store
 
 func NewAI(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	opts = bacnetOpts(opts)
@@ -26,12 +28,13 @@ func NewAI(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	body, err = nodeDefault(body, bacnetAI, category, opts.Application)
 	body.SetSchema(buildSchemaUI())
 	flowOptions := &toFlowOptions{}
+	store = opts.Store
 	return &AI{
 		body,
 		0,
 		points.AnalogInput,
 		"",
-		opts.Store,
+		//opts.Store,
 		opts.Application,
 		opts.MqttClient,
 		flowOptions,
@@ -70,10 +73,37 @@ func (inst *AI) Process() {
 		inst.toFlowOptions.precision = settings.Decimal
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
 		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true, inst.application)
+		fmt.Println(22222222)
 		if err != nil {
 			log.Errorf("bacnet-server add new point type:%s-%d err:%s", objectType, inst.objectID, err.Error())
+			return
 		}
-		point, err = inst.store.AddPoint(point, true)
+		fmt.Println(111111111)
+		s := inst.GetStore()
+		if s == nil {
+			log.Errorf("bacnet-server add new point failed to get store type:%s-%d err:%s", objectType, inst.objectID, err.Error())
+			return
+		}
+		fmt.Println("!!!!!!!!!!!!!!!!!!!!!!11", setUUID(points.AnalogInput, inst.objectID))
+		s.Set(setUUID(points.AnalogInput, inst.objectID), point, 0)
+		//point, err = store.AddPoint(point, true)
 	}
-	toFlow(inst, points.AnalogInput, inst.objectID, inst.store, inst.toFlowOptions)
+	toFlow(inst, points.AnalogInput, inst.objectID, store, inst.toFlowOptions)
+
+	s := inst.GetStore()
+	if s == nil {
+		return
+	}
+	//parentId := inst.GetParentId()
+	//nodeUUID := inst.GetID()
+
+	//s.Set("123", 123, 0)
+	//
+	//d, ok := s.Get("123")
+	//
+	////fmt.Println(parentId)
+	//fmt.Println(nodeUUID)
+	//fmt.Println(ok)
+	//fmt.Println(d)
+
 }

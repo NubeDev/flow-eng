@@ -36,24 +36,16 @@ func Encode(graph *flowctrl.Flow) (*NodesList, error) {
 		}
 		if len(_node.GetInputs()) > 0 {
 			links := map[string]node.SchemaInputs{}
-			link := node.SchemaLinks{}
-			inputsLinks := node.SchemaInputs{}
 			// for a node we need its input and see if it has a link, if so we need the uuid of the node its link to
 			for _, input := range _node.GetInputs() {
+				inputsLinks := node.SchemaInputs{}
 				// check the input has links
 				destOutputName := input.Connection.NodePort
 				if destOutputName != "" {
+					link := node.SchemaLinks{}
 					link.Socket = string(input.Connection.NodePort)
 					link.NodeId = input.Connection.NodeID
-					if len(inputsLinks.Links) > 0 {
-						for _, schemaLinks := range inputsLinks.Links {
-							if schemaLinks.Socket != link.Socket {
-								inputsLinks.Links = append(inputsLinks.Links, link)
-							}
-						}
-					} else {
-						inputsLinks.Links = append(inputsLinks.Links, link)
-					}
+					inputsLinks.Links = append(inputsLinks.Links, link)
 					links[string(input.Name)] = inputsLinks
 					nodeSchema.Inputs = links
 				} else {
