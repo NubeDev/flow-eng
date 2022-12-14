@@ -1,7 +1,8 @@
 package pid
 
 import (
-	"github.com/NubeDev/flow-eng/node"
+	"errors"
+	"math"
 	"time"
 )
 
@@ -18,42 +19,42 @@ import (
 type PID_DIRECTION bool
 
 const (
-	DIRECT   	PID_DIRECTION = false
-	REVERSE 	PID_DIRECTION = true
+	DIRECT  PID_DIRECTION = false
+	REVERSE PID_DIRECTION = true
 )
 
 type PID_MODE bool
 
 const (
-	MANUAL   	PID_MODE = false
-	AUTO 		PID_MODE = true
+	MANUAL PID_MODE = false
+	AUTO   PID_MODE = true
 )
 
 type Pid struct {
-	enable			bool			`json:"enable"`
-	input			float64			`json:"input"`
-	setpoint		float64			`json:"setpoint"`
-	output			float64			`json:"output"`
-	currMode		PID_MODE		`json:"curr_mode"`
-	direction		PID_DIRECTION	`json:"direction"`
-	bias			float64			`json:"bias"`
-	intervalSecs	float64			`json:"interval_secs"`
-	displayP		float64			`json:"display_p"`
-	displayI		float64			`json:"display_i"`
-	displayD		float64			`json:"display_d"`
-	lastTime		float64			`json:"last_time"`
-	pFactor			float64			`json:"p_factor"`
-	iFactor			float64			`json:"i_factor"`
-	dFactor			float64			`json:"d_factor"`
-	outputSum		float64			`json:"output_sum"`
-	lastInput		float64			`json:"last_input"`
-	iTerm			float64			`json:"i_term"`
-	outMin			float64			`json:"out_min"`
-	outMax			float64			`json:"out_max"`
-
+	enable         bool
+	input          float64
+	setpoint       float64
+	output         float64
+	currMode       PID_MODE
+	direction      PID_DIRECTION
+	bias           float64
+	intervalMillis float64
+	displayP       float64
+	displayI       float64
+	displayD       float64
+	lastTime       float64
+	kp             float64
+	ki             float64
+	kd             float64
+	outputSum      float64
+	lastInput      float64
+	iTerm          float64
+	outMin         float64
+	outMax         float64
+	inAuto         bool
 }
 
-func Init(input, setpoint, p, i, d float64, dir PID_DIRECTION) *Pid {
+func NewPid(input, setpoint, p, i, d, intervalSecs float64, dir PID_DIRECTION) *Pid {
 	if p < 0 {
 		p = 0
 	}
@@ -63,103 +64,89 @@ func Init(input, setpoint, p, i, d float64, dir PID_DIRECTION) *Pid {
 	if d < 0 {
 		d = 0
 	}
-	interval := float64(10)
-	last := float64(time.Now().Unix()) - interval
+	interval := intervalSecs * 1000
+	last := float64(time.Now().UnixMilli()) - (interval)
 
-	pid := &Pid{false, input, setpoint, 0, MANUAL, DIRECT, 0, interval, p, i, d, last, }
+	pid := &Pid{false, input, setpoint, 0, MANUAL, dir, 0, interval, p, i, d, last, 0, 0, 0, 0, input, 0, 0, 100, false}
+	pid.Compute()
 
-	this.lastTime = this.millis() - this.SampleTime
-	
-	this.myBias = 0
-	this.ITerm = 0
-	this.myOutput = 0
+	return pid
 }
 
-// Constants for backward compatibility
-// PID.AUTOMATIC = 1
-// PID.MANUAL = 0
-// PID.DIRECT = 0
-// PID.REVERSE = 1
-
-PID.prototype.setInput = function(current_value) {
-const input = Number(current_value)
-if (isNaN(input)) return
-this.input = input
+func (pid Pid) setInput(newInput float64) error {
+	pid.input = newInput
+	return nil
 }
 
-PID.prototype.setPoint = function(current_value) {
-const setpoint = Number(current_value)
-if (isNaN(setpoint)) return
-this.mySetpoint = setpoint
+func (pid Pid) setSetpoint(newSetpoint float64) error {
+	pid.setpoint = newSetpoint
+	return nil
 }
 
-PID.prototype.setBias = function(current_value) {
-let bias = Number(current_value)
-if (isNaN(bias)) return
-if (bias > this.outMax) {
-bias = this.outMax // POSSIBLY INCORRECT
-} else if (bias < this.outMin) {
-bias = this.outMin
-}
-this.myBias = bias
-}
-
-PID.prototype.millis = function() {
-var d = new Date()
-return d.getTime()
+func (pid Pid) setBias(newBias float64) error {
+	if newBias > pid.outMax {
+		pid.bias = pid.outMax // POSSIBLY INCORRECT
+	} else if newBias < pid.outMin {
+		pid.bias = pid.outMin
+	}
+	pid.bias = newBias
+	return nil
 }
 
 /**
  * Compute()
- * This, as they say, is where the magic happens.  this function should be called
+ * This, as they say, is where the magic happens.  pid function should be called
  * every time "void loop()" executes.  the function will decide for itself whether a new
  * pid Output needs to be computed.  returns true when the output is computed,
  * false when nothing has been done.
  */
 
-PID.prototype.compute = function() {
-if (!this.inAuto) {
-return false
-}
+func (pid Pid) Compute() (computed bool, err error) {
+	if !pid.inAuto {
+		return false, errors.New("pid controller is not enabled")
+	}
 
-var now = this.millis()
-var timeChange = now - this.lastTime
-if (timeChange >= this.SampleTime) {
-// Compute all the working error variables
-var input = this.input
+	now := float64(time.Now().UnixMilli())
+	timeChange := now - pid.lastTime
+	if timeChange >= pid.intervalMillis {
+		// Compute all the working error variables
+		input := pid.input
+		// var error = pid.mySetpoint - input
+		errorAmount := input - pid.setpoint // above setpoint = positive error
+		directionMultiplier := float64(1)
+		if pid.direction {
+			directionMultiplier = -1
+		}
+		errorAmount = errorAmount * directionMultiplier
 
-//var error = this.mySetpoint - input
-var error = input - this.mySetpoint // above setpoint = positive error
-error = error * this.setDirection
+		pid.iTerm += pid.kp * errorAmount
+		if pid.iTerm > pid.outMax-pid.bias {
+			pid.iTerm = pid.outMax - pid.bias
+		} else if pid.iTerm < pid.outMin-pid.bias {
+			pid.iTerm = pid.outMin - pid.bias
+		}
 
-this.ITerm += this.ki * error
-if (this.ITerm > this.outMax - this.myBias) {
-this.ITerm = this.outMax - this.myBias
-} else if (this.ITerm < this.outMin - this.myBias) {
-this.ITerm = this.outMin - this.myBias
-}
+		dInput := input - pid.lastInput
 
-var dInput = input - this.lastInput
+		// Compute PID Output
+		// var output = ((pid.kp * error) + pid.iTerm - (pid.kd * dInput)) * pid.setDirection
+		output := pid.kp*errorAmount + pid.iTerm - pid.kd*dInput + pid.bias
+		// var output = ((pid.kp * error) + pid.iTerm - (pid.kd * dInput))
 
-// Compute PID Output
-//var output = ((this.kp * error) + this.ITerm - (this.kd * dInput)) * this.setDirection
-var output = this.kp * error + this.ITerm - this.kd * dInput + this.myBias
-//var output = ((this.kp * error) + this.ITerm - (this.kd * dInput))
+		if output > pid.outMax {
+			output = pid.outMax
+		} else if output < pid.outMin {
+			output = pid.outMin
+		}
+		pid.output = output
 
-if (output > this.outMax) {
-output = this.outMax
-} else if (output < this.outMin) {
-output = this.outMin
-}
-this.myOutput = output
-
-// Remember some variables for next time
-this.lastInput = input
-this.lastTime = now
-return true
-} else {
-return false
-}
+		// Remember some variables for next time
+		pid.lastInput = input
+		pid.lastTime = now
+		return true, nil
+	} else {
+		return false, nil
+	}
 }
 
 /**
@@ -168,57 +155,55 @@ return false
  * it's called automatically from the constructor, but tunings can also
  * be adjusted on the fly during normal operation
  */
-PID.prototype.setTunings = function(Kp, Ki, Kd) {
-const Kp_num = Number(Kp)
-const Ki_num = Number(Ki)
-const Kd_num = Number(Kd)
-if (isNaN(Kp_num) || isNaN(Ki_num) || isNaN(Kd_num)) return
-if (Kp < 0 || Ki < 0 || Kd < 0) {
-return
-}
+func (pid Pid) setTunings(Kp, Ki, Kd float64) error {
+	if Kp < 0 || Ki < 0 || Kd < 0 {
+		return errors.New("invalid value: all tuning values must be positive")
+	}
 
-this.dispKp = Kp
-this.dispKi = Ki
-this.dispKd = Kd
+	pid.displayP = Kp
+	pid.displayI = Ki
+	pid.displayD = Kd
 
-if(Ki == 0) this.ITerm = 0
+	if Ki == 0 {
+		pid.iTerm = 0
+	}
 
-this.SampleTimeInSec = this.SampleTime / 1000
-this.kp = Kp
-this.ki = Ki * this.SampleTimeInSec
-this.kd = Kd / this.SampleTimeInSec
+	SampleTimeInSec := pid.intervalMillis / 1000
+	pid.kp = Kp
+	pid.ki = Ki * SampleTimeInSec
+	pid.kd = Kd / SampleTimeInSec
+
+	return nil
 }
 
 /**
  * SetSampleTime(...)
  * sets the period, in Milliseconds, at which the calculation is performed
  */
-PID.prototype.setSampleTime = function(NewSampleTime) {
-let NewSampleTime_num = Number(NewSampleTime)
-if (isNaN(NewSampleTime_num)) return
-
-if (NewSampleTime > 0) {
-var ratio = NewSampleTime / (1.0 * this.SampleTime)
-this.ki *= ratio
-this.kd /= ratio
-this.SampleTime = Math.round(NewSampleTime)
-}
+func (pid Pid) setSampleTime(newIntervalMillis float64) error {
+	if newIntervalMillis > 0 {
+		var ratio = newIntervalMillis / (1.0 * pid.intervalMillis)
+		pid.ki *= ratio
+		pid.kd /= ratio
+		pid.intervalMillis = math.Round(newIntervalMillis)
+		return nil
+	} else {
+		return errors.New("invalid: interval value must be positive")
+	}
 }
 
 /**
  * SetOutput( )
  * Set output level if in manual mode
  */
-PID.prototype.setOutput = function(val) {
-let val_num = Number(val)
-if (isNaN(val_num)) return
-
-if (val > this.outMax) {
-val = this.outMax // POSSIBLY INCORRECT
-} else if (val < this.outMin) {
-val = this.outMin
-}
-this.myOutput = val
+func (pid Pid) setOutput(newOutput float64) error {
+	if newOutput > pid.outMax {
+		newOutput = pid.outMax // POSSIBLY INCORRECT
+	} else if newOutput < pid.outMin {
+		newOutput = pid.outMin
+	}
+	pid.output = newOutput
+	return nil
 }
 
 /**
@@ -229,30 +214,27 @@ this.myOutput = val
  * be doing a time window and will need 0-8000 or something.  or maybe they'll
  * want to clamp it from 0-125.  who knows.  at any rate, that can all be done here.
  */
-PID.prototype.setOutputLimits = function(Min, Max) {
-let Min_num = Number(Min)
-let Max_num = Number(Max)
-if (isNaN(Min_num) || isNaN(Max_num)) return
+func (pid Pid) setOutputLimits(min, max float64) error {
+	if min >= max {
+		return errors.New("invalid values: min <= max")
+	}
+	pid.outMin = min
+	pid.outMax = max
 
-if (Min >= Max) {
-return
-}
-this.outMin = Min
-this.outMax = Max
+	if pid.inAuto {
+		if pid.output > pid.outMax {
+			pid.output = pid.outMax
+		} else if pid.output < pid.outMin {
+			pid.output = pid.outMin
+		}
 
-if (this.inAuto) {
-if (this.myOutput > this.outMax) {
-this.myOutput = this.outMax
-} else if (this.myOutput < this.outMin) {
-this.myOutput = this.outMin
-}
-
-if (this.ITerm > this.outMax - this.myBias) {
-this.ITerm = this.outMax - this.myBias
-} else if (this.ITerm < this.outMin - this.myBias) {
-this.ITerm = this.outMin - this.myBias
-}
-}
+		if pid.iTerm > pid.outMax-pid.bias {
+			pid.iTerm = pid.outMax - pid.bias
+		} else if pid.iTerm < pid.outMin-pid.bias {
+			pid.iTerm = pid.outMin - pid.bias
+		}
+	}
+	return nil
 }
 
 /**
@@ -261,45 +243,21 @@ this.ITerm = this.outMin - this.myBias
  * when the transition from manual to auto occurs, the controller is
  * automatically initialized
  */
-PID.prototype.setMode = function(Mode) {
-var newAuto
-if (
-Mode == 0 ||
-Mode.toString().toLowerCase() == 'automatic' ||
-Mode.toString().toLowerCase() == 'auto'
-) {
-newAuto = 1
-} else if (Mode == 1 || Mode.toString().toLowerCase() == 'manual') {
-newAuto = 0
-} else {
-throw new Error('Incorrect Mode Chosen')
-}
-/*  Removed in favor of manually triggered 'Reset'(using Initialize()).
-if (newAuto == !this.inAuto) {
-  //we just went from manual to auto
-  this.initialize()
-}
-*/
-this.inAuto = newAuto
-}
-
-/**
- * Initialize()
- * does all the things that need to happen to ensure a bumpless transfer
- * from manual to automatic mode.
- */
-PID.prototype.initialize = function() {
-//this.ITerm = this.myOutput
-this.ITerm = 0
-this.myOutput = this.myBias
-this.lastInput = this.input
-/*
-  if (this.ITerm > this.outMax) {
-    this.ITerm = this.outMax
-  } else if (this.ITerm < this.outMin) {
-    this.ITerm = this.outMin
-  }
-*/
+func (pid Pid) setMode(newMode PID_MODE) error {
+	/*  Removed in favor of manually triggered 'Reset'(using Initialize()).
+	if (newAuto == !pid.inAuto) {
+	  //we just went from manual to auto
+	  pid.initialize()
+	}
+	*/
+	if newMode == MANUAL {
+		pid.inAuto = false
+	} else if newMode == AUTO {
+		pid.inAuto = true
+	} else {
+		return errors.New("invalid value: mode setting is not a valid value")
+	}
+	return nil
 }
 
 /**
@@ -309,60 +267,69 @@ this.lastInput = this.input
  * know which one, because otherwise we may increase the output when we should
  * be decreasing.  This is called from the constructor.
  */
-PID.prototype.setControllerDirection = function(ControllerDirection) {
-if (ControllerDirection == 0 || ControllerDirection.toString().toLowerCase() == 'direct') {
-this.setDirection = 1
-} else if (
-ControllerDirection == 1 ||
-ControllerDirection.toString().toLowerCase() == 'reverse'
-) {
-this.setDirection = -1
-} else {
-throw new Error('Incorrect Controller Direction Chosen')
+func (pid Pid) setControllerDirection(newDirection PID_DIRECTION) error {
+	pid.direction = newDirection
+	return nil
 }
+
+/**
+ * Initialize()
+ * does all the things that need to happen to ensure a bumpless transfer
+ * from manual to automatic mode.
+ */
+func (pid Pid) initialize() error {
+	// pid.iTerm = pid.myOutput
+	pid.iTerm = 0
+	pid.output = pid.bias
+	pid.lastInput = pid.input
+	/*
+		  if (pid.iTerm > pid.outMax) {
+			pid.iTerm = pid.outMax
+		  } else if (pid.iTerm < pid.outMin) {
+			pid.iTerm = pid.outMin
+		  }
+	*/
+	return nil
 }
 
 /**
  * Status Functions
  * Just because you set the Kp=-1 doesn't mean it actually happened.  these
  * functions query the internal state of the PID.  they're here for display
- * purposes.  this are the functions the PID Front-end uses for example
+ * purposes.  pid are the functions the PID Front-end uses for example
  */
-PID.prototype.getKp = function() {
-return this.dispKp
+func (pid Pid) getKp() float64 {
+	return pid.displayP
 }
 
-PID.prototype.getKd = function() {
-return this.dispKd
+func (pid Pid) getKi() float64 {
+	return pid.displayI
 }
 
-PID.prototype.getKi = function() {
-return this.dispKi
+func (pid Pid) getKd() float64 {
+	return pid.displayD
 }
 
-PID.prototype.getMode = function() {
-return this.inAuto ? 'Auto' : 'Manual'
+func (pid Pid) getMode() PID_MODE {
+	return pid.currMode
 }
 
-PID.prototype.getDirection = function() {
-return this.controllerDirection
+func (pid Pid) getDirection() PID_DIRECTION {
+	return pid.direction
 }
 
-PID.prototype.getOutput = function() {
-return this.myOutput
+func (pid Pid) getOutput() float64 {
+	return pid.output
 }
 
-PID.prototype.getInput = function() {
-return this.input
+func (pid Pid) getInput() float64 {
+	return pid.input
 }
 
-PID.prototype.getSetPoint = function() {
-return this.mySetpoint
+func (pid Pid) getSetPoint() float64 {
+	return pid.setpoint
 }
 
-PID.prototype.getBias = function() {
-return this.myBias
+func (pid Pid) getBias() float64 {
+	return pid.bias
 }
-
-module.exports = PID
-
