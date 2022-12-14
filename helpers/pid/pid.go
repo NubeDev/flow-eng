@@ -31,7 +31,6 @@ const (
 )
 
 type Pid struct {
-	enable         bool
 	input          float64
 	setpoint       float64
 	output         float64
@@ -67,7 +66,7 @@ func NewPid(input, setpoint, p, i, d, intervalSecs float64, dir PID_DIRECTION) *
 	interval := intervalSecs * 1000
 	last := float64(time.Now().UnixMilli()) - (interval)
 
-	pid := &Pid{false, input, setpoint, 0, MANUAL, dir, 0, interval, p, i, d, last, 0, 0, 0, 0, input, 0, 0, 100, false}
+	pid := &Pid{input, setpoint, 0, MANUAL, dir, 0, interval, p, i, d, last, 0, 0, 0, 0, input, 0, 0, 100, false}
 	pid.Compute()
 
 	return pid
