@@ -6,4 +6,5 @@ const (
 
 const (
 	deadBandNode = "dead-band"
+	pidNode      = "pid"
 )

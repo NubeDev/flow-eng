@@ -8,27 +8,15 @@ import (
 
 type PIDNode struct {
 	*node.Spec
-	enable           bool
-	fanStatusOffTime int64
-	clgMode          bool
-	htgMode          bool
-	clgModeEnd       int64
-	htgModeEnd       int64
-	compStage        int
-	econoMode        bool
-	stageStartTime   int64
-	econoConditions  bool
-	numComps         int
+	lastEnable      bool
+	lastTime 		int64
+	startTime		int64
+	lastReset       bool
 }
 
-// input
-// enable
-// sp
-// cool offset
-// heat offset
 
 func NewPIDNode(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, pacControlNode, category)
+	body = node.Defaults(body, pidNode, category)
 	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs)
 	processValue := node.BuildInput(node.ProcessValue, node.TypeFloat, nil, body.Inputs)
 	setPoint := node.BuildInput(node.Setpoint, node.TypeFloat, nil, body.Inputs)
@@ -48,8 +36,8 @@ func NewPIDNode(body *node.Spec) (node.Node, error) {
 	inputs := node.BuildInputs(enable, processValue, setPoint, minOut, maxOut, inP, inI, inD, direction, intervalSecs, bias, manual, reset)
 	outputs := node.BuildOutputs(output)
 	body = node.BuildNode(body, inputs, outputs, nil)
-	body.SetSchema(buildSchema())
-	return &PIDNode{body, false, }, nil
+	// body.SetSchema(buildSchema())
+	return &PIDNode{body, false, 0, 0, false}, nil
 }
 
 func (inst *PIDNode) Process() {
