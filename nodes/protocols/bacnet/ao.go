@@ -2,6 +2,7 @@ package bacnetio
 
 import (
 	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
@@ -79,12 +80,15 @@ func (inst *AO) Process() {
 		}
 		s.Set(setUUID(inst.GetParentId(), points.AnalogInput, inst.objectID), point, 0)
 	}
-	pv, err := inst.getPV(points.AnalogInput, inst.objectID)
-	if err != nil {
-		return
+
+	in14, in15 := fromFlow(inst, inst.objectID)
+	if in14 != nil {
+		inst.WritePinFloat(node.Out, float.NonNil(in14), 2)
 	}
-	inst.WritePinFloat(node.Out, pv, 2)
-	fromFlow(inst, inst.objectID, inst.store)
+	if in15 != nil {
+		inst.WritePinFloat(node.Out, float.NonNil(in15), 2)
+	}
+
 }
 
 func (inst *AO) getPV(objType points.ObjectType, id points.ObjectID) (float64, error) {

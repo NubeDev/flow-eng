@@ -1,12 +1,8 @@
 package points
 
 import (
-	"errors"
-	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/names"
-	log "github.com/sirupsen/logrus"
 	"math"
-	"reflect"
 )
 
 type Point struct {
@@ -35,13 +31,13 @@ func (inst *Store) GetPoints() []*Point {
 	return nil
 }
 
-func (inst *Store) GetWriteablePoints() []*Point {
-	var out []*Point
-	for _, point := range inst.GetPoints() {
-		out = append(out, point)
-	}
-	return out
-}
+//func (inst *Store) GetWriteablePoints() []*Point {
+//	var out []*Point
+//	for _, point := range inst.GetPoints() {
+//		out = append(out, point)
+//	}
+//	return out
+//}
 
 type ModbusPoints struct {
 	DeviceOne   []*Point
@@ -50,32 +46,32 @@ type ModbusPoints struct {
 	DeviceFour  []*Point
 }
 
-func (inst *Store) GetPointsByApplication(name names.ApplicationName) []*Point {
-	return inst.GetPoints()
-}
-
-func (inst *Store) GetPointsByApplicationAndType(name names.ApplicationName, t ObjectType) []*Point {
-	var out []*Point
-	for _, point := range inst.GetPoints() {
-		if point.Application == name {
-			if point.ObjectType == t {
-				out = append(out, point)
-			}
-		}
-	}
-	return out
-}
-
-func (inst *Store) GetPointByObject(t ObjectType, id ObjectID) *Point {
-	for _, point := range inst.GetPoints() {
-		if point.ObjectType == t {
-			if point.ObjectID == id {
-				return point
-			}
-		}
-	}
-	return nil
-}
+//func (inst *Store) GetPointsByApplication(name names.ApplicationName) []*Point {
+//	return inst.GetPoints()
+//}
+//
+//func (inst *Store) GetPointsByApplicationAndType(name names.ApplicationName, t ObjectType) []*Point {
+//	var out []*Point
+//	for _, point := range inst.GetPoints() {
+//		if point.Application == name {
+//			if point.ObjectType == t {
+//				out = append(out, point)
+//			}
+//		}
+//	}
+//	return out
+//}
+//
+//func (inst *Store) GetPointByObject(t ObjectType, id ObjectID) *Point {
+//	for _, point := range inst.GetPoints() {
+//		if point.ObjectType == t {
+//			if point.ObjectID == id {
+//				return point
+//			}
+//		}
+//	}
+//	return nil
+//}
 
 func (inst *Store) GetPoint(uuid string) *Point {
 	//for _, point := range inst.GetPoints() {
@@ -121,154 +117,154 @@ func (inst *Store) mergePriority(p2 *PriArray, in14, in15 *float64) *PriArray {
 	return out
 }
 
-//SetPresentValue set present value
-func (inst *Store) SetPresentValue(p *Point, value float64) bool {
-	if p != nil {
-		point := inst.GetPoint(p.UUID)
-		if point != nil {
-			point.PresentValue = value
-		}
-	}
-	return false
-}
-
-//GetPresentValue get present value
-func (inst *Store) GetPresentValue(uuid string) (float64, bool) {
-	p := inst.GetPoint(uuid)
-	if p != nil {
-		return p.PresentValue, true
-	}
-	return 0, false
-}
-
-//GetPresentValueByObject get that value that has already been stored
-func (inst *Store) GetPresentValueByObject(t ObjectType, id ObjectID) (point *Point, value float64, found bool) {
-	p := inst.GetPointByObject(t, id)
-	if p != nil {
-		return p, p.PresentValue, true
-	}
-	return nil, 0, false
-}
-
-//GetValueFromReadByObject get that value that has already been stored
-func (inst *Store) GetValueFromReadByObject(t ObjectType, id ObjectID) (point *Point, value float64, found bool) {
-	p := inst.GetPointByObject(t, id)
-	if p != nil {
-		return p, p.ValueFromRead, true
-	}
-	return nil, 0, false
-}
-
-//GetValueFromRead get that value that has already been stored
-func (inst *Store) GetValueFromRead(uuid string) (float64, bool) {
-	p := inst.GetPoint(uuid)
-	if p != nil {
-		return p.ValueFromRead, true
-	}
-	return 0, false
-}
-
-//WriteValueFromRead this is a value from a modbus input or rubix-io input
-func (inst *Store) WriteValueFromRead(point *Point, value float64) bool {
-	if point != nil {
-		inst.SetPresentValue(point, value)
-		if point.ValueFromRead != value { // cov event
-			inst.SetPendingMQTTPublish(point)
-		}
-		point.ValueFromRead = value
-		return true
-	}
-	return false
-}
-
-//WritePointValue to is to be written to flow modbus or the wire-sheet @ priority 15
-func (inst *Store) WritePointValue(point *Point, value *PriArray, in14, in15 *float64, syncFrom SyncFrom) {
-	var cov bool
-	if point != nil {
-		point.SyncFrom = syncFrom
-		if value == nil {
-			c := inst.mergePriority(point.WriteValue, in14, in15)
-			cov = !reflect.DeepEqual(c, point.WriteValue)
-			point.WriteValue = c
-			if cov {
-				inst.AddPendingWriteCount(point)
-			}
-		} else {
-			c := inst.mergePriority(value, in14, in15)
-			point.WriteValue = c
-			inst.AddPendingWriteCount(point)
-		}
-	}
-}
-
-func (inst *Store) SetPendingMQTTPublish(point *Point) {
-	if point.SyncFrom != FromMqttPriory {
-		point.PendingMQTTPublish = true
-	}
-}
-
-func (inst *Store) PendingMQTTPublish(point *Point) bool {
-	return point.PendingMQTTPublish
-}
-
-func (inst *Store) CompleteMQTTPublish(point *Point) {
-	point.PendingMQTTPublish = false
-}
-
-func (inst *Store) PendingWrite(point *Point) bool {
-	if point.PendingWriteCount > 0 {
-		return true
-	}
-	return false
-}
-
-func (inst *Store) AddPendingWriteCount(point *Point) {
-	if point.ObjectType == AnalogVariable || point.ObjectType == BinaryVariable {
-		point.PendingWriteCount++
-		pri := GetHighest(point.WriteValue)
-		if pri != nil {
-			inst.SetPendingMQTTPublish(point)
-			inst.SetPresentValue(point, pri.Value)
-		}
-	} else {
-		point.PendingWriteCount++
-	}
-}
-func (inst *Store) CompletePendingWriteCount(point *Point) {
-	point.PendingWriteCount--
-	inst.SetPendingMQTTPublish(point)
-	pri := GetHighest(point.WriteValue)
-	if pri != nil {
-		inst.SetPresentValue(point, pri.Value)
-	}
-}
-
-func (inst *Store) GetByType(objectType ObjectType) (out []*Point, count int) {
-	out = []*Point{}
-	for _, pnt := range inst.GetPoints() {
-		if pnt.ObjectType == objectType {
-			out = append(out, pnt)
-		}
-	}
-	return out, len(out)
-}
-
-func (inst *Store) CheckExistingPointErr(point *Point) error {
-	if inst.CheckExistingPoint(point) {
-		errMsg := fmt.Sprintf("store-add-point: point is existing object-type:%s:%d", point.ObjectType, point.ObjectID)
-		log.Error(errMsg)
-		return errors.New(errMsg)
-	}
-	return nil
-}
-
-func (inst *Store) CheckExistingPoint(point *Point) bool {
-	for _, pnt := range inst.GetPoints() {
-		if pnt.ObjectType == point.ObjectType {
-			if pnt.ObjectID == point.ObjectID {
-				return true
-			}
-		}
-	}
-	return false
-}
+////SetPresentValue set present value
+//func (inst *Store) SetPresentValue(p *Point, value float64) bool {
+//	if p != nil {
+//		point := inst.GetPoint(p.UUID)
+//		if point != nil {
+//			point.PresentValue = value
+//		}
+//	}
+//	return false
+//}
+//
+////GetPresentValue get present value
+//func (inst *Store) GetPresentValue(uuid string) (float64, bool) {
+//	p := inst.GetPoint(uuid)
+//	if p != nil {
+//		return p.PresentValue, true
+//	}
+//	return 0, false
+//}
+//
+////GetPresentValueByObject get that value that has already been stored
+//func (inst *Store) GetPresentValueByObject(t ObjectType, id ObjectID) (point *Point, value float64, found bool) {
+//	p := inst.GetPointByObject(t, id)
+//	if p != nil {
+//		return p, p.PresentValue, true
+//	}
+//	return nil, 0, false
+//}
+//
+////GetValueFromReadByObject get that value that has already been stored
+//func (inst *Store) GetValueFromReadByObject(t ObjectType, id ObjectID) (point *Point, value float64, found bool) {
+//	p := inst.GetPointByObject(t, id)
+//	if p != nil {
+//		return p, p.ValueFromRead, true
+//	}
+//	return nil, 0, false
+//}
+//
+////GetValueFromRead get that value that has already been stored
+//func (inst *Store) GetValueFromRead(uuid string) (float64, bool) {
+//	p := inst.GetPoint(uuid)
+//	if p != nil {
+//		return p.ValueFromRead, true
+//	}
+//	return 0, false
+//}
+//
+////WriteValueFromRead this is a value from a modbus input or rubix-io input
+//func (inst *Store) WriteValueFromRead(point *Point, value float64) bool {
+//	if point != nil {
+//		inst.SetPresentValue(point, value)
+//		if point.ValueFromRead != value { // cov event
+//			inst.SetPendingMQTTPublish(point)
+//		}
+//		point.ValueFromRead = value
+//		return true
+//	}
+//	return false
+//}
+//
+////WritePointValue to is to be written to flow modbus or the wire-sheet @ priority 15
+//func (inst *Store) WritePointValue(point *Point, value *PriArray, in14, in15 *float64, syncFrom SyncFrom) {
+//	var cov bool
+//	if point != nil {
+//		point.SyncFrom = syncFrom
+//		if value == nil {
+//			c := inst.mergePriority(point.WriteValue, in14, in15)
+//			cov = !reflect.DeepEqual(c, point.WriteValue)
+//			point.WriteValue = c
+//			if cov {
+//				inst.AddPendingWriteCount(point)
+//			}
+//		} else {
+//			c := inst.mergePriority(value, in14, in15)
+//			point.WriteValue = c
+//			inst.AddPendingWriteCount(point)
+//		}
+//	}
+//}
+//
+//func (inst *Store) SetPendingMQTTPublish(point *Point) {
+//	if point.SyncFrom != FromMqttPriory {
+//		point.PendingMQTTPublish = true
+//	}
+//}
+//
+//func (inst *Store) PendingMQTTPublish(point *Point) bool {
+//	return point.PendingMQTTPublish
+//}
+//
+//func (inst *Store) CompleteMQTTPublish(point *Point) {
+//	point.PendingMQTTPublish = false
+//}
+//
+//func (inst *Store) PendingWrite(point *Point) bool {
+//	if point.PendingWriteCount > 0 {
+//		return true
+//	}
+//	return false
+//}
+//
+//func (inst *Store) AddPendingWriteCount(point *Point) {
+//	if point.ObjectType == AnalogVariable || point.ObjectType == BinaryVariable {
+//		point.PendingWriteCount++
+//		pri := GetHighest(point.WriteValue)
+//		if pri != nil {
+//			inst.SetPendingMQTTPublish(point)
+//			inst.SetPresentValue(point, pri.Value)
+//		}
+//	} else {
+//		point.PendingWriteCount++
+//	}
+//}
+//func (inst *Store) CompletePendingWriteCount(point *Point) {
+//	point.PendingWriteCount--
+//	inst.SetPendingMQTTPublish(point)
+//	pri := GetHighest(point.WriteValue)
+//	if pri != nil {
+//		inst.SetPresentValue(point, pri.Value)
+//	}
+//}
+//
+//func (inst *Store) GetByType(objectType ObjectType) (out []*Point, count int) {
+//	out = []*Point{}
+//	for _, pnt := range inst.GetPoints() {
+//		if pnt.ObjectType == objectType {
+//			out = append(out, pnt)
+//		}
+//	}
+//	return out, len(out)
+//}
+//
+//func (inst *Store) CheckExistingPointErr(point *Point) error {
+//	if inst.CheckExistingPoint(point) {
+//		errMsg := fmt.Sprintf("store-add-point: point is existing object-type:%s:%d", point.ObjectType, point.ObjectID)
+//		log.Error(errMsg)
+//		return errors.New(errMsg)
+//	}
+//	return nil
+//}
+//
+//func (inst *Store) CheckExistingPoint(point *Point) bool {
+//	for _, pnt := range inst.GetPoints() {
+//		if pnt.ObjectType == point.ObjectType {
+//			if pnt.ObjectID == point.ObjectID {
+//				return true
+//			}
+//		}
+//	}
+//	return false
+//}

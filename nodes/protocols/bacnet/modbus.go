@@ -76,18 +76,18 @@ func (inst *Server) modbusOutputsDispatch(cli *modbuscli.Modbus) {
 		if err != nil {
 			log.Error(err)
 		}
-		for _, point := range pointsList.DeviceOne {
-			inst.store.CompletePendingWriteCount(point)
-		}
+		//for _, point := range pointsList.DeviceOne {
+		//	//inst.store.CompletePendingWriteCount(point)
+		//}
 	}
 	if len(pointsList.DeviceTwo) > 1 {
 		err := cli.Write(2, modbusBulkWrite(pointsList.DeviceOne))
 		if err != nil {
 			log.Error(err)
 		}
-		for _, point := range pointsList.DeviceOne {
-			inst.store.CompletePendingWriteCount(point)
-		}
+		//for _, point := range pointsList.DeviceOne {
+		//	inst.store.CompletePendingWriteCount(point)
+		//}
 	}
 	//if len(pointsList.DeviceTwo) > 0 {
 	//	err := cli.Write(2, modbusBulkWrite(pointsList.DeviceTwo))

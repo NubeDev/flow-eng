@@ -1,9 +1,5 @@
 package points
 
-import (
-	log "github.com/sirupsen/logrus"
-)
-
 type SyncFrom string // FromMqttPriory, FromFlow, FromRubixIO
 
 const (
@@ -12,15 +8,15 @@ const (
 	FromFlow       SyncFrom = "FromFlow"       // message from the broker, ie: something wrote via bacnet
 )
 
-// CreateSync can come from bacnet or the flow
-func (inst *Store) CreateSync(writeValue *PriArray, object ObjectType, id ObjectID, syncFrom SyncFrom, in14, in15 *float64) {
-	point := inst.GetPointByObject(object, id)
-	if object == "" {
-		log.Errorf("bacnet-server: object type type can not be empty")
-	}
-	if syncFrom == "" {
-		log.Errorf("bacnet-server: get sync from can not be empty")
-	}
-	inst.WritePointValue(point, writeValue, in14, in15, syncFrom)
-
-}
+//// CreateSync can come from bacnet or the flow
+//func (inst *Store) CreateSync(writeValue *PriArray, object ObjectType, id ObjectID, syncFrom SyncFrom, in14, in15 *float64) {
+//	point := inst.GetPointByObject(object, id)
+//	if object == "" {
+//		log.Errorf("bacnet-server: object type type can not be empty")
+//	}
+//	if syncFrom == "" {
+//		log.Errorf("bacnet-server: get sync from can not be empty")
+//	}
+//	inst.WritePointValue(point, writeValue, in14, in15, syncFrom)
+//
+//}

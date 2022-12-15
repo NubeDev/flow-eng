@@ -322,7 +322,7 @@ func (inst *Store) checkExisting(point *Point, from, to int) error {
 		return err
 	}
 	// check if there is a free address
-	err = inst.CheckExistingPointErr(point)
+	//err = inst.CheckExistingPointErr(point)
 	if err != nil {
 		return err
 	}
