@@ -197,6 +197,12 @@ func (inst *Store) AddPoint(point *Point, ignoreError bool) (*Point, error) {
 	if point.ObjectType == AnalogOutput {
 		addr, _ := ModbusBuildOutput(point.IoType, point.ObjectID)
 		point.ModbusDevAddr = addr.DeviceAddr
+		if point.IoType == IoTypeDigital {
+			point.ModbusRegister = addr.Volt
+		}
+		if point.IoType == IoTypeVolts {
+			point.ModbusRegister = addr.Volt
+		}
 		point.Application = names.Modbus
 
 	}
@@ -316,7 +322,7 @@ func (inst *Store) checkExisting(point *Point, from, to int) error {
 		return err
 	}
 	// check if there is a free address
-	err = inst.CheckExistingPointErr(point)
+	//err = inst.CheckExistingPointErr(point)
 	if err != nil {
 		return err
 	}

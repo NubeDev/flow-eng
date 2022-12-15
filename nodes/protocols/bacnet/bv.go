@@ -73,6 +73,6 @@ func (inst *BV) Process() {
 			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
 		}
 	}
-	toFlow(inst, points.BinaryVariable, inst.objectID, inst.store, inst.toFlowOptions)
-	fromFlow(inst, inst.objectID, inst.store)
+	//toFlow(inst, points.BinaryVariable, inst.objectID, inst.store, inst.toFlowOptions)
+	//fromFlow(inst, inst.objectID, inst.store)
 }

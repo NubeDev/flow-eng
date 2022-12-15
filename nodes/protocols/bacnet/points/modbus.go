@@ -96,7 +96,7 @@ type OutputAddr struct {
 func outputAddress(deviceCount int, filterByBacnet int) ([]OutputAddr, OutputAddr) {
 	var ioNumber = 1
 	var relay = 1
-	var volt = 250
+	var volt = 0
 	var count = 0
 	var innerCount = 0
 	if deviceCount == 0 {

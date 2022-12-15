@@ -2,6 +2,7 @@ package bacnetio
 
 import (
 	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
@@ -58,6 +59,10 @@ func (inst *AO) setObjectId() {
 }
 func (inst *AO) Process() {
 	_, firstLoop := inst.Loop()
+	s := inst.GetStore()
+	if s == nil {
+		return
+	}
 	if firstLoop {
 		inst.setObjectId()
 		go inst.setName()
@@ -73,7 +78,53 @@ func (inst *AO) Process() {
 		if err != nil {
 			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
 		}
+		s.Set(setUUID(inst.GetParentId(), points.AnalogOutput, inst.objectID), point, 0)
 	}
-	toFlow(inst, points.AnalogOutput, inst.objectID, inst.store, inst.toFlowOptions)
-	fromFlow(inst, inst.objectID, inst.store)
+
+	in14, in15 := fromFlow(inst, inst.objectID)
+	if in14 != nil {
+		inst.WritePinFloat(node.Out, float.NonNil(in14), 2)
+	}
+	if in15 != nil {
+		inst.WritePinFloat(node.Out, float.NonNil(in15), 2)
+	}
+	p, _ := inst.getPoint(points.AnalogOutput, inst.objectID)
+	if p != nil {
+		p.WriteValue = points.NewPriArray(in14, in15)
+		v := points.GetHighest(p.WriteValue)
+		if v != nil {
+			p.PresentValue = v.Value
+		}
+		inst.updatePoint(points.AnalogOutput, inst.objectID, p)
+	}
+
+}
+
+func (inst *AO) getPV(objType points.ObjectType, id points.ObjectID) (float64, error) {
+	pnt, ok := inst.getPoint(objType, id)
+	if ok {
+		return pnt.PresentValue, nil
+	}
+	return 0, nil
+}
+
+func (inst *AO) getPoint(objType points.ObjectType, id points.ObjectID) (*points.Point, bool) {
+	s := inst.GetStore()
+	if s == nil {
+		return nil, false
+	}
+	d, ok := s.Get(setUUID(inst.ParentId, objType, id))
+	if ok {
+		return d.(*points.Point), true
+	}
+	return nil, false
+}
+
+func (inst *AO) updatePoint(objType points.ObjectType, id points.ObjectID, point *points.Point) error {
+	s := inst.GetStore()
+	if s == nil {
+		return nil
+	}
+	s.Set(setUUID(inst.GetID(), objType, id), point, 0)
+	return nil
 }

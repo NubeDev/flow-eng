@@ -1,5 +1,9 @@
 package array
 
+import (
+	"sort"
+)
+
 type Map map[string]interface{}
 type Slice []interface{}
 
@@ -168,21 +172,17 @@ func MaxFloat64(array []float64) float64 {
 	if len(array) == 0 {
 		return 0
 	}
-	max := array[0]
-	for _, item := range array {
-		if item > max {
-			max = item
-		}
-	}
-	return max
+	sort.Float64s(array)
+	return array[len(array)-1]
 }
 
 func MinFloat64(array []float64) float64 {
-	min := array[0]
-	for _, item := range array {
-		if item < min {
-			min = item
-		}
+	if len(array) == 0 {
+		return 0
 	}
-	return min
+	sort.Float64s(array)
+	if len(array) > 0 {
+		return array[0]
+	}
+	return 0
 }
