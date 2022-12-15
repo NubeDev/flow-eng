@@ -78,7 +78,7 @@ func (inst *AO) Process() {
 		if err != nil {
 			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
 		}
-		s.Set(setUUID(inst.GetParentId(), points.AnalogInput, inst.objectID), point, 0)
+		s.Set(setUUID(inst.GetParentId(), points.AnalogOutput, inst.objectID), point, 0)
 	}
 
 	in14, in15 := fromFlow(inst, inst.objectID)
@@ -87,6 +87,15 @@ func (inst *AO) Process() {
 	}
 	if in15 != nil {
 		inst.WritePinFloat(node.Out, float.NonNil(in15), 2)
+	}
+	p, _ := inst.getPoint(points.AnalogOutput, inst.objectID)
+	if p != nil {
+		p.WriteValue = points.NewPriArray(in14, in15)
+		v := points.GetHighest(p.WriteValue)
+		if v != nil {
+			p.PresentValue = v.Value
+		}
+		inst.updatePoint(points.AnalogOutput, inst.objectID, p)
 	}
 
 }
@@ -109,4 +118,13 @@ func (inst *AO) getPoint(objType points.ObjectType, id points.ObjectID) (*points
 		return d.(*points.Point), true
 	}
 	return nil, false
+}
+
+func (inst *AO) updatePoint(objType points.ObjectType, id points.ObjectID, point *points.Point) error {
+	s := inst.GetStore()
+	if s == nil {
+		return nil
+	}
+	s.Set(setUUID(inst.GetID(), objType, id), point, 0)
+	return nil
 }
