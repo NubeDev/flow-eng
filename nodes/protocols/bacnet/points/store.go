@@ -197,6 +197,12 @@ func (inst *Store) AddPoint(point *Point, ignoreError bool) (*Point, error) {
 	if point.ObjectType == AnalogOutput {
 		addr, _ := ModbusBuildOutput(point.IoType, point.ObjectID)
 		point.ModbusDevAddr = addr.DeviceAddr
+		if point.IoType == IoTypeDigital {
+			point.ModbusRegister = addr.Volt
+		}
+		if point.IoType == IoTypeVolts {
+			point.ModbusRegister = addr.Volt
+		}
 		point.Application = names.Modbus
 
 	}

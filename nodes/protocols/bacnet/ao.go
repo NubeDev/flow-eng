@@ -58,6 +58,10 @@ func (inst *AO) setObjectId() {
 }
 func (inst *AO) Process() {
 	_, firstLoop := inst.Loop()
+	s := inst.GetStore()
+	if s == nil {
+		return
+	}
 	if firstLoop {
 		inst.setObjectId()
 		go inst.setName()
@@ -73,7 +77,32 @@ func (inst *AO) Process() {
 		if err != nil {
 			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
 		}
+		s.Set(setUUID(inst.GetParentId(), points.AnalogInput, inst.objectID), point, 0)
 	}
-	toFlow(inst, points.AnalogOutput, inst.objectID, inst.store, inst.toFlowOptions)
+	pv, err := inst.getPV(points.AnalogInput, inst.objectID)
+	if err != nil {
+		return
+	}
+	inst.WritePinFloat(node.Out, pv, 2)
 	fromFlow(inst, inst.objectID, inst.store)
+}
+
+func (inst *AO) getPV(objType points.ObjectType, id points.ObjectID) (float64, error) {
+	pnt, ok := inst.getPoint(objType, id)
+	if ok {
+		return pnt.PresentValue, nil
+	}
+	return 0, nil
+}
+
+func (inst *AO) getPoint(objType points.ObjectType, id points.ObjectID) (*points.Point, bool) {
+	s := inst.GetStore()
+	if s == nil {
+		return nil, false
+	}
+	d, ok := s.Get(setUUID(inst.ParentId, objType, id))
+	if ok {
+		return d.(*points.Point), true
+	}
+	return nil, false
 }

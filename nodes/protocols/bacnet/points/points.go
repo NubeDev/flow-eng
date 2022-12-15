@@ -25,6 +25,7 @@ type Point struct {
 	PendingMQTTPublish bool
 	SyncFrom           SyncFrom
 	ModbusDevAddr      int
+	ModbusRegister     int
 }
 
 func (inst *Store) GetPoints() []*Point {
@@ -47,38 +48,6 @@ type ModbusPoints struct {
 	DeviceTwo   []*Point
 	DeviceThree []*Point
 	DeviceFour  []*Point
-}
-
-func (inst *Store) GetModbusWriteablePoints() *ModbusPoints {
-	out := &ModbusPoints{
-		DeviceOne:   []*Point{},
-		DeviceTwo:   []*Point{},
-		DeviceThree: []*Point{},
-		DeviceFour:  []*Point{},
-	}
-	for _, point := range inst.GetPoints() {
-		if point.ModbusDevAddr == 1 {
-			if point.IsWriteable {
-				out.DeviceOne = append(out.DeviceOne, point)
-			}
-		}
-		if point.ModbusDevAddr == 2 {
-			if point.IsWriteable {
-				out.DeviceTwo = append(out.DeviceTwo, point)
-			}
-		}
-		if point.ModbusDevAddr == 3 {
-			if point.IsWriteable {
-				out.DeviceThree = append(out.DeviceThree, point)
-			}
-		}
-		if point.ModbusDevAddr == 4 {
-			if point.IsWriteable {
-				out.DeviceFour = append(out.DeviceFour, point)
-			}
-		}
-	}
-	return out
 }
 
 func (inst *Store) GetPointsByApplication(name names.ApplicationName) []*Point {

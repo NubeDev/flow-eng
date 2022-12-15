@@ -7,6 +7,8 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/services/mqttclient"
 	log "github.com/sirupsen/logrus"
+	"sort"
+	"strings"
 )
 
 type Bacnet struct {
@@ -85,26 +87,80 @@ func (inst *Server) Process() {
 
 }
 
-func setUUID(objType points.ObjectType, id points.ObjectID) string {
-	return fmt.Sprintf("%s:%d", objType, id)
+func setUUID(parentID string, objType points.ObjectType, id points.ObjectID) string {
+	return fmt.Sprintf("%s:%s:%d", parentID, objType, id)
 }
 
-func (inst *Server) writePV(objType points.ObjectType, id points.ObjectID) error {
-	//pnt, ok := inst.getPoint(objType, id)
-	//if ok {
-	//	//pnt.WriteValue = 11.0
-	//}
+func (inst *Server) getPV(objType points.ObjectType, id points.ObjectID) (float64, error) {
+	pnt, ok := inst.getPoint(objType, id)
+	if ok {
+		return pnt.PresentValue, nil
+
+	}
+	return 0, nil
+}
+
+func (inst *Server) writePV(objType points.ObjectType, id points.ObjectID, value float64) error {
+	pnt, ok := inst.getPoint(objType, id)
+	if ok {
+		pnt.PresentValue = value
+		err := inst.updatePoint(objType, id, pnt)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
-
 }
 
-func (inst *Server) setPoint(objType points.ObjectType, id points.ObjectID, point *points.Point) error {
+func (inst *Server) updatePoint(objType points.ObjectType, id points.ObjectID, point *points.Point) error {
 	s := inst.GetStore()
 	if s == nil {
 		return nil
 	}
-	s.Set(setUUID(objType, id), point, 0)
+	s.Set(setUUID(inst.GetID(), objType, id), point, 0)
 	return nil
+}
+
+func (inst *Server) getPointsReadOnly() ([]*points.Point, bool) {
+	p, _ := inst.getPoints()
+	var pointsList []*points.Point
+	for _, point := range p {
+		if !point.IsWriteable {
+			pointsList = append(pointsList, point)
+		}
+	}
+	return pointsList, false
+}
+
+func (inst *Server) getPointsWriteOnly() ([]*points.Point, bool) {
+	p, _ := inst.getPoints()
+	var pointsList []*points.Point
+	for _, point := range p {
+		if point.IsWriteable {
+			pointsList = append(pointsList, point)
+		}
+	}
+	return pointsList, false
+}
+
+func (inst *Server) getPoints() ([]*points.Point, bool) {
+	s := inst.GetStore()
+	if s == nil {
+		return nil, false
+	}
+	var pointsList []*points.Point
+	for id, item := range s.All() {
+		parts := strings.Split(id, ":")
+		if len(parts) > 0 {
+			if parts[0] == inst.GetID() {
+				point, ok := item.Object.(*points.Point)
+				if ok {
+					pointsList = append(pointsList, point)
+				}
+			}
+		}
+	}
+	return pointsList, false
 }
 
 func (inst *Server) getPoint(objType points.ObjectType, id points.ObjectID) (*points.Point, bool) {
@@ -112,9 +168,54 @@ func (inst *Server) getPoint(objType points.ObjectType, id points.ObjectID) (*po
 	if s == nil {
 		return nil, false
 	}
-	d, ok := s.Get(fmt.Sprintf("%s:%d", objType, id))
+	d, ok := s.Get(setUUID(inst.GetID(), objType, id))
 	if ok {
 		return d.(*points.Point), true
 	}
 	return nil, false
+}
+
+func (inst *Server) GetModbusWriteablePoints() *points.ModbusPoints {
+	out := &points.ModbusPoints{
+		DeviceOne:   []*points.Point{},
+		DeviceTwo:   []*points.Point{},
+		DeviceThree: []*points.Point{},
+		DeviceFour:  []*points.Point{},
+	}
+	p, _ := inst.getPoints()
+	for _, point := range p {
+		if point.ModbusDevAddr == 1 {
+			if point.IsWriteable {
+				out.DeviceOne = append(out.DeviceOne, point)
+				sort.Slice(out.DeviceOne[:], func(i, j int) bool { // sort by the modbus register
+					return out.DeviceOne[i].ModbusRegister < out.DeviceOne[j].ModbusRegister
+				})
+			}
+		}
+		if point.ModbusDevAddr == 2 {
+			if point.IsWriteable {
+				out.DeviceTwo = append(out.DeviceTwo, point)
+				sort.Slice(out.DeviceTwo[:], func(i, j int) bool { // sort by the modbus register
+					return out.DeviceTwo[i].ModbusRegister < out.DeviceTwo[j].ModbusRegister
+				})
+			}
+		}
+		if point.ModbusDevAddr == 3 {
+			if point.IsWriteable {
+				out.DeviceThree = append(out.DeviceThree, point)
+				sort.Slice(out.DeviceThree[:], func(i, j int) bool { // sort by the modbus register
+					return out.DeviceThree[i].ModbusRegister < out.DeviceThree[j].ModbusRegister
+				})
+			}
+		}
+		if point.ModbusDevAddr == 4 {
+			if point.IsWriteable {
+				out.DeviceFour = append(out.DeviceFour, point)
+				sort.Slice(out.DeviceFour[:], func(i, j int) bool { // sort by the modbus register
+					return out.DeviceFour[i].ModbusRegister < out.DeviceFour[j].ModbusRegister
+				})
+			}
+		}
+	}
+	return out
 }

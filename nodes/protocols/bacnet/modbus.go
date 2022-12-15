@@ -1,7 +1,6 @@
 package bacnetio
 
 import (
-	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/services/modbuscli"
 	"github.com/NubeIO/nubeio-rubix-lib-modbus-go/modbus"
@@ -37,9 +36,9 @@ func (inst *Server) modbusRunner(settings map[string]interface{}) {
 	var count int
 	for {
 		log.Infof("modbus polling loop count: %d application-type: %s", count, inst.application)
-		pointsList := inst.store.GetPointsByApplication(names.Modbus)
-		inst.modbusInputsRunner(init, pointsList) // process the inputs
-		inst.modbusOutputsDispatch(init)          // process the outs
+		pointsListRead, _ := inst.getPointsReadOnly()
+		inst.modbusInputsRunner(init, pointsListRead) // process the inputs
+		inst.modbusOutputsDispatch(init)              // process the outs
 		time.Sleep(1 * time.Second)
 		count++
 	}
@@ -56,8 +55,19 @@ func modbusBulkWrite(pointsList []*points.Point) [8]float64 {
 	return out
 }
 
+func modbusBulkWrite2(pointsList []*points.Point) [8]float64 {
+	var out [8]float64
+	for i, point := range pointsList {
+		v := points.GetHighest(point.WriteValue)
+		if v != nil {
+			out[i] = v.Value
+		}
+	}
+	return out
+}
+
 func (inst *Server) modbusOutputsDispatch(cli *modbuscli.Modbus) {
-	pointsList := inst.store.GetModbusWriteablePoints()
+	pointsList := inst.GetModbusWriteablePoints()
 	if pointsList == nil {
 		//return
 	}
@@ -70,8 +80,8 @@ func (inst *Server) modbusOutputsDispatch(cli *modbuscli.Modbus) {
 			inst.store.CompletePendingWriteCount(point)
 		}
 	}
-	if len(pointsList.DeviceTwo) > 0 {
-		err := cli.Write(2, modbusBulkWrite(pointsList.DeviceTwo))
+	if len(pointsList.DeviceTwo) > 1 {
+		err := cli.Write(2, modbusBulkWrite(pointsList.DeviceOne))
 		if err != nil {
 			log.Error(err)
 		}
@@ -79,6 +89,15 @@ func (inst *Server) modbusOutputsDispatch(cli *modbuscli.Modbus) {
 			inst.store.CompletePendingWriteCount(point)
 		}
 	}
+	//if len(pointsList.DeviceTwo) > 0 {
+	//	err := cli.Write(2, modbusBulkWrite(pointsList.DeviceTwo))
+	//	if err != nil {
+	//		log.Error(err)
+	//	}
+	//	for _, point := range pointsList.DeviceOne {
+	//		inst.store.CompletePendingWriteCount(point)
+	//	}
+	//}
 
 }
 
@@ -93,7 +112,10 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 		if !point.IsWriteable {
 			addr, _ := points.ModbusBuildInput(point.IoType, point.ObjectID)
 			slaveId := addr.DeviceAddr
-			p := inst.store.GetPointByObject(points.AnalogInput, point.ObjectID)
+			if slaveId <= 0 {
+				log.Errorf("modbus slave addrress cant not be less to 1")
+				continue
+			}
 			if !completedTemp && (point.IoType == points.IoTypeTemp || point.IoType == points.IoTypeDigital) {
 				tempList, err = cli.ReadTemps(slaveId) // DO MODBUS READ FOR TEMPS
 				if err != nil {
@@ -118,7 +140,7 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 			if point.IoType == points.IoTypeVolts { // update anypoint that is type voltage
 				returnedValue = voltList[io16Pin]
 			}
-			inst.store.WriteValueFromRead(p, returnedValue)
+			inst.writePV(point.ObjectType, point.ObjectID, returnedValue)
 		}
 	}
 
