@@ -6,24 +6,24 @@ import (
 	"github.com/enescakir/emoji"
 )
 
-type Point struct {
+type FFPoint struct {
 	*node.Spec
 	topic       string
 	lastPayload *covPayload
 }
 
-func NewPoint(body *node.Spec) (node.Node, error) {
+func NewFFPoint(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, flowPoint, category)
 	inputs := node.BuildInputs()
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body.SetAllowSettings()
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body = node.SetNoParent(body)
-	pnt := &Point{body, "", nil}
+	pnt := &FFPoint{body, "", nil}
 	return pnt, nil
 }
 
-func (inst *Point) set() {
+func (inst *FFPoint) set() {
 	s := inst.GetStore()
 	if s == nil {
 		return
@@ -51,24 +51,23 @@ func (inst *Point) set() {
 	}
 }
 
-func (inst *Point) Process() {
+func (inst *FFPoint) Process() {
 	_, firstLoop := inst.Loop()
 	if firstLoop {
 		selectedPoint, err := getPointSettings(inst.GetSettings())
 		var setTopic bool
 		if selectedPoint != nil && err == nil {
 			if selectedPoint.Point != "" {
-				if selectedPoint.Point != "" {
-					t := makePointTopic(selectedPoint.Point)
-					if t != "" {
-						inst.topic = t
-						inst.set()
-					}
+				t := makePointTopic(selectedPoint.Point)
+				if t != "" {
+					inst.topic = t
+					inst.set()
+					setTopic = true
 				}
 			}
 		}
 		if !setTopic {
-			inst.SetWaringMessage("no point has been selected")
+			inst.SetWaringMessage("no point selected")
 			inst.SetWaringIcon(string(emoji.OrangeCircle))
 		}
 	}
@@ -89,7 +88,7 @@ func (inst *Point) Process() {
 	}
 }
 
-func (inst *Point) GetSchema() *schemas.Schema {
+func (inst *FFPoint) GetSchema() *schemas.Schema {
 	s := inst.buildSchema()
 	return s
 }

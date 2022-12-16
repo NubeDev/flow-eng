@@ -63,6 +63,14 @@ func (n *Spec) ReadPinAsFloat(name InputName) (value float64, null bool) {
 	return conversions.GetFloat(r), false
 }
 
+func (n *Spec) ReadInputPriority(name InputName) (value float64, null bool) {
+	r := n.ReadPin(name)
+	if r == nil {
+		return 0, true
+	}
+	return conversions.GetFloat(r), false
+}
+
 func (n *Spec) readPinAsFloat(name InputName) (value float64) {
 	r := n.ReadPin(name)
 	out := conversions.GetFloat(r)
@@ -131,7 +139,7 @@ func (n *Spec) ReadMultipleFloat(count int) []float64 {
 	return out
 }
 
-func (n *Spec) readPinAsFloatPointer(name InputName) *float64 {
+func (n *Spec) ReadPinAsFloatPointer(name InputName) *float64 {
 	r := n.ReadPin(name)
 	return conversions.GetFloatPointer(r)
 }
@@ -140,7 +148,7 @@ func (n *Spec) ReadMultipleFloatPointer(count int) []*float64 {
 	var out []*float64
 	for i, input := range n.GetInputs() {
 		if i < count {
-			out = append(out, n.readPinAsFloatPointer(input.Name))
+			out = append(out, n.ReadPinAsFloatPointer(input.Name))
 		}
 	}
 	return out

@@ -41,7 +41,7 @@ type pointNodeSchema struct {
 	Point schemas.EnumString `json:"point"`
 }
 
-func (inst *Point) buildSchema() *schemas.Schema {
+func (inst *FFPoint) buildSchema() *schemas.Schema {
 	s := inst.GetStore()
 	var data interface{}
 	var ok bool
@@ -73,7 +73,7 @@ func (inst *Point) buildSchema() *schemas.Schema {
 	return sch
 }
 
-func (inst *PointWrite) buildSchema() *schemas.Schema {
+func (inst *FFPointWrite) buildSchema() *schemas.Schema {
 	s := inst.GetStore()
 	var data interface{}
 	var ok bool

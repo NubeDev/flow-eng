@@ -68,8 +68,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	flatLine, _ := streams.NewFlatline(nil)
 
 	flowNetwork, _ := flow.NewNetwork(nil)
-	flowPoint, _ := flow.NewPoint(nil)
-	flowPointWrite, _ := flow.NewPointWrite(nil)
+	flowPoint, _ := flow.NewFFPoint(nil)
+	flowPointWrite, _ := flow.NewFFPointWrite(nil)
 
 	flowLoopCount, _ := system.NewLoopCount(nil)
 
@@ -426,9 +426,9 @@ func builderFlowNetworks(body *node.Spec, opts []interface{}) (node.Node, error)
 	case flowNetwork:
 		return flow.NewNetwork(body)
 	case flowPoint:
-		return flow.NewPoint(body)
+		return flow.NewFFPoint(body)
 	case flowPointWrite:
-		return flow.NewPointWrite(body)
+		return flow.NewFFPointWrite(body)
 	}
 	return nil, nil
 }
