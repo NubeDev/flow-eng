@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/helpers/integer"
+	"reflect"
 	"strconv"
 	"time"
 )
@@ -47,6 +48,22 @@ func (n *Spec) InputHasConnection(name InputName) bool {
 	return false
 }
 
+func isNil(i interface{}) bool {
+	return i == nil || reflect.ValueOf(i).IsNil()
+}
+
+// InputHasConnectionOrValue true if the node input has a connection, or there is a manual input
+func (n *Spec) InputHasConnectionOrValue(name InputName) bool {
+	if n.InputHasConnection(name) {
+		return true
+	}
+	_, null := n.ReadPinAsString(name)
+	if !null {
+		return true
+	}
+	return false
+}
+
 func (n *Spec) ReadPin(name InputName) interface{} {
 	input := n.GetInput(name)
 	if input == nil {
@@ -79,7 +96,6 @@ func (n *Spec) readPinAsFloat(name InputName) (value float64) {
 
 func (n *Spec) ReadPinAsDuration(name InputName) (value time.Duration, null bool) {
 	r := n.ReadPin(name)
-	fmt.Println(r, 888)
 	if r == nil {
 		return 0, true
 	}

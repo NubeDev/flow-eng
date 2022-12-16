@@ -121,19 +121,19 @@ func (inst *FFPointWrite) EvaluateInputsArray() map[string]*float64 {
 	newInputArray := [17]InputData{}
 
 	valueIn1 := inst.ReadPinAsFloatPointer(node.In1)
-	linkIn1 := inst.InputHasConnection(node.In1)
+	linkIn1 := inst.InputHasConnectionOrValue(node.In1)
 	newInputArray[1] = InputData{valueIn1, linkIn1}
 
 	valueIn10 := inst.ReadPinAsFloatPointer(node.In10)
-	linkIn10 := inst.InputHasConnection(node.In10)
+	linkIn10 := inst.InputHasConnectionOrValue(node.In10)
 	newInputArray[10] = InputData{valueIn10, linkIn10}
 
 	valueIn15 := inst.ReadPinAsFloatPointer(node.In15)
-	linkIn15 := inst.InputHasConnection(node.In15)
+	linkIn15 := inst.InputHasConnectionOrValue(node.In15)
 	newInputArray[15] = InputData{valueIn15, linkIn15}
 
 	valueIn16 := inst.ReadPinAsFloatPointer(node.In16)
-	linkIn16 := inst.InputHasConnection(node.In16)
+	linkIn16 := inst.InputHasConnectionOrValue(node.In16)
 	newInputArray[16] = InputData{valueIn16, linkIn16}
 
 	arraysMatch, arrayChanges := compareInputArrays(newInputArray, inst.inputsArray)
@@ -153,9 +153,7 @@ func (inst *FFPointWrite) EvaluateInputsArray() map[string]*float64 {
 			}
 		}
 	}
-
 	inst.inputsArray = newInputArray
-
 	return priorityArrayWrite
 }
 
