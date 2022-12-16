@@ -39,6 +39,7 @@ type Node interface {
 	ReadPinAsInt(name InputName) (value int, null bool)
 	ReadPinAsBool(name InputName) (value bool, null bool)
 	ReadPinAsFloat(name InputName) (value float64, null bool)
+	ReadInputPriority(name InputName) (value float64, null bool)
 	ReadPinAsDuration(name InputName) (value time.Duration, null bool)
 	ReadMultiple(count int) []interface{}
 	ReadMultipleFloatPointer(count int) []*float64

@@ -65,6 +65,7 @@ func (inst *Network) setConnection() {
 	mqttClient, err := mqttclient.NewClient(mqttclient.ClientOptions{
 		Servers: []string{fmt.Sprintf("tcp://%s:%d", connection.Host, connection.Port)},
 	})
+	log.Infof("flow-network mqtt connect try and connect to broker %s ", fmt.Sprintf("tcp://%s:%d", connection.Host, connection.Port))
 	err = mqttClient.Connect()
 	if err != nil {
 		errMes := fmt.Sprintf("flow-network mqtt connect err: %s", err.Error())

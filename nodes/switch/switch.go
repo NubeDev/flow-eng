@@ -22,16 +22,22 @@ func NewSwitch(body *node.Spec) (node.Node, error) {
 
 func (inst *Switch) Process() {
 	inSwitch, _ := inst.ReadPinAsBool(node.Switch)
-	inTrue, _ := inst.ReadPinAsFloat(node.InTrue)
+	inTrue, inTrueNull := inst.ReadPinAsFloat(node.InTrue)
 	inFalse, inFalseNull := inst.ReadPinAsFloat(node.InFalse)
 
 	if inSwitch {
-		inst.WritePin(node.Out, inTrue)
+		if inTrueNull {
+			inst.WritePinNull(node.Out)
+		} else {
+			inst.WritePin(node.Out, inTrue)
+		}
+
 	} else {
 		if inFalseNull {
 			inst.WritePinNull(node.Out)
 			return
+		} else {
+			inst.WritePin(node.Out, inFalse)
 		}
-		inst.WritePin(node.Out, inFalse)
 	}
 }
