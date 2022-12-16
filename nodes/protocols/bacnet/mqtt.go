@@ -35,6 +35,7 @@ func (inst *Server) subscribeToBacnetServer() {
 		mes := &topics.Message{UUID: helpers.ShortUUID("bus"), Msg: message}
 		if topics.IsPri(message.Topic()) {
 			err := inst.fromBacnet(mes, inst.store)
+			log.Infof("mqtt-bacnet message from server topic: %s -> value: %s", mes.Msg.Topic(), string(mes.Msg.Payload()))
 			if err != nil {
 				log.Error(err)
 			}
@@ -71,7 +72,7 @@ func (inst *Server) mqttPublishPV(point *points.Point) error {
 	topic := fmt.Sprintf("bacnet/%s/%d/write/pv", obj, objectId) // bacnet/ao/1/write/pv
 	//topic := fmt.Sprintf("bacnet/%s/%d/write/pri/15", obj, objectId) // bacnet/ao/1/write/pv
 	payload := buildPayload("", point.PresentValue)
-	log.Infof("topic: %s -> value: %s", topic, payload)
+	log.Infof("mqtt-bacnet publish topic: %s -> value: %s", topic, payload)
 	if payload != "" {
 		err = inst.clients.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload)
 		if err != nil {
@@ -112,8 +113,10 @@ func (inst *Server) fromBacnet(msg interface{}, store *points.Store) error {
 	if point == nil {
 		return errors.New(fmt.Sprintf("mqtt-payload-priorty-array no point-found in store for type:%s-%d", objectType, objectId))
 	}
+
 	if topics.IsPri(topic) {
-		//value := payload.GetFullPriority()
+		value := payload.GetFullPriority()
+		fmt.Println(value)
 		//store.CreateSync(value, objectType, objectId, points.FromMqttPriory, nil, nil)
 	}
 	return nil

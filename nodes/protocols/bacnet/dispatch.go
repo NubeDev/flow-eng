@@ -24,16 +24,9 @@ func (inst *Server) writeRunner() {
 	for {
 		p, _ := inst.getPoints()
 		for _, point := range p {
+			//pprint.PrintJOSN(point)
 			inst.mqttPublishPV(point)
 		}
-		//for _, point := range inst.store.GetPoints() {
-		//	if inst.store.PendingMQTTPublish(point) {
-		//		err := inst.mqttPublishPV(point)
-		//		if err != nil {
-		//			log.Error(err)
-		//		}
-		//	}
-		//}
 		time.Sleep(runnerDelay * time.Millisecond)
 	}
 }
