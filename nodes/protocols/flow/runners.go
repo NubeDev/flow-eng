@@ -11,7 +11,6 @@ import (
 
 func (inst *Network) subscribe() {
 	callback := func(client mqtt.Client, message mqtt.Message) {
-		// fmt.Println(fmt.Sprintf("FF Network subscribe() message: %+v", message))
 		s := inst.GetStore()
 		children, ok := s.Get(inst.GetID())
 		payloads := getPayloads(children, ok)
@@ -19,7 +18,6 @@ func (inst *Network) subscribe() {
 			if payload.topic == fixTopic(message.Topic()) {
 				n := inst.GetNode(payload.nodeUUID)
 				if n != nil {
-					// fmt.Println(string(message.Payload()), payload.nodeUUID, n.GetName())
 					n.SetPayload(&node.Payload{
 						Any: message,
 					})
@@ -94,7 +92,6 @@ func spitPointNames(names string) []string {
 const pointWriteTopic = "rubix/platform/point/write"
 
 func (inst *Network) publish(loopCount uint64) {
-	// fmt.Println("Flow Network publish(): START PUBLISH LOOP")
 	s := inst.GetStore()
 	if s == nil {
 		log.Errorf("Flow Network publish() err: faild to get point store")
@@ -118,26 +115,29 @@ func (inst *Network) publish(loopCount uint64) {
 			continue
 		}
 
+		var inputValueUpdated bool
+		in1COV, _ := n.InputUpdated(node.In1)
+		in2COV, _ := n.InputUpdated(node.In10)
+		in3COV, _ := n.InputUpdated(node.In15)
+		in4COV, _ := n.InputUpdated(node.In16)
+		if in1COV || in2COV || in3COV || in4COV {
+			inputValueUpdated = true
+		}
+		if !inputValueUpdated {
+			if loopCount%50 == 0 { // republish every 50 loops
+			} else { // skip as no input value was updated
+				continue
+			}
+		}
+
 		priority := map[string]*float64{}
 		// TODO: Replace this next bit with Priority Array evaluation
 		if n.GetName() == flowPointWrite {
 			ffPointWriteNode := n.(*FFPointWrite)
-			// fmt.Println(fmt.Sprintf("FLOW POINT WRITE NODE: %+v", ffPointWriteNode))
 			priority = ffPointWriteNode.EvaluateInputsArray()
-
 			if len(priority) <= 0 && loopCount != 2 {
 				continue
 			}
-
-			/*
-				for j, data := range priority {
-					if data == nil {
-						fmt.Println(fmt.Sprintf("PRIOIRTY WRITE ARRAY: %s, %s,  %+v", n.GetName(), j, data))
-					} else {
-						fmt.Println(fmt.Sprintf("PRIOIRTY WRITE ARRAY: %s, %s,  %+v", n.GetName(), j, *data))
-					}
-				}
-			*/
 
 			pointWriter := &PointWriter{Priority: &priority}
 			body := &MqttPoint{
