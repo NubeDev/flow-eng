@@ -58,7 +58,7 @@ func modbusBulkWrite(pointsList []*points.Point) [8]float64 {
 func (inst *Server) modbusOutputsDispatch(cli *modbuscli.Modbus) {
 	pointsList := inst.GetModbusWriteablePoints()
 	if pointsList == nil {
-		//return
+
 	}
 	if len(pointsList.DeviceOne) > 0 {
 		err := cli.Write(1, modbusBulkWrite(pointsList.DeviceOne))
