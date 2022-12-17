@@ -24,7 +24,6 @@ func (inst *Server) writeRunner() {
 	for {
 		p, _ := inst.getPoints()
 		for _, point := range p {
-			//pprint.PrintJOSN(point)
 			inst.mqttPublishPV(point)
 		}
 		time.Sleep(runnerDelay * time.Millisecond)

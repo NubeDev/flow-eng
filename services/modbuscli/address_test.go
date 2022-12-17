@@ -19,7 +19,7 @@ func Test_Write(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
-	err = init.WriteRegister(1, 2, 6.1)
+	err = init.WriteRegister(2, 0, 0)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -40,7 +40,7 @@ func Test_Read(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
-	registers, err := init.readRegisters(1, 200, 2, false)
+	registers, err := init.readRegisters(2, 200, 2, false)
 	if err != nil {
 		fmt.Println(err)
 		return

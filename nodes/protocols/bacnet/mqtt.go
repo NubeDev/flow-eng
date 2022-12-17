@@ -34,7 +34,7 @@ func (inst *Server) subscribeToBacnetServer() {
 	callback := func(client mqtt.Client, message mqtt.Message) {
 		mes := &topics.Message{UUID: helpers.ShortUUID("bus"), Msg: message}
 		if topics.IsPri(message.Topic()) {
-			err := inst.fromBacnet(mes, inst.store)
+			err := inst.fromBacnet(mes)
 			log.Infof("mqtt-bacnet message from server topic: %s -> value: %s", mes.Msg.Topic(), string(mes.Msg.Payload()))
 			if err != nil {
 				log.Error(err)
@@ -101,9 +101,20 @@ func decode(msg interface{}) *topics.Message {
 	return nil
 }
 
-func (inst *Server) fromBacnet(msg interface{}, store *points.Store) error {
+func (inst *Server) fromBacnet(msg interface{}) error {
+	var err error
 	payload := points.NewPayload()
-	err := payload.NewMessage(msg)
+	if payload == nil {
+		return errors.New("mqtt-payload message from bacnet-server failed to get payload")
+	}
+	if !inst.firstMessageFromBacnet { // this is to try and get the bacnet-server's last value sent from another bacnet master
+		err = payload.NewMessage(msg, true)
+		if err == nil {
+			inst.firstMessageFromBacnet = true
+		}
+	} else {
+		err = payload.NewMessage(msg, false)
+	}
 	if err != nil {
 		return err
 	}
@@ -113,11 +124,9 @@ func (inst *Server) fromBacnet(msg interface{}, store *points.Store) error {
 	if point == nil {
 		return errors.New(fmt.Sprintf("mqtt-payload-priorty-array no point-found in store for type:%s-%d", objectType, objectId))
 	}
-
 	if topics.IsPri(topic) {
 		value := payload.GetFullPriority()
-		fmt.Println(value)
-		//store.CreateSync(value, objectType, objectId, points.FromMqttPriory, nil, nil)
+		inst.updateFromBACnet(objectType, objectId, value)
 	}
 	return nil
 }
