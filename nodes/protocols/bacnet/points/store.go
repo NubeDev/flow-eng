@@ -210,31 +210,9 @@ func (inst *Store) AddPoint(point *Point, ignoreError bool) (*Point, error) {
 	var checked bool
 	if objectType == AnalogInput {
 		checked = true
-		//p := inst.Store.AI
-		//err = errNoObj(p, objectType)
-		//if err != nil {
-		//	return nil, err
-		//}
-		//err = inst.checkExisting(point, p.From, p.Count)
-		//if err != nil {
-		//	if !ignoreError {
-		//		return nil, err
-		//	}
-		//}
 	}
 	if objectType == AnalogOutput {
 		checked = true
-		//p := inst.Store.AO
-		//err = errNoObj(p, objectType)
-		//if err != nil {
-		//	return nil, err
-		//}
-		//err = inst.checkExisting(point, p.From, p.Count)
-		//if err != nil {
-		//	if !ignoreError {
-		//		return nil, err
-		//	}
-		//}
 	}
 
 	if objectType == AnalogVariable {
@@ -251,36 +229,6 @@ func (inst *Store) AddPoint(point *Point, ignoreError bool) (*Point, error) {
 			}
 		}
 	}
-
-	//if objectType == BinaryInput {
-	//	checked = true
-	//	p := inst.Store.BI
-	//	err = errNoObj(p, objectType)
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//	err = inst.checkExisting(point, p.From, p.Count)
-	//	if err != nil {
-	//		if !ignoreError {
-	//			return nil, err
-	//		}
-	//	}
-	//}
-	//
-	//if objectType == BinaryOutput {
-	//	checked = true
-	//	p := inst.Store.BO
-	//	err = errNoObj(p, objectType)
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//	err = inst.checkExisting(point, p.From, p.Count)
-	//	if err != nil {
-	//		if !ignoreError {
-	//			return nil, err
-	//		}
-	//	}
-	//}
 
 	if objectType == BinaryVariable {
 		checked = true

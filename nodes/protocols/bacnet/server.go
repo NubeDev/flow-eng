@@ -20,12 +20,14 @@ type Bacnet struct {
 
 type Server struct {
 	*node.Spec
-	clients       *clients
-	pingFailed    bool
-	pingLock      bool
-	reconnectedOk bool
-	store         *points.Store
-	application   names.ApplicationName
+	clients                *clients
+	pingFailed             bool
+	pingLock               bool
+	reconnectedOk          bool
+	store                  *points.Store
+	application            names.ApplicationName
+	loopCount              uint64
+	firstMessageFromBacnet bool
 }
 
 var runnersLock bool
@@ -61,7 +63,7 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	body.IsParent = true
 	body = node.BuildNode(body, nil, outputs, body.Settings)
 	clients := &clients{}
-	server := &Server{body, clients, false, false, false, opts.Store, application}
+	server := &Server{body, clients, false, false, false, opts.Store, application, 0, false}
 	server.clients.mqttClient = opts.MqttClient
 	body.SetSchema(BuildSchemaServer())
 	if application == names.Modbus {
@@ -71,7 +73,7 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 }
 
 func (inst *Server) Process() {
-	_, firstLoop := inst.Loop()
+	loopCount, firstLoop := inst.Loop()
 	if firstLoop {
 		go inst.subscribe()
 		go inst.mqttReconnect()
@@ -82,8 +84,11 @@ func (inst *Server) Process() {
 	}
 	if !runnersLock {
 		go inst.protocolRunner()
-		runnersLock = true
+		if loopCount == 1 {
+			runnersLock = true
+		}
 	}
+	inst.loopCount = loopCount
 
 }
 
@@ -118,6 +123,17 @@ func (inst *Server) updatePoint(objType points.ObjectType, id points.ObjectID, p
 		return nil
 	}
 	s.Set(setUUID(inst.GetID(), objType, id), point, 0)
+	return nil
+}
+
+// updateFromBACnet this is a value that has come from the bacnet-server over MQTT
+func (inst *Server) updateFromBACnet(objType points.ObjectType, id points.ObjectID, array *points.PriArray) error {
+	p, _ := inst.getPoint(objType, id)
+	if p != nil {
+		p.WriteValueFromBACnet = array
+		p.PendingWriteValueFromBACnet = true
+		inst.updatePoint(objType, id, p)
+	}
 	return nil
 }
 

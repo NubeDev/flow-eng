@@ -35,7 +35,9 @@ func NewPayload() *Payload {
 // bacnet/ao/1/pv -> "11.000000"
 // bacnet/ao/1/pri -> {Null,33.3,Null,Null,Null,Null,Null,Null,Null,Null,Null,Null,Null,Null,Null,11.000000}
 
-func (inst *Payload) NewMessage(msg interface{}) error {
+var ErrStopMQTTLoop = "mqtt bacnet message came from flow (stopping infinite loop)"
+
+func (inst *Payload) NewMessage(msg interface{}, ignoreLoop bool) error {
 	m, ok := msg.(*topics.Message)
 	if ok {
 		var decoded *BacnetPayload
@@ -43,9 +45,12 @@ func (inst *Payload) NewMessage(msg interface{}) error {
 		if decoded == nil || err != nil {
 			return errors.New("mqtt bacnet message failed to decode")
 		}
-		if decoded.UUID != "" {
-			return errors.New("mqtt bacnet message came from flow (stopping infinite loop)")
+		if !ignoreLoop {
+			if decoded.UUID != "" { // this is to stop looping, if the UUID is empty then we assume the message came from the bacnet and not from flow-eng
+				return errors.New(ErrStopMQTTLoop)
+			}
 		}
+
 		topic := m.Msg.Topic()
 		inst.topic = topic
 		id, err := objectId(topic)

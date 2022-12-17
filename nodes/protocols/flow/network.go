@@ -105,5 +105,4 @@ func (inst *Network) Process() {
 	if loopCount%50 == 0 { // get the points every 50 loops
 		inst.fetchPointsList()
 	}
-
 }

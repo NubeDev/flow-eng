@@ -17,7 +17,7 @@ func (inst *Server) modbusRunner(settings map[string]interface{}) {
 		log.Error(err)
 		return
 	}
-	port := "/dev/ttyUSB0"
+	port := "/dev/ttyAMA0"
 	if schema.Serial != "" {
 		port = schema.Serial
 	}
@@ -55,49 +55,23 @@ func modbusBulkWrite(pointsList []*points.Point) [8]float64 {
 	return out
 }
 
-func modbusBulkWrite2(pointsList []*points.Point) [8]float64 {
-	var out [8]float64
-	for i, point := range pointsList {
-		v := points.GetHighest(point.WriteValue)
-		if v != nil {
-			out[i] = v.Value
-		}
-	}
-	return out
-}
-
 func (inst *Server) modbusOutputsDispatch(cli *modbuscli.Modbus) {
 	pointsList := inst.GetModbusWriteablePoints()
 	if pointsList == nil {
-		//return
+
 	}
 	if len(pointsList.DeviceOne) > 0 {
 		err := cli.Write(1, modbusBulkWrite(pointsList.DeviceOne))
 		if err != nil {
 			log.Error(err)
 		}
-		//for _, point := range pointsList.DeviceOne {
-		//	//inst.store.CompletePendingWriteCount(point)
-		//}
 	}
-	if len(pointsList.DeviceTwo) > 1 {
-		err := cli.Write(2, modbusBulkWrite(pointsList.DeviceOne))
+	if len(pointsList.DeviceTwo) > 0 {
+		err := cli.Write(2, modbusBulkWrite(pointsList.DeviceTwo))
 		if err != nil {
 			log.Error(err)
 		}
-		//for _, point := range pointsList.DeviceOne {
-		//	inst.store.CompletePendingWriteCount(point)
-		//}
 	}
-	//if len(pointsList.DeviceTwo) > 0 {
-	//	err := cli.Write(2, modbusBulkWrite(pointsList.DeviceTwo))
-	//	if err != nil {
-	//		log.Error(err)
-	//	}
-	//	for _, point := range pointsList.DeviceOne {
-	//		inst.store.CompletePendingWriteCount(point)
-	//	}
-	//}
 
 }
 

@@ -2,7 +2,6 @@ package bacnetio
 
 import (
 	"fmt"
-	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
@@ -82,42 +81,69 @@ func (inst *AO) Process() {
 	}
 
 	in14, in15 := fromFlow(inst, inst.objectID)
-	if in14 != nil {
-		inst.WritePinFloat(node.Out, float.NonNil(in14), 2)
-	}
-	if in15 != nil {
-		inst.WritePinFloat(node.Out, float.NonNil(in15), 2)
-	}
-	p, _ := inst.getPoint(points.AnalogOutput, inst.objectID)
-	if p != nil {
-		p.WriteValue = points.NewPriArray(in14, in15)
-		v := points.GetHighest(p.WriteValue)
-		if v != nil {
-			p.PresentValue = v.Value
+	pnt := inst.writePointPri(points.AnalogOutput, inst.objectID, in14, in15)
+	if pnt != nil {
+		inst.WritePinFloat(node.Out, pnt.PresentValue, 2)
+		currentPriority := points.GetHighest(pnt.WriteValue)
+		if currentPriority != nil {
+			inst.WritePinFloat(node.CurrentPriority, float64(currentPriority.Number), 0)
 		}
-		inst.updatePoint(points.AnalogOutput, inst.objectID, p)
+	} else {
+		inst.WritePinNull(node.Out)
 	}
 
 }
 
 func (inst *AO) getPV(objType points.ObjectType, id points.ObjectID) (float64, error) {
-	pnt, ok := inst.getPoint(objType, id)
-	if ok {
+	pnt := inst.getPoint(objType, id)
+	if pnt != nil {
 		return pnt.PresentValue, nil
 	}
 	return 0, nil
 }
 
-func (inst *AO) getPoint(objType points.ObjectType, id points.ObjectID) (*points.Point, bool) {
+func (inst *AO) getPoint(objType points.ObjectType, id points.ObjectID) *points.Point {
 	s := inst.GetStore()
 	if s == nil {
-		return nil, false
+		return nil
 	}
 	d, ok := s.Get(setUUID(inst.ParentId, objType, id))
 	if ok {
-		return d.(*points.Point), true
+		return d.(*points.Point)
 	}
-	return nil, false
+	return nil
+}
+
+func (inst *AO) writePointPri(objType points.ObjectType, id points.ObjectID, in14, in15 *float64) *points.Point {
+	p := inst.getPoint(objType, id)
+	if p == nil {
+		return nil
+	}
+	if p.WriteValueFromBACnet != nil {
+		p.WriteValueFromBACnet.P14 = in14
+		p.WriteValueFromBACnet.P15 = in15
+		p.WriteValue = p.WriteValueFromBACnet
+		currentPriority := points.GetHighest(p.WriteValue)
+		if currentPriority != nil {
+			p.PresentValue = currentPriority.Value
+		}
+		inst.updatePoint(objType, id, p)
+		return p
+	} else {
+		if p.WriteValue == nil {
+			p.WriteValue = points.NewPriArray(in14, in15)
+		} else {
+			p.WriteValue.P14 = in14
+			p.WriteValue.P15 = in15
+		}
+		currentPriority := points.GetHighest(p.WriteValue)
+		if currentPriority != nil {
+			p.PresentValue = currentPriority.Value
+		}
+		inst.updatePoint(objType, id, p)
+		return p
+	}
+
 }
 
 func (inst *AO) updatePoint(objType points.ObjectType, id points.ObjectID, point *points.Point) error {

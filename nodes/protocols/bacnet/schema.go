@@ -12,7 +12,8 @@ type serverSchema struct {
 	Serial      schemas.EnumString `json:"serial"`
 }
 
-var serialPorts = []string{"485-1", "485-2", "SIDE-485-PORT", "/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyAMA0"}
+var serialOptions = []string{"485-1", "485-2", "SIDE-485-PORT", "/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyAMA0"}
+var serialPorts = []string{"/dev/ttyUSB0", "/dev/ttyAMA0", "/dev/ttyAMA0", "/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyAMA0"}
 
 func BuildSchemaServer() *schemas.Schema {
 	props := &serverSchema{}
@@ -22,8 +23,8 @@ func BuildSchemaServer() *schemas.Schema {
 	props.DeviceCount.Options = []string{"0", "1", "2", "3", "4"}
 
 	props.Serial.Title = "serial-port (baud-rate:38400)"
-	props.Serial.Default = serialPorts[0]
-	props.Serial.EnumName = serialPorts
+	props.Serial.Default = serialOptions[0]
+	props.Serial.EnumName = serialOptions
 	props.Serial.Options = serialPorts
 	schema.Set(props)
 	s := &schemas.Schema{
