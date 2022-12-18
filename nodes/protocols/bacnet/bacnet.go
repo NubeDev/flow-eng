@@ -19,3 +19,12 @@ func buildPayload(value string, valueFloat float64) string {
 	}
 	return string(p)
 }
+
+func buildPayloadName(value string) string {
+	payload := &points.BacnetPayload{Value: value, UUID: helpers.ShortUUID("pay")}
+	p, err := json.Marshal(payload)
+	if err != nil {
+		return ""
+	}
+	return string(p)
+}

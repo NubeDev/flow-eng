@@ -5,7 +5,8 @@ import (
 )
 
 type Point struct {
-	UUID                        string                `json:"uuid"`
+	UUID                        string `json:"uuid"`
+	Name                        string
 	Application                 names.ApplicationName `json:"application"`
 	ObjectType                  ObjectType            `json:"objectType"`
 	ObjectID                    ObjectID
@@ -20,9 +21,10 @@ type Point struct {
 	PendingWriteValueFromBACnet bool
 	PendingWriteCount           uint64
 	PendingMQTTPublish          bool
-
-	ModbusDevAddr  int
-	ModbusRegister int
+	InError                     bool
+	Message                     string
+	ModbusDevAddr               int
+	ModbusRegister              int
 }
 
 type ModbusPoints struct {

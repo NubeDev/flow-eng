@@ -1,7 +1,7 @@
 package bacnetio
 
 import (
-	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
@@ -38,20 +38,6 @@ func NewAO(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	}, err
 }
 
-func (inst *AO) setName() {
-	name, null := inst.ReadPinAsString(node.Name)
-	if null {
-		name = fmt.Sprintf("%s_%d", inst.objectType, inst.objectID)
-	}
-	topic := fmt.Sprintf("%s/write/name", topicBuilder(inst.objectType, inst.objectID))
-	payload := buildPayload(name, 0)
-	if payload != "" {
-		err := inst.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload)
-		if err != nil {
-		}
-	}
-}
-
 func (inst *AO) setObjectId() {
 	id, _ := inst.ReadPinAsInt(node.ObjectId)
 	inst.objectID = points.ObjectID(id)
@@ -64,7 +50,6 @@ func (inst *AO) Process() {
 	}
 	if firstLoop {
 		inst.setObjectId()
-		go inst.setName()
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
 		settings, err := getSettings(inst.GetSettings())
 		ioType := settings.Io
@@ -73,6 +58,7 @@ func (inst *AO) Process() {
 		}
 		inst.toFlowOptions.precision = settings.Decimal
 		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true, inst.application)
+		point.Name = inst.GetNodeName()
 		point, err = inst.store.AddPoint(point, false)
 		if err != nil {
 			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
@@ -91,7 +77,17 @@ func (inst *AO) Process() {
 	} else {
 		inst.WritePinNull(node.Out)
 	}
+}
 
+func scaleAO(value float64, isBO bool) float64 {
+	if isBO {
+		if value > 0 {
+			return 10
+		} else {
+			return 0
+		}
+	}
+	return float.Scale(value, 0, 100, 0, 10)
 }
 
 func (inst *AO) getPV(objType points.ObjectType, id points.ObjectID) (float64, error) {

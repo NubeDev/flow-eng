@@ -28,6 +28,7 @@ type Server struct {
 	application            names.ApplicationName
 	loopCount              uint64
 	firstMessageFromBacnet bool
+	deviceCount            string
 }
 
 var runnersLock bool
@@ -57,13 +58,12 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	var err error
 	body = node.Defaults(body, serverNode, category)
 	//inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs))
-	outputApplication := node.BuildOutput(node.Msg, node.TypeString, nil, body.Outputs)
-	outputErr := node.BuildOutput(node.ErrMsg, node.TypeString, nil, body.Outputs)
-	outputs := node.BuildOutputs(outputApplication, outputErr)
+	outputMsg := node.BuildOutput(node.Msg, node.TypeString, nil, body.Outputs)
+	outputs := node.BuildOutputs(outputMsg)
 	body.IsParent = true
 	body = node.BuildNode(body, nil, outputs, body.Settings)
 	clients := &clients{}
-	server := &Server{body, clients, false, false, false, opts.Store, application, 0, false}
+	server := &Server{body, clients, false, false, false, opts.Store, application, 0, false, ""}
 	server.clients.mqttClient = opts.MqttClient
 	body.SetSchema(BuildSchemaServer())
 	if application == names.Modbus {
@@ -75,8 +75,16 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 func (inst *Server) Process() {
 	loopCount, firstLoop := inst.Loop()
 	if firstLoop {
+		go inst.setMessage()
 		go inst.subscribe()
 		go inst.mqttReconnect()
+		p, ok := inst.getPoints()
+		if ok {
+			for _, point := range p {
+				go inst.mqttPublishNames(point)
+			}
+		}
+
 	}
 	if inst.pingFailed || inst.reconnectedOk { // on failed resubscribe
 	}
@@ -89,7 +97,14 @@ func (inst *Server) Process() {
 		}
 	}
 	inst.loopCount = loopCount
-
+	if loopCount%100 == 0 {
+		p, ok := inst.getPoints()
+		if ok {
+			for _, point := range p {
+				go inst.mqttPublishNames(point)
+			}
+		}
+	}
 }
 
 func setUUID(parentID string, objType points.ObjectType, id points.ObjectID) string {
@@ -176,7 +191,7 @@ func (inst *Server) getPoints() ([]*points.Point, bool) {
 			}
 		}
 	}
-	return pointsList, false
+	return pointsList, true
 }
 
 func (inst *Server) getPoint(objType points.ObjectType, id points.ObjectID) (*points.Point, bool) {
@@ -234,4 +249,14 @@ func (inst *Server) GetModbusWriteablePoints() *points.ModbusPoints {
 		}
 	}
 	return out
+}
+
+func (inst *Server) setMessage() {
+	schema, err := GetBacnetSchema(inst.GetSettings())
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	log.Infof("start modbus polling on port: %s", schema.Serial)
+	inst.WritePin(node.Msg, fmt.Sprintf("port:%s & %s:IO16s", schema.Serial, schema.DeviceCount))
 }

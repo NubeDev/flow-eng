@@ -1,9 +1,11 @@
 package bacnetio
 
 import (
+	"fmt"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/services/modbuscli"
 	"github.com/NubeIO/nubeio-rubix-lib-modbus-go/modbus"
+	"github.com/enescakir/emoji"
 	log "github.com/sirupsen/logrus"
 	"time"
 )
@@ -15,6 +17,8 @@ func (inst *Server) modbusRunner(settings map[string]interface{}) {
 	schema, err := GetBacnetSchema(settings)
 	if err != nil {
 		log.Error(err)
+		inst.SetStatusError("failed to set node settings")
+		inst.SetErrorIcon(string(emoji.RedCircle))
 		return
 	}
 	port := "/dev/ttyAMA0"
@@ -27,9 +31,10 @@ func (inst *Server) modbusRunner(settings map[string]interface{}) {
 			SerialPort: port,
 		},
 	}
-	log.Infof("start modbus polling on port: %s", port)
 	init, err := cli.Init(cli)
 	if err != nil {
+		inst.SetStatusError(fmt.Sprintf("failed to set serial port: %s", port))
+		inst.SetErrorIcon(string(emoji.RedCircle))
 		log.Error(err)
 		return
 	}
@@ -49,7 +54,18 @@ func modbusBulkWrite(pointsList []*points.Point) [8]float64 {
 	for i, point := range pointsList {
 		v := points.GetHighest(point.WriteValue)
 		if v != nil {
-			out[i] = v.Value
+			var value = v.Value
+			if point.ObjectType == points.AnalogOutput {
+				if value >= 10 {
+					value = 10
+				}
+				if point.IoType == points.IoTypeDigital {
+					if value > 0 {
+						value = 10
+					}
+				}
+			}
+			out[i] = value
 		}
 	}
 	return out
