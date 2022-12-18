@@ -6,6 +6,6 @@ import (
 )
 
 func Test_scaleBetween(t *testing.T) {
-	a := Scale(1, 1, 1, 1, 1)
+	a := Scale(100, 0, 100, 0, 10)
 	fmt.Println(a)
 }
