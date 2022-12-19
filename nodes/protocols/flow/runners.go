@@ -11,11 +11,14 @@ import (
 
 func (inst *Network) subscribe() {
 	callback := func(client mqtt.Client, message mqtt.Message) {
+		log.Infof("Flow Network subscribe(): %+v", message)
 		s := inst.GetStore()
 		children, ok := s.Get(inst.GetID())
 		payloads := getPayloads(children, ok)
 		for _, payload := range payloads {
-			if payload.topic == fixTopic(message.Topic()) {
+			fixedTopic, pntUUID := fixTopic(message.Topic())
+			payload.pointUUID = pntUUID
+			if payload.topic == fixedTopic {
 				n := inst.GetNode(payload.nodeUUID)
 				if n != nil {
 					n.SetPayload(&node.Payload{
@@ -81,14 +84,44 @@ func (inst *Network) pointsList() {
 	}
 }
 
+const fetchSelectedPointsCOVTopic = "rubix/platform/points/cov/selected"
+
 func (inst *Network) fetchAllPointValues() {
-	var topic = "rubix/platform/points"
+	log.Infof("Flow Network fetchAllPointValues()")
+	s := inst.GetStore()
+	children, ok := s.Get(inst.GetID())
+	payloads := getPayloads(children, ok)
+	var pointUUIDList []*MqttPoint
+	for _, payload := range payloads {
+		if payload.pointUUID != "" {
+			pnt := MqttPoint{
+				PointUUID: payload.pointUUID,
+			}
+			exists := false
+			for _, val := range pointUUIDList {
+				if val != nil && val.PointUUID == pnt.PointUUID {
+					exists = true
+					break
+				}
+			}
+			if !exists {
+				pointUUIDList = append(pointUUIDList, &pnt)
+			}
+
+		}
+	}
+	log.Infof("Flow Network fetchAllPointValues() pointUUIDList: %+v", pointUUIDList)
+	data, err := json.Marshal(pointUUIDList)
+	if err != nil {
+		log.Errorf("Flow Network fetchAllPointValues() json marshal err: %s", err.Error())
+		return
+	}
+	log.Infof("Flow Network fetchAllPointValues() data: %+v", data)
 	if inst.mqttClient != nil {
-		err := inst.mqttClient.Publish(topic, mqttQOS, false, "")
+		fmt.Println("Flow Network fetchAllPointValues()", string(data))
+		err := inst.mqttClient.Publish(fetchSelectedPointsCOVTopic, mqttQOS, mqttRetain, data)
 		if err != nil {
-			log.Errorf("Flow Network fetchPointsList(): %s err: %s", topic, err.Error())
-		} else {
-			log.Infof("Flow Network fetchPointsList(): %s", topic)
+			log.Errorf("Flow Network fetchAllPointValues() mqtt publish err: %s", err.Error())
 		}
 	}
 }
