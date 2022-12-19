@@ -24,7 +24,7 @@ var mqttQOS = mqttclient.AtMostOnce
 var mqttRetain = false
 
 func NewNetwork(body *node.Spec) (node.Node, error) {
-	//var err error
+	// var err error
 	body = node.Defaults(body, flowNetwork, category)
 	inputs := node.BuildInputs()
 	outputs := node.BuildOutputs(node.BuildOutput(node.Connected, node.TypeBool, nil, body.Outputs))
@@ -99,10 +99,12 @@ func (inst *Network) Process() {
 	} else {
 		inst.WritePinFalse(node.Connected)
 	}
-	if loopCount > 1 {
+	if loopCount > 2 {
 		go inst.publish(loopCount)
 	}
 	if loopCount%50 == 0 { // get the points every 50 loops
 		inst.fetchPointsList()
+	} else if loopCount%110 == 0 { // refresh point COV
+		inst.fetchAllPointValues()
 	}
 }

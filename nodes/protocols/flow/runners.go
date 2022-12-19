@@ -81,6 +81,18 @@ func (inst *Network) pointsList() {
 	}
 }
 
+func (inst *Network) fetchAllPointValues() {
+	var topic = "rubix/platform/points"
+	if inst.mqttClient != nil {
+		err := inst.mqttClient.Publish(topic, mqttQOS, false, "")
+		if err != nil {
+			log.Errorf("Flow Network fetchPointsList(): %s err: %s", topic, err.Error())
+		} else {
+			log.Infof("Flow Network fetchPointsList(): %s", topic)
+		}
+	}
+}
+
 func spitPointNames(names string) []string {
 	s := strings.Split(names, ":")
 	if len(s) == 4 {
@@ -115,26 +127,18 @@ func (inst *Network) publish(loopCount uint64) {
 			continue
 		}
 
-		var inputValueUpdated bool
-		in1COV, _ := n.InputUpdated(node.In1)
-		in2COV, _ := n.InputUpdated(node.In10)
-		in3COV, _ := n.InputUpdated(node.In15)
-		in4COV, _ := n.InputUpdated(node.In16)
-		if in1COV || in2COV || in3COV || in4COV {
-			inputValueUpdated = true
-		}
-		if !inputValueUpdated {
-			if loopCount%50 == 0 { // republish every 50 loops
-			} else { // skip as no input value was updated
-				continue
-			}
+		republishLoop := false
+		if loopCount%100 == 0 { // republish every 100 loops
+			republishLoop = true
+			log.Infof("Flow Network publish(): REPUBLISH LOOP!")
 		}
 
 		priority := map[string]*float64{}
 		// TODO: Replace this next bit with Priority Array evaluation
 		if n.GetName() == flowPointWrite {
 			ffPointWriteNode := n.(*FFPointWrite)
-			priority = ffPointWriteNode.EvaluateInputsArray()
+
+			priority = ffPointWriteNode.EvaluateInputsArray(republishLoop)
 			if len(priority) <= 0 && loopCount != 2 {
 				continue
 			}
@@ -152,7 +156,7 @@ func (inst *Network) publish(loopCount uint64) {
 				continue
 			}
 			if inst.mqttClient != nil {
-				// fmt.Println("MQTT publish", string(data))
+				fmt.Println("MQTT publish", string(data))
 				err := inst.mqttClient.Publish(pointWriteTopic, mqttQOS, mqttRetain, data)
 				if err != nil {
 					log.Errorf("Flow Network publish() err: %s", err.Error())
