@@ -121,8 +121,9 @@ const (
 	Ok OutputName = "ok"
 	//Result OutputName = "result"
 
-	ErrMsg OutputName = "error"
-	Msg    OutputName = "message"
+	ErrMsg       OutputName = "error"
+	Msg          OutputName = "message"
+	PollingCount OutputName = "polling-count"
 
 	FlatLine OutputName = "flatline"
 

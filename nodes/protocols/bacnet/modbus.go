@@ -38,9 +38,10 @@ func (inst *Server) modbusRunner(settings map[string]interface{}) {
 		log.Error(err)
 		return
 	}
-	var count int
+	var count float64
 	for {
-		log.Infof("modbus polling loop count: %d application-type: %s", count, inst.application)
+		log.Infof("modbus polling loop count: %f application-type: %s", count, inst.application)
+		inst.pollingCount = count
 		pointsListRead, _ := inst.getPointsReadOnly()
 		inst.modbusInputsRunner(init, pointsListRead) // process the inputs
 		inst.modbusOutputsDispatch(init)              // process the outs
