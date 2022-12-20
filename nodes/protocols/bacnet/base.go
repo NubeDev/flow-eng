@@ -74,25 +74,27 @@ func nodeDefault(body *node.Spec, nodeName, category string, application names.A
 	var err error
 	body = node.Defaults(body, nodeName, category)
 	_, isWriteable, _, err := getBacnetType(nodeName)
-	pointName := node.BuildInput(node.Name, node.TypeString, nil, body.Inputs)
+	//pointName := node.BuildInput(node.Name, node.TypeString, nil, body.Inputs)
 	objectIDInput := node.BuildInput(node.ObjectId, node.TypeFloat, 0, body.Inputs)
 	var inputs []*node.Input
 	if isWriteable {
 		if body.GetName() == bacnetBV || body.GetName() == bacnetBO {
 			in14 := node.BuildInput(node.In14, node.TypeBool, nil, body.Inputs)
 			in15 := node.BuildInput(node.In15, node.TypeBool, nil, body.Inputs)
-			inputs = node.BuildInputs(pointName, objectIDInput, in14, in15)
+			inputs = node.BuildInputs(objectIDInput, in14, in15)
 		} else {
 			in14 := node.BuildInput(node.In14, node.TypeFloat, nil, body.Inputs)
 			in15 := node.BuildInput(node.In15, node.TypeFloat, nil, body.Inputs)
-			inputs = node.BuildInputs(pointName, objectIDInput, in14, in15)
+			inputs = node.BuildInputs(objectIDInput, in14, in15)
 		}
 
 	} else {
-		overrideInput := node.BuildInput(node.OverrideInput, node.TypeFloat, nil, body.Inputs)
-		inputs = node.BuildInputs(pointName, objectIDInput, overrideInput)
+		//overrideInput := node.BuildInput(node.OverrideInput, node.TypeFloat, nil, body.Inputs)
+		inputs = node.BuildInputs(objectIDInput)
 	}
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
+	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
+	currentPriority := node.BuildOutput(node.CurrentPriority, node.TypeFloat, nil, body.Outputs)
+	outputs := node.BuildOutputs(out, currentPriority)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return body, err
 }

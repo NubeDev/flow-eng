@@ -166,14 +166,15 @@ func (p *Flow) nodeConnector(nodeId string, makeConnection bool) error {
 			connectionOutputId := input.Connection.NodeID     // const node nodeId
 			if connectionOutputName != "" {
 				outputNode := p.GetNode(connectionOutputId) //this is the const node
-				for _, output := range outputNode.GetOutputs() {
-					if output.Name == connectionOutputName {
-						if makeConnection {
-							output.Connect(input)
+				if outputNode != nil {
+					for _, output := range outputNode.GetOutputs() {
+						if output.Name == connectionOutputName {
+							if makeConnection {
+								output.Connect(input)
+							}
+							log.Infof("make node connections: %s:%s -> %s:%s", outputNode.GetName(), output.Name, getNode.GetName(), input.Name)
 						}
-						log.Infof("make node connections: %s:%s -> %s:%s", outputNode.GetName(), output.Name, getNode.GetName(), input.Name)
 					}
-
 				}
 			}
 		}

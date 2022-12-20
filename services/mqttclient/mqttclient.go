@@ -72,10 +72,10 @@ func (c *Client) Close() {
 
 // Subscribe to topic
 func (c *Client) Subscribe(topic string, qos QOS, handler mqtt.MessageHandler) (err error) {
-	log.Infof("mqtt-susbcribe %s", topic)
+	log.Infof("MQTT Client: Subscribe() topic: %s", topic)
 	token := c.client.Subscribe(topic, byte(qos), handler)
 	if token.WaitTimeout(2*time.Second) == false {
-		return errors.New("mqtt subscribe timout, after 2 seconds")
+		return errors.New("MQTT Client: Subscribe() err: timout, after 2 seconds")
 	}
 	if token.Error() != nil {
 		return token.Error()
@@ -119,7 +119,7 @@ func (c *Client) Publish(topic string, qos QOS, retain bool, payload interface{}
 	if c != nil {
 		token := c.client.Publish(topic, byte(qos), retain, payload)
 		if token.WaitTimeout(2*time.Second) == false {
-			return errors.New("mqtt publish timout, after 2 seconds")
+			return errors.New("MQTT Client: Publish() timout, after 2 seconds")
 		}
 		if token.Error() != nil {
 			return token.Error()

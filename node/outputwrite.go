@@ -40,6 +40,17 @@ func (n *Spec) WritePinFloat(name OutputName, value float64, precision ...int) {
 	}
 }
 
+// WritePinInt write an as in int
+func (n *Spec) WritePinInt(name OutputName, value int) {
+	out := n.GetOutput(name)
+	if out == nil {
+		return
+	}
+	if name == out.Name {
+		out.Write(value)
+	}
+}
+
 func (n *Spec) WritePinFalse(name OutputName) {
 	out := n.GetOutput(name)
 	if out == nil {

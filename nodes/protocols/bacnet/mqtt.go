@@ -7,7 +7,9 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/topics"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/enescakir/emoji"
 	log "github.com/sirupsen/logrus"
+	"strings"
 	"time"
 )
 
@@ -22,6 +24,8 @@ func (inst *Server) mqttReconnect() {
 		if err != nil {
 			log.Errorf("bacnet-server failed to reconnect with mqtt broker")
 			inst.reconnectedOk = false
+			inst.SetWaringMessage("bacnet-server failed to reconnect with mqtt broker")
+			inst.SetWaringIcon(string(emoji.OrangeCircle))
 		} else {
 			inst.reconnectedOk = true
 		}
@@ -34,9 +38,10 @@ func (inst *Server) subscribeToBacnetServer() {
 	callback := func(client mqtt.Client, message mqtt.Message) {
 		mes := &topics.Message{UUID: helpers.ShortUUID("bus"), Msg: message}
 		if topics.IsPri(message.Topic()) {
-			err := fromBacnet(mes, inst.store)
+			err := inst.fromBacnet(mes)
+			log.Infof("mqtt-bacnet message from server topic: %s -> value: %s", mes.Msg.Topic(), string(mes.Msg.Payload()))
 			if err != nil {
-				log.Error(err)
+				//log.Error(err)
 			}
 		}
 	}
@@ -71,17 +76,53 @@ func (inst *Server) mqttPublishPV(point *points.Point) error {
 	topic := fmt.Sprintf("bacnet/%s/%d/write/pv", obj, objectId) // bacnet/ao/1/write/pv
 	//topic := fmt.Sprintf("bacnet/%s/%d/write/pri/15", obj, objectId) // bacnet/ao/1/write/pv
 	payload := buildPayload("", point.PresentValue)
-	log.Infof("topic: %s -> value: %s", topic, payload)
+	log.Infof("mqtt-bacnet publish topic: %s -> value: %s", topic, payload)
 	if payload != "" {
 		err = inst.clients.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload)
 		if err != nil {
 			log.Errorf("bacnet-server: mqtt publish err: %s", err.Error())
 			return err
 		} else {
-			inst.store.CompleteMQTTPublish(point)
 		}
 	}
 	return nil
+}
+
+type bacnetName struct {
+	name string
+	uuid string
+}
+
+// mqttPublishNames write the point names to the server
+func (inst *Server) mqttPublishNames(point *points.Point) {
+	if point == nil {
+		log.Error("failed to find point to publish bacnet name to server")
+		return
+	}
+	objectType := point.ObjectType
+	objectId := point.ObjectID
+	obj, err := points.ObjectSwitcher(objectType)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	topic := fmt.Sprintf("bacnet/%s/%d/write/name", obj, objectId) // bacnet/ao/1/write/pv
+	//topic := fmt.Sprintf("bacnet/%s/%d/write/pri/15", obj, objectId) // bacnet/ao/1/write/pv
+	name := point.Name
+	if name == "" {
+		name = fmt.Sprintf("%s_%d", obj, objectId)
+		name = strings.ToUpper(name)
+	}
+	payload := buildPayloadName(name)
+	log.Infof("mqtt-bacnet publish name topic: %s -> value: %s", topic, payload)
+	if payload != "" {
+		err = inst.clients.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload)
+		if err != nil {
+			log.Errorf("bacnet-server: mqtt publish err: %s", err.Error())
+			return
+		}
+	}
+	return
 }
 
 func getTopic(msg interface{}) string {
@@ -96,6 +137,36 @@ func decode(msg interface{}) *topics.Message {
 	m, ok := msg.(*topics.Message)
 	if ok {
 		return m
+	}
+	return nil
+}
+
+func (inst *Server) fromBacnet(msg interface{}) error {
+	var err error
+	payload := points.NewPayload()
+	if payload == nil {
+		return errors.New("mqtt-payload message from bacnet-server failed to get payload")
+	}
+	if !inst.firstMessageFromBacnet { // this is to try and get the bacnet-server's last value sent from another bacnet master
+		err = payload.NewMessage(msg, true)
+		if err == nil {
+			inst.firstMessageFromBacnet = true
+		}
+	} else {
+		err = payload.NewMessage(msg, false)
+	}
+	if err != nil {
+		return err
+	}
+	topic := payload.GetTopic()
+	objectType, objectId := payload.GetObjectID()
+	point, _ := inst.getPoint(objectType, objectId)
+	if point == nil {
+		return errors.New(fmt.Sprintf("mqtt-payload-priorty-array no point-found in store for type:%s-%d", objectType, objectId))
+	}
+	if topics.IsPri(topic) {
+		value := payload.GetFullPriority()
+		inst.updateFromBACnet(objectType, objectId, value)
 	}
 	return nil
 }

@@ -197,6 +197,12 @@ func (inst *Store) AddPoint(point *Point, ignoreError bool) (*Point, error) {
 	if point.ObjectType == AnalogOutput {
 		addr, _ := ModbusBuildOutput(point.IoType, point.ObjectID)
 		point.ModbusDevAddr = addr.DeviceAddr
+		if point.IoType == IoTypeDigital {
+			point.ModbusRegister = addr.Volt
+		}
+		if point.IoType == IoTypeVolts {
+			point.ModbusRegister = addr.Volt
+		}
 		point.Application = names.Modbus
 
 	}
@@ -204,31 +210,9 @@ func (inst *Store) AddPoint(point *Point, ignoreError bool) (*Point, error) {
 	var checked bool
 	if objectType == AnalogInput {
 		checked = true
-		//p := inst.Store.AI
-		//err = errNoObj(p, objectType)
-		//if err != nil {
-		//	return nil, err
-		//}
-		//err = inst.checkExisting(point, p.From, p.Count)
-		//if err != nil {
-		//	if !ignoreError {
-		//		return nil, err
-		//	}
-		//}
 	}
 	if objectType == AnalogOutput {
 		checked = true
-		//p := inst.Store.AO
-		//err = errNoObj(p, objectType)
-		//if err != nil {
-		//	return nil, err
-		//}
-		//err = inst.checkExisting(point, p.From, p.Count)
-		//if err != nil {
-		//	if !ignoreError {
-		//		return nil, err
-		//	}
-		//}
 	}
 
 	if objectType == AnalogVariable {
@@ -245,36 +229,6 @@ func (inst *Store) AddPoint(point *Point, ignoreError bool) (*Point, error) {
 			}
 		}
 	}
-
-	//if objectType == BinaryInput {
-	//	checked = true
-	//	p := inst.Store.BI
-	//	err = errNoObj(p, objectType)
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//	err = inst.checkExisting(point, p.From, p.Count)
-	//	if err != nil {
-	//		if !ignoreError {
-	//			return nil, err
-	//		}
-	//	}
-	//}
-	//
-	//if objectType == BinaryOutput {
-	//	checked = true
-	//	p := inst.Store.BO
-	//	err = errNoObj(p, objectType)
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//	err = inst.checkExisting(point, p.From, p.Count)
-	//	if err != nil {
-	//		if !ignoreError {
-	//			return nil, err
-	//		}
-	//	}
-	//}
 
 	if objectType == BinaryVariable {
 		checked = true
@@ -316,7 +270,7 @@ func (inst *Store) checkExisting(point *Point, from, to int) error {
 		return err
 	}
 	// check if there is a free address
-	err = inst.CheckExistingPointErr(point)
+	//err = inst.CheckExistingPointErr(point)
 	if err != nil {
 		return err
 	}
