@@ -11,7 +11,7 @@ import (
 
 func (inst *Network) subscribe() {
 	callback := func(client mqtt.Client, message mqtt.Message) {
-		log.Infof("Flow Network subscribe(): %+v", message)
+		// log.Infof("Flow Network subscribe(): %+v", message)
 		s := inst.GetStore()
 		children, ok := s.Get(inst.GetID())
 		payloads := getPayloads(children, ok)
@@ -164,7 +164,7 @@ func (inst *Network) publish(loopCount uint64) {
 		republishLoop := false
 		if loopCount%100 == 0 { // republish every 100 loops
 			republishLoop = true
-			log.Infof("Flow Network publish(): REPUBLISH LOOP!")
+			// log.Infof("Flow Network publish(): REPUBLISH LOOP!")
 		}
 
 		priority := map[string]*float64{}
@@ -190,7 +190,7 @@ func (inst *Network) publish(loopCount uint64) {
 				continue
 			}
 			if inst.mqttClient != nil {
-				fmt.Println("MQTT publish", string(data))
+				// fmt.Println("MQTT publish", string(data))
 				err := inst.mqttClient.Publish(pointWriteTopic, mqttQOS, mqttRetain, data)
 				if err != nil {
 					log.Errorf("Flow Network publish() err: %s", err.Error())
