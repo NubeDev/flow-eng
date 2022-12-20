@@ -2,6 +2,7 @@ package pid
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"time"
 )
@@ -66,30 +67,10 @@ func NewPid(input, setpoint, p, i, d, intervalSecs float64, dir PID_DIRECTION) *
 	interval := intervalSecs * 1000
 	last := float64(time.Now().UnixMilli()) - (interval)
 
-	pid := &Pid{input, setpoint, 0, MANUAL, dir, 0, interval, p, i, d, last, 0, 0, 0, 0, input, 0, 0, 100, false}
-	pid.Compute()
+	newPid := &Pid{input, setpoint, 0, MANUAL, dir, 0, interval, p, i, d, last, 0, 0, 0, 0, input, 0, 0, 100, false}
+	newPid.Compute()
 
-	return pid
-}
-
-func (pid Pid) setInput(newInput float64) error {
-	pid.input = newInput
-	return nil
-}
-
-func (pid Pid) setSetpoint(newSetpoint float64) error {
-	pid.setpoint = newSetpoint
-	return nil
-}
-
-func (pid Pid) setBias(newBias float64) error {
-	if newBias > pid.outMax {
-		pid.bias = pid.outMax // POSSIBLY INCORRECT
-	} else if newBias < pid.outMin {
-		pid.bias = pid.outMin
-	}
-	pid.bias = newBias
-	return nil
+	return newPid
 }
 
 /**
@@ -100,52 +81,75 @@ func (pid Pid) setBias(newBias float64) error {
  * false when nothing has been done.
  */
 
-func (pid Pid) Compute() (computed bool, err error) {
-	if !pid.inAuto {
+func (p Pid) Compute() (computed bool, err error) {
+	fmt.Println("PID Compute()")
+	fmt.Println(fmt.Sprintf("PID Compute() inAuto: %t", p.inAuto))
+	if !p.inAuto {
 		return false, errors.New("pid controller is not enabled")
 	}
 
 	now := float64(time.Now().UnixMilli())
-	timeChange := now - pid.lastTime
-	if timeChange >= pid.intervalMillis {
+	timeChange := now - p.lastTime
+	if timeChange >= p.intervalMillis {
 		// Compute all the working error variables
-		input := pid.input
-		// var error = pid.mySetpoint - input
-		errorAmount := input - pid.setpoint // above setpoint = positive error
+		input := p.input
+		// var error = p.mySetpoint - input
+		errorAmount := input - p.setpoint // above setpoint = positive error
 		directionMultiplier := float64(1)
-		if pid.direction {
+		if p.direction {
 			directionMultiplier = -1
 		}
 		errorAmount = errorAmount * directionMultiplier
 
-		pid.iTerm += pid.kp * errorAmount
-		if pid.iTerm > pid.outMax-pid.bias {
-			pid.iTerm = pid.outMax - pid.bias
-		} else if pid.iTerm < pid.outMin-pid.bias {
-			pid.iTerm = pid.outMin - pid.bias
+		p.iTerm += p.kp * errorAmount
+		if p.iTerm > p.outMax-p.bias {
+			p.iTerm = p.outMax - p.bias
+		} else if p.iTerm < p.outMin-p.bias {
+			p.iTerm = p.outMin - p.bias
 		}
 
-		dInput := input - pid.lastInput
+		dInput := input - p.lastInput
 
 		// Compute PID Output
-		// var output = ((pid.kp * error) + pid.iTerm - (pid.kd * dInput)) * pid.setDirection
-		output := pid.kp*errorAmount + pid.iTerm - pid.kd*dInput + pid.bias
-		// var output = ((pid.kp * error) + pid.iTerm - (pid.kd * dInput))
+		// var output = ((p.kp * error) + p.iTerm - (p.kd * dInput)) * p.setDirection
+		output := p.kp*errorAmount + p.iTerm - p.kd*dInput + p.bias
+		// var output = ((p.kp * error) + p.iTerm - (p.kd * dInput))
 
-		if output > pid.outMax {
-			output = pid.outMax
-		} else if output < pid.outMin {
-			output = pid.outMin
+		if output > p.outMax {
+			output = p.outMax
+		} else if output < p.outMin {
+			output = p.outMin
 		}
-		pid.output = output
+		p.output = output
 
 		// Remember some variables for next time
-		pid.lastInput = input
-		pid.lastTime = now
+		p.lastInput = input
+		p.lastTime = now
+		fmt.Println(fmt.Sprintf("PID Compute() output: %f", p.output))
 		return true, nil
 	} else {
 		return false, nil
 	}
+}
+
+func (p Pid) SetInput(newInput float64) error {
+	p.input = newInput
+	return nil
+}
+
+func (p Pid) SetSetpoint(newSetpoint float64) error {
+	p.setpoint = newSetpoint
+	return nil
+}
+
+func (p Pid) SetBias(newBias float64) error {
+	if newBias > p.outMax {
+		p.bias = p.outMax // POSSIBLY INCORRECT
+	} else if newBias < p.outMin {
+		p.bias = p.outMin
+	}
+	p.bias = newBias
+	return nil
 }
 
 /**
@@ -154,23 +158,23 @@ func (pid Pid) Compute() (computed bool, err error) {
  * it's called automatically from the constructor, but tunings can also
  * be adjusted on the fly during normal operation
  */
-func (pid Pid) setTunings(Kp, Ki, Kd float64) error {
+func (p Pid) SetTunings(Kp, Ki, Kd float64) error {
 	if Kp < 0 || Ki < 0 || Kd < 0 {
 		return errors.New("invalid value: all tuning values must be positive")
 	}
 
-	pid.displayP = Kp
-	pid.displayI = Ki
-	pid.displayD = Kd
+	p.displayP = Kp
+	p.displayI = Ki
+	p.displayD = Kd
 
 	if Ki == 0 {
-		pid.iTerm = 0
+		p.iTerm = 0
 	}
 
-	SampleTimeInSec := pid.intervalMillis / 1000
-	pid.kp = Kp
-	pid.ki = Ki * SampleTimeInSec
-	pid.kd = Kd / SampleTimeInSec
+	SampleTimeInSec := p.intervalMillis / 1000
+	p.kp = Kp
+	p.ki = Ki * SampleTimeInSec
+	p.kd = Kd / SampleTimeInSec
 
 	return nil
 }
@@ -179,12 +183,12 @@ func (pid Pid) setTunings(Kp, Ki, Kd float64) error {
  * SetSampleTime(...)
  * sets the period, in Milliseconds, at which the calculation is performed
  */
-func (pid Pid) setSampleTime(newIntervalMillis float64) error {
+func (p Pid) SetSampleTime(newIntervalMillis float64) error {
 	if newIntervalMillis > 0 {
-		var ratio = newIntervalMillis / (1.0 * pid.intervalMillis)
-		pid.ki *= ratio
-		pid.kd /= ratio
-		pid.intervalMillis = math.Round(newIntervalMillis)
+		var ratio = newIntervalMillis / (p.intervalMillis)
+		p.ki *= ratio
+		p.kd /= ratio
+		p.intervalMillis = math.Round(newIntervalMillis)
 		return nil
 	} else {
 		return errors.New("invalid: interval value must be positive")
@@ -195,13 +199,13 @@ func (pid Pid) setSampleTime(newIntervalMillis float64) error {
  * SetOutput( )
  * Set output level if in manual mode
  */
-func (pid Pid) setOutput(newOutput float64) error {
-	if newOutput > pid.outMax {
-		newOutput = pid.outMax // POSSIBLY INCORRECT
-	} else if newOutput < pid.outMin {
-		newOutput = pid.outMin
+func (p Pid) SetOutput(newOutput float64) error {
+	if newOutput > p.outMax {
+		newOutput = p.outMax // POSSIBLY INCORRECT
+	} else if newOutput < p.outMin {
+		newOutput = p.outMin
 	}
-	pid.output = newOutput
+	p.output = newOutput
 	return nil
 }
 
@@ -213,24 +217,24 @@ func (pid Pid) setOutput(newOutput float64) error {
  * be doing a time window and will need 0-8000 or something.  or maybe they'll
  * want to clamp it from 0-125.  who knows.  at any rate, that can all be done here.
  */
-func (pid Pid) setOutputLimits(min, max float64) error {
+func (p Pid) SetOutputLimits(min, max float64) error {
 	if min >= max {
 		return errors.New("invalid values: min <= max")
 	}
-	pid.outMin = min
-	pid.outMax = max
+	p.outMin = min
+	p.outMax = max
 
-	if pid.inAuto {
-		if pid.output > pid.outMax {
-			pid.output = pid.outMax
-		} else if pid.output < pid.outMin {
-			pid.output = pid.outMin
+	if p.inAuto {
+		if p.output > p.outMax {
+			p.output = p.outMax
+		} else if p.output < p.outMin {
+			p.output = p.outMin
 		}
 
-		if pid.iTerm > pid.outMax-pid.bias {
-			pid.iTerm = pid.outMax - pid.bias
-		} else if pid.iTerm < pid.outMin-pid.bias {
-			pid.iTerm = pid.outMin - pid.bias
+		if p.iTerm > p.outMax-p.bias {
+			p.iTerm = p.outMax - p.bias
+		} else if p.iTerm < p.outMin-p.bias {
+			p.iTerm = p.outMin - p.bias
 		}
 	}
 	return nil
@@ -242,17 +246,24 @@ func (pid Pid) setOutputLimits(min, max float64) error {
  * when the transition from manual to auto occurs, the controller is
  * automatically initialized
  */
-func (pid Pid) setMode(newMode PID_MODE) error {
+func (p Pid) SetMode(newMode PID_MODE) error {
 	/*  Removed in favor of manually triggered 'Reset'(using Initialize()).
-	if (newAuto == !pid.inAuto) {
+	if (newAuto == !p.inAuto) {
 	  //we just went from manual to auto
-	  pid.initialize()
+	  p.initialize()
 	}
 	*/
+	fmt.Println(fmt.Sprintf("PID SetMode() newMode: %t", newMode))
 	if newMode == MANUAL {
-		pid.inAuto = false
+		fmt.Println("PID SetMode() newMode == MANUAL")
+		p.inAuto = false
+		p.currMode = MANUAL
 	} else if newMode == AUTO {
-		pid.inAuto = true
+		fmt.Println("PID SetMode() newMode == AUTO")
+		p.inAuto = true
+		p.currMode = AUTO
+		fmt.Println(fmt.Sprintf("PID SetMode() inAuto: %t", p.inAuto))
+		p.Compute()
 	} else {
 		return errors.New("invalid value: mode setting is not a valid value")
 	}
@@ -266,8 +277,8 @@ func (pid Pid) setMode(newMode PID_MODE) error {
  * know which one, because otherwise we may increase the output when we should
  * be decreasing.  This is called from the constructor.
  */
-func (pid Pid) setControllerDirection(newDirection PID_DIRECTION) error {
-	pid.direction = newDirection
+func (p Pid) SetControllerDirection(newDirection PID_DIRECTION) error {
+	p.direction = newDirection
 	return nil
 }
 
@@ -276,18 +287,19 @@ func (pid Pid) setControllerDirection(newDirection PID_DIRECTION) error {
  * does all the things that need to happen to ensure a bumpless transfer
  * from manual to automatic mode.
  */
-func (pid Pid) initialize() error {
-	// pid.iTerm = pid.myOutput
-	pid.iTerm = 0
-	pid.output = pid.bias
-	pid.lastInput = pid.input
+func (p Pid) Initialize() error {
+	// p.iTerm = p.myOutput
+	p.iTerm = 0
+	p.output = p.bias
+	p.lastInput = p.input
 	/*
-		  if (pid.iTerm > pid.outMax) {
-			pid.iTerm = pid.outMax
-		  } else if (pid.iTerm < pid.outMin) {
-			pid.iTerm = pid.outMin
+		  if (p.iTerm > p.outMax) {
+			p.iTerm = p.outMax
+		  } else if (p.iTerm < p.outMin) {
+			p.iTerm = p.outMin
 		  }
 	*/
+	p.Compute()
 	return nil
 }
 
@@ -297,38 +309,38 @@ func (pid Pid) initialize() error {
  * functions query the internal state of the PID.  they're here for display
  * purposes.  pid are the functions the PID Front-end uses for example
  */
-func (pid Pid) getKp() float64 {
-	return pid.displayP
+func (p Pid) GetKp() float64 {
+	return p.displayP
 }
 
-func (pid Pid) getKi() float64 {
-	return pid.displayI
+func (p Pid) getKi() float64 {
+	return p.displayI
 }
 
-func (pid Pid) getKd() float64 {
-	return pid.displayD
+func (p Pid) GetKd() float64 {
+	return p.displayD
 }
 
-func (pid Pid) getMode() PID_MODE {
-	return pid.currMode
+func (p Pid) GetMode() PID_MODE {
+	return p.currMode
 }
 
-func (pid Pid) getDirection() PID_DIRECTION {
-	return pid.direction
+func (p Pid) GetDirection() PID_DIRECTION {
+	return p.direction
 }
 
-func (pid Pid) getOutput() float64 {
-	return pid.output
+func (p Pid) GetOutput() float64 {
+	return p.output
 }
 
-func (pid Pid) getInput() float64 {
-	return pid.input
+func (p Pid) GetInput() float64 {
+	return p.input
 }
 
-func (pid Pid) getSetPoint() float64 {
-	return pid.setpoint
+func (p Pid) GetSetPoint() float64 {
+	return p.setpoint
 }
 
-func (pid Pid) getBias() float64 {
-	return pid.bias
+func (p Pid) GetBias() float64 {
+	return p.bias
 }
