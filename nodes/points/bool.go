@@ -27,15 +27,19 @@ func (inst *Boolean) Process() {
 	in4, in4Null := inst.ReadPinAsBool(node.In4)
 	if !in1Null {
 		inst.WritePin(node.Out, in1)
+		return
 	}
 	if !in2Null {
 		inst.WritePin(node.Out, in2)
+		return
 	}
 	if !in3Null {
 		inst.WritePin(node.Out, in3)
+		return
 	}
 	if !in4Null {
 		inst.WritePin(node.Out, in4)
+		return
 	}
 	inst.WritePinNull(node.Out)
 }
