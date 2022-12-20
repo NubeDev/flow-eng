@@ -1,7 +1,6 @@
 package hvac
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/pid"
 	"github.com/NubeDev/flow-eng/node"
 )
@@ -52,10 +51,7 @@ func (inst *PIDNode) Process() {
 
 	input, inputNull := inst.ReadPinAsFloat(node.ProcessValue)
 	setpoint, setpointNull := inst.ReadPinAsFloat(node.Setpoint)
-
 	enable, _ := inst.ReadPinAsBool(node.Enable)
-
-	fmt.Println(fmt.Sprintf("enable: %t, input: %f, setpoint: %f", enable, input, setpoint))
 
 	if !enable || inputNull || setpointNull {
 		inst.PID.SetMode(pid.MANUAL)
@@ -68,53 +64,49 @@ func (inst *PIDNode) Process() {
 	inst.PID.SetSetpoint(setpoint)
 	inst.PID.SetInput(input)
 
-	/*
-		minOut, null := inst.ReadPinAsFloat(node.MinOut)
-		if null {
-			minOut = 0
-		}
-		maxOut, null := inst.ReadPinAsFloat(node.MaxOut)
-		if null {
-			minOut = 100
-		}
-		inst.PID.SetOutputLimits(minOut, maxOut)
+	minOut, null := inst.ReadPinAsFloat(node.MinOut)
+	if null {
+		minOut = 0
+	}
+	maxOut, null := inst.ReadPinAsFloat(node.MaxOut)
+	if null {
+		minOut = 100
+	}
+	inst.PID.SetOutputLimits(minOut, maxOut)
 
-		inP, null := inst.ReadPinAsFloat(node.InP)
-		if null {
-			inP = 1
-		}
-		inI, null := inst.ReadPinAsFloat(node.InI)
-		if null {
-			inI = 0
-		}
-		inD, null := inst.ReadPinAsFloat(node.InD)
-		if null {
-			inD = 0
-		}
-		inst.PID.SetTunings(inP, inI, inD)
+	inP, null := inst.ReadPinAsFloat(node.InP)
+	if null {
+		inP = 1
+	}
+	inI, null := inst.ReadPinAsFloat(node.InI)
+	if null {
+		inI = 0
+	}
+	inD, null := inst.ReadPinAsFloat(node.InD)
+	if null {
+		inD = 0
+	}
+	inst.PID.SetTunings(inP, inI, inD)
 
-		direction := pid.DIRECT
-		dir, _ := inst.ReadPinAsBool(node.PIDDirection)
-		if dir {
-			direction = pid.REVERSE
-		}
-		inst.PID.SetControllerDirection(direction)
+	direction := pid.DIRECT
+	dir, _ := inst.ReadPinAsBool(node.PIDDirection)
+	if dir {
+		direction = pid.REVERSE
+	}
+	inst.PID.SetControllerDirection(direction)
 
-		intervalSecs, _ := inst.ReadPinAsFloat(node.IntervalSecs)
-		if intervalSecs <= 0 {
-			intervalSecs = 10
-		} else if intervalSecs > 500 {
-			intervalSecs = 500
-		}
-		intervalMillis := intervalSecs * 1000
-		inst.PID.SetSampleTime(intervalMillis)
+	intervalSecs, _ := inst.ReadPinAsFloat(node.IntervalSecs)
+	if intervalSecs <= 0 {
+		intervalSecs = 10
+	} else if intervalSecs > 500 {
+		intervalSecs = 500
+	}
+	intervalMillis := intervalSecs * 1000
+	inst.PID.SetSampleTime(intervalMillis)
 
-		bias, _ := inst.ReadPinAsFloat(node.Bias)
-		inst.PID.SetBias(bias)
+	bias, _ := inst.ReadPinAsFloat(node.Bias)
+	inst.PID.SetBias(bias)
 
-	*/
-
-	// fmt.Println(fmt.Sprintf("PID Process() inAuto: %t", inst.PID.inAuto))
 	inst.PID.Compute()
-	// inst.WritePinFloat(node.Out, inst.PID.GetOutput())
+	inst.WritePinFloat(node.Out, inst.PID.GetOutput())
 }

@@ -2,7 +2,6 @@ package pid
 
 import (
 	"errors"
-	"fmt"
 	"math"
 	"time"
 )
@@ -81,9 +80,7 @@ func NewPid(input, setpoint, p, i, d, intervalSecs float64, dir PID_DIRECTION) *
  * false when nothing has been done.
  */
 
-func (p Pid) Compute() (computed bool, err error) {
-	fmt.Println("PID Compute()")
-	fmt.Println(fmt.Sprintf("PID Compute() inAuto: %t", p.inAuto))
+func (p *Pid) Compute() (computed bool, err error) {
 	if !p.inAuto {
 		return false, errors.New("pid controller is not enabled")
 	}
@@ -101,7 +98,7 @@ func (p Pid) Compute() (computed bool, err error) {
 		}
 		errorAmount = errorAmount * directionMultiplier
 
-		p.iTerm += p.kp * errorAmount
+		p.iTerm += p.ki * errorAmount
 		if p.iTerm > p.outMax-p.bias {
 			p.iTerm = p.outMax - p.bias
 		} else if p.iTerm < p.outMin-p.bias {
@@ -125,24 +122,23 @@ func (p Pid) Compute() (computed bool, err error) {
 		// Remember some variables for next time
 		p.lastInput = input
 		p.lastTime = now
-		fmt.Println(fmt.Sprintf("PID Compute() output: %f", p.output))
 		return true, nil
 	} else {
 		return false, nil
 	}
 }
 
-func (p Pid) SetInput(newInput float64) error {
+func (p *Pid) SetInput(newInput float64) error {
 	p.input = newInput
 	return nil
 }
 
-func (p Pid) SetSetpoint(newSetpoint float64) error {
+func (p *Pid) SetSetpoint(newSetpoint float64) error {
 	p.setpoint = newSetpoint
 	return nil
 }
 
-func (p Pid) SetBias(newBias float64) error {
+func (p *Pid) SetBias(newBias float64) error {
 	if newBias > p.outMax {
 		p.bias = p.outMax // POSSIBLY INCORRECT
 	} else if newBias < p.outMin {
@@ -158,7 +154,7 @@ func (p Pid) SetBias(newBias float64) error {
  * it's called automatically from the constructor, but tunings can also
  * be adjusted on the fly during normal operation
  */
-func (p Pid) SetTunings(Kp, Ki, Kd float64) error {
+func (p *Pid) SetTunings(Kp, Ki, Kd float64) error {
 	if Kp < 0 || Ki < 0 || Kd < 0 {
 		return errors.New("invalid value: all tuning values must be positive")
 	}
@@ -183,7 +179,7 @@ func (p Pid) SetTunings(Kp, Ki, Kd float64) error {
  * SetSampleTime(...)
  * sets the period, in Milliseconds, at which the calculation is performed
  */
-func (p Pid) SetSampleTime(newIntervalMillis float64) error {
+func (p *Pid) SetSampleTime(newIntervalMillis float64) error {
 	if newIntervalMillis > 0 {
 		var ratio = newIntervalMillis / (p.intervalMillis)
 		p.ki *= ratio
@@ -199,7 +195,7 @@ func (p Pid) SetSampleTime(newIntervalMillis float64) error {
  * SetOutput( )
  * Set output level if in manual mode
  */
-func (p Pid) SetOutput(newOutput float64) error {
+func (p *Pid) SetOutput(newOutput float64) error {
 	if newOutput > p.outMax {
 		newOutput = p.outMax // POSSIBLY INCORRECT
 	} else if newOutput < p.outMin {
@@ -217,7 +213,7 @@ func (p Pid) SetOutput(newOutput float64) error {
  * be doing a time window and will need 0-8000 or something.  or maybe they'll
  * want to clamp it from 0-125.  who knows.  at any rate, that can all be done here.
  */
-func (p Pid) SetOutputLimits(min, max float64) error {
+func (p *Pid) SetOutputLimits(min, max float64) error {
 	if min >= max {
 		return errors.New("invalid values: min <= max")
 	}
@@ -246,24 +242,19 @@ func (p Pid) SetOutputLimits(min, max float64) error {
  * when the transition from manual to auto occurs, the controller is
  * automatically initialized
  */
-func (p Pid) SetMode(newMode PID_MODE) error {
+func (p *Pid) SetMode(newMode PID_MODE) error {
 	/*  Removed in favor of manually triggered 'Reset'(using Initialize()).
 	if (newAuto == !p.inAuto) {
 	  //we just went from manual to auto
 	  p.initialize()
 	}
 	*/
-	fmt.Println(fmt.Sprintf("PID SetMode() newMode: %t", newMode))
 	if newMode == MANUAL {
-		fmt.Println("PID SetMode() newMode == MANUAL")
 		p.inAuto = false
 		p.currMode = MANUAL
 	} else if newMode == AUTO {
-		fmt.Println("PID SetMode() newMode == AUTO")
 		p.inAuto = true
 		p.currMode = AUTO
-		fmt.Println(fmt.Sprintf("PID SetMode() inAuto: %t", p.inAuto))
-		p.Compute()
 	} else {
 		return errors.New("invalid value: mode setting is not a valid value")
 	}
@@ -277,7 +268,7 @@ func (p Pid) SetMode(newMode PID_MODE) error {
  * know which one, because otherwise we may increase the output when we should
  * be decreasing.  This is called from the constructor.
  */
-func (p Pid) SetControllerDirection(newDirection PID_DIRECTION) error {
+func (p *Pid) SetControllerDirection(newDirection PID_DIRECTION) error {
 	p.direction = newDirection
 	return nil
 }
@@ -287,7 +278,7 @@ func (p Pid) SetControllerDirection(newDirection PID_DIRECTION) error {
  * does all the things that need to happen to ensure a bumpless transfer
  * from manual to automatic mode.
  */
-func (p Pid) Initialize() error {
+func (p *Pid) Initialize() error {
 	// p.iTerm = p.myOutput
 	p.iTerm = 0
 	p.output = p.bias
@@ -309,38 +300,38 @@ func (p Pid) Initialize() error {
  * functions query the internal state of the PID.  they're here for display
  * purposes.  pid are the functions the PID Front-end uses for example
  */
-func (p Pid) GetKp() float64 {
+func (p *Pid) GetKp() float64 {
 	return p.displayP
 }
 
-func (p Pid) getKi() float64 {
+func (p *Pid) getKi() float64 {
 	return p.displayI
 }
 
-func (p Pid) GetKd() float64 {
+func (p *Pid) GetKd() float64 {
 	return p.displayD
 }
 
-func (p Pid) GetMode() PID_MODE {
+func (p *Pid) GetMode() PID_MODE {
 	return p.currMode
 }
 
-func (p Pid) GetDirection() PID_DIRECTION {
+func (p *Pid) GetDirection() PID_DIRECTION {
 	return p.direction
 }
 
-func (p Pid) GetOutput() float64 {
+func (p *Pid) GetOutput() float64 {
 	return p.output
 }
 
-func (p Pid) GetInput() float64 {
+func (p *Pid) GetInput() float64 {
 	return p.input
 }
 
-func (p Pid) GetSetPoint() float64 {
+func (p *Pid) GetSetPoint() float64 {
 	return p.setpoint
 }
 
-func (p Pid) GetBias() float64 {
+func (p *Pid) GetBias() float64 {
 	return p.bias
 }
