@@ -2,6 +2,7 @@ package bacnetio
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
@@ -12,16 +13,23 @@ type serverSchema struct {
 	Serial      schemas.EnumString `json:"serial"`
 }
 
-var serialOptions = []string{"485-1", "485-2", "SIDE-485-PORT", "/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyAMA0"}
+func selectIO16() string {
+	for i, _ := range ioOptions {
+		fmt.Println("!!!!!!!!!1", i)
+		return fmt.Sprintf("%d", i)
+	}
+	return "0"
+}
+
+var ioOptions = []string{"Select an IO-16", "1x IO-16", "2x IO-16s", "3x IO-16s", "4x IO-16s"}
 var serialPorts = []string{"/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyAMA0"}
 
 func BuildSchemaServer() *schemas.Schema {
 	props := &serverSchema{}
 	props.DeviceCount.Title = "IO-16-device-count"
-	props.DeviceCount.Default = "No IO-16s"
-	props.DeviceCount.EnumName = []string{"No IO-16s", "1x IO-16", "2x IO-16s", "3x IO-16s", "4x IO-16s"}
-	props.DeviceCount.Options = []string{"0", "1", "2", "3", "4"}
-
+	props.DeviceCount.Default = ioOptions[1]
+	props.DeviceCount.EnumName = ioOptions
+	props.DeviceCount.Options = ioOptions
 	props.Serial.Title = "serial-port (baud-rate:38400)"
 	props.Serial.Default = serialPorts[2]
 	props.Serial.EnumName = serialPorts
@@ -108,4 +116,30 @@ func getSettings(body map[string]interface{}) (*nodeSettings, error) {
 	}
 	err = json.Unmarshal(marshal, &settings)
 	return settings, err
+}
+
+func bacnetAddress(deviceCount int, prefix, ioTypePrefix string) []string {
+	var devicesCount = 1
+	var ioCount = 1
+	var out []string
+	if deviceCount == 0 {
+		deviceCount = 1
+	}
+	var devCount = deviceCount * 8
+	for i := 0; i <= devCount; i++ {
+		if i > 0 {
+			if i%8 == 0 {
+				devicesCount++
+			}
+		}
+		if i%8 == 0 {
+			ioCount = 1
+		}
+		dev := fmt.Sprintf("dev-%d", devicesCount)
+		bacnet := fmt.Sprintf("%s-%d", prefix, i+1)
+		value := fmt.Sprintf("%s %s %s-%d", dev, bacnet, ioTypePrefix, ioCount)
+		out = append(out, value)
+		ioCount++
+	}
+	return out
 }

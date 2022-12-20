@@ -44,7 +44,7 @@ func (inst *Server) modbusRunner(settings map[string]interface{}) {
 		pointsListRead, _ := inst.getPointsReadOnly()
 		inst.modbusInputsRunner(init, pointsListRead) // process the inputs
 		inst.modbusOutputsDispatch(init)              // process the outs
-		time.Sleep(1 * time.Second)
+		time.Sleep(500 * time.Millisecond)
 		count++
 	}
 }
@@ -84,6 +84,18 @@ func (inst *Server) modbusOutputsDispatch(cli *modbuscli.Modbus) {
 	}
 	if len(pointsList.DeviceTwo) > 0 {
 		err := cli.Write(2, modbusBulkWrite(pointsList.DeviceTwo))
+		if err != nil {
+			log.Error(err)
+		}
+	}
+	if len(pointsList.DeviceThree) > 0 {
+		err := cli.Write(3, modbusBulkWrite(pointsList.DeviceThree))
+		if err != nil {
+			log.Error(err)
+		}
+	}
+	if len(pointsList.DeviceFour) > 0 {
+		err := cli.Write(4, modbusBulkWrite(pointsList.DeviceFour))
 		if err != nil {
 			log.Error(err)
 		}

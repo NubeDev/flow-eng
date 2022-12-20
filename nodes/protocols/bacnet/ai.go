@@ -1,11 +1,13 @@
 package bacnetio
 
 import (
+	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/services/mqttclient"
 	log "github.com/sirupsen/logrus"
+	"strings"
 )
 
 type AI struct {
@@ -40,16 +42,25 @@ func NewAI(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	}, err
 }
 
-func (inst *AI) setObjectId() {
+func (inst *AI) setObjectId(settings *nodeSettings) {
 	id, _ := inst.ReadPinAsInt(node.ObjectId)
 	inst.objectID = points.ObjectID(id)
+	name := bacnetAddress(4, "AI", "UI")
+	if len(name) >= id {
+		if settings != nil {
+			ioType := strings.ReplaceAll(settings.Io, "_", " ")
+			inst.SetSubTitle(strings.ToUpper(fmt.Sprintf("%s %s", name[id-1], ioType)))
+		} else {
+			inst.SetSubTitle(name[id-1])
+		}
+	}
 }
 
 func (inst *AI) Process() {
 	_, firstLoop := inst.Loop()
 	if firstLoop {
-		inst.setObjectId()
 		settings, err := getSettings(inst.GetSettings())
+		inst.setObjectId(settings)
 		ioType := settings.Io
 		if ioType == "" {
 			ioType = string(points.IoTypeVolts)
