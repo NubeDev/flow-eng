@@ -1,12 +1,14 @@
 package bacnetio
 
 import (
+	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/services/mqttclient"
 	log "github.com/sirupsen/logrus"
+	"strings"
 )
 
 type AO struct {
@@ -38,10 +40,20 @@ func NewAO(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	}, err
 }
 
-func (inst *AO) setObjectId() {
+func (inst *AO) setObjectId(settings *nodeSettings) {
 	id, _ := inst.ReadPinAsInt(node.ObjectId)
 	inst.objectID = points.ObjectID(id)
+	name := bacnetAddress(4, "AO", "UO")
+	if len(name) >= id {
+		if settings != nil {
+			ioType := strings.ReplaceAll(settings.Io, "_", " ")
+			inst.SetSubTitle(strings.ToUpper(fmt.Sprintf("%s %s", name[id-1], ioType)))
+		} else {
+			inst.SetSubTitle(name[id-1])
+		}
+	}
 }
+
 func (inst *AO) Process() {
 	_, firstLoop := inst.Loop()
 	s := inst.GetStore()
@@ -49,9 +61,9 @@ func (inst *AO) Process() {
 		return
 	}
 	if firstLoop {
-		inst.setObjectId()
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
 		settings, err := getSettings(inst.GetSettings())
+		inst.setObjectId(settings)
 		ioType := settings.Io
 		if ioType == "" {
 			ioType = string(points.IoTypeVolts)

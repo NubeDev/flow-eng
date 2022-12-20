@@ -41,7 +41,7 @@ func (inst *Server) subscribeToBacnetServer() {
 			err := inst.fromBacnet(mes)
 			log.Infof("mqtt-bacnet message from server topic: %s -> value: %s", mes.Msg.Topic(), string(mes.Msg.Payload()))
 			if err != nil {
-				log.Error(err)
+				//log.Error(err)
 			}
 		}
 	}
