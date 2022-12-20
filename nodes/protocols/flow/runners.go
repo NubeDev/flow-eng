@@ -51,8 +51,6 @@ func (inst *Network) fetchPointsList() {
 		err := inst.mqttClient.Publish(topic, mqttQOS, false, "")
 		if err != nil {
 			log.Errorf("Flow Network fetchPointsList(): %s err: %s", topic, err.Error())
-		} else {
-			log.Infof("Flow Network fetchPointsList(): %s", topic)
 		}
 	}
 }
