@@ -11,11 +11,14 @@ import (
 
 func (inst *Network) subscribe() {
 	callback := func(client mqtt.Client, message mqtt.Message) {
+		// log.Infof("Flow Network subscribe(): %+v", message)
 		s := inst.GetStore()
 		children, ok := s.Get(inst.GetID())
 		payloads := getPayloads(children, ok)
 		for _, payload := range payloads {
-			if payload.topic == fixTopic(message.Topic()) {
+			fixedTopic, pntUUID := fixTopic(message.Topic())
+			payload.pointUUID = pntUUID
+			if payload.topic == fixedTopic {
 				n := inst.GetNode(payload.nodeUUID)
 				if n != nil {
 					n.SetPayload(&node.Payload{
@@ -48,16 +51,16 @@ func (inst *Network) fetchPointsList() {
 		err := inst.mqttClient.Publish(topic, mqttQOS, false, "")
 		if err != nil {
 			log.Errorf("Flow Network fetchPointsList(): %s err: %s", topic, err.Error())
-		} else {
-			log.Infof("Flow Network fetchPointsList(): %s", topic)
 		}
 	}
 }
 
+// TODO: the points list topic gets a message on EVERY FF Point CRUD.  This produces MANY updates and many FF DB calls. Consider removing them.
 func (inst *Network) pointsList() {
 	callback := func(client mqtt.Client, message mqtt.Message) {
 		var points []*point
 		err := json.Unmarshal(message.Payload(), &points)
+		// log.Infof("Flow Network pointsList() points: %+v", points)
 		if err == nil {
 			if points != nil {
 				s := inst.GetStore()
@@ -78,6 +81,47 @@ func (inst *Network) pointsList() {
 		} else {
 			log.Infof("Flow Network pointsList() Subscribe() : %s", topic)
 		}
+	}
+}
+
+const fetchSelectedPointsCOVTopic = "rubix/platform/points/cov/selected"
+
+func (inst *Network) fetchAllPointValues() {
+	// log.Infof("Flow Network fetchAllPointValues()")
+	s := inst.GetStore()
+	children, ok := s.Get(inst.GetID())
+	payloads := getPayloads(children, ok)
+	var pointUUIDList []*MqttPoint
+	for _, payload := range payloads {
+		if payload.pointUUID != "" {
+			pnt := MqttPoint{
+				PointUUID: payload.pointUUID,
+			}
+			exists := false
+			for _, val := range pointUUIDList {
+				if val != nil && val.PointUUID == pnt.PointUUID {
+					exists = true
+					break
+				}
+			}
+			if !exists {
+				pointUUIDList = append(pointUUIDList, &pnt)
+			}
+
+		}
+	}
+	data, err := json.Marshal(pointUUIDList)
+	if err != nil {
+		log.Errorf("Flow Network fetchAllPointValues() json marshal err: %s", err.Error())
+		return
+	}
+	if inst.mqttClient != nil {
+		err := inst.mqttClient.Publish(fetchSelectedPointsCOVTopic, mqttQOS, mqttRetain, data)
+		if err != nil {
+			log.Errorf("Flow Network fetchAllPointValues() mqtt publish err: %s", err.Error())
+		}
+	} else {
+		log.Errorf("Flow Network fetchAllPointValues() mqttClient not available")
 	}
 }
 
@@ -115,27 +159,19 @@ func (inst *Network) publish(loopCount uint64) {
 			continue
 		}
 
-		var inputValueUpdated bool
-		in1COV, _ := n.InputUpdated(node.In1)
-		in2COV, _ := n.InputUpdated(node.In10)
-		in3COV, _ := n.InputUpdated(node.In15)
-		in4COV, _ := n.InputUpdated(node.In16)
-		if in1COV || in2COV || in3COV || in4COV {
-			inputValueUpdated = true
-		}
-		if !inputValueUpdated {
-			if loopCount%50 == 0 { // republish every 50 loops
-			} else { // skip as no input value was updated
-				continue
-			}
+		republishLoop := false
+		if loopCount%100 == 0 { // republish every 100 loops
+			republishLoop = true
+			// log.Infof("Flow Network publish(): REPUBLISH LOOP!")
 		}
 
 		priority := map[string]*float64{}
 		// TODO: Replace this next bit with Priority Array evaluation
 		if n.GetName() == flowPointWrite {
 			ffPointWriteNode := n.(*FFPointWrite)
-			priority = ffPointWriteNode.EvaluateInputsArray()
-			if len(priority) <= 0 && loopCount != 2 {
+
+			priority = ffPointWriteNode.EvaluateInputsArray(republishLoop)
+			if len(priority) <= 0 {
 				continue
 			}
 

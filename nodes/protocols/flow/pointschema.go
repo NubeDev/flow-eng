@@ -8,15 +8,16 @@ import (
 	"strings"
 )
 
-func fixTopic(topic string) string {
+func fixTopic(topic string) (fixedTopic, pointUUID string) {
 	parts := strings.Split(topic, "/")
 	if len(parts) == 12 {
+		pointUUID = parts[10]
 		parts[6] = "+"
 		parts[8] = "+"
 		parts[10] = "+"
-		return strings.Join(parts, "/")
+		return strings.Join(parts, "/"), pointUUID
 	}
-	return ""
+	return "", ""
 }
 
 func makePointTopic(selected string) string {

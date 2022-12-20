@@ -117,7 +117,7 @@ func (inst *FFPointWrite) GetLastPriorityWrite() (priorityArrayWrite map[string]
 	return inst.lastPointPriorityWrite
 }
 
-func (inst *FFPointWrite) EvaluateInputsArray() map[string]*float64 {
+func (inst *FFPointWrite) EvaluateInputsArray(forceResend bool) map[string]*float64 {
 	newInputArray := [17]InputData{}
 
 	valueIn1 := inst.ReadPinAsFloatPointer(node.In1)
@@ -137,22 +137,33 @@ func (inst *FFPointWrite) EvaluateInputsArray() map[string]*float64 {
 	newInputArray[16] = InputData{valueIn16, linkIn16}
 
 	arraysMatch, arrayChanges := compareInputArrays(newInputArray, inst.inputsArray)
+	for _, val := range arrayChanges {
+		if val != nil {
+			// log.Infof(fmt.Sprintf("FF Network EvaluateInputsArray() arrayChanges %d: %+v", f, arrayChanges[f]))
+		}
+	}
+
 	priorityArrayWrite := make(map[string]*float64)
 
-	if !arraysMatch {
+	if !arraysMatch || forceResend {
 		for i, changeData := range arrayChanges {
-			if changeData == nil {
+			if i == 0 || (!forceResend && changeData == nil) {
 				continue
 			}
 			inputName := fmt.Sprintf("_%d", i)
-			if changeData.LinkDisconnected { // has the link been disconnected
+			if !forceResend && changeData.LinkDisconnected { // has the link been disconnected
 				priorityArrayWrite[inputName] = float.New(1)
 				priorityArrayWrite[inputName] = nil
-			} else if newInputArray[i].LinkConnected && (changeData.NewValue || changeData.LinkConnected) { // has there been a new value or a new link connected
+			} else if newInputArray[i].LinkConnected && (forceResend || changeData.NewValue || changeData.LinkConnected) { // has there been a new value or a new link connected
+				if forceResend && newInputArray[i].InputValue == nil {
+					continue
+				}
+				priorityArrayWrite[inputName] = float.New(1)
 				priorityArrayWrite[inputName] = newInputArray[i].InputValue
 			}
 		}
 	}
+
 	inst.inputsArray = newInputArray
 	return priorityArrayWrite
 }
@@ -160,9 +171,14 @@ func (inst *FFPointWrite) EvaluateInputsArray() map[string]*float64 {
 func compareInputArrays(newInputs, oldInputs [17]InputData) (arraysMatch bool, changedValues [17]*InputChanges) {
 	arraysMatch = true
 	for i, inputData := range newInputs {
-		if (inputData.InputValue != oldInputs[i].InputValue) || (inputData.LinkConnected != oldInputs[i].LinkConnected) {
+		newValIsNil := inputData.InputValue == nil
+		oldValIsNil := oldInputs[i].InputValue == nil
+		newVal := float.NonNil(inputData.InputValue)
+		oldVal := float.NonNil(oldInputs[i].InputValue)
+
+		if (newValIsNil != oldValIsNil) || (!newValIsNil && !oldValIsNil && newVal != oldVal) || (inputData.LinkConnected != oldInputs[i].LinkConnected) {
 			arraysMatch = false
-			inputValueChanged := inputData.InputValue != oldInputs[i].InputValue
+			inputValueChanged := newValIsNil != oldValIsNil || !newValIsNil && !oldValIsNil && newVal != oldVal
 			inputLinkDisconnected := !inputData.LinkConnected && oldInputs[i].LinkConnected
 			inputLinkConnected := inputData.LinkConnected && !oldInputs[i].LinkConnected
 			changedValues[i] = &InputChanges{inputValueChanged, inputLinkDisconnected, inputLinkConnected}
