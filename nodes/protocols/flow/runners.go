@@ -57,10 +57,12 @@ func (inst *Network) fetchPointsList() {
 	}
 }
 
+// TODO: the points list topic gets a message on EVERY FF Point CRUD.  This produces MANY updates and many FF DB calls. Consider removing them.
 func (inst *Network) pointsList() {
 	callback := func(client mqtt.Client, message mqtt.Message) {
 		var points []*point
 		err := json.Unmarshal(message.Payload(), &points)
+		// log.Infof("Flow Network pointsList() points: %+v", points)
 		if err == nil {
 			if points != nil {
 				s := inst.GetStore()
@@ -87,7 +89,7 @@ func (inst *Network) pointsList() {
 const fetchSelectedPointsCOVTopic = "rubix/platform/points/cov/selected"
 
 func (inst *Network) fetchAllPointValues() {
-	log.Infof("Flow Network fetchAllPointValues()")
+	// log.Infof("Flow Network fetchAllPointValues()")
 	s := inst.GetStore()
 	children, ok := s.Get(inst.GetID())
 	payloads := getPayloads(children, ok)
@@ -110,19 +112,18 @@ func (inst *Network) fetchAllPointValues() {
 
 		}
 	}
-	log.Infof("Flow Network fetchAllPointValues() pointUUIDList: %+v", pointUUIDList)
 	data, err := json.Marshal(pointUUIDList)
 	if err != nil {
 		log.Errorf("Flow Network fetchAllPointValues() json marshal err: %s", err.Error())
 		return
 	}
-	log.Infof("Flow Network fetchAllPointValues() data: %+v", data)
 	if inst.mqttClient != nil {
-		fmt.Println("Flow Network fetchAllPointValues()", string(data))
 		err := inst.mqttClient.Publish(fetchSelectedPointsCOVTopic, mqttQOS, mqttRetain, data)
 		if err != nil {
 			log.Errorf("Flow Network fetchAllPointValues() mqtt publish err: %s", err.Error())
 		}
+	} else {
+		log.Errorf("Flow Network fetchAllPointValues() mqttClient not available")
 	}
 }
 
@@ -172,7 +173,7 @@ func (inst *Network) publish(loopCount uint64) {
 			ffPointWriteNode := n.(*FFPointWrite)
 
 			priority = ffPointWriteNode.EvaluateInputsArray(republishLoop)
-			if len(priority) <= 0 && loopCount != 2 {
+			if len(priority) <= 0 {
 				continue
 			}
 
