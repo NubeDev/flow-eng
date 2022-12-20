@@ -6,7 +6,6 @@ import (
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/enescakir/emoji"
-	log "github.com/sirupsen/logrus"
 )
 
 type InputData struct {
@@ -138,9 +137,9 @@ func (inst *FFPointWrite) EvaluateInputsArray(forceResend bool) map[string]*floa
 	newInputArray[16] = InputData{valueIn16, linkIn16}
 
 	arraysMatch, arrayChanges := compareInputArrays(newInputArray, inst.inputsArray)
-	for f, val := range arrayChanges {
+	for _, val := range arrayChanges {
 		if val != nil {
-			log.Infof(fmt.Sprintf("FF Network EvaluateInputsArray() arrayChanges %d: %+v", f, arrayChanges[f]))
+			// log.Infof(fmt.Sprintf("FF Network EvaluateInputsArray() arrayChanges %d: %+v", f, arrayChanges[f]))
 		}
 	}
 
