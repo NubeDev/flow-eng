@@ -4,6 +4,8 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/boolean"
 	"github.com/NubeDev/flow-eng/node"
+	"github.com/NubeDev/flow-eng/schemas"
+	"github.com/mitchellh/mapstructure"
 )
 
 const (
@@ -23,14 +25,26 @@ const (
 	inputCount = "Inputs Count"
 )
 
+type nodeSettings struct {
+	InputCount int `json:"inputCount"`
+}
+
 func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error) {
 	body = node.Defaults(body, nodeName, category)
-	in1 := node.BuildInput(node.In1, node.TypeBool, nil, body.Inputs) // TODO: this input shouldn't have a manual override value
-	in2 := node.BuildInput(node.In2, node.TypeBool, nil, body.Inputs) // TODO: this input shouldn't have a manual override value
-
-	inputs := node.BuildInputs(in1, in2)
+	settings := &nodeSettings{}
+	err := mapstructure.Decode(body.Settings, &settings)
+	if err != nil {
+		return nil, err
+	}
+	var count = 2
+	if settings != nil {
+		count = settings.InputCount
+	}
+	inputs := node.BuildInputs(node.DynamicInputs(node.TypeBool, nil, count, 2, 20, body.Inputs)...)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs))
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
+	body.SetSchema(schemas.GetInputCount())
+	body.SetDynamicInputs()
 	return body, nil
 }
 

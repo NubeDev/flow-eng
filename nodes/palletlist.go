@@ -29,6 +29,7 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/protocols/rest"
 	"github.com/NubeDev/flow-eng/nodes/statistics"
 	"github.com/NubeDev/flow-eng/nodes/streams"
+	"github.com/NubeDev/flow-eng/nodes/subflow"
 	switches "github.com/NubeDev/flow-eng/nodes/switch"
 	"github.com/NubeDev/flow-eng/nodes/system"
 	"github.com/NubeDev/flow-eng/nodes/tigger"
@@ -72,6 +73,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	flowPointWrite, _ := flow.NewFFPointWrite(nil)
 
 	flowLoopCount, _ := system.NewLoopCount(nil)
+	subFlowFolder, _ := subflow.NewSubFlowFolder(nil)
 
 	conversionString, _ := conversion.NewString(nil)
 	conversionNum, _ := conversion.NewNumber(nil)
@@ -187,6 +189,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(pingNode),
 
 		node.ConvertToSpec(flowLoopCount),
+		node.ConvertToSpec(subFlowFolder),
 
 		node.ConvertToSpec(flowNetwork),
 		node.ConvertToSpec(flowPoint),
@@ -356,6 +359,8 @@ func Builder(body *node.Spec, db db.DB, store *store.Store, opts ...interface{})
 func builderMisc(body *node.Spec) (node.Node, error) {
 	con := &link.Store{}
 	switch body.GetName() {
+	case subFlowFolder:
+		return subflow.NewSubFlowFolder(body)
 	case logNode:
 		return debugging.NewLog(body)
 	case funcNode:
