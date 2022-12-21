@@ -89,11 +89,12 @@ func (inst *FFPointWrite) Process() {
 					setTopic = true
 				}
 			}
+			inst.SetSubTitle(selectedPoint.Point)
 		}
 		if !setTopic {
 			inst.SetWaringMessage("no point selected")
 			inst.SetWaringIcon(string(emoji.OrangeCircle))
-
+			inst.SetSubTitle("")
 		}
 	}
 

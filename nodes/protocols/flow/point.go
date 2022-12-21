@@ -64,11 +64,16 @@ func (inst *FFPoint) Process() {
 					inst.set()
 					setTopic = true
 				}
+
 			}
+			inst.SetSubTitle(selectedPoint.Point)
+		} else {
+			inst.SetSubTitle("")
 		}
 		if !setTopic {
 			inst.SetWaringMessage("no point selected")
 			inst.SetWaringIcon(string(emoji.OrangeCircle))
+			inst.SetSubTitle("")
 		}
 	}
 	val, null := inst.GetPayloadNull()

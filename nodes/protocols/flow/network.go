@@ -41,6 +41,7 @@ func (inst *Network) setConnection() {
 		log.Errorf(errMes)
 		inst.SetStatusError(errMes)
 		inst.SetErrorIcon(string(emoji.RedCircle))
+		inst.SetSubTitle("")
 		return
 	}
 	if settings == nil {
@@ -52,6 +53,7 @@ func (inst *Network) setConnection() {
 		log.Errorf(errMes)
 		inst.SetStatusError(errMes)
 		inst.SetErrorIcon(string(emoji.RedCircle))
+		inst.SetSubTitle("")
 		return
 	}
 	if connection == nil {
@@ -59,9 +61,11 @@ func (inst *Network) setConnection() {
 		log.Errorf(errMes)
 		inst.SetStatusError(errMes)
 		inst.SetErrorIcon(string(emoji.RedCircle))
+		inst.SetSubTitle("")
 		return
 	}
 	inst.connection = connection
+	inst.SetSubTitle(connection.Name)
 	mqttClient, err := mqttclient.NewClient(mqttclient.ClientOptions{
 		Servers: []string{fmt.Sprintf("tcp://%s:%d", connection.Host, connection.Port)},
 	})
