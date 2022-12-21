@@ -85,6 +85,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	// hvac
 	deadBand, _ := hvac.NewDeadBand(nil)
 	pid, _ := hvac.NewPIDNode(nil)
+	pacControl, _ := hvac.NewPACControl(nil)
 
 	gmailNode, _ := gmail.NewGmail(nil)
 	pingNode, _ := ping.NewPing(nil)
@@ -193,6 +194,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(deadBand),
 		node.ConvertToSpec(pid),
+		node.ConvertToSpec(pacControl),
 
 		node.ConvertToSpec(pointNum),
 		node.ConvertToSpec(pointBool),
@@ -437,6 +439,8 @@ func builderHVAC(body *node.Spec) (node.Node, error) {
 		return hvac.NewDeadBand(body)
 	case pidNode:
 		return hvac.NewPIDNode(body)
+	case pacControlNode:
+		return hvac.NewPACControl(body)
 	}
 	return nil, nil
 }

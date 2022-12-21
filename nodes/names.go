@@ -47,6 +47,7 @@ const (
 
 	deadBandNode = "dead-band"
 	pidNode      = "pid"
+	pacControlNode = "pac-control"
 
 	logicCompareGreater = "compare-greater"
 	logicCompareLess    = "compare-less"
