@@ -45,7 +45,8 @@ const (
 	getHttpNode   = "http-get"
 	writeHttpNode = "http-write"
 
-	deadBandNode   = "dead-band"
+	deadBandNode = "dead-band"
+	pidNode      = "pid"
 	pacControlNode = "pac-control"
 
 	logicCompareGreater = "compare-greater"

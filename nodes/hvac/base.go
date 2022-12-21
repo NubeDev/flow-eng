@@ -5,7 +5,8 @@ const (
 )
 
 const (
-	deadBandNode   = "dead-band"
+	deadBandNode = "dead-band"
+	pidNode      = "pid"
 	pacControlNode = "pac-control"
 
 	// methods

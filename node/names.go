@@ -128,6 +128,17 @@ const (
 	Latch InputName = "latch"
 	Set   InputName = "set"
 	Reset InputName = "reset"
+
+	ProcessValue InputName = "process-value"
+	MinOut       InputName = "min-out"
+	MaxOut       InputName = "max-out"
+	InP          InputName = "in-p"
+	InI          InputName = "in-i"
+	InD          InputName = "in-d"
+	PIDDirection InputName = "direction"
+	Bias         InputName = "bias"
+	Manual       InputName = "manual"
+	IntervalSecs	InputName = "interval-secs"
 )
 
 const (
