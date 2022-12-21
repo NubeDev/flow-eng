@@ -123,6 +123,7 @@ const (
 
 	ErrMsg       OutputName = "error"
 	Msg          OutputName = "message"
+	PollingStats OutputName = "polling-status"
 	PollingCount OutputName = "polling-count"
 
 	FlatLine OutputName = "flatline"

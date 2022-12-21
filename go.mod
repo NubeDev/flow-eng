@@ -8,6 +8,7 @@ require (
 	github.com/NubeIO/nubeio-rubix-lib-modbus-go v0.0.4
 	github.com/NubeIO/nubeio-rubix-lib-models-go v1.3.7
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f
+	github.com/dustin/go-humanize v1.0.0
 	github.com/eclipse/paho.mqtt.golang v1.4.1
 	github.com/enescakir/emoji v1.0.0
 	github.com/go-co-op/gocron v1.17.0

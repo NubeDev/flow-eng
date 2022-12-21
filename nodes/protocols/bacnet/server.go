@@ -6,6 +6,7 @@ import (
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/services/mqttclient"
+	"github.com/dustin/go-humanize"
 	log "github.com/sirupsen/logrus"
 	"sort"
 	"strings"
@@ -29,7 +30,7 @@ type Server struct {
 	loopCount              uint64
 	firstMessageFromBacnet bool
 	deviceCount            string
-	pollingCount           float64
+	pollingCount           int64
 }
 
 var runnersLock bool
@@ -59,8 +60,7 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	var err error
 	body = node.Defaults(body, serverNode, category)
 	outputMsg := node.BuildOutput(node.Msg, node.TypeString, nil, body.Outputs)
-	pollingCount := node.BuildOutput(node.PollingCount, node.TypeFloat, nil, body.Outputs)
-	outputs := node.BuildOutputs(outputMsg, pollingCount)
+	outputs := node.BuildOutputs(outputMsg)
 	body.IsParent = true
 	body = node.BuildNode(body, nil, outputs, body.Settings)
 	clients := &clients{}
@@ -85,7 +85,6 @@ func (inst *Server) Process() {
 				go inst.mqttPublishNames(point)
 			}
 		}
-
 	}
 	if inst.pingFailed || inst.reconnectedOk { // on failed resubscribe
 	}
@@ -106,7 +105,11 @@ func (inst *Server) Process() {
 			}
 		}
 	}
-	inst.WritePinFloat(node.PollingCount, inst.pollingCount)
+	inst.WritePin(node.PollingCount, pollStats(inst.pollingCount))
+}
+
+func pollStats(pollingCount int64) string {
+	return humanize.Comma(pollingCount)
 }
 
 func setUUID(parentID string, objType points.ObjectType, id points.ObjectID) string {
