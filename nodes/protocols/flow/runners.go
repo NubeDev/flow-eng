@@ -149,6 +149,7 @@ func (inst *Network) publish(loopCount uint64) {
 			continue
 		}
 		names := spitPointNames(payload.netDevPntNames)
+		// log.Infof("spitPointNames(): %+v", names)
 		if len(names) != 4 {
 			log.Errorf("Flow Network publish() err: failed to get point name")
 			continue

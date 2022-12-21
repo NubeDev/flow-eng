@@ -26,7 +26,7 @@ func (inst *Toggle) Process() {
 	if inAsBool && !inst.lastIn {
 		inst.currentOut = !inst.currentOut
 	}
-	inst.lastIn = in == true
+	inst.lastIn = inAsBool
 
 	if inst.currentOut {
 		inst.WritePin(node.Out, true)

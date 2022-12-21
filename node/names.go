@@ -20,11 +20,24 @@ const (
 )
 
 const (
-	SetPoint   InputName = "set-point"
+	Setpoint   InputName = "setpoint"
 	Offset     InputName = "offset"
 	CoolOffset InputName = "offset-cool"
 	HeatOffset InputName = "offset-heat"
 	DeadBand   InputName = "dead-band"
+
+	ZoneTemp        InputName = "zone-temp"
+	ClgOffset       InputName = "clg-offset"
+	HtgOffset       InputName = "htg-offset"
+	StgUpDelay      InputName = "stage-up-delay"
+	ModeChangeDelay InputName = "mode-change-delay"
+	EconoAllow      InputName = "econo-allow"
+	OATemp          InputName = "oa-temp"
+	EconoHigh       InputName = "econo-high"
+	EconoLow        InputName = "econo-low"
+	FanStatus       InputName = "fan-status"
+	ClgLockout      InputName = "clg-lockout"
+	HtgLockout      InputName = "htg-lockout"
 
 	AlertDelayMins InputName = "alert-delay-mins"
 
@@ -119,7 +132,7 @@ const (
 
 const (
 	Ok OutputName = "ok"
-	//Result OutputName = "result"
+	// Result OutputName = "result"
 
 	ErrMsg OutputName = "error"
 	Msg    OutputName = "message"
@@ -159,4 +172,13 @@ const (
 	LessThanEqual    OutputName = "less or equal"
 	LessThan         OutputName = "less"
 	Equal            OutputName = "equal"
+
+	ClgMode        OutputName = "clg-mode"
+	HtgMode        OutputName = "htg-mode"
+	CompStage      OutputName = "comp-stage"
+	EconoMode      OutputName = "econo-mode"
+	OADamper       OutputName = "oa-damper"
+	ReversingValve OutputName = "reversing-valve"
+	Compressor1    OutputName = "compressor-1"
+	Compressor2    OutputName = "compressor-2"
 )
