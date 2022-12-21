@@ -8,6 +8,7 @@ type Add struct {
 	*node.Spec
 }
 
+
 func NewAdd(body *node.Spec) (node.Node, error) {
 	var err error
 	body, err = nodeDefault(body, add, category)

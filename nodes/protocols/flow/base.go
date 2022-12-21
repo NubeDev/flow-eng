@@ -59,7 +59,7 @@ type pointDetails struct {
 	isWriteable    bool
 }
 
-func parseCOV(body any) (payload *covPayload, value float64, priorty int, err error) {
+func parseCOV(body any) (payload *covPayload, value float64, priority int, err error) {
 	msg, ok := body.(mqtt.Message)
 	if !ok {
 		return nil, 0, 0, errors.New("failed to parse mqtt cov payload")

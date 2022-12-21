@@ -2,7 +2,6 @@ package modbuscli
 
 import (
 	"errors"
-	"fmt"
 	"github.com/NubeIO/nubeio-rubix-lib-modbus-go/modbus"
 )
 
@@ -12,12 +11,12 @@ func tempRegs() (start int, count int) {
 }
 
 func voltRegs() (start int, count int) {
-	start = 201
+	start = 200
 	return start, 8
 }
 
 func currentRegs() (start int, count int) {
-	start = 301
+	start = 300
 	return start, 8
 }
 
@@ -89,7 +88,7 @@ func (inst *Modbus) readRegisters(slave, start, count int, holding bool) (raw []
 		registers, _, err := inst.client.ReadHoldingRegisters(uint16(start), uint16(count))
 		return registers, err
 	} else {
-		fmt.Println("READ INPUTS", slave, uint16(start), uint16(count))
+		//fmt.Println("READ INPUTS", slave, uint16(start), uint16(count))
 		registers, _, err := inst.client.ReadInputRegisters(uint16(start), uint16(count))
 		return registers, err
 	}

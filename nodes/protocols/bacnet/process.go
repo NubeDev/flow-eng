@@ -1,10 +1,7 @@
 package bacnetio
 
 import (
-	"errors"
-	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/float"
-	"github.com/NubeDev/flow-eng/helpers/topics"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	log "github.com/sirupsen/logrus"
@@ -17,10 +14,10 @@ These would only be messages that we need to write to, as in write output-point,
 */
 
 // fromFlow is when a node has been written to from the wire sheet link, as in write a value @16
-func fromFlow(body node.Node, objectId points.ObjectID, store *points.Store) {
-	objectType, isWriteable, _, err := getBacnetType(body.GetName())
+func fromFlow(body node.Node, objectId points.ObjectID) (*float64, *float64) {
+	_, isWriteable, _, err := getBacnetType(body.GetName())
 	if err != nil {
-		return
+		return nil, nil
 	}
 	var in14 *float64
 	var in15 *float64
@@ -40,26 +37,26 @@ func fromFlow(body node.Node, objectId points.ObjectID, store *points.Store) {
 	}
 	if objectId == 0 {
 		log.Errorf("bacnet-server: failed to get object-id from node process")
-		return
+		return nil, nil
 	}
-	store.CreateSync(nil, objectType, objectId, points.FromFlow, in14, in15)
+	return in14, in15
 }
 
-func fromBacnet(msg interface{}, store *points.Store) error {
-	payload := points.NewPayload()
-	err := payload.NewMessage(msg)
-	if err != nil {
-		return err
-	}
-	topic := payload.GetTopic()
-	objectType, objectId := payload.GetObjectID()
-	point := store.GetPointByObject(objectType, objectId)
-	if point == nil {
-		return errors.New(fmt.Sprintf("mqtt-payload-priorty-array no point-found in store for type:%s-%d", objectType, objectId))
-	}
-	if topics.IsPri(topic) {
-		value := payload.GetFullPriority()
-		store.CreateSync(value, objectType, objectId, points.FromMqttPriory, nil, nil)
-	}
-	return nil
-}
+//func fromBacnet(msg interface{}, store *points.Store) error {
+//	payload := points.NewPayload()
+//	err := payload.NewMessage(msg)
+//	if err != nil {
+//		return err
+//	}
+//	topic := payload.GetTopic()
+//	objectType, objectId := payload.GetObjectID()
+//	point := store.GetPointByObject(objectType, objectId)
+//	if point == nil {
+//		return errors.New(fmt.Sprintf("mqtt-payload-priorty-array no point-found in store for type:%s-%d", objectType, objectId))
+//	}
+//	if topics.IsPri(topic) {
+//		value := payload.GetFullPriority()
+//		store.CreateSync(value, objectType, objectId, points.FromMqttPriory, nil, nil)
+//	}
+//	return nil
+//}

@@ -9,8 +9,8 @@ import (
 const (
 	category = "statistics"
 
-	max = "min"
-	min = "max"
+	max = "max"
+	min = "min"
 	avg = "avg"
 )
 

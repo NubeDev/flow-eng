@@ -68,8 +68,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	flatLine, _ := streams.NewFlatline(nil)
 
 	flowNetwork, _ := flow.NewNetwork(nil)
-	flowPoint, _ := flow.NewPoint(nil)
-	flowPointWrite, _ := flow.NewPointWrite(nil)
+	flowPoint, _ := flow.NewFFPoint(nil)
+	flowPointWrite, _ := flow.NewFFPointWrite(nil)
 
 	flowLoopCount, _ := system.NewLoopCount(nil)
 
@@ -135,8 +135,6 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	bacPointAO, _ := bacnetio.NewAO(nil, nil)
 	bacPointAV, _ := bacnetio.NewAV(nil, nil)
 	bacPointBV, _ := bacnetio.NewBV(nil, nil)
-	bacPointBO, _ := bacnetio.NewBO(nil, nil)
-	bacPointBI, _ := bacnetio.NewBI(nil, nil)
 
 	mqttBroker, _ := broker.NewBroker(nil)
 	mqttSub, _ := broker.NewMqttSub(nil)
@@ -239,9 +237,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(bacPointAI),
 		node.ConvertToSpec(bacPointAO),
 		node.ConvertToSpec(bacPointAV),
-		node.ConvertToSpec(bacPointBI),
 		node.ConvertToSpec(bacPointBV),
-		node.ConvertToSpec(bacPointBO),
 
 		node.ConvertToSpec(mqttBroker),
 		node.ConvertToSpec(mqttSub),
@@ -428,9 +424,9 @@ func builderFlowNetworks(body *node.Spec, opts []interface{}) (node.Node, error)
 	case flowNetwork:
 		return flow.NewNetwork(body)
 	case flowPoint:
-		return flow.NewPoint(body)
+		return flow.NewFFPoint(body)
 	case flowPointWrite:
-		return flow.NewPointWrite(body)
+		return flow.NewFFPointWrite(body)
 	}
 	return nil, nil
 }
@@ -626,10 +622,6 @@ func builderProtocols(body *node.Spec, opts []interface{}) (node.Node, error) {
 		return bacnetio.NewAV(body, bacOpts)
 	case bacnetBV:
 		return bacnetio.NewBV(body, bacOpts)
-	case bacnetBO:
-		return bacnetio.NewBO(body, bacOpts)
-	case bacnetBI:
-		return bacnetio.NewBI(body, bacOpts)
 
 	}
 	return nil, nil
