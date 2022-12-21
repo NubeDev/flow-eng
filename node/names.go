@@ -20,7 +20,7 @@ const (
 )
 
 const (
-	Setpoint   InputName = "set-point"
+	Setpoint   InputName = "setpoint"
 	Offset     InputName = "offset"
 	CoolOffset InputName = "offset-cool"
 	HeatOffset InputName = "offset-heat"

@@ -76,8 +76,12 @@ func (p *Flow) GetNodeSpec(id string) *node.Spec {
 
 func (p *Flow) AddNodes(node ...node.Node) {
 	for _, n := range node {
-		log.Infof("add node: %s %s", n.GetID(), n.GetName())
-		p.addNode(n)
+		if n != nil {
+			log.Infof("add node: %s %s", n.GetID(), n.GetName())
+			p.addNode(n)
+		} else {
+			log.Error("AddNodes() err: unknown node")
+		}
 	}
 }
 
@@ -165,7 +169,7 @@ func (p *Flow) nodeConnector(nodeId string, makeConnection bool) error {
 			connectionOutputName := input.Connection.NodePort // on const node will be named:out
 			connectionOutputId := input.Connection.NodeID     // const node nodeId
 			if connectionOutputName != "" {
-				outputNode := p.GetNode(connectionOutputId) //this is the const node
+				outputNode := p.GetNode(connectionOutputId) // this is the const node
 				if outputNode != nil {
 					for _, output := range outputNode.GetOutputs() {
 						if output.Name == connectionOutputName {
@@ -205,7 +209,7 @@ func makeGraphs(runners []*node.Runner) []*graph.Ordered {
 		}
 	}
 	if len(graphs) == 0 {
-		//panic("circular flows are not supported")
+		// panic("circular flows are not supported")
 	}
 	return graphs
 }

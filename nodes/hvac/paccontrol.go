@@ -1,8 +1,10 @@
 package hvac
 
 import (
+	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/node"
+	log "github.com/sirupsen/logrus"
 	"time"
 )
 
@@ -12,8 +14,8 @@ type PACControl struct {
 	fanStatusOffTime int64
 	clgMode          bool
 	htgMode          bool
-	clgModeEnd       int64
-	htgModeEnd       int64
+	clgModeEndTime   int64
+	htgModeEndTime   int64
 	compStage        int
 	econoMode        bool
 	stageStartTime   int64
@@ -63,23 +65,18 @@ func NewPACControl(body *node.Spec) (node.Node, error) {
 func (inst *PACControl) Process() {
 	inst.numComps = 2 // TODO: replace with settings value
 	enable, null := inst.ReadPinAsBool(node.Enable)
-	if null {
-		enable = false
-	}
 	fanStatus := true
 	requireFanStatus := true // TODO: replace with settings value
 	if requireFanStatus {
-		fanStatusInput, null := inst.ReadPinAsBool(node.FanStatus)
-		if null {
-			fanStatusInput = false
-		}
+		fanStatusInput, _ := inst.ReadPinAsBool(node.FanStatus)
 		if fanStatusInput {
 			fanStatus = true
 			inst.fanStatus = true
 		} else {
 			if inst.fanStatus {
 				fanStatusOffDelay := 30 // TODO: replace with settings value
-				inst.fanStatusOffTime = time.Now().Add(time.Second * time.Duration(fanStatusOffDelay)).Unix()
+				fanStatusOffDelayDuration, _ := time.ParseDuration(fmt.Sprintf("%fs", fanStatusOffDelay))
+				inst.fanStatusOffTime = time.Now().Add(fanStatusOffDelayDuration).Unix()
 			}
 			inst.fanStatus = fanStatusInput
 			if time.Now().Unix() >= inst.fanStatusOffTime {
@@ -127,13 +124,15 @@ func (inst *PACControl) Process() {
 		if null {
 			modeChangeDelay = 15
 		}
+		modeChangeDelayDuration, _ := time.ParseDuration(fmt.Sprintf("%fm", modeChangeDelay))
+
 		if !htgLockout && !inst.clgMode && !inst.htgMode && (zoneTemp < htgSP) {
-			if inst.clgModeEnd == 0 || (time.Now().Unix() >= time.Unix(inst.clgModeEnd, 0).Add(time.Duration(modeChangeDelay)*time.Minute).Unix()) {
+			if inst.clgModeEndTime == 0 || (time.Now().Unix() >= time.Unix(inst.clgModeEndTime, 0).Add(modeChangeDelayDuration).Unix()) {
 				inst.htgMode = true
 				inst.compStage = 0
 			}
 		} else if !clgLockout && !inst.clgMode && !inst.htgMode && (zoneTemp > clgSP) {
-			if inst.htgModeEnd == 0 || (time.Now().Unix() >= time.Unix(inst.htgModeEnd, 0).Add(time.Duration(modeChangeDelay)*time.Minute).Unix()) {
+			if inst.htgModeEndTime == 0 || (time.Now().Unix() >= time.Unix(inst.htgModeEndTime, 0).Add(modeChangeDelayDuration).Unix()) {
 				inst.clgMode = true
 				inst.compStage = 0
 			}
@@ -143,6 +142,8 @@ func (inst *PACControl) Process() {
 		if null {
 			stageUpDelay = 10
 		}
+		stageUpDelayDuration, _ := time.ParseDuration(fmt.Sprintf("%fm", stageUpDelay))
+
 		conditionPastSetpoint := false // TODO: update with settings value
 
 		if inst.htgMode {
@@ -150,13 +151,13 @@ func (inst *PACControl) Process() {
 			if htgLockout {
 				inst.compStage = 0
 				inst.htgMode = false
-				inst.htgModeEnd = time.Now().Unix()
+				inst.htgModeEndTime = time.Now().Unix()
 				inst.stageStartTime = 0
 			} else if zoneTemp < htgSP {
 				if inst.compStage == 0 {
 					inst.compStage = 1
 					inst.stageStartTime = time.Now().Unix()
-				} else if inst.compStage > 0 && (time.Now().Unix() >= time.Unix(inst.stageStartTime, 0).Add(time.Duration(stageUpDelay)*time.Minute).Unix()) {
+				} else if inst.compStage > 0 && (time.Now().Unix() >= time.Unix(inst.stageStartTime, 0).Add(stageUpDelayDuration).Unix()) {
 					if inst.compStage < inst.numComps {
 						inst.compStage++
 						inst.stageStartTime = time.Now().Unix()
@@ -182,7 +183,7 @@ func (inst *PACControl) Process() {
 				}
 				if inst.compStage == 0 {
 					inst.htgMode = false
-					inst.htgModeEnd = time.Now().Unix()
+					inst.htgModeEndTime = time.Now().Unix()
 					inst.stageStartTime = 0
 				}
 			}
@@ -190,13 +191,13 @@ func (inst *PACControl) Process() {
 			if clgLockout {
 				inst.compStage = 0
 				inst.clgMode = false
-				inst.clgModeEnd = time.Now().Unix()
+				inst.clgModeEndTime = time.Now().Unix()
 				inst.stageStartTime = 0
 			} else if zoneTemp > clgSP {
 				if inst.compStage == 0 {
 					inst.compStage = 1
 					inst.stageStartTime = time.Now().Unix()
-				} else if inst.compStage > 0 && (time.Now().Unix() >= time.Unix(inst.stageStartTime, 0).Add(time.Duration(stageUpDelay)*time.Minute).Unix()) {
+				} else if inst.compStage > 0 && (time.Now().Unix() >= time.Unix(inst.stageStartTime, 0).Add(stageUpDelayDuration).Unix()) {
 					if inst.compStage < inst.numComps {
 						inst.compStage++
 						inst.stageStartTime = time.Now().Unix()
@@ -222,7 +223,7 @@ func (inst *PACControl) Process() {
 				}
 				if inst.compStage == 0 {
 					inst.htgMode = false
-					inst.htgModeEnd = time.Now().Unix()
+					inst.htgModeEndTime = time.Now().Unix()
 					inst.stageStartTime = 0
 				}
 			}
@@ -239,6 +240,9 @@ func (inst *PACControl) Process() {
 		} else {
 			inst.econoConditions = false
 		}
+
+		inst.SetOutputs(zoneTemp, setpoint, clgSP)
+
 	} else {
 		// For disabled controller
 		inst.DisablePAC()
@@ -274,13 +278,16 @@ func (inst *PACControl) CheckEconoConditions(oaTemp float64) bool {
 }
 
 func (inst *PACControl) DisablePAC() {
+	log.Infof("PAC DisablePAC()")
 	inst.clgMode = false
-	inst.WritePinFalse(node.ClgMode)
 	inst.htgMode = false
-	inst.WritePinFalse(node.HtgMode)
 	inst.compStage = 0
-	inst.WritePinFloat(node.CompStage, 0)
 	inst.econoMode = false
+	inst.econoConditions = false
+	inst.stageStartTime = 0
+	inst.WritePinFalse(node.ClgMode)
+	inst.WritePinFalse(node.HtgMode)
+	inst.WritePinFloat(node.CompStage, 0)
 	inst.WritePinFalse(node.EconoMode)
 	inst.WritePinFloat(node.OADamper, 0)
 	inst.WritePinFalse(node.ReversingValve)
