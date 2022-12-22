@@ -162,9 +162,11 @@ const (
 
 	OutNot OutputName = "out not"
 
-	OutTopic        OutputName = "topic"
-	Out             OutputName = "out"
-	CurrentPriority OutputName = "current priority"
+	OutTopic OutputName = "topic"
+	Out      OutputName = "out"
+
+	LastUpdated     OutputName = "last-updated"
+	CurrentPriority OutputName = "current-priority"
 
 	Connected OutputName = "connected"
 

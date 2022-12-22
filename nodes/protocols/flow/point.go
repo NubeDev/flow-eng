@@ -1,25 +1,31 @@
 package flow
 
 import (
+	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/enescakir/emoji"
+	"time"
 )
 
 type FFPoint struct {
 	*node.Spec
 	topic       string
 	lastPayload *covPayload
+	lastValue   float64
+	lastUpdate  time.Time
 }
 
 func NewFFPoint(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, flowPoint, category)
 	inputs := node.BuildInputs()
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
+	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
+	lastUpdated := node.BuildOutput(node.LastUpdated, node.TypeString, nil, body.Outputs)
+	outputs := node.BuildOutputs(out, lastUpdated)
 	body.SetAllowSettings()
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body = node.SetNoParent(body)
-	pnt := &FFPoint{body, "", nil}
+	pnt := &FFPoint{body, "", nil, 0, time.Now()}
 	return pnt, nil
 }
 
@@ -86,6 +92,12 @@ func (inst *FFPoint) Process() {
 			inst.lastPayload = p
 			wroteValue = true
 			inst.WritePinFloat(node.Out, value, 2)
+			if inst.lastValue != value {
+				inst.lastValue = value
+				inst.lastUpdate = time.Now()
+			} else {
+				inst.WritePin(node.LastUpdated, ttime.TimeSince(inst.lastUpdate))
+			}
 		}
 	}
 	if !wroteValue {

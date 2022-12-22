@@ -5,5 +5,12 @@ const (
 )
 
 const (
-	folder = "folder"
+	folder      = "folder"
+	inputFloat  = "input-float"
+	inputBool   = "input-bool"
+	inputString = "input-string"
+
+	outputFloat  = "output-float"
+	outputBool   = "output-bool"
+	outputString = "output-string"
 )
