@@ -3,11 +3,12 @@ package timing
 import "time"
 
 const (
-	category = "time"
-	delay    = "delay"
-	delayOn  = "delay-on"
-	delayOff = "delay-off"
-	inject   = "inject"
+	category  = "time"
+	delay     = "delay"
+	delayOn   = "delay-on"
+	delayOff  = "delay-off"
+	dutyCycle = "duty-cycle"
+	inject    = "inject"
 )
 
 func duration(f time.Duration, format string) time.Duration {

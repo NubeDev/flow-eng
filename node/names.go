@@ -51,6 +51,7 @@ const (
 	OnInterval  InputName = "on-interval"
 	OffInterval InputName = "off-interval"
 	Interval    InputName = "interval"
+	DutyCycle   InputName = "duty-cycle"
 
 	Duration InputName = "duration"
 
@@ -138,7 +139,7 @@ const (
 	PIDDirection InputName = "direction"
 	Bias         InputName = "bias"
 	Manual       InputName = "manual"
-	IntervalSecs	InputName = "interval-secs"
+	IntervalSecs InputName = "interval-secs"
 )
 
 const (
