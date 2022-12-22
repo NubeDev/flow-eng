@@ -48,10 +48,10 @@ const (
 
 	Enable InputName = "enable"
 
-	OnInterval  InputName = "on-interval"
-	OffInterval InputName = "off-interval"
-	Interval    InputName = "interval"
-	DutyCycle   InputName = "duty-cycle"
+	MinOnTime  InputName = "min-on-time"
+	MinOffTime InputName = "min-off-time"
+	Interval   InputName = "interval"
+	DutyCycle  InputName = "duty-cycle"
 
 	Duration InputName = "duration"
 
@@ -172,8 +172,8 @@ const (
 
 	CountOut OutputName = "count"
 
-	MinOn  OutputName = "min-on"
-	MinOff OutputName = "min-off"
+	MinOnActive  OutputName = "min-on-active"
+	MinOffActive OutputName = "min-off-active"
 
 	Out1 OutputName = "out1"
 	Out2 OutputName = "out2"

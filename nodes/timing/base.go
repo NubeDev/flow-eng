@@ -8,6 +8,7 @@ const (
 	delayOn   = "delay-on"
 	delayOff  = "delay-off"
 	dutyCycle = "duty-cycle"
+	minOnOff  = "min-on-off"
 	inject    = "inject"
 )
 

@@ -52,7 +52,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	xor, _ := bool.NewXor(nil)
 	not, _ := bool.NewNot(nil)
 	toggle, _ := bool.NewToggle(nil)
-	delayMinOnOff, _ := bool.NewMinOnOff(nil, nil)
+
 	// compare
 	comp, _ := compare.NewCompareGreater(nil)
 	compLess, _ := compare.NewCompareLess(nil)
@@ -128,6 +128,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	delayOn, _ := timing.NewDelayOn(nil, nil)
 	delayOff, _ := timing.NewDelayOff(nil, nil)
 	dutyCycle, _ := timing.NewDutyCycle(nil)
+	minOnOff, _ := timing.NewMinOnOff(nil)
 
 	// number transformations
 	scaleNode, _ := transformations.NewScale(nil)
@@ -174,7 +175,6 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(xor),
 		node.ConvertToSpec(not),
 		node.ConvertToSpec(toggle),
-		node.ConvertToSpec(delayMinOnOff),
 
 		node.ConvertToSpec(comp),
 		node.ConvertToSpec(compLess),
@@ -214,6 +214,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(delayOn),
 		node.ConvertToSpec(delayOff),
 		node.ConvertToSpec(dutyCycle),
+		node.ConvertToSpec(minOnOff),
 
 		node.ConvertToSpec(randomFloat),
 		node.ConvertToSpec(inject),
@@ -534,8 +535,6 @@ func builderBoolean(body *node.Spec) (node.Node, error) {
 		return bool.NewNot(body)
 	case toggle:
 		return bool.NewToggle(body)
-	case delayMinOnOff:
-		return bool.NewMinOnOff(body, timer.NewTimer())
 	}
 	return nil, nil
 }
@@ -612,6 +611,8 @@ func builderTiming(body *node.Spec) (node.Node, error) {
 		return timing.NewDelayOff(body, timer.NewTimer())
 	case dutyCycle:
 		return timing.NewDutyCycle(body)
+	case minOnOff:
+		return timing.NewMinOnOff(body)
 	}
 	return nil, nil
 }

@@ -75,11 +75,11 @@ const (
 	randomFloat = "random-number"
 	inject      = "inject"
 
-	delay         = "delay"
-	delayOn       = "delay-on"
-	delayOff      = "delay-off"
-	dutyCycle     = "duty-cycle"
-	delayMinOnOff = "min on off"
+	delay     = "delay"
+	delayOn   = "delay-on"
+	delayOff  = "delay-off"
+	dutyCycle = "duty-cycle"
+	minOnOff  = "min-on-off"
 
 	// switch
 	switchNode = "switch"
