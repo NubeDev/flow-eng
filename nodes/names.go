@@ -45,8 +45,8 @@ const (
 	getHttpNode   = "http-get"
 	writeHttpNode = "http-write"
 
-	deadBandNode = "dead-band"
-	pidNode      = "pid"
+	deadBandNode   = "dead-band"
+	pidNode        = "pid"
 	pacControlNode = "pac-control"
 
 	logicCompareGreater = "compare-greater"
@@ -78,6 +78,7 @@ const (
 	delay         = "delay"
 	delayOn       = "delay-on"
 	delayOff      = "delay-off"
+	dutyCycle     = "duty-cycle"
 	delayMinOnOff = "min on off"
 
 	// switch

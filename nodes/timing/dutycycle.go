@@ -4,14 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"github.com/NubeDev/flow-eng/node"
+	log "github.com/sirupsen/logrus"
 	"time"
 )
 
 type DutyCycle struct {
 	*node.Spec
 	onTicker         *time.Ticker
-	offTicker        *time.Ticker
-	offDelayTimer    *time.Timer
+	offTimer         *time.Timer
 	cancelChannel    chan bool
 	lastIntervalSecs float64
 	lastDuty         float64
@@ -28,7 +28,7 @@ func NewDutyCycle(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(buildSchema())
-	return &DutyCycle{body, nil, nil, nil, nil, 10, 50, false}, nil
+	return &DutyCycle{body, nil, nil, nil, 10, 50, false}, nil
 }
 
 /*
@@ -37,15 +37,18 @@ start delay, after the delay set the triggered to true
 */
 
 func (inst *DutyCycle) Process() {
+	// log.Infof("Process()")
 	// settings, _ := getSettings(inst.GetSettings())
 
 	enable, _ := inst.ReadPinAsBool(node.Enable)
 	if !enable {
 		inst.disableDutyCycle()
+		inst.lastEnable = false
+		inst.WritePinFalse(node.Out)
 		return
 	}
 
-	intervalSecs, _ := inst.ReadPinAsFloat(node.Interval)
+	intervalSecs, _ := inst.ReadPinAsFloat(node.IntervalSecs)
 	if intervalSecs <= 0 {
 		intervalSecs = 10
 	}
@@ -54,6 +57,8 @@ func (inst *DutyCycle) Process() {
 	if dutyCyclePerc < 0 || dutyCyclePerc > 100 || dutyNull {
 		dutyCyclePerc = 50
 	}
+
+	// log.Infof("Process() enable: %t  intervalSecs: %f  dutyCyclePerc: %f", enable, intervalSecs, dutyCyclePerc)
 
 	// Check if there are settings that require a restart
 	if enable && !inst.lastEnable || intervalSecs != inst.lastIntervalSecs || dutyCyclePerc != inst.lastDuty {
@@ -66,6 +71,9 @@ func (inst *DutyCycle) Process() {
 }
 
 func (inst *DutyCycle) restartDutyCycle(intervalSeconds, dutyCycle float64) error {
+	log.Infof("restartDutyCycle() intervalSeconds: %f  dutyCycle: %f", intervalSeconds, dutyCycle)
+	inst.disableDutyCycle() // stop existing timers
+
 	if intervalSeconds <= 0 || (dutyCycle < 0 || dutyCycle > 100) {
 		return errors.New("restartDutyCycle() err: invalid inputs")
 	}
@@ -77,9 +85,7 @@ func (inst *DutyCycle) restartDutyCycle(intervalSeconds, dutyCycle float64) erro
 	cancel := make(chan bool)
 	inst.cancelChannel = cancel
 	inst.onTicker = time.NewTicker(intervalDuration)
-	inst.offDelayTimer = time.AfterFunc(delayBetweenOnAndOffDuration, func() {
-		inst.offTicker = time.NewTicker(intervalDuration)
-	})
+	inst.startIteration(delayBetweenOnAndOffDuration)
 
 	go func() {
 		for {
@@ -87,26 +93,36 @@ func (inst *DutyCycle) restartDutyCycle(intervalSeconds, dutyCycle float64) erro
 			case <-cancel:
 				return
 			case <-inst.onTicker.C:
-				inst.WritePinTrue(node.Out)
-			case <-inst.offTicker.C:
-				inst.WritePinFalse(node.Out)
+				inst.startIteration(delayBetweenOnAndOffDuration)
 			}
 		}
 	}()
+
 	return nil
 }
 
+func (inst *DutyCycle) startIteration(delayBetweenOnAndOffDuration time.Duration) {
+	log.Infof("startIteration() delayBetweenOnAndOffDuration: %s", delayBetweenOnAndOffDuration)
+	inst.WritePinTrue(node.Out)
+	log.Infof("DutyCycle: ON")
+	inst.offTimer = time.AfterFunc(delayBetweenOnAndOffDuration, func() {
+		inst.WritePinFalse(node.Out)
+		log.Infof("DutyCycle: OFF")
+	})
+}
+
 func (inst *DutyCycle) disableDutyCycle() {
-	inst.cancelChannel <- true
+	// log.Infof("disableDutyCycle()")
+	if inst.cancelChannel != nil {
+		inst.cancelChannel <- true
+		inst.cancelChannel = nil
+	}
 	if inst.onTicker != nil {
 		inst.onTicker.Stop()
+		inst.onTicker = nil
 	}
-	if inst.offTicker != nil {
-		inst.offTicker.Stop()
+	if inst.offTimer != nil {
+		inst.offTimer.Stop()
+		inst.offTimer = nil
 	}
-	if inst.offDelayTimer != nil {
-		inst.offDelayTimer.Stop()
-	}
-	inst.lastEnable = false
-	inst.WritePinFalse(node.Out)
 }
