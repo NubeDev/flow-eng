@@ -31,13 +31,7 @@ func NewDutyCycle(body *node.Spec) (node.Node, error) {
 	return &DutyCycle{body, nil, nil, nil, 10, 50, false}, nil
 }
 
-/*
-if node input is true
-start delay, after the delay set the triggered to true
-*/
-
 func (inst *DutyCycle) Process() {
-	// log.Infof("Process()")
 	// settings, _ := getSettings(inst.GetSettings())
 
 	enable, _ := inst.ReadPinAsBool(node.Enable)
@@ -58,8 +52,6 @@ func (inst *DutyCycle) Process() {
 		dutyCyclePerc = 50
 	}
 
-	// log.Infof("Process() enable: %t  intervalSecs: %f  dutyCyclePerc: %f", enable, intervalSecs, dutyCyclePerc)
-
 	// Check if there are settings that require a restart
 	if enable && !inst.lastEnable || intervalSecs != inst.lastIntervalSecs || dutyCyclePerc != inst.lastDuty {
 		inst.restartDutyCycle(intervalSecs, dutyCyclePerc)
@@ -71,7 +63,6 @@ func (inst *DutyCycle) Process() {
 }
 
 func (inst *DutyCycle) restartDutyCycle(intervalSeconds, dutyCycle float64) error {
-	log.Infof("restartDutyCycle() intervalSeconds: %f  dutyCycle: %f", intervalSeconds, dutyCycle)
 	inst.disableDutyCycle() // stop existing timers
 
 	if intervalSeconds <= 0 || (dutyCycle < 0 || dutyCycle > 100) {
@@ -102,7 +93,6 @@ func (inst *DutyCycle) restartDutyCycle(intervalSeconds, dutyCycle float64) erro
 }
 
 func (inst *DutyCycle) startIteration(delayBetweenOnAndOffDuration time.Duration) {
-	log.Infof("startIteration() delayBetweenOnAndOffDuration: %s", delayBetweenOnAndOffDuration)
 	inst.WritePinTrue(node.Out)
 	log.Infof("DutyCycle: ON")
 	inst.offTimer = time.AfterFunc(delayBetweenOnAndOffDuration, func() {
