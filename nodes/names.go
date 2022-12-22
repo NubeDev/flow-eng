@@ -101,5 +101,6 @@ const (
 	mqttSub    = "mqtt-subscribe"
 	mqttPub    = "mqtt-publish"
 
-	logNode = "log"
+	logNode       = "log"
+	subFlowFolder = "folder"
 )
