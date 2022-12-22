@@ -3,60 +3,64 @@ package timing
 import (
 	"github.com/NubeDev/flow-eng/helpers/timer"
 	"github.com/NubeDev/flow-eng/node"
+	"time"
 )
 
 type DelayOn struct {
 	*node.Spec
-	timer     timer.TimedDelay
-	triggered bool
-	active    bool
+	timer      *time.Timer
+	currOutput bool
 }
 
 func NewDelayOn(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
 	body = node.Defaults(body, delayOn, category)
 	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs)
 	inputs := node.BuildInputs(in)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs))
+	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
+	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(buildSchema())
-	return &DelayOn{body, timer, false, false}, nil
+	return &DelayOn{body, nil, false}, nil
 }
 
 /*
 if node input is true
-start delay, after the delay set the triggered to true
+start delay, after the delay set the output to true
 */
 
 func (inst *DelayOn) Process() {
 	settings, _ := getSettings(inst.GetSettings())
-	in1, null := inst.ReadPinAsBool(node.In)
-	if null {
-		inst.WritePinNull(node.Out)
-	}
-	if in1 && inst.active { // timer has gone to true and input is still true
-		inst.WritePinTrue(node.Out)
-		return
-	} else {
-		inst.active = false // timer is true and input went back to 0
-	}
+	in1, _ := inst.ReadPinAsBool(node.In)
 
-	if !in1 && inst.triggered { // went true but not for long enough to finish the timeOn delay, so reset the timer
-		inst.timer.Stop()
-		inst.timer = timer.NewTimer()
-		inst.triggered = false
-	}
-	if in1 {
-		if !inst.timer.WaitFor(duration(settings.Duration, settings.Time)) {
-			inst.WritePinFalse(node.Out)
-			inst.triggered = true
-			return
-		} else {
-			inst.active = true
-			inst.WritePinTrue(node.Out)
-		}
-
-	} else {
+	if !in1 { // any time input is false, set output false and cancel any running timers
 		inst.WritePinFalse(node.Out)
+		inst.currOutput = false
+		if inst.timer != nil {
+			inst.timer.Stop()
+			inst.timer = nil
+		}
+		return
 	}
 
+	// input is true
+
+	if inst.currOutput { // input is still active, so output is still active, cancel any running timers (for safety)
+		inst.WritePinTrue(node.Out)
+		inst.currOutput = true
+		if inst.timer != nil {
+			inst.timer.Stop()
+			inst.timer = nil
+		}
+		return
+	}
+
+	// input is active, but output isn't so start a timer if it doesn't exist already
+	if inst.timer == nil {
+		onDelayDuration := duration(settings.Duration, settings.Time)
+		inst.timer = time.AfterFunc(onDelayDuration, func() {
+			inst.WritePinTrue(node.Out)
+			inst.currOutput = true
+			inst.timer = nil
+		})
+	}
 }

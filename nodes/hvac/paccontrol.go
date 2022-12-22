@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/node"
-	log "github.com/sirupsen/logrus"
 	"time"
 )
 
@@ -278,7 +277,6 @@ func (inst *PACControl) CheckEconoConditions(oaTemp float64) bool {
 }
 
 func (inst *PACControl) DisablePAC() {
-	log.Infof("PAC DisablePAC()")
 	inst.clgMode = false
 	inst.htgMode = false
 	inst.compStage = 0

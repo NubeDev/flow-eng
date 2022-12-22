@@ -27,7 +27,7 @@ func (inst *Broker) getConnectionsNames() (names []string, uuids []string) {
 		}
 		return names, uuids
 	}
-	log.Errorf("flow-networks failed to get db instance")
+	log.Errorf("mqtt-broker failed to get db instance")
 	return nil, nil
 
 }

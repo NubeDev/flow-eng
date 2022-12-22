@@ -51,6 +51,7 @@ const (
 	OnInterval  InputName = "on-interval"
 	OffInterval InputName = "off-interval"
 	Interval    InputName = "interval"
+	DutyCycle   InputName = "duty-cycle"
 
 	Duration InputName = "duration"
 

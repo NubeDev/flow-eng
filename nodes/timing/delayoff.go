@@ -3,46 +3,58 @@ package timing
 import (
 	"github.com/NubeDev/flow-eng/helpers/timer"
 	"github.com/NubeDev/flow-eng/node"
+	"time"
 )
 
 type DelayOff struct {
 	*node.Spec
-	timer   timer.TimedDelay
-	wasTrue bool
+	timer      *time.Timer
+	currOutput bool
 }
 
 func NewDelayOff(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
 	body = node.Defaults(body, delayOff, category)
 	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs)
 	body.Inputs = node.BuildInputs(in)
-	body.Outputs = node.BuildOutputs(node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs))
+	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
+	body.Outputs = node.BuildOutputs(out)
 	body.SetSchema(buildSchema())
-	return &DelayOff{body, timer, false}, nil
+	return &DelayOff{body, nil, false}, nil
 }
 
 func (inst *DelayOff) Process() {
 	settings, _ := getSettings(inst.GetSettings())
-	in1, null := inst.ReadPinAsBool(node.In)
-	if null {
-		inst.WritePinNull(node.Out)
-	}
-	if in1 {
-		inst.wasTrue = true
+	in1, _ := inst.ReadPinAsBool(node.In)
+
+	if in1 { // any time input is true, set output true and cancel any running timers
 		inst.WritePinTrue(node.Out)
-	}
-
-	if !in1 && inst.wasTrue { // was true and now is false
-		if inst.timer.WaitFor(duration(settings.Duration, settings.Time)) {
-			inst.WritePinFalse(node.Out)
-			inst.wasTrue = false
-			return
-		} else {
-			inst.WritePinTrue(node.Out)
-			return
+		inst.currOutput = true
+		if inst.timer != nil {
+			inst.timer.Stop()
+			inst.timer = nil
 		}
-	}
-	if !in1 {
-		inst.WritePinFalse(node.Out)
+		return
 	}
 
+	// input is false
+
+	if !inst.currOutput { // input is still false, so output is still false, cancel any running timers (for safety)
+		inst.WritePinFalse(node.Out)
+		inst.currOutput = false
+		if inst.timer != nil {
+			inst.timer.Stop()
+			inst.timer = nil
+		}
+		return
+	}
+
+	// input is false, but output isn't so start a timer if it doesn't exist already
+	if inst.timer == nil {
+		onDelayDuration := duration(settings.Duration, settings.Time)
+		inst.timer = time.AfterFunc(onDelayDuration, func() {
+			inst.WritePinFalse(node.Out)
+			inst.currOutput = false
+			inst.timer = nil
+		})
+	}
 }
