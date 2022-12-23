@@ -28,7 +28,7 @@ func (inst *DelayOff) Process() {
 	settings, _ := getSettings(inst.GetSettings())
 	if settings != nil {
 		t := strings.Replace(settings.Duration.String(), "ns", "", -1)
-		inst.SetSubTitle(fmt.Sprintf("setting %s:%s", t, settings.Time))
+		inst.SetSubTitle(fmt.Sprintf("setting: %s %s", t, settings.Time))
 	}
 	in1, _ := inst.ReadPinAsBool(node.In)
 
