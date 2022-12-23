@@ -49,12 +49,12 @@ const (
 	pidNode        = "pid"
 	pacControlNode = "pac-control"
 
-	logicCompareGreater = "compare-greater"
-	logicCompareLess    = "compare-less"
-	logicCompareEqual   = "compare-equal"
-	between             = "between"
-	hysteresis          = "hysteresis"
-	funcNode            = "func"
+	greaterThan = "greater-than"
+	lessThan    = "less-than"
+	equal       = "equal"
+	between     = "between"
+	hysteresis  = "hysteresis"
+	funcNode    = "func"
 
 	conversionString = "conversion-string"
 	conversionNum    = "conversion-number"
@@ -75,11 +75,11 @@ const (
 	randomFloat = "random-number"
 	inject      = "inject"
 
-	delay         = "delay"
-	delayOn       = "delay-on"
-	delayOff      = "delay-off"
-	dutyCycle     = "duty-cycle"
-	delayMinOnOff = "min on off"
+	delay     = "delay"
+	delayOn   = "delay-on"
+	delayOff  = "delay-off"
+	dutyCycle = "duty-cycle"
+	minOnOff  = "min-on-off"
 
 	// switch
 	switchNode = "switch"

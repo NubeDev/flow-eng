@@ -1,7 +1,8 @@
 package boolean
 
 import (
-	"github.com/NubeDev/flow-eng/helpers/conversions"
+	"fmt"
+	"strconv"
 )
 
 func New(value bool) *bool {
@@ -53,24 +54,12 @@ func IsNil(b *bool) bool {
 }
 
 func ConvertInterfaceToBool(value interface{}) *bool {
-	if value == nil {
-		return nil
+	var valAsBoolPtr *bool
+	if value != nil {
+		valAsBool, _ := strconv.ParseBool(fmt.Sprintf("%v", value))
+		valAsBoolPtr = New(valAsBool)
 	}
-	v, ok := conversions.GetFloatOk(value)
-	if ok {
-		if v == 1 {
-			return NewTrue()
-		}
-		if v == 0 {
-			return NewFalse()
-		}
-	}
-	output, ok := value.(bool)
-	if ok {
-		return &output
-	}
-
-	return nil
+	return valAsBoolPtr
 }
 
 func ConvertInterfaceToBoolMultiple(values []interface{}) []*bool {
