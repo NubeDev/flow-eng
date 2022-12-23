@@ -31,9 +31,6 @@ func NewNetwork(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(node.BuildOutput(node.Connected, node.TypeBool, nil, body.Outputs))
 	body.IsParent = true
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	if body.GetNodeName() == "" {
-		body.SetNodeName("network")
-	}
 	network := &Network{body, false, 0, nil, nil, false, nil, 0}
 	return network, nil
 }

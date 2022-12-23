@@ -1,8 +1,10 @@
 package timing
 
 import (
+	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/timer"
 	"github.com/NubeDev/flow-eng/node"
+	"strings"
 	"time"
 )
 
@@ -30,6 +32,10 @@ start delay, after the delay set the output to true
 
 func (inst *DelayOn) Process() {
 	settings, _ := getSettings(inst.GetSettings())
+	if settings != nil {
+		t := strings.Replace(settings.Duration.String(), "ns", "", -1)
+		inst.SetSubTitle(fmt.Sprintf("setting %s:%s", t, settings.Time))
+	}
 	in1, _ := inst.ReadPinAsBool(node.In)
 
 	if !in1 { // any time input is false, set output false and cancel any running timers

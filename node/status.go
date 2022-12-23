@@ -40,6 +40,9 @@ func (n *Spec) SetSubTitle(message string) {
 	if n.Status == nil {
 		n.Status = &Status{}
 	}
+	if n.GetNodeName() == "" {
+		n.SetNodeName(n.GetName())
+	}
 	n.Status.SubTitle = message
 }
 

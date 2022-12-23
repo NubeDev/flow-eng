@@ -37,12 +37,8 @@ func (runner *SerialRunner) Process() (e error) {
 				return
 			}
 		}
-		//for j := 0; j < len(graph.Runners); j++ { // TODO Binod should the reset be moved to the bottom
-		//	runner := graph.Runners[j]
-		//	runner.Reset()
-		//}
 	}
-	for i := 0; i < len(runner.flow.Graphs); i++ { // TODO Binod
+	for i := 0; i < len(runner.flow.Graphs); i++ {
 		graph := runner.flow.Graphs[i]
 		for j := 0; j < len(graph.Runners); j++ {
 			runner := graph.Runners[j]
