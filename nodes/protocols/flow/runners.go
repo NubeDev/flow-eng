@@ -64,9 +64,11 @@ func (inst *Network) pointsList() {
 		if err == nil {
 			if points != nil {
 				s := inst.GetStore()
+				inst.pointsCount = len(points)
 				if s != nil {
 					// fmt.Println(string(message.Payload()))
 					s.Set(fmt.Sprintf("pointsList_%s", inst.GetID()), points, 0)
+					inst.SetSubTitle(fmt.Sprintf("points count: %d", inst.pointsCount))
 				}
 			}
 		} else {

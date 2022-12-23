@@ -18,6 +18,7 @@ type Network struct {
 	mqttClient    *mqttclient.Client
 	mqttConnected bool
 	points        []*point
+	pointsCount   int
 }
 
 var mqttQOS = mqttclient.AtMostOnce
@@ -30,24 +31,27 @@ func NewNetwork(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(node.BuildOutput(node.Connected, node.TypeBool, nil, body.Outputs))
 	body.IsParent = true
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	network := &Network{body, false, 0, nil, nil, false, nil}
+	if body.GetNodeName() == "" {
+		body.SetNodeName("network")
+	}
+	network := &Network{body, false, 0, nil, nil, false, nil, 0}
 	return network, nil
 }
 
 func (inst *Network) setConnection() {
 	settings, err := getSettings(inst.GetSettings())
 	if err != nil {
-		errMes := fmt.Sprintf("flow-network add mqtt broker failed to get settings err:%s", err.Error())
+		errMes := fmt.Sprintf("flow-network, add mqtt broker failed to get settings err:%s", err.Error())
 		log.Errorf(errMes)
 		inst.SetStatusError(errMes)
 		inst.SetErrorIcon(string(emoji.RedCircle))
 		inst.SetSubTitle("")
 		return
 	}
-	if settings == nil {
-		return
-	}
-	connection, err := inst.GetDB().GetConnection(settings.Conn)
+	var connection *db.Connection
+	var connectionName = "flow framework integration over MQTT (dont not edit/delete)" // this name is set in rubix-edge-wires
+
+	connection, err = inst.GetDB().GetConnectionByName(connectionName)
 	if err != nil {
 		errMes := fmt.Sprintf("flow-network error in getting connection err:%s", err.Error())
 		log.Errorf(errMes)
@@ -56,16 +60,27 @@ func (inst *Network) setConnection() {
 		inst.SetSubTitle("")
 		return
 	}
+
+	if connection == nil {
+		connection, err = inst.GetDB().GetConnection(settings.Conn)
+		if err != nil {
+			errMes := fmt.Sprintf("flow-network error in getting connection err:%s", err.Error())
+			log.Errorf(errMes)
+			inst.SetStatusError(errMes)
+			inst.SetErrorIcon(string(emoji.RedCircle))
+			inst.SetSubTitle("")
+			return
+		}
+	}
+
 	if connection == nil {
 		errMes := fmt.Sprintf("no flow-network mqtt connection, please select a connection")
 		log.Errorf(errMes)
 		inst.SetStatusError(errMes)
 		inst.SetErrorIcon(string(emoji.RedCircle))
-		inst.SetSubTitle("")
 		return
 	}
 	inst.connection = connection
-	inst.SetSubTitle(connection.Name)
 	mqttClient, err := mqttclient.NewClient(mqttclient.ClientOptions{
 		Servers: []string{fmt.Sprintf("tcp://%s:%d", connection.Host, connection.Port)},
 	})
