@@ -54,9 +54,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	toggle, _ := bool.NewToggle(nil)
 
 	// compare
-	comp, _ := compare.NewCompareGreater(nil)
-	compLess, _ := compare.NewCompareLess(nil)
-	logicCompareEqual, _ := compare.NewCompareEqual(nil)
+	greaterthan, _ := compare.NewGreaterThan(nil)
+	lessthan, _ := compare.NewLessThan(nil)
+	equal, _ := compare.NewEqual(nil)
 	between, _ := compare.NewBetween(nil)
 	hysteresis, _ := compare.NewHysteresis(nil)
 
@@ -176,9 +176,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(not),
 		node.ConvertToSpec(toggle),
 
-		node.ConvertToSpec(comp),
-		node.ConvertToSpec(compLess),
-		node.ConvertToSpec(logicCompareEqual),
+		node.ConvertToSpec(greaterthan),
+		node.ConvertToSpec(lessthan),
+		node.ConvertToSpec(equal),
 		node.ConvertToSpec(between),
 		node.ConvertToSpec(hysteresis),
 
@@ -541,12 +541,12 @@ func builderBoolean(body *node.Spec) (node.Node, error) {
 
 func builderCompare(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
-	case logicCompareGreater:
-		return compare.NewCompareGreater(body)
-	case logicCompareLess:
-		return compare.NewCompareLess(body)
-	case logicCompareEqual:
-		return compare.NewCompareEqual(body)
+	case greaterThan:
+		return compare.NewGreaterThan(body)
+	case lessThan:
+		return compare.NewLessThan(body)
+	case equal:
+		return compare.NewEqual(body)
 	case between:
 		return compare.NewBetween(body)
 	case hysteresis:

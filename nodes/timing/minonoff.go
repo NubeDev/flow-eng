@@ -2,7 +2,6 @@ package timing
 
 import (
 	"github.com/NubeDev/flow-eng/node"
-	log "github.com/sirupsen/logrus"
 	"time"
 )
 
@@ -37,8 +36,8 @@ func (inst *MinOnOff) Process() {
 	input, _ := inst.ReadPinAsBool(node.In)
 
 	reset, _ := inst.ReadPinAsBool(node.Reset)
+
 	if reset && !inst.lastReset {
-		log.Infof("MIN-ON-OFF Process(): RESET")
 		inst.minOnEnabled = false
 		inst.minOffEnabled = false
 		inst.WritePinFalse(node.MinOnActive)
@@ -46,14 +45,8 @@ func (inst *MinOnOff) Process() {
 	}
 	inst.lastReset = reset
 
-	log.Infof("MIN-ON-OFF Process(): input: %v   reset: %v   minOnEnabled: %v   minOffEnabled: %v   lastInput: %v", input, reset, inst.minOnEnabled, inst.minOffEnabled, inst.lastInput)
-
 	if !inst.minOnEnabled && !inst.minOffEnabled {
-		if input {
-			inst.WritePinTrue(node.Out)
-		} else {
-			inst.WritePinFalse(node.Out)
-		}
+		inst.WritePinBool(node.Out, input)
 		if input && !inst.lastInput {
 			inst.timeOn = time.Now().Unix()
 			inst.minOnEnabled = true
@@ -87,5 +80,6 @@ func (inst *MinOnOff) Process() {
 			}
 		}
 	}
+	inst.lastInput = input
 
 }

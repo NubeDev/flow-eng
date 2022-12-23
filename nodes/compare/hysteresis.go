@@ -6,6 +6,7 @@ import (
 
 type Hysteresis struct {
 	*node.Spec
+	currentVal bool
 }
 
 func NewHysteresis(body *node.Spec) (node.Node, error) {
@@ -13,38 +14,45 @@ func NewHysteresis(body *node.Spec) (node.Node, error) {
 	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs)
 	risingEdge := node.BuildInput(node.RisingEdge, node.TypeFloat, 20, body.Inputs)
 	fallingEdge := node.BuildInput(node.FallingEdge, node.TypeFloat, 10, body.Inputs)
-
 	inputs := node.BuildInputs(in, risingEdge, fallingEdge)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs))
+
+	output := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
+	outNot := node.BuildOutput(node.OutNot, node.TypeBool, nil, body.Outputs)
+	outputs := node.BuildOutputs(output, outNot)
 	body = node.BuildNode(body, inputs, outputs, nil)
-	return &Hysteresis{body}, nil
+	return &Hysteresis{body, false}, nil
 }
 
 func (inst *Hysteresis) Process() {
-	value, _ := inst.ReadPinAsFloat(node.In)
-	var out bool
-	risingEdge, _ := inst.ReadPinAsFloat(node.RisingEdge)
-	fallingEdge, _ := inst.ReadPinAsFloat(node.FallingEdge)
+	value, inNull := inst.ReadPinAsFloat(node.In)
+	risingEdge, riseNull := inst.ReadPinAsFloat(node.RisingEdge)
+	fallingEdge, fallNull := inst.ReadPinAsFloat(node.FallingEdge)
+
+	if riseNull || fallNull || inNull {
+		inst.WritePinFalse(node.Out)
+		inst.WritePinTrue(node.Out)
+		inst.currentVal = false
+		return
+	}
 
 	if risingEdge > fallingEdge {
 		if value <= fallingEdge {
-			out = false
+			inst.currentVal = false
 		}
 		if value >= risingEdge {
-			out = true
+			inst.currentVal = true
 		}
 	} else if risingEdge < fallingEdge {
 		if value >= fallingEdge {
-			out = false
+			inst.currentVal = false
 		}
 		if value <= risingEdge {
-			out = true
+			inst.currentVal = false
 		}
-	}
-	if out {
-		inst.WritePinTrue(node.Out)
-	} else {
-		inst.WritePinFalse(node.Out)
+	} else if risingEdge == fallingEdge {
+		inst.currentVal = value > risingEdge
 	}
 
+	inst.WritePinBool(node.Out, inst.currentVal)
+	inst.WritePinBool(node.OutNot, !inst.currentVal)
 }

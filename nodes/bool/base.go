@@ -52,15 +52,10 @@ func Process(body node.Node) {
 	equation := body.GetName()
 	count := body.InputsLen()
 	inputs := boolean.ConvertInterfaceToBoolMultiple(body.ReadMultiple(count))
-	output := operation(equation, inputs)
-	if output == nil {
-		body.WritePinNull(node.Out)
-	} else {
-		body.WritePinBool(node.Out, boolean.NonNil(output))
-	}
+	body.WritePinBool(node.Out, operation(equation, inputs))
 }
 
-func operation(operation string, values []*bool) *bool {
+func operation(operation string, values []*bool) bool {
 	var nonNilValues []bool
 	for _, value := range values {
 		if value != nil {
@@ -68,27 +63,13 @@ func operation(operation string, values []*bool) *bool {
 		}
 	}
 	if len(nonNilValues) == 0 {
-		return nil
+		return false
 	}
 	switch operation {
 	case and:
-		if array.AllTrue(nonNilValues) {
-			return boolean.New(true)
-		} else {
-			return boolean.New(false)
-		}
+		return array.AllTrue(nonNilValues)
 	case or:
-		if array.OneIsTrue(nonNilValues) {
-			return boolean.New(true)
-		} else {
-			return boolean.New(false)
-		}
-	case not:
-		if nonNilValues[0] {
-			return boolean.New(false)
-		} else {
-			return boolean.New(true)
-		}
+		return array.OneIsTrue(nonNilValues)
 	}
-	return boolean.New(false)
+	return false
 }

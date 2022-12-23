@@ -5,11 +5,11 @@ const (
 )
 
 const (
-	logicCompareGreater = "compare-greater"
-	logicCompareLess    = "compare-less"
-	logicCompareEqual   = "compare-equal"
-	betweenNode         = "between"
-	hysteresis          = "hysteresis"
+	GreaterThan = "greater-than"
+	LessThan    = "less-than"
+	Equal       = "equal"
+	betweenNode = "between"
+	hysteresis  = "hysteresis"
 )
 
 func B2F(b bool) float64 {

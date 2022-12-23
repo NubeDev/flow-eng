@@ -188,6 +188,7 @@ const (
 	LessThanEqual    OutputName = "less or equal"
 	LessThan         OutputName = "less"
 	Equal            OutputName = "equal"
+	NotEqual         OutputName = "not-equal"
 
 	ClgMode        OutputName = "clg-mode"
 	HtgMode        OutputName = "htg-mode"
