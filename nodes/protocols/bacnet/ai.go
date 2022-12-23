@@ -21,15 +21,12 @@ type AI struct {
 	toFlowOptions *toFlowOptions
 }
 
-//var store *points.Store
-
 func NewAI(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	opts = bacnetOpts(opts)
 	var err error
 	body, err = nodeDefault(body, bacnetAI, category, opts.Application)
 	body.SetSchema(buildSchemaUI())
 	flowOptions := &toFlowOptions{}
-	//store = opts.Store
 	return &AI{
 		body,
 		0,
