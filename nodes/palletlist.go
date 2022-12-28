@@ -74,6 +74,11 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	flowLoopCount, _ := system.NewLoopCount(nil)
 	subFlowFolder, _ := subflow.NewSubFlowFolder(nil)
+	subInputFloat, _ := subflow.NewSubFlowInputFloat(nil)
+	subInputString, _ := subflow.NewSubFlowInputString(nil)
+	subInputBool, _ := subflow.NewSubFlowInputBool(nil)
+
+	subOutputFloat, _ := subflow.NewSubFlowOutputFloat(nil)
 
 	conversionString, _ := conversion.NewString(nil)
 	conversionNum, _ := conversion.NewNumber(nil)
@@ -191,6 +196,10 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(flowLoopCount),
 		node.ConvertToSpec(subFlowFolder),
+		node.ConvertToSpec(subInputFloat),
+		node.ConvertToSpec(subInputString),
+		node.ConvertToSpec(subInputBool),
+		node.ConvertToSpec(subOutputFloat),
 
 		node.ConvertToSpec(flowNetwork),
 		node.ConvertToSpec(flowPoint),
@@ -364,6 +373,14 @@ func builderMisc(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case subFlowFolder:
 		return subflow.NewSubFlowFolder(body)
+	case inputFloat:
+		return subflow.NewSubFlowInputFloat(body)
+	case inputString:
+		return subflow.NewSubFlowInputString(body)
+	case inputBool:
+		return subflow.NewSubFlowInputBool(body)
+	case outputFloat:
+		return subflow.NewSubFlowOutputFloat(body)
 	case logNode:
 		return debugging.NewLog(body)
 	case funcNode:
