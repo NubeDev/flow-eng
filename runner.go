@@ -1,9 +1,7 @@
 package flowctrl
 
 import (
-	"errors"
-	"fmt"
-	"github.com/NubeDev/flow-eng/node"
+	"sync"
 )
 
 type SerialRunner struct {
@@ -14,37 +12,35 @@ func NewSerialRunner(flow *Flow) *SerialRunner {
 	return &SerialRunner{flow}
 }
 
-func (runner *SerialRunner) Process() (e error) {
-	defer func() {
-		if recovered := recover(); recovered != nil {
-			e = fmt.Errorf("flow processing error: %v", recovered)
-		}
-	}()
-	for i := 0; i < len(runner.flow.Graphs); i++ {
-		graph := runner.flow.Graphs[i]
-		var lastNode string
-		for j := 0; j < len(graph.Runners); j++ {
-			runner := graph.Runners[j]
-			lastNode = runner.Name()
-			//fmt.Println("node", lastNode, len(graph.Runners))
-			err := runner.Process()
-			if err != nil {
-				// node was no triggered, not all input ports were written by dependent nodes
-				if err == node.ErrNoInputData {
-					continue
-				}
-				e = errors.New(fmt.Sprintf("node: %s err:%s", lastNode, err.Error()))
-				return
-			}
+func (sr *SerialRunner) Start() {
+	for _, graph := range sr.flow.Graphs {
+		for _, runner := range graph.Runners {
+			runner.Start()
 		}
 	}
-	for i := 0; i < len(runner.flow.Graphs); i++ {
-		graph := runner.flow.Graphs[i]
-		for j := 0; j < len(graph.Runners); j++ {
-			runner := graph.Runners[j]
-			//fmt.Println("Reset", runner.Name())
+}
+
+func (sr *SerialRunner) Process() {
+	for _, graph := range sr.flow.Graphs {
+		for _, runner := range graph.Runners {
+			runner.Process()
+		}
+	}
+	for _, graph := range sr.flow.Graphs {
+		for _, runner := range graph.Runners {
 			runner.Reset()
 		}
 	}
 	return
+}
+
+func (sr *SerialRunner) Stop() {
+	var wg sync.WaitGroup // stop function takes long time, and it gets accumulated without having wait group
+	wg.Add(len(sr.flow.nodes))
+	for _, graph := range sr.flow.Graphs {
+		for _, runner := range graph.Runners {
+			go runner.Stop(&wg)
+		}
+	}
+	wg.Wait()
 }
