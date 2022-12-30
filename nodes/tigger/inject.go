@@ -6,11 +6,13 @@ import (
 	"github.com/go-co-op/gocron"
 )
 
+const DefaultInjectSecond = 2
+
 type Inject struct {
 	*node.Spec
-	cron         *gocron.Scheduler
-	triggered    bool
-	triggerCount uint64
+	cron             *gocron.Scheduler
+	triggerCount     uint32
+	previousInterval int
 }
 
 func NewInject(body *node.Spec) (node.Node, error) {
@@ -21,7 +23,7 @@ func NewInject(body *node.Spec) (node.Node, error) {
 	body.Outputs = node.BuildOutputs(trigger)
 	j := jobs.New().Get()
 	j.StartAsync()
-	return &Inject{body, j, false, 0}, nil
+	return &Inject{body, j, 0, 0}, nil
 }
 
 func (inst *Inject) injectJob() {
@@ -30,23 +32,22 @@ func (inst *Inject) injectJob() {
 
 func (inst *Inject) run(interval int) {
 	if interval == 0 {
-		interval = 2
+		interval = DefaultInjectSecond
 	}
+	inst.cron.Clear() // if it's runtime change, we need to clear the running jobs and start fresh
 	inst.cron.Every(interval).Second().Do(inst.injectJob)
-	inst.triggered = true
 }
 
 func (inst *Inject) Process() {
 	interval, _ := inst.ReadPinAsInt(node.Interval)
-	if !inst.triggered {
+	if inst.previousInterval != interval { // if input interval gets changed on runtime
+		inst.previousInterval = interval
 		inst.run(interval)
 	}
 	toggle := inst.triggerCount%2 == 0
-	_, firstLoop := inst.Loop()
-	if firstLoop {
-		inst.WritePin(node.Toggle, false)
-	} else {
-		inst.WritePin(node.Toggle, toggle)
-	}
+	inst.WritePin(node.Toggle, toggle)
+}
 
+func (inst *Inject) Stop() {
+	inst.cron.Clear()
 }
