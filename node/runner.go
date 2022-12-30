@@ -5,6 +5,7 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/global"
 	"github.com/NubeDev/flow-eng/helpers/uuid"
 	log "github.com/sirupsen/logrus"
+	"sync"
 )
 
 type Runner struct {
@@ -40,19 +41,47 @@ func (runner *Runner) UUID() uuid.Value {
 	return runner.uuid
 }
 
-func (runner *Runner) Process() error {
+func (runner *Runner) Start() {
+	defer func() {
+		if recovered := recover(); recovered != nil {
+			log.Errorf("flow on remove error: %v", recovered)
+			log.Errorf("error on node: %s, node_id: %s", runner.node.GetName(), runner.NodeId())
+		}
+	}()
+	runner.node.Start()
+}
+
+func (runner *Runner) Process() {
+	defer func() {
+		if recovered := recover(); recovered != nil {
+			log.Errorf("flow process error: %v", recovered)
+			log.Errorf("error on node: %s, node_id: %s", runner.node.GetName(), runner.NodeId())
+		}
+	}()
+
 	// trigger all connectors to input ports
 	err := runner.processConnectors()
 	if err != nil {
-		log.Errorf("RUNNER node:%s name-name%s err:%s", runner.node.GetNodeName(), runner.node.GetName(), err.Error())
-		return err
+		log.Errorf("RUNNER node: %s err: %s", runner.node.GetName(), err.Error())
+		return
 	}
+
 	// run processing node
 	if !runner.node.GetProcessed() {
-		runner.node.Process() // TODO Binod this was calling the node process for each graph
+		runner.node.Process()
 		runner.node.SetProcessed()
 	}
-	return nil
+}
+
+func (runner *Runner) Stop(wg *sync.WaitGroup) {
+	defer func() {
+		wg.Done()
+		if recovered := recover(); recovered != nil {
+			log.Errorf("flow on start error: %v", recovered)
+			log.Errorf("error on node: %s, node_id: %s", runner.node.GetName(), runner.NodeId())
+		}
+	}()
+	runner.node.Stop()
 }
 
 func (runner *Runner) Reset() {
@@ -90,7 +119,7 @@ func (runner *Runner) processConnectors() error {
 		}
 		err := conn.Trigger(debug)
 		if err != nil {
-			log.Errorf(fmt.Sprintf("err from runner:%s from:%s to:%s", err.Error(), conn.from.Name, conn.to.Name))
+			log.Errorf("error from runner: %s from: %s to: %s", err.Error(), conn.from.Name, conn.to.Name)
 			return err
 		}
 	}
