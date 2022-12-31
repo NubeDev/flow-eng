@@ -48,7 +48,12 @@ func (runner *Runner) Start() {
 			log.Errorf("error on node: %s, node_id: %s", runner.node.GetName(), runner.NodeId())
 		}
 	}()
-	runner.node.Start()
+
+	// on multiple graphs the start lifecycle might be already got called for the same node
+	if runner.node.GetCurrentState() != STARTED {
+		runner.node.Start()
+		runner.node.SetCurrentState(STARTED)
+	}
 }
 
 func (runner *Runner) Process() {
@@ -66,7 +71,8 @@ func (runner *Runner) Process() {
 		return
 	}
 
-	// run processing node
+	// if the same node is already processed, don't process it again
+	// this restricts the same node from processing which has multiple output connections to the nodes
 	if !runner.node.GetProcessed() {
 		runner.node.Process()
 		runner.node.SetProcessed()
@@ -81,7 +87,12 @@ func (runner *Runner) Stop(wg *sync.WaitGroup) {
 			log.Errorf("error on node: %s, node_id: %s", runner.node.GetName(), runner.NodeId())
 		}
 	}()
-	runner.node.Stop()
+
+	// on multiple graphs the stop lifecycle might be already got called for the same node
+	if runner.node.GetCurrentState() != STOPPED {
+		runner.node.Stop()
+		runner.node.SetCurrentState(STOPPED)
+	}
 }
 
 func (runner *Runner) Reset() {

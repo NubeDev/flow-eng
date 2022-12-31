@@ -7,14 +7,26 @@ import (
 	"time"
 )
 
+type CurrentState int
+
+const (
+	CREATED CurrentState = iota
+	STARTED CurrentState = iota
+	STOPPED CurrentState = iota
+)
+
 type Node interface {
 	Start()
 	Process()
 	Stop()
 
+	GetCurrentState() CurrentState
+	SetCurrentState(currentState CurrentState)
+
 	ResetProcessed()
 	SetProcessed()
 	GetProcessed() bool
+
 	Loop() (count uint64, firstLoop bool)
 	AddDB(d db.DB)
 	GetDB() db.DB
@@ -125,6 +137,7 @@ type Spec struct {
 	store         *store.Store
 	nodes         []Node
 	processed     bool
+	currentState  CurrentState
 }
 
 func (n *Spec) Start() {}
@@ -145,6 +158,14 @@ func (n *Spec) SetProcessed() {
 
 func (n *Spec) GetProcessed() bool {
 	return n.processed
+}
+
+func (n *Spec) GetCurrentState() CurrentState {
+	return n.currentState
+}
+
+func (n *Spec) SetCurrentState(currentState CurrentState) {
+	n.currentState = currentState
 }
 
 func (n *Spec) SetIcon(icon string) {
