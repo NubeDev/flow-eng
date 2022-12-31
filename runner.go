@@ -36,7 +36,11 @@ func (sr *SerialRunner) Process() {
 
 func (sr *SerialRunner) Stop() {
 	var wg sync.WaitGroup // stop function takes long time, and it gets accumulated without having wait group
-	wg.Add(len(sr.flow.nodes))
+	totalRunners := 0
+	for _, graph := range sr.flow.Graphs {
+		totalRunners += len(graph.Runners)
+	}
+	wg.Add(totalRunners)
 	for _, graph := range sr.flow.Graphs {
 		for _, runner := range graph.Runners {
 			go runner.Stop(&wg)
