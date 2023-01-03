@@ -15,15 +15,6 @@ func NewSubFlowInputFloat(body *node.Spec) (node.Node, error) {
 	return &InputFloat{body}, nil
 }
 
-func NewSubFlowOutputFloat(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, outputFloat, category)
-	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs)
-	in.FolderExport = true
-	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
-	body = node.BuildNode(body, node.BuildInputs(in), node.BuildOutputs(out), nil)
-	return &InputFloat{body}, nil
-}
-
 func (inst *InputFloat) Process() {
 	inst.WritePin(node.Out, inst.ReadPin(node.In))
 }
@@ -59,5 +50,22 @@ func NewSubFlowInputString(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *InputString) Process() {
+	inst.WritePin(node.Out, inst.ReadPin(node.In))
+}
+
+type OutputFloat struct {
+	*node.Spec
+}
+
+func NewSubFlowOutputFloat(body *node.Spec) (node.Node, error) {
+	body = node.Defaults(body, outputFloat, category)
+	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs)
+	in.FolderExport = true
+	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
+	body = node.BuildNode(body, node.BuildInputs(in), node.BuildOutputs(out), nil)
+	return &OutputFloat{body}, nil
+}
+
+func (inst *OutputFloat) Process() {
 	inst.WritePin(node.Out, inst.ReadPin(node.In))
 }
