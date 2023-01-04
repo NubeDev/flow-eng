@@ -79,6 +79,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	subInputBool, _ := subflow.NewSubFlowInputBool(nil)
 
 	subOutputFloat, _ := subflow.NewSubFlowOutputFloat(nil)
+	subOutputBool, _ := subflow.NewSubFlowOutputBool(nil)
+	subOutputString, _ := subflow.NewSubFlowOutputString(nil)
 
 	conversionString, _ := conversion.NewString(nil)
 	conversionNum, _ := conversion.NewNumber(nil)
@@ -200,6 +202,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(subInputString),
 		node.ConvertToSpec(subInputBool),
 		node.ConvertToSpec(subOutputFloat),
+		node.ConvertToSpec(subOutputBool),
+		node.ConvertToSpec(subOutputString),
 
 		node.ConvertToSpec(flowNetwork),
 		node.ConvertToSpec(flowPoint),
@@ -381,6 +385,10 @@ func builderMisc(body *node.Spec) (node.Node, error) {
 		return subflow.NewSubFlowInputBool(body)
 	case outputFloat:
 		return subflow.NewSubFlowOutputFloat(body)
+	case outputBool:
+		return subflow.NewSubFlowOutputBool(body)
+	case outputString:
+		return subflow.NewSubFlowOutputString(body)
 	case logNode:
 		return debugging.NewLog(body)
 	case funcNode:

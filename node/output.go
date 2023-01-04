@@ -19,6 +19,7 @@ type Output struct {
 	connectors   []*Connector
 	Help         OutputHelp `json:"help"`
 	FolderExport bool       `json:"folderExport"`
+	HideOutput   bool       `json:"hideOutput"`
 }
 
 func newOutput(body *Output) *Output {
@@ -31,6 +32,7 @@ func newOutput(body *Output) *Output {
 		DirectionOutput,
 		make([]*Connector, 0, 1),
 		"",
+		false,
 		false,
 	}
 }
@@ -81,7 +83,7 @@ func (p *Output) Connect(inputs ...*Input) {
 		input := inputs[i]
 		if err := p.connectInput(input); err != nil {
 			panic(err)
-			//log.Error(err)
+			// log.Error(err)
 		}
 	}
 }

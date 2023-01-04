@@ -9,12 +9,14 @@ type PalletInputs struct {
 	ValueType    string      `json:"valueType"`
 	DefaultValue interface{} `json:"defaultValue,omitempty"`
 	FolderExport bool        `json:"folderExport"`
+	HideInput    bool        `json:"hideInput"`
 }
 
 type PalletOutputs struct {
 	Name         string `json:"name"`
 	ValueType    string `json:"valueType"`
 	FolderExport bool   `json:"folderExport"`
+	HideOutput   bool   `json:"hideOutput"`
 }
 
 type PalletNode struct {
@@ -37,6 +39,7 @@ func convertOutputs(node *node.Spec) []*PalletOutputs {
 		one.Name = string(output.Name)
 		one.ValueType = string(output.DataType)
 		one.FolderExport = output.FolderExport
+		one.HideOutput = output.HideOutput
 		all = append(all, one)
 	}
 	return all
@@ -48,6 +51,7 @@ func convertInputs(node *node.Spec) []*PalletInputs {
 		one.Name = string(input.Name)
 		one.ValueType = string(input.DataType)
 		one.FolderExport = input.FolderExport
+		one.HideInput = input.HideInput
 		all = append(all, one)
 	}
 	return all

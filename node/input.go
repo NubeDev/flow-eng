@@ -17,6 +17,7 @@ type Input struct {
 	connector    *Connector
 	Help         InputHelp `json:"help"`
 	FolderExport bool      `json:"folderExport"`
+	HideInput    bool      `json:"hideInput"`
 }
 
 func newInput(body *Input) *Input {
@@ -32,6 +33,7 @@ func newInput(body *Input) *Input {
 		DirectionInput,
 		nil,
 		"",
+		false,
 		false,
 	}
 }
