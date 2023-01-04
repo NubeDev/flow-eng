@@ -60,6 +60,33 @@ func (p *Flow) NodesValues() []*node.Values {
 	return out
 }
 
+// NodesValuesInsideParent get all the node current values from the runtime for one parent
+func (p *Flow) NodesValuesInsideParent(parentID string) []*node.Values {
+	var out []*node.Values
+	for _, n := range p.GetNodes() {
+		if n.GetParentId() == parentID {
+			out = append(out, n.NodeValues())
+		}
+	}
+	return out
+}
+
+// NodesValuesSubFlow get all the node current values from the runtime for a parent node with sub-flow inputs and outputs values
+func (p *Flow) NodesValuesSubFlow(parentID string) []*node.Values {
+	var out []*node.Values
+	for _, n := range p.GetNodes() {
+		if n.GetParentId() == parentID {
+			info := n.GetInfo()
+			if info.Category == "sub-flow" {
+				if n.GetName() != "folder" {
+					out = append(out, n.NodeValues())
+				}
+			}
+		}
+	}
+	return out
+}
+
 func (p *Flow) GetNodesSpec() []*node.Spec {
 	var list []*node.Spec
 	for _, n := range p.GetNodes() {
