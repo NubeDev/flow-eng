@@ -107,6 +107,7 @@ const (
 	Time        InputName = "time"
 	NetworkPort InputName = "port"
 
+	Delay        InputName = "delay"
 	DelaySeconds InputName = "delay (s)"
 	Selection    InputName = "select"
 

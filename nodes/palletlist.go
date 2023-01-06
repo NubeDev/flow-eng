@@ -127,11 +127,10 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	rampNode, _ := count.NewRamp(nil)
 
 	// trigger
-	inject, _ := trigger.NewInject(nil)
 	randomFloat, _ := trigger.NewRandom(nil)
 
 	// time
-	delay, _ := timing.NewDelay(nil, nil)
+	delay, _ := timing.NewDelay(nil)
 	delayOn, _ := timing.NewDelayOn(nil, nil)
 	delayOff, _ := timing.NewDelayOff(nil, nil)
 	dutyCycle, _ := timing.NewDutyCycle(nil)
@@ -230,7 +229,6 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(minOnOff),
 
 		node.ConvertToSpec(randomFloat),
-		node.ConvertToSpec(inject),
 
 		node.ConvertToSpec(flatLine),
 
@@ -618,8 +616,6 @@ func builderCount(body *node.Spec) (node.Node, error) {
 
 func builderTrigger(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
-	case inject:
-		return trigger.NewInject(body)
 	case randomFloat:
 		return trigger.NewRandom(body)
 	}
@@ -629,7 +625,7 @@ func builderTrigger(body *node.Spec) (node.Node, error) {
 func builderTiming(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case delay:
-		return timing.NewDelay(body, timer.NewTimer())
+		return timing.NewDelay(body)
 	case delayOn:
 		return timing.NewDelayOn(body, timer.NewTimer())
 	case delayOff:
