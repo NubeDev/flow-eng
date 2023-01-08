@@ -19,6 +19,10 @@ type nodeSettings struct {
 	InputCount int `json:"inputCount"`
 }
 
+const (
+	mathHelp string = "test help"
+)
+
 func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error) {
 	body = node.Defaults(body, nodeName, category)
 	settings := &nodeSettings{}
