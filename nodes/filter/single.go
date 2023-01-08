@@ -10,8 +10,8 @@ type OnlyTrue struct {
 
 func NewOnlyTrue(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, onlyTrue, category)
-	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs))
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
+	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeBool, nil, body.Inputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
 	return &OnlyTrue{body}, nil
 }

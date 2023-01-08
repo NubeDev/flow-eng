@@ -3,6 +3,7 @@ package nodes
 import (
 	"errors"
 	"fmt"
+
 	"github.com/NubeDev/flow-eng/db"
 	"github.com/NubeDev/flow-eng/helpers/store"
 	"github.com/NubeDev/flow-eng/helpers/timer"
@@ -13,6 +14,7 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/conversion"
 	"github.com/NubeDev/flow-eng/nodes/count"
 	debugging "github.com/NubeDev/flow-eng/nodes/debug"
+	"github.com/NubeDev/flow-eng/nodes/filter"
 	"github.com/NubeDev/flow-eng/nodes/functions"
 	"github.com/NubeDev/flow-eng/nodes/hvac"
 	nodejson "github.com/NubeDev/flow-eng/nodes/json"
@@ -32,7 +34,7 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/subflow"
 	switches "github.com/NubeDev/flow-eng/nodes/switch"
 	"github.com/NubeDev/flow-eng/nodes/system"
-	"github.com/NubeDev/flow-eng/nodes/tigger"
+	trigger "github.com/NubeDev/flow-eng/nodes/tigger"
 	"github.com/NubeDev/flow-eng/nodes/timing"
 	"github.com/NubeDev/flow-eng/nodes/transformations"
 )
@@ -154,6 +156,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	logNode, _ := debugging.NewLog(nil)
 
+	onlyTrue, _ := filter.NewOnlyTrue(nil)
+
 	pointNum, _ := point.NewNumber(nil)
 	pointBool, _ := point.NewBoolean(nil)
 
@@ -269,6 +273,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(logNode),
 
+		node.ConvertToSpec(onlyTrue),
+
 		node.ConvertToSpec(getNode),
 		node.ConvertToSpec(writeNode),
 	)
@@ -369,6 +375,10 @@ func Builder(body *node.Spec, db db.DB, store *store.Store, opts ...interface{})
 	if n != nil || err != nil {
 		return n, err
 	}
+	n, err = builderFilter(body)
+	if n != nil || err != nil {
+		return n, err
+	}
 	return nil, errors.New(fmt.Sprintf("no nodes found with name:%s", body.GetName()))
 }
 
@@ -410,6 +420,14 @@ func builderSystem(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case flowLoopCount:
 		return system.NewLoopCount(body)
+	}
+	return nil, nil
+}
+
+func builderFilter(body *node.Spec) (node.Node, error) {
+	switch body.GetName() {
+	case onlyTrue:
+		return filter.NewOnlyTrue(body)
 	}
 	return nil, nil
 }
