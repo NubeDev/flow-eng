@@ -38,10 +38,6 @@ func (n *Spec) NodeHelp() *Help {
 }
 
 const (
-	ConstHelp string = "This node can outputs a fixed numeric, string or boolean value. The output (out) value is set from input (in) value"
-)
-
-const (
 	InHelp            InputHelp = "interval"
 	IntervalInputHelp InputHelp = "interval"
 )

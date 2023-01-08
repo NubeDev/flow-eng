@@ -13,7 +13,7 @@ func NewString(body *node.Spec) (node.Node, error) {
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeString, nil, body.Inputs))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
-	body.SetHelp(node.ConstHelp)
+	body.SetHelp(constHelp)
 	return &ConstString{body}, nil
 }
 
