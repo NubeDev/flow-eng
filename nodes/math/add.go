@@ -15,7 +15,7 @@ func NewAdd(body *node.Spec) (node.Node, error) {
 	if err != nil {
 		return nil, err
 	}
-	body.SetHelp(fmt.Sprintf("Add %s", mathHelp))
+	body.SetHelp(fmt.Sprintf("%s addition", mathHelp))
 	return &Add{body}, nil
 }
 

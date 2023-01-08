@@ -20,7 +20,7 @@ type nodeSettings struct {
 }
 
 const (
-	mathHelp string = "test help"
+	mathHelp string = "perfrom a math"
 )
 
 func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error) {
