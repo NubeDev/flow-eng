@@ -42,6 +42,8 @@ const (
 
 	flowLoopCount = "flow-loop-count"
 
+	onlyTrue = "only-true"
+
 	getHttpNode   = "http-get"
 	writeHttpNode = "http-write"
 

@@ -13,7 +13,7 @@ func NewBoolean(body *node.Spec) (node.Node, error) {
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeBool, nil, body.Inputs, node.SetInputHelp(node.IntervalInputHelp)))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
-	body.SetHelp(node.ConstHelp)
+	body.SetHelp(constHelp)
 	return &Boolean{body}, nil
 }
 
