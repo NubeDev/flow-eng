@@ -9,7 +9,7 @@ const (
 	delayOff  = "delay-off"
 	dutyCycle = "duty-cycle"
 	minOnOff  = "min-on-off"
-	inject    = "inject"
+	oneShot   = "one-shot"
 )
 
 func duration(f time.Duration, format string) time.Duration {
