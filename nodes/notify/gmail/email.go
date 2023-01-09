@@ -17,10 +17,7 @@ const (
 
 type Gmail struct {
 	*node.Spec
-	firstLoop bool
-	triggered bool
-	loopCount uint64
-	address   []string
+	address []string
 }
 
 type nodeSettings struct {
@@ -50,21 +47,16 @@ func NewGmail(body *node.Spec) (node.Node, error) {
 	to := node.BuildInput(node.To, node.TypeString, nil, body.Inputs)
 	subject := node.BuildInput(node.Subject, node.TypeString, nil, body.Inputs)
 	message := node.BuildInput(node.Message, node.TypeString, nil, body.Inputs)
-	trigger := node.BuildInput(node.TriggerInput, node.TypeFloat, nil, body.Inputs)
+	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs)
 	inputs := node.BuildInputs(to, subject, message, trigger)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
 	body.SetSchema(buildSchema())
-	return &Gmail{body, false, false, 0, address}, nil
+	return &Gmail{body, address}, nil
 }
 
-func (inst *Gmail) setEmailClient() {
+func (inst *Gmail) sendEmail() {
 	connection, err := inst.GetDB().GetConnection("")
-	if err != nil {
-		inst.firstLoop = false // if fail try again
-		return
-	}
-	inst.firstLoop = true
 	pprint.Print(connection)
 	e := email.NewEmail()
 	e.From = "nubeio <noreply@nube-io.com>"
@@ -81,22 +73,10 @@ func (inst *Gmail) setEmailClient() {
 }
 
 func (inst *Gmail) Process() {
-	inst.loopCount++
-	if !inst.firstLoop {
-		//inst.setEmailClient()
-	}
-
-	// if trigger == true then set triggered to true
-	// if trigger == false && triggered == true then rest triggered to false
-	// now we can send gmail again
-	trigger, _ := inst.ReadPinAsBool(node.TriggerInput)
-	if trigger {
+	_, cov := inst.InputUpdated(node.TriggerInput)
+	if cov {
 		fmt.Println("TRIGGER EMAIL")
-		inst.triggered = true
-	}
-	if !trigger && inst.triggered {
-		fmt.Println("RESET")
-		inst.triggered = false
+		// inst.sendEmail()
 	}
 
 }
