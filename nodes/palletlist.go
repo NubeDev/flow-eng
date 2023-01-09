@@ -59,6 +59,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	greaterthan, _ := compare.NewGreaterThan(nil)
 	lessthan, _ := compare.NewLessThan(nil)
 	equal, _ := compare.NewEqual(nil)
+	equalString, _ := compare.NewEqualString(nil)
 	between, _ := compare.NewBetween(nil)
 	hysteresis, _ := compare.NewHysteresis(nil)
 
@@ -193,6 +194,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(greaterthan),
 		node.ConvertToSpec(lessthan),
 		node.ConvertToSpec(equal),
+		node.ConvertToSpec(equalString),
 		node.ConvertToSpec(between),
 		node.ConvertToSpec(hysteresis),
 
@@ -596,6 +598,8 @@ func builderCompare(body *node.Spec) (node.Node, error) {
 		return compare.NewLessThan(body)
 	case equal:
 		return compare.NewEqual(body)
+	case equalString:
+		return compare.NewEqualString(body)
 	case between:
 		return compare.NewBetween(body)
 	case hysteresis:

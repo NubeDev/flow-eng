@@ -20,7 +20,7 @@ func NewRank(body *node.Spec) (node.Node, error) {
 	out2 := node.BuildOutput(node.Out2, node.TypeFloat, nil, body.Outputs)
 	out3 := node.BuildOutput(node.Out3, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(out1, out2, out3)
-	body = node.BuildNode(body, body.Inputs, outputs, nil)
+	body = node.BuildNode(body, body.Inputs, outputs, body.Settings)
 	return &Rank{body}, nil
 }
 

@@ -1,7 +1,6 @@
 package statistics
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/node"
@@ -46,18 +45,8 @@ func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error)
 
 func process(body node.Node) {
 	equation := body.GetName()
-	fmt.Println("STATS Process() node: ", equation)
 	count := body.InputsLen()
-	fmt.Println("STATS Process() input count: ", count)
 	inputs := float.ConvertInterfaceToFloatMultiple(body.ReadMultiple(count))
-	fmt.Println("STATS Process() inputs: ", inputs)
-	for i, val := range inputs {
-		if val != nil {
-			fmt.Println("STATS Process(): ", i, " ", *val)
-		} else {
-			fmt.Println("STATS Process(): ", i, " ", val)
-		}
-	}
 	output := operation(equation, inputs)
 	if output == nil {
 		body.WritePinNull(node.Out)
@@ -73,7 +62,6 @@ func operation(operation string, values []*float64) *float64 {
 			nonNilValues = append(nonNilValues, *value)
 		}
 	}
-	fmt.Println("STATS operation() nonNilInputs: ", nonNilValues)
 	if len(nonNilValues) == 0 {
 		return nil
 	}

@@ -1,7 +1,6 @@
 package statistics
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/node"
@@ -21,13 +20,12 @@ func NewMinMaxAvg(body *node.Spec) (node.Node, error) {
 	max := node.BuildOutput(node.MaxOutput, node.TypeFloat, nil, body.Outputs)
 	avg := node.BuildOutput(node.AvgOutput, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(min, max, avg)
-	body = node.BuildNode(body, body.Inputs, outputs, nil)
+	body = node.BuildNode(body, body.Inputs, outputs, body.Settings)
 	return &MinMaxAvg{body}, nil
 }
 
 func (inst *MinMaxAvg) Process() {
 	count := inst.InputsLen()
-	fmt.Println("MIN-MAX-AVG Process() input count: ", count)
 	inputs := float.ConvertInterfaceToFloatMultiple(inst.ReadMultiple(count))
 	var nonNilValues []float64
 	for _, value := range inputs {

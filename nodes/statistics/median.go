@@ -35,7 +35,7 @@ func (inst *Median) Process() {
 		inst.WritePin(node.Out, nonNilValues[0])
 	} else {
 		sort.Float64s(nonNilValues)
-		mid := float64(len(nonNilValues) / 2)
+		mid := float64(len(nonNilValues)) / 2
 		if math.Mod(mid, 1) > 0 { // Odd number of elements in the input array, take the middle one
 			inst.WritePin(node.Out, nonNilValues[int(mid-0.5)])
 		} else { // Even number of elements in the input array, take the average of the middle 2 values
