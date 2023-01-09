@@ -45,12 +45,11 @@ func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error)
 func process(body node.Node) {
 	equation := body.GetName()
 	count := body.InputsLen()
-	inputs := body.ReadMultipleFloatPointer(count)
+	inputs := float.ConvertInterfaceToFloatMultiple(body.ReadMultiple(count))
 	output := operation(equation, inputs)
 	if output == nil {
 		body.WritePinNull(node.Out)
 	} else {
 		body.WritePinFloat(node.Out, float.NonNil(output))
 	}
-
 }

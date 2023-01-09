@@ -70,3 +70,10 @@ func (inst *DelayOn) Process() {
 		})
 	}
 }
+
+func (inst *DelayOn) Stop() {
+	if inst.timer != nil {
+		inst.timer.Stop()
+		inst.timer = nil
+	}
+}
