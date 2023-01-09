@@ -60,9 +60,13 @@ const (
 	conversionNum    = "conversion-number"
 	conversionBool   = "conversion-bool"
 
-	max = "min"
-	min = "max"
-	avg = "avg"
+	max       = "min"
+	min       = "max"
+	avg       = "average"
+	minMaxAvg = "min-max-avg"
+	rangeNode = "range"
+	rank      = "rank"
+	median    = "median"
 
 	flatLine = "flatLine"
 

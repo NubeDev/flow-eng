@@ -1,6 +1,9 @@
 package math
 
-import "github.com/NubeDev/flow-eng/helpers/array"
+import (
+	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/array"
+)
 
 func operation(operation string, values []*float64) *float64 {
 	var nonNilValues []float64
@@ -9,6 +12,7 @@ func operation(operation string, values []*float64) *float64 {
 			nonNilValues = append(nonNilValues, *value)
 		}
 	}
+	fmt.Println("MATH operation() nonNilInputs: ", nonNilValues)
 	if len(nonNilValues) == 0 {
 		return nil
 	}

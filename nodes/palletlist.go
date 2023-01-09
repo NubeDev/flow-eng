@@ -64,6 +64,10 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	min, _ := statistics.NewMin(nil)
 	max, _ := statistics.NewMax(nil)
 	avg, _ := statistics.NewAvg(nil)
+	minMaxAvg, _ := statistics.NewMinMaxAvg(nil)
+	rangeNode, _ := statistics.NewRange(nil)
+	rank, _ := statistics.NewRank(nil)
+	median, _ := statistics.NewMedian(nil)
 
 	// streams
 	flatLine, _ := streams.NewFlatline(nil)
@@ -191,6 +195,10 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(min),
 		node.ConvertToSpec(max),
 		node.ConvertToSpec(avg),
+		node.ConvertToSpec(minMaxAvg),
+		node.ConvertToSpec(rangeNode),
+		node.ConvertToSpec(rank),
+		node.ConvertToSpec(median),
 
 		node.ConvertToSpec(gmailNode),
 		node.ConvertToSpec(pingNode),
@@ -586,6 +594,14 @@ func builderStatistics(body *node.Spec) (node.Node, error) {
 		return statistics.NewMax(body)
 	case avg:
 		return statistics.NewAvg(body)
+	case minMaxAvg:
+		return statistics.NewMinMaxAvg(body)
+	case rangeNode:
+		return statistics.NewRange(body)
+	case rank:
+		return statistics.NewRank(body)
+	case median:
+		return statistics.NewMedian(body)
 	}
 	return nil, nil
 }

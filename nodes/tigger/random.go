@@ -13,8 +13,8 @@ type Random struct {
 
 func NewRandom(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, randomFloat, category)
-	min := node.BuildInput(node.Min, node.TypeFloat, nil, body.Inputs)
-	max := node.BuildInput(node.Max, node.TypeFloat, nil, body.Inputs)
+	min := node.BuildInput(node.MinInput, node.TypeFloat, nil, body.Inputs)
+	max := node.BuildInput(node.MaxInput, node.TypeFloat, nil, body.Inputs)
 	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs)
 	inputs := node.BuildInputs(min, max, trigger)
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
@@ -27,8 +27,8 @@ func NewRandom(body *node.Spec) (node.Node, error) {
 
 func (inst *Random) Process() {
 	_, firstLoop := inst.Loop()
-	min, _ := inst.ReadPinAsFloat(node.Min)
-	max, _ := inst.ReadPinAsFloat(node.Max)
+	min, _ := inst.ReadPinAsFloat(node.MinInput)
+	max, _ := inst.ReadPinAsFloat(node.MaxInput)
 	_, boolCov := inst.InputUpdated(node.TriggerInput)
 	if boolCov || firstLoop {
 		inst.value = float.RandFloat(min, max)

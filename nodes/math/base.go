@@ -1,6 +1,7 @@
 package math
 
 import (
+	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
@@ -40,13 +41,22 @@ func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error)
 
 func process(body node.Node) {
 	equation := body.GetName()
+	fmt.Println("MATH Process() node: ", equation)
 	count := body.InputsLen()
-	inputs := body.ReadMultipleFloatPointer(count)
+	fmt.Println("MATH Process() input count: ", count)
+	inputs := float.ConvertInterfaceToFloatMultiple(body.ReadMultiple(count))
+	fmt.Println("MATH Process() inputs: ", inputs)
+	for i, val := range inputs {
+		if val != nil {
+			fmt.Println("MATH Process(): ", i, " ", *val)
+		} else {
+			fmt.Println("MATH Process(): ", i, " ", val)
+		}
+	}
 	output := operation(equation, inputs)
 	if output == nil {
 		body.WritePinNull(node.Out)
 	} else {
 		body.WritePinFloat(node.Out, float.NonNil(output))
 	}
-
 }
