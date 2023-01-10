@@ -21,23 +21,23 @@ const (
 )
 
 type defaultNodeSchema struct {
+	Interval  schemas.Number     `json:"interval"`
 	TimeUnits schemas.EnumString `json:"time"`
-	Duration  schemas.Number     `json:"duration"`
 }
 
 type defaultNodeSettings struct {
+	Interval  float64 `json:"interval"`
 	TimeUnits string  `json:"time_units"`
-	Duration  float64 `json:"duration"`
 }
 
 func buildDefaultSchema() *schemas.Schema {
 	props := &defaultNodeSchema{}
 	// time selection
-	props.Duration.Title = "duration"
-	props.Duration.Default = 1
+	props.Interval.Title = "Interval"
+	props.Interval.Default = 1
 
 	// time selection
-	props.TimeUnits.Title = "time"
+	props.TimeUnits.Title = "Time Units"
 	props.TimeUnits.Default = ttime.Sec
 	props.TimeUnits.Options = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
 	props.TimeUnits.EnumName = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
-	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
@@ -15,12 +14,14 @@ import (
 
 type MinOnOff struct {
 	*node.Spec
-	lastInput     bool
-	lastReset     bool
-	minOnEnabled  bool
-	minOffEnabled bool
-	timeOn        int64
-	timeOff       int64
+	lastInput          bool
+	lastReset          bool
+	minOnEnabled       bool
+	minOffEnabled      bool
+	timeOn             int64
+	timeOff            int64
+	lastMinOnInterval  float64
+	lastMinOffInterval float64
 }
 
 func NewMinOnOff(body *node.Spec) (node.Node, error) {
@@ -36,11 +37,38 @@ func NewMinOnOff(body *node.Spec) (node.Node, error) {
 	minOffActive := node.BuildOutput(node.MinOffActive, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out, minOnActive, minOffActive)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	return &MinOnOff{body, false, true, false, false, 0, 0}, nil
+	return &MinOnOff{body, false, true, false, false, 0, 0, 0, 0}, nil
 }
 
 func (inst *MinOnOff) Process() {
-	// settings, _ := getSettings(inst.GetSettings())
+	settings, _ := inst.getSettings(inst.GetSettings())
+
+	// Select intervals from input links or node settings
+	minOnIntervalLink, onIntNull := inst.ReadPinAsFloat(node.MinOnTime)
+	var minOnIntervalDuration time.Duration
+	var minOnInterval float64
+	if onIntNull { // no interval input, so get value from settings
+		minOnInterval = settings.MinOnInterval
+		minOnIntervalDuration = ttime.Duration(settings.MinOnInterval, settings.MinOnTimeUnits)
+	} else {
+		minOnInterval = minOnIntervalLink
+		minOnIntervalDuration = ttime.Duration(minOnIntervalLink, settings.MinOnTimeUnits)
+	}
+	minOffIntervalLink, offIntNull := inst.ReadPinAsFloat(node.MinOffTime)
+	var minOffIntervalDuration time.Duration
+	var minOffInterval float64
+	if offIntNull { // no interval input, so get value from settings
+		minOffInterval = settings.MinOffInterval
+		minOffIntervalDuration = ttime.Duration(settings.MinOffInterval, settings.MinOffTimeUnits)
+	} else {
+		minOffInterval = minOffIntervalLink
+		minOffIntervalDuration = ttime.Duration(minOffIntervalLink, settings.MinOffTimeUnits)
+	}
+	if minOnInterval != inst.lastMinOnInterval || minOffInterval != inst.lastMinOffInterval {
+		inst.setSubtitle(minOnInterval, settings.MinOnTimeUnits, minOffInterval, settings.MinOffTimeUnits)
+		inst.lastMinOnInterval = minOnInterval
+		inst.lastMinOffInterval = minOffInterval
+	}
 
 	input, _ := inst.ReadPinAsBool(node.In)
 
@@ -70,8 +98,8 @@ func (inst *MinOnOff) Process() {
 	var elapsed int64
 	if inst.minOnEnabled {
 		elapsed = time.Now().Unix() - inst.timeOn
-		onInterval, _ := inst.ReadPinAsFloat(node.MinOnTime) // TODO: update to settings value and units
-		if elapsed >= int64(onInterval) {
+		minOnIntervalSecs := minOnIntervalDuration.Seconds()
+		if elapsed >= int64(minOnIntervalSecs) {
 			inst.minOnEnabled = false
 			inst.WritePinFalse(node.MinOnActive)
 			if input {
@@ -80,8 +108,8 @@ func (inst *MinOnOff) Process() {
 		}
 	} else if inst.minOffEnabled {
 		elapsed = time.Now().Unix() - inst.timeOff
-		offInterval, _ := inst.ReadPinAsFloat(node.MinOffTime) // TODO: update to settings value and units
-		if elapsed >= int64(offInterval) {
+		minOffIntervalSecs := minOffIntervalDuration.Seconds()
+		if elapsed >= int64(minOffIntervalSecs) {
 			inst.minOffEnabled = false
 			inst.WritePinFalse(node.MinOffActive)
 			if !input {
@@ -97,46 +125,48 @@ func (inst *MinOnOff) Stop() {
 	inst.minOffEnabled = false
 }
 
-func (inst *MinOnOff) setSubtitle(settings *OneShotSettings) {
-	subtitleText := fmt.Sprintf("min-on %s %s", strconv.FormatFloat(settings.Duration, 'f', -1, 64), settings.TimeUnits)
+func (inst *MinOnOff) setSubtitle(minOnIntervalAmount float64, minOnTimeUnits string, minOffIntervalAmount float64, minOffTimeUnits string) {
+	subtitleText := fmt.Sprintf("min-on %s %s, min-off %s %s", strconv.FormatFloat(minOnIntervalAmount, 'f', -1, 64), minOnTimeUnits, strconv.FormatFloat(minOffIntervalAmount, 'f', -1, 64), minOffTimeUnits)
 	inst.SetSubTitle(subtitleText)
 }
 
 // Custom Node Settings Schema
 
 type MinOnOffSettingsSchema struct {
-	Duration  schemas.Number     `json:"duration"`
-	TimeUnits schemas.EnumString `json:"time_units"`
-	Retrigger schemas.Boolean    `json:"retrigger"`
+	MinOnInterval   schemas.Number     `json:"min_on_interval"`
+	MinOnTimeUnits  schemas.EnumString `json:"min_on_time_units"`
+	MinOffInterval  schemas.Number     `json:"min_off_interval"`
+	MinOffTimeUnits schemas.EnumString `json:"min_off_time_units"`
 }
 
 type MinOnOffSettings struct {
-	Duration  float64 `json:"duration"`
-	TimeUnits string  `json:"time_units"`
-	Retrigger bool    `json:"retrigger"`
+	MinOnInterval   float64 `json:"min_on_interval"`
+	MinOnTimeUnits  string  `json:"min_on_time_units"`
+	MinOffInterval  float64 `json:"min_off_interval"`
+	MinOffTimeUnits string  `json:"min_off_time_units"`
 }
 
 func (inst *MinOnOff) buildSchema() *schemas.Schema {
 	props := &MinOnOffSettingsSchema{}
 	// time selection
-	props.Duration.Title = "Duration"
-	props.Duration.Default = 1
+	props.MinOnInterval.Title = "Min ON Interval"
+	props.MinOnInterval.Default = 1
+
+	props.MinOffInterval.Title = "Min OFF Interval"
+	props.MinOffInterval.Default = 1
 
 	// time selection
-	props.TimeUnits.Title = "Time Units"
-	props.TimeUnits.Default = ttime.Sec
-	props.TimeUnits.Options = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
-	props.TimeUnits.EnumName = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
+	props.MinOnTimeUnits.Title = "Min ON Time Units"
+	props.MinOnTimeUnits.Default = ttime.Sec
+	props.MinOnTimeUnits.Options = []string{ttime.Sec, ttime.Min, ttime.Hr}
+	props.MinOnTimeUnits.EnumName = []string{ttime.Sec, ttime.Min, ttime.Hr}
 
-	// retrigger selection
-	props.Retrigger.Title = "Allow Retrigger"
-	props.Retrigger.Default = false
+	props.MinOffTimeUnits.Title = "Min OFF Time Units"
+	props.MinOffTimeUnits.Default = ttime.Sec
+	props.MinOffTimeUnits.Options = []string{ttime.Sec, ttime.Min, ttime.Hr}
+	props.MinOffTimeUnits.EnumName = []string{ttime.Sec, ttime.Min, ttime.Hr}
 
-	pprint.PrintJSON(props)
 	schema.Set(props)
-
-	fmt.Println(fmt.Sprintf("buildSchema() props: %+v", props))
-	pprint.PrintJSON(props)
 
 	uiSchema := array.Map{
 		"time_units": array.Map{
@@ -153,8 +183,6 @@ func (inst *MinOnOff) buildSchema() *schemas.Schema {
 		},
 		UiSchema: uiSchema,
 	}
-	fmt.Println(fmt.Sprintf("buildSchema() s: %+v", s))
-	pprint.PrintJSON(s)
 	return s
 }
 

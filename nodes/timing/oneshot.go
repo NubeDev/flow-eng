@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
-	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
@@ -46,8 +45,8 @@ func (inst *OneShot) Process() {
 	var oneShotIntervalDuration time.Duration
 	var oneShotInterval float64
 	if iNull { // no interval input, so get value from settings
-		oneShotInterval = settings.Duration
-		oneShotIntervalDuration = ttime.Duration(settings.Duration, settings.TimeUnits)
+		oneShotInterval = settings.Interval
+		oneShotIntervalDuration = ttime.Duration(settings.Interval, settings.TimeUnits)
 	} else {
 		oneShotInterval = interval
 		oneShotIntervalDuration = ttime.Duration(interval, settings.TimeUnits)
@@ -114,13 +113,13 @@ func (inst *OneShot) setSubtitle(intervalAmount float64, timeUnits string) {
 // Custom Node Settings Schema
 
 type OneShotSettingsSchema struct {
-	Duration  schemas.Number     `json:"duration"`
+	Interval  schemas.Number     `json:"interval"`
 	TimeUnits schemas.EnumString `json:"time_units"`
 	Retrigger schemas.Boolean    `json:"retrigger"`
 }
 
 type OneShotSettings struct {
-	Duration  float64 `json:"duration"`
+	Interval  float64 `json:"interval"`
 	TimeUnits string  `json:"time_units"`
 	Retrigger bool    `json:"retrigger"`
 }
@@ -128,8 +127,8 @@ type OneShotSettings struct {
 func (inst *OneShot) buildSchema() *schemas.Schema {
 	props := &OneShotSettingsSchema{}
 	// time selection
-	props.Duration.Title = "Duration"
-	props.Duration.Default = 1
+	props.Interval.Title = "Interval"
+	props.Interval.Default = 1
 
 	// time selection
 	props.TimeUnits.Title = "Time Units"
@@ -141,11 +140,7 @@ func (inst *OneShot) buildSchema() *schemas.Schema {
 	props.Retrigger.Title = "Allow Retrigger"
 	props.Retrigger.Default = false
 
-	pprint.PrintJSON(props)
 	schema.Set(props)
-
-	fmt.Println(fmt.Sprintf("buildSchema() props: %+v", props))
-	pprint.PrintJSON(props)
 
 	uiSchema := array.Map{
 		"time_units": array.Map{
@@ -162,8 +157,6 @@ func (inst *OneShot) buildSchema() *schemas.Schema {
 		},
 		UiSchema: uiSchema,
 	}
-	fmt.Println(fmt.Sprintf("buildSchema() s: %+v", s))
-	pprint.PrintJSON(s)
 	return s
 }
 
