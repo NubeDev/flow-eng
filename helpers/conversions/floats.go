@@ -146,6 +146,11 @@ func GetFloatOk(in interface{}) (val float64, ok bool) {
 			val = 0
 			ok = false
 		}
+	case interface{}:
+		s := fmt.Sprint(in)
+		if s, err := strconv.ParseFloat(s, 64); err == nil {
+			val = s
+		}
 	default:
 		return 0, false
 	}
@@ -186,6 +191,11 @@ func GetIntOk(in interface{}) (val int, ok bool) {
 		val = int(i)
 	case uint64:
 		val = int(i)
+	case interface{}:
+		s := fmt.Sprint(in)
+		if i, err := strconv.Atoi(s); err == nil {
+			val = i
+		}
 	default:
 		return 0, false
 	}
