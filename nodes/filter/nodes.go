@@ -71,7 +71,7 @@ func NewPreventEqualString(body *node.Spec) (node.Node, error) {
 
 func NewOnlyBetween(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, onlyBetween, category)
-	inputs := node.BuildInputs(node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs), node.BuildInput(node.Min, node.TypeFloat, nil, body.Inputs), node.BuildInput(node.Max, node.TypeFloat, nil, body.Inputs))
+	inputs := node.BuildInputs(node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs), node.BuildInput(node.MinInput, node.TypeFloat, nil, body.Inputs), node.BuildInput(node.MaxInput, node.TypeFloat, nil, body.Inputs))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
 	body.SetHelp(fmt.Sprintln("This node filters ‘input’ values. Only Numeric ‘input’ values between ‘min’ and ‘max’ are passed to ‘output’. Output the last known input float value if the input is not in range. Out put nil if any of the inputs are nil."))
@@ -165,8 +165,8 @@ func (inst *PreventEqualString) Process() {
 // lastValue is defaulted to be 0
 func (inst *OnlyBetween) Process() {
 	input, inputNull := inst.ReadPinAsFloat(node.Inp)
-	min, minNull := inst.ReadPinAsFloat(node.Min)
-	max, maxNull := inst.ReadPinAsFloat(node.Max)
+	min, minNull := inst.ReadPinAsFloat(node.MinInput)
+	max, maxNull := inst.ReadPinAsFloat(node.MaxInput)
 
 	if inputNull {
 		inst.WritePinFloat(node.Outp, inst.lastValue)
