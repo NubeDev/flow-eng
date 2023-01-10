@@ -2,12 +2,12 @@ package gmail
 
 import (
 	"fmt"
+	"net/smtp"
+
 	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/notify"
 	"github.com/jordan-wright/email"
-	"log"
-	"net/smtp"
 )
 
 const (
@@ -31,19 +31,17 @@ func NewGmail(body *node.Spec) (node.Node, error) {
 	return &Gmail{body}, nil
 }
 
-func (inst *Gmail) sendEmail() {
+func (inst *Gmail) sendEmail(ed map[string]string) {
 	connection, err := inst.GetDB().GetConnection("")
 	pprint.Print(connection)
 	e := email.NewEmail()
 
-	// log.Println("The content of settings is: ", inst.Settings)
-
-	e.From = "nubeio <noreply@nube-io.com>"
-	e.To = []string{"jfe@nube-io.com"}
-	e.Subject = "test"
-	e.Text = []byte("Text Body is, of course, supported!")
-	e.HTML = []byte("<h1>Fancy HTML is supported, too!</h1>")
-	err = e.Send("smtp.gmail.com:587", smtp.PlainAuth("", "noreply@nube-io.com", "22222-11eb-111111111", "smtp.gmail.com"))
+	e.From = ed["from"]
+	e.To = []string{ed["to"]}
+	e.Subject = ed["subject"]
+	e.Text = []byte(ed["message"])
+	// e.HTML = []byte("<h1>Fancy HTML is supported, too!</h1>")
+	err = e.Send("smtp.gmail.com:587", smtp.PlainAuth("", ed["from"], ed["password"], "smtp.gmail.com"))
 	fmt.Println(err)
 	if err != nil {
 		return
@@ -52,12 +50,27 @@ func (inst *Gmail) sendEmail() {
 }
 
 func (inst *Gmail) Process() {
-	_, cov := inst.InputUpdated(node.TriggerInput)
+	to := inst.GetInput(node.To).GetValue()
+	subject := inst.GetInput(node.Subject).GetValue()
+	message := inst.GetInput(node.Message).GetValue()
+
 	s, _ := getSettings(inst.GetSettings())
-	log.Println("The setting is: ", s)
+
+	var ed map[string]string = make(map[string]string)
+	ed["from"] = s.FromAddress
+	ed["password"] = s.Password
+	ed["subject"] = subject.(string)
+	ed["message"] = message.(string)
+	if to != nil {
+		ed["to"] = to.(string)
+	} else {
+		ed["to"] = s.ToAddress
+	}
+
+	_, cov := inst.InputUpdated(node.TriggerInput)
 	if cov {
 		fmt.Println("TRIGGER EMAIL")
-		inst.sendEmail()
+		inst.sendEmail(ed)
 	}
 
 }
