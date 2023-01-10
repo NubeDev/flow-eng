@@ -33,7 +33,7 @@ func NewPIDNode(body *node.Spec) (node.Node, error) {
 
 	inputs := node.BuildInputs(enable, processValue, setPoint, minOut, maxOut, inP, inI, inD, direction, intervalSecs, bias, manual, reset)
 	outputs := node.BuildOutputs(output)
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	// body.SetSchema(buildSchema())
 	return &PIDNode{body, nil, 0, 0, false}, nil
 }

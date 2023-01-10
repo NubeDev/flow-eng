@@ -100,6 +100,10 @@ func (inst *Delay) ClearAllDelays() {
 	inst.activeDelays = make([]*DelayTimer, 0)
 }
 
+func (inst *Delay) Start() {
+	inst.WritePinNull(node.Out)
+}
+
 func (inst *Delay) Stop() {
 	inst.ClearAllDelays()
 }

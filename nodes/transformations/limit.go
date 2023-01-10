@@ -16,7 +16,7 @@ func NewLimit(body *node.Spec) (node.Node, error) {
 	max := node.BuildInput(node.MaxInput, node.TypeFloat, nil, body.Inputs)
 	inputs := node.BuildInputs(in, min, max)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &Limit{body}, nil
 }
 

@@ -16,7 +16,7 @@ func NewSwitch(body *node.Spec) (node.Node, error) {
 
 	inputs := node.BuildInputs(inSwitch, inTrue, inFalse)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &Switch{body}, nil
 }
 

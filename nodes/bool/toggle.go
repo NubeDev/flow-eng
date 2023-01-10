@@ -17,7 +17,7 @@ func NewToggle(body *node.Spec) (node.Node, error) {
 
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &Toggle{body, false, true}, nil
 }
 

@@ -87,6 +87,7 @@ const (
 	delayOff  = "delay-off"
 	dutyCycle = "duty-cycle"
 	minOnOff  = "min-on-off"
+	oneShot   = "one-shot"
 
 	// switch
 	switchNode = "switch"

@@ -23,7 +23,8 @@ func NewOneShot(body *node.Spec) (node.Node, error) {
 
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
+	body.SetSchema(buildSchema())
 	return &OneShot{body, nil, false, true, true}, nil
 }
 
@@ -45,6 +46,13 @@ func (inst *OneShot) Process() {
 	}
 	inst.lastIn = in
 
+	reset, _ := inst.ReadPinAsBool(node.Reset)
+	if reset && !inst.lastReset {
+		if inst.outputActive {
+			inst.StopOneShotTimer(true)
+		}
+	}
+	inst.lastReset = reset
 }
 
 func (inst *OneShot) StartOneShot(duration time.Duration) {
@@ -68,4 +76,13 @@ func (inst *OneShot) StopOneShotTimer(reset bool) {
 		inst.WritePinFalse(node.Out)
 		inst.outputActive = false
 	}
+}
+
+func (inst *OneShot) Start() {
+	inst.WritePinFalse(node.Out)
+	inst.outputActive = false
+}
+
+func (inst *OneShot) Stop() {
+	inst.StopOneShotTimer(true)
 }

@@ -21,7 +21,7 @@ func NewInputNum(body *node.Spec, store *Store) (node.Node, error) {
 	value := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs)
 	inputs := node.BuildInputs(topic, value)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &InputNum{body}, nil
 }
 

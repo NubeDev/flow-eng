@@ -65,6 +65,11 @@ func (inst *DelayOff) Process() {
 	}
 }
 
+func (inst *DelayOff) Start() {
+	inst.WritePinFalse(node.Out)
+	inst.currOutput = false
+}
+
 func (inst *DelayOff) Stop() {
 	if inst.timer != nil {
 		inst.timer.Stop()

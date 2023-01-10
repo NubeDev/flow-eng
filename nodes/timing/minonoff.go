@@ -21,13 +21,14 @@ func NewMinOnOff(body *node.Spec) (node.Node, error) {
 	onInterval := node.BuildInput(node.MinOnTime, node.TypeFloat, 0, body.Inputs)
 	offInterval := node.BuildInput(node.MinOffTime, node.TypeFloat, 0, body.Inputs)
 	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs)
-	body.Inputs = node.BuildInputs(in, onInterval, offInterval, reset)
+	inputs := node.BuildInputs(in, onInterval, offInterval, reset)
 
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	minOnActive := node.BuildOutput(node.MinOnActive, node.TypeBool, nil, body.Outputs)
 	minOffActive := node.BuildOutput(node.MinOffActive, node.TypeBool, nil, body.Outputs)
-	body.Outputs = node.BuildOutputs(out, minOnActive, minOffActive)
-	return &MinOnOff{body, false, false, false, false, 0, 0}, nil
+	outputs := node.BuildOutputs(out, minOnActive, minOffActive)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
+	return &MinOnOff{body, false, true, false, false, 0, 0}, nil
 }
 
 func (inst *MinOnOff) Process() {

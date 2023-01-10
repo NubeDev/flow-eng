@@ -56,7 +56,7 @@ func NewPACControl(body *node.Spec) (node.Node, error) {
 
 	inputs := node.BuildInputs(enable, zoneTemp, setPoint, clgOffset, htgOffset, stgUpDelay, modeChangeDelay, econoAllow, oaTemp, econoHigh, econoLow, fanStatus, clgLockout, htgLockout)
 	outputs := node.BuildOutputs(clgMode, htgMode, compStage, econoMode, oaDamper, revValve, comp1, comp2)
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(buildSchema())
 	return &PACControl{body, false, 0, false, false, 0, 0, 0, false, 0, false, 2}, nil
 }

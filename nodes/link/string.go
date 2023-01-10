@@ -20,7 +20,7 @@ func NewInput(body *node.Spec, store *Store) (node.Node, error) {
 	value := node.BuildInput(node.In, node.TypeString, nil, body.Inputs)
 	inputs := node.BuildInputs(topic, value)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &Input{body}, nil
 }
 
