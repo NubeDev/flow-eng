@@ -5,7 +5,7 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
-	"strings"
+	"strconv"
 	"time"
 )
 
@@ -55,13 +55,13 @@ func (inst *Delay) Process() {
 	if !float.ComparePtrValues(inst.lastValue, inputFloatPtr) {
 		settings, _ := getDefaultSettings(inst.GetSettings())
 		if settings != nil {
-			t := strings.Replace(settings.Duration.String(), "ns", "", -1)
-			inst.SetSubTitle(fmt.Sprintf("setting: %s %s", t, settings.Time))
+			subtitleText := fmt.Sprintf("%s %s", strconv.FormatFloat(settings.Duration, 'f', -1, 64), settings.TimeUnits)
+			inst.SetSubTitle(subtitleText)
 		}
 
 		// TODO: Implement delay from wired input
 
-		delayDuration := ttime.Duration(settings.Duration, settings.Time)
+		delayDuration := ttime.Duration(settings.Duration, settings.TimeUnits)
 
 		newDelay := &DelayTimer{false, nil}
 		newDelay.Timer = time.AfterFunc(delayDuration, func() {

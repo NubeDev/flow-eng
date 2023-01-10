@@ -8,7 +8,6 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
-	"time"
 )
 
 const (
@@ -22,13 +21,13 @@ const (
 )
 
 type defaultNodeSchema struct {
-	Time     schemas.EnumString `json:"time"`
-	Duration schemas.Number     `json:"duration"`
+	TimeUnits schemas.EnumString `json:"time"`
+	Duration  schemas.Number     `json:"duration"`
 }
 
 type defaultNodeSettings struct {
-	Time     string        `json:"time"`
-	Duration time.Duration `json:"duration"`
+	TimeUnits string  `json:"time_units"`
+	Duration  float64 `json:"duration"`
 }
 
 func buildDefaultSchema() *schemas.Schema {
@@ -38,10 +37,10 @@ func buildDefaultSchema() *schemas.Schema {
 	props.Duration.Default = 1
 
 	// time selection
-	props.Time.Title = "time"
-	props.Time.Default = ttime.Sec
-	props.Time.Options = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
-	props.Time.EnumName = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
+	props.TimeUnits.Title = "time"
+	props.TimeUnits.Default = ttime.Sec
+	props.TimeUnits.Options = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
+	props.TimeUnits.EnumName = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
 	pprint.PrintJSON(props)
 	schema.Set(props)
 
@@ -58,7 +57,7 @@ func buildDefaultSchema() *schemas.Schema {
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{
-			Title:      "Set delay time",
+			Title:      "Node Settings",
 			Properties: props,
 		},
 		UiSchema: uiSchema,
@@ -68,7 +67,7 @@ func buildDefaultSchema() *schemas.Schema {
 	return s
 }
 
-func getSettings(body map[string]interface{}) (*defaultNodeSettings, error) {
+func getDefaultSettings(body map[string]interface{}) (*defaultNodeSettings, error) {
 	settings := &defaultNodeSettings{}
 	marshal, err := json.Marshal(body)
 	if err != nil {

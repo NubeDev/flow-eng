@@ -1,7 +1,15 @@
 package timing
 
 import (
+	"encoding/json"
+	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/array"
+	pprint "github.com/NubeDev/flow-eng/helpers/print"
+	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
+	"github.com/NubeDev/flow-eng/schemas"
+	"github.com/NubeIO/lib-schema/schema"
+	"strconv"
 	"time"
 )
 
@@ -82,10 +90,80 @@ func (inst *MinOnOff) Process() {
 		}
 	}
 	inst.lastInput = input
-
 }
 
 func (inst *MinOnOff) Stop() {
 	inst.minOnEnabled = false
 	inst.minOffEnabled = false
+}
+
+func (inst *MinOnOff) setSubtitle(settings *OneShotSettings) {
+	subtitleText := fmt.Sprintf("min-on %s %s", strconv.FormatFloat(settings.Duration, 'f', -1, 64), settings.TimeUnits)
+	inst.SetSubTitle(subtitleText)
+}
+
+// Custom Node Settings Schema
+
+type MinOnOffSettingsSchema struct {
+	Duration  schemas.Number     `json:"duration"`
+	TimeUnits schemas.EnumString `json:"time_units"`
+	Retrigger schemas.Boolean    `json:"retrigger"`
+}
+
+type MinOnOffSettings struct {
+	Duration  float64 `json:"duration"`
+	TimeUnits string  `json:"time_units"`
+	Retrigger bool    `json:"retrigger"`
+}
+
+func (inst *MinOnOff) buildSchema() *schemas.Schema {
+	props := &MinOnOffSettingsSchema{}
+	// time selection
+	props.Duration.Title = "Duration"
+	props.Duration.Default = 1
+
+	// time selection
+	props.TimeUnits.Title = "Time Units"
+	props.TimeUnits.Default = ttime.Sec
+	props.TimeUnits.Options = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
+	props.TimeUnits.EnumName = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
+
+	// retrigger selection
+	props.Retrigger.Title = "Allow Retrigger"
+	props.Retrigger.Default = false
+
+	pprint.PrintJSON(props)
+	schema.Set(props)
+
+	fmt.Println(fmt.Sprintf("buildSchema() props: %+v", props))
+	pprint.PrintJSON(props)
+
+	uiSchema := array.Map{
+		"time_units": array.Map{
+			"ui:widget": "radio",
+			"ui:options": array.Map{
+				"inline": true,
+			},
+		},
+	}
+	s := &schemas.Schema{
+		Schema: schemas.SchemaBody{
+			Title:      "Node Settings",
+			Properties: props,
+		},
+		UiSchema: uiSchema,
+	}
+	fmt.Println(fmt.Sprintf("buildSchema() s: %+v", s))
+	pprint.PrintJSON(s)
+	return s
+}
+
+func (inst *MinOnOff) getSettings(body map[string]interface{}) (*MinOnOffSettings, error) {
+	settings := &MinOnOffSettings{}
+	marshal, err := json.Marshal(body)
+	if err != nil {
+		return settings, err
+	}
+	err = json.Unmarshal(marshal, &settings)
+	return settings, err
 }

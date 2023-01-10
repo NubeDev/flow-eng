@@ -39,18 +39,18 @@ func (rt *RealTime) Now(notUTC ...bool) time.Time {
 	return time.Now()
 }
 
-func Duration(f time.Duration, format string) time.Duration {
-	if format == Ms {
-		return f * time.Millisecond
+func Duration(amount float64, units string) time.Duration {
+	if units == Ms {
+		return time.Duration(amount * float64(time.Millisecond))
 	}
-	if format == Sec {
-		return f * time.Second
+	if units == Sec {
+		return time.Duration(amount * float64(time.Second))
 	}
-	if format == Min {
-		return f * time.Minute
+	if units == Min {
+		return time.Duration(amount * float64(time.Minute))
 	}
-	if format == Hr {
-		return f * time.Hour
+	if units == Hr {
+		return time.Duration(amount * float64(time.Hour))
 	}
-	return f * time.Second
+	return time.Duration(amount * float64(time.Second))
 }
