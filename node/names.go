@@ -92,10 +92,10 @@ const (
 	InputC InputName = "c"
 	InputD InputName = "d"
 
-	Inp         InputName = "input"
-	InputMatch  InputName = "match"
-	InputValue  InputName = "value"
-	InputThresh InputName = "threshold"
+	Inp       InputName = "input"
+	Match     InputName = "match"
+	Value     InputName = "value"
+	Threshold InputName = "threshold"
 
 	Connection   InputName = "topic"
 	URL          InputName = "url"
@@ -169,6 +169,7 @@ const (
 
 	OutTopic OutputName = "topic"
 	Out      OutputName = "out"
+	Outp     OutputName = "output"
 
 	LastUpdated     OutputName = "last-updated"
 	CurrentPriority OutputName = "current-priority"
