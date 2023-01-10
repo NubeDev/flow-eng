@@ -92,7 +92,10 @@ const (
 	InputC InputName = "c"
 	InputD InputName = "d"
 
-	InputMatch InputName = "match"
+	Inp         InputName = "input"
+	InputMatch  InputName = "match"
+	InputValue  InputName = "value"
+	InputThresh InputName = "threshold"
 
 	Connection   InputName = "topic"
 	URL          InputName = "url"
