@@ -16,7 +16,11 @@ const (
 // prevent-equal
 
 const (
-	onlyTrue    = "only-true"
-	onlyFalse   = "only-false"
-	preventNull = "prevent-null"
+	preventNull        = "prevent-null"
+	preventEqualFloat  = "prevent-equal-float"
+	preventEqualString = "prevent-equal-string"
+	onlyBetween        = "only-between"
+	onlyGreater        = "only-greater"
+	onlyLower          = "only-lower"
+	preventDuplicates  = "prevent-duplicates"
 )

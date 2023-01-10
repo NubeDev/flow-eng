@@ -92,6 +92,11 @@ const (
 	InputC InputName = "c"
 	InputD InputName = "d"
 
+	Inp       InputName = "input"
+	Match     InputName = "match"
+	Value     InputName = "value"
+	Threshold InputName = "threshold"
+
 	Connection   InputName = "topic"
 	URL          InputName = "url"
 	Topic        InputName = "topic"
@@ -165,6 +170,7 @@ const (
 
 	OutTopic OutputName = "topic"
 	Out      OutputName = "out"
+	Outp     OutputName = "output"
 
 	MinOutput OutputName = "min"
 	MaxOutput OutputName = "max"
