@@ -49,6 +49,12 @@ func (inst *Gmail) sendEmail(ed map[string]string) {
 
 }
 
+// instructions to generate gmail application password
+// 1. Go to your Google Account.
+// 2. Select Security.
+// 3. Under "Signing in to Google," select App Passwords. You may need to sign in.
+// 4. At the bottom, choose Select app and choose the app you using and then Select device and choose the device you’re using and then Generate.
+// refer to this page if unclear: https://support.google.com/accounts/answer/185833?visit_id=638089001343155683-2129707965&p=InvalidSecondFactor&rd=1
 func (inst *Gmail) Process() {
 	to := inst.GetInput(node.To).GetValue()
 	subject := inst.GetInput(node.Subject).GetValue()
