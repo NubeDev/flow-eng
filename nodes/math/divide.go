@@ -24,7 +24,7 @@ func NewDivide(body *node.Spec) (node.Node, error) {
 func (inst *Divide) Process() {
 	in1, null1 := inst.ReadPinAsFloat(node.In1)
 	in2, null2 := inst.ReadPinAsFloat(node.In2)
-	if null1 || null2 {
+	if null1 || null2 || in2 == 0 {
 		inst.WritePinFloat(node.Out, 0)
 	} else {
 		output := in1 / in2

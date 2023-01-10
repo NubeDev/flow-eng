@@ -1,6 +1,8 @@
 package math
 
-import "github.com/NubeDev/flow-eng/helpers/array"
+import (
+	"github.com/NubeDev/flow-eng/helpers/array"
+)
 
 func operation(operation string, values []*float64) *float64 {
 	var nonNilValues []float64

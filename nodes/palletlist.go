@@ -59,6 +59,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	greaterthan, _ := compare.NewGreaterThan(nil)
 	lessthan, _ := compare.NewLessThan(nil)
 	equal, _ := compare.NewEqual(nil)
+	equalString, _ := compare.NewEqualString(nil)
 	between, _ := compare.NewBetween(nil)
 	hysteresis, _ := compare.NewHysteresis(nil)
 
@@ -66,6 +67,10 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	min, _ := statistics.NewMin(nil)
 	max, _ := statistics.NewMax(nil)
 	avg, _ := statistics.NewAvg(nil)
+	minMaxAvg, _ := statistics.NewMinMaxAvg(nil)
+	rangeNode, _ := statistics.NewRange(nil)
+	rank, _ := statistics.NewRank(nil)
+	median, _ := statistics.NewMedian(nil)
 
 	// streams
 	flatLine, _ := streams.NewFlatline(nil)
@@ -129,11 +134,10 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	rampNode, _ := count.NewRamp(nil)
 
 	// trigger
-	inject, _ := trigger.NewInject(nil)
 	randomFloat, _ := trigger.NewRandom(nil)
 
 	// time
-	delay, _ := timing.NewDelay(nil, nil)
+	delay, _ := timing.NewDelay(nil)
 	delayOn, _ := timing.NewDelayOn(nil, nil)
 	delayOff, _ := timing.NewDelayOff(nil, nil)
 	dutyCycle, _ := timing.NewDutyCycle(nil)
@@ -197,12 +201,17 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(greaterthan),
 		node.ConvertToSpec(lessthan),
 		node.ConvertToSpec(equal),
+		node.ConvertToSpec(equalString),
 		node.ConvertToSpec(between),
 		node.ConvertToSpec(hysteresis),
 
 		node.ConvertToSpec(min),
 		node.ConvertToSpec(max),
 		node.ConvertToSpec(avg),
+		node.ConvertToSpec(minMaxAvg),
+		node.ConvertToSpec(rangeNode),
+		node.ConvertToSpec(rank),
+		node.ConvertToSpec(median),
 
 		node.ConvertToSpec(gmailNode),
 		node.ConvertToSpec(pingNode),
@@ -241,7 +250,6 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(minOnOff),
 
 		node.ConvertToSpec(randomFloat),
-		node.ConvertToSpec(inject),
 
 		node.ConvertToSpec(flatLine),
 
@@ -619,6 +627,8 @@ func builderCompare(body *node.Spec) (node.Node, error) {
 		return compare.NewLessThan(body)
 	case equal:
 		return compare.NewEqual(body)
+	case equalString:
+		return compare.NewEqualString(body)
 	case between:
 		return compare.NewBetween(body)
 	case hysteresis:
@@ -635,6 +645,14 @@ func builderStatistics(body *node.Spec) (node.Node, error) {
 		return statistics.NewMax(body)
 	case avg:
 		return statistics.NewAvg(body)
+	case minMaxAvg:
+		return statistics.NewMinMaxAvg(body)
+	case rangeNode:
+		return statistics.NewRange(body)
+	case rank:
+		return statistics.NewRank(body)
+	case median:
+		return statistics.NewMedian(body)
 	}
 	return nil, nil
 }
@@ -665,8 +683,6 @@ func builderCount(body *node.Spec) (node.Node, error) {
 
 func builderTrigger(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
-	case inject:
-		return trigger.NewInject(body)
 	case randomFloat:
 		return trigger.NewRandom(body)
 	}
@@ -676,7 +692,7 @@ func builderTrigger(body *node.Spec) (node.Node, error) {
 func builderTiming(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case delay:
-		return timing.NewDelay(body, timer.NewTimer())
+		return timing.NewDelay(body)
 	case delayOn:
 		return timing.NewDelayOn(body, timer.NewTimer())
 	case delayOff:

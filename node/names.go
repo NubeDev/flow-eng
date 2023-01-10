@@ -60,8 +60,8 @@ const (
 	CountUp        InputName = "count-up"
 	CountDown      InputName = "count-down"
 
-	Min InputName = "min"
-	Max InputName = "max"
+	MinInput InputName = "min"
+	MaxInput InputName = "max"
 
 	InMin  InputName = "in-min"
 	InMax  InputName = "in-max"
@@ -112,6 +112,7 @@ const (
 	Time        InputName = "time"
 	NetworkPort InputName = "port"
 
+	Delay        InputName = "delay"
 	DelaySeconds InputName = "delay (s)"
 	Selection    InputName = "select"
 
@@ -170,6 +171,10 @@ const (
 	OutTopic OutputName = "topic"
 	Out      OutputName = "out"
 	Outp     OutputName = "output"
+
+	MinOutput OutputName = "min"
+	MaxOutput OutputName = "max"
+	AvgOutput OutputName = "avg"
 
 	LastUpdated     OutputName = "last-updated"
 	CurrentPriority OutputName = "current-priority"

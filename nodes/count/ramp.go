@@ -15,8 +15,8 @@ type Ramp struct {
 func NewRamp(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, rampNode, category)
 	duration := node.BuildInput(node.Duration, node.TypeFloat, nil, body.Inputs)
-	min := node.BuildInput(node.Min, node.TypeFloat, nil, body.Inputs)
-	max := node.BuildInput(node.Max, node.TypeFloat, nil, body.Inputs)
+	min := node.BuildInput(node.MinInput, node.TypeFloat, nil, body.Inputs)
+	max := node.BuildInput(node.MaxInput, node.TypeFloat, nil, body.Inputs)
 	body.Inputs = node.BuildInputs(duration, min, max)
 	out := node.BuildOutput(node.CountOut, node.TypeFloat, nil, body.Outputs)
 	body.Outputs = node.BuildOutputs(out)
@@ -25,8 +25,8 @@ func NewRamp(body *node.Spec) (node.Node, error) {
 
 func (inst *Ramp) run() {
 	duration, _ := inst.ReadPinAsDuration(node.Duration)
-	min, _ := inst.ReadPinAsFloat(node.Min)
-	max, _ := inst.ReadPinAsFloat(node.Max)
+	min, _ := inst.ReadPinAsFloat(node.MinInput)
+	max, _ := inst.ReadPinAsFloat(node.MaxInput)
 	if !inst.breakLoop {
 		inst.count += 1
 	}

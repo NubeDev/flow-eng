@@ -64,3 +64,10 @@ func (inst *DelayOff) Process() {
 		})
 	}
 }
+
+func (inst *DelayOff) Stop() {
+	if inst.timer != nil {
+		inst.timer.Stop()
+		inst.timer = nil
+	}
+}

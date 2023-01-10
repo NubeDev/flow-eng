@@ -116,3 +116,7 @@ func (inst *DutyCycle) disableDutyCycle() {
 		inst.offTimer = nil
 	}
 }
+
+func (inst *DutyCycle) Stop() {
+	inst.disableDutyCycle()
+}

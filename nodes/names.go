@@ -52,6 +52,7 @@ const (
 	greaterThan = "greater-than"
 	lessThan    = "less-than"
 	equal       = "equal"
+	equalString = "equal-string"
 	between     = "between"
 	hysteresis  = "hysteresis"
 	funcNode    = "func"
@@ -60,9 +61,13 @@ const (
 	conversionNum    = "conversion-number"
 	conversionBool   = "conversion-bool"
 
-	max = "min"
-	min = "max"
-	avg = "avg"
+	max       = "max"
+	min       = "min"
+	avg       = "average"
+	minMaxAvg = "min-max-avg"
+	rangeNode = "range"
+	rank      = "rank"
+	median    = "median"
 
 	flatLine = "flatLine"
 

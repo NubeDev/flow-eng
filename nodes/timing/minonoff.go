@@ -83,3 +83,8 @@ func (inst *MinOnOff) Process() {
 	inst.lastInput = input
 
 }
+
+func (inst *MinOnOff) Stop() {
+	inst.minOnEnabled = false
+	inst.minOffEnabled = false
+}
