@@ -2,6 +2,7 @@ package gmail
 
 import (
 	"encoding/json"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
@@ -9,7 +10,7 @@ import (
 
 type nodeSchema struct {
 	FromAddress schemas.String `json:"fromAddress"`
-	Password    schemas.String `json:"password"`
+	Token       schemas.String `json:"token"`
 	ToAddress   schemas.String `json:"toAddress"`
 }
 
@@ -20,13 +21,13 @@ func buildSchema() *schemas.Schema {
 	props.ToAddress.Title = "To Address"
 	schema.Set(props)
 	uiSchema := array.Map{
-		"password": array.Map{
+		"token": array.Map{
 			"ui:widget": "password",
 		},
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{
-			Title:      "addresses and password",
+			Title:      "addresses and token",
 			Properties: props,
 		},
 		UiSchema: uiSchema,
@@ -36,7 +37,7 @@ func buildSchema() *schemas.Schema {
 
 type nodeSettings struct {
 	FromAddress string `json:"fromAddress"`
-	Password    string `json:"password"`
+	Token       string `json:"token"`
 	ToAddress   string `json:"toAddress"`
 }
 

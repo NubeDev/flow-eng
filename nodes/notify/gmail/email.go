@@ -27,6 +27,7 @@ func NewGmail(body *node.Spec) (node.Node, error) {
 	inputs := node.BuildInputs(to, subject, message, trigger)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
+	body.SetHelp(fmt.Sprintln("Please format the message in HTML. Instructions to generate gmail application token. \n 1. Go to your Google Account. \n 2. Select Security. \n 3. Under 'Signing in to Google,' select App Passwords. You may need to sign in. 4. At the bottom, choose Select app and choose the app you using and then Select device and choose the device you’re using and then Generate."))
 	body.SetSchema(buildSchema())
 	return &Gmail{body}, nil
 }
@@ -39,9 +40,9 @@ func (inst *Gmail) sendEmail(ed map[string]string) {
 	e.From = ed["from"]
 	e.To = []string{ed["to"]}
 	e.Subject = ed["subject"]
-	e.Text = []byte(ed["message"])
-	// e.HTML = []byte("<h1>Fancy HTML is supported, too!</h1>")
-	err = e.Send("smtp.gmail.com:587", smtp.PlainAuth("", ed["from"], ed["password"], "smtp.gmail.com"))
+	// e.Text = []byte(ed["message"])
+	e.HTML = []byte(ed["message"])
+	err = e.Send("smtp.gmail.com:587", smtp.PlainAuth("", ed["from"], ed["token"], "smtp.gmail.com"))
 	fmt.Println(err)
 	if err != nil {
 		return
@@ -49,7 +50,7 @@ func (inst *Gmail) sendEmail(ed map[string]string) {
 
 }
 
-// instructions to generate gmail application password
+// instructions to generate gmail application token
 // 1. Go to your Google Account.
 // 2. Select Security.
 // 3. Under "Signing in to Google," select App Passwords. You may need to sign in.
@@ -64,7 +65,7 @@ func (inst *Gmail) Process() {
 
 	var ed map[string]string = make(map[string]string)
 	ed["from"] = s.FromAddress
-	ed["password"] = s.Password
+	ed["token"] = s.Token
 	ed["subject"] = subject.(string)
 	ed["message"] = message.(string)
 	if to != nil {
