@@ -2,13 +2,15 @@ package gmail
 
 import (
 	"fmt"
+	"log"
+	"net/smtp"
+	"strings"
+
 	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/notify"
 	"github.com/jordan-wright/email"
 	"github.com/mitchellh/mapstructure"
-	"net/smtp"
-	"strings"
 )
 
 const (
@@ -59,8 +61,11 @@ func (inst *Gmail) sendEmail() {
 	connection, err := inst.GetDB().GetConnection("")
 	pprint.Print(connection)
 	e := email.NewEmail()
+
+	// log.Println("The content of settings is: ", inst.Settings)
+
 	e.From = "nubeio <noreply@nube-io.com>"
-	e.To = []string{"ap@nube-io.com"}
+	e.To = []string{"jfe@nube-io.com"}
 	e.Subject = "test"
 	e.Text = []byte("Text Body is, of course, supported!")
 	e.HTML = []byte("<h1>Fancy HTML is supported, too!</h1>")
@@ -74,9 +79,11 @@ func (inst *Gmail) sendEmail() {
 
 func (inst *Gmail) Process() {
 	_, cov := inst.InputUpdated(node.TriggerInput)
+	// log.Println("The input is: ", (*inst.GetInput(node.Message)).GetValue())
+	log.Println("The setting is: ", inst.GetSettings())
 	if cov {
 		fmt.Println("TRIGGER EMAIL")
-		// inst.sendEmail()
+		inst.sendEmail()
 	}
 
 }
