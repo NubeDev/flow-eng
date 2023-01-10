@@ -1,16 +1,14 @@
 package gmail
 
 import (
+	"encoding/json"
 	"fmt"
-	"log"
-	"net/smtp"
-	"strings"
-
 	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/notify"
 	"github.com/jordan-wright/email"
-	"github.com/mitchellh/mapstructure"
+	"log"
+	"net/smtp"
 )
 
 const (
@@ -19,33 +17,20 @@ const (
 
 type Gmail struct {
 	*node.Spec
-	address []string
 }
 
-type nodeSettings struct {
-	Address string `json:"address"`
-}
-
-func getSettings(body *node.Spec) ([]string, error) {
-	settings := &nodeSettings{}
-	err := mapstructure.Decode(body.Settings, &settings)
+func getSettings(body map[string]interface{}) (*nodeSchema, error) {
+	settings := &nodeSchema{}
+	marshal, err := json.Marshal(body)
 	if err != nil {
-		return nil, err
+		return settings, err
 	}
-	if settings != nil {
-		address := strings.Split(settings.Address, ",")
-		return address, nil
-	}
-	return nil, nil
-
+	err = json.Unmarshal(marshal, &settings)
+	return settings, err
 }
 
 func NewGmail(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, gmailNode, notify.Category)
-	address, err := getSettings(body)
-	if err != nil {
-		return nil, err
-	}
 	to := node.BuildInput(node.To, node.TypeString, nil, body.Inputs)
 	subject := node.BuildInput(node.Subject, node.TypeString, nil, body.Inputs)
 	message := node.BuildInput(node.Message, node.TypeString, nil, body.Inputs)
@@ -54,7 +39,7 @@ func NewGmail(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(buildSchema())
-	return &Gmail{body, address}, nil
+	return &Gmail{body}, nil
 }
 
 func (inst *Gmail) sendEmail() {
@@ -80,7 +65,9 @@ func (inst *Gmail) sendEmail() {
 func (inst *Gmail) Process() {
 	_, cov := inst.InputUpdated(node.TriggerInput)
 	// log.Println("The input is: ", (*inst.GetInput(node.Message)).GetValue())
-	log.Println("The setting is: ", inst.GetSettings())
+	s, err := getSettings(inst.GetSettings())
+	log.Println("The setting is: ", err)
+	log.Println("The setting is: ", s)
 	if cov {
 		fmt.Println("TRIGGER EMAIL")
 		inst.sendEmail()
