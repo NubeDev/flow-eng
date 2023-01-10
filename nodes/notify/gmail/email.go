@@ -1,7 +1,6 @@
 package gmail
 
 import (
-	"encoding/json"
 	"fmt"
 	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
@@ -17,16 +16,6 @@ const (
 
 type Gmail struct {
 	*node.Spec
-}
-
-func getSettings(body map[string]interface{}) (*nodeSchema, error) {
-	settings := &nodeSchema{}
-	marshal, err := json.Marshal(body)
-	if err != nil {
-		return settings, err
-	}
-	err = json.Unmarshal(marshal, &settings)
-	return settings, err
 }
 
 func NewGmail(body *node.Spec) (node.Node, error) {
@@ -64,9 +53,7 @@ func (inst *Gmail) sendEmail() {
 
 func (inst *Gmail) Process() {
 	_, cov := inst.InputUpdated(node.TriggerInput)
-	// log.Println("The input is: ", (*inst.GetInput(node.Message)).GetValue())
-	s, err := getSettings(inst.GetSettings())
-	log.Println("The setting is: ", err)
+	s, _ := getSettings(inst.GetSettings())
 	log.Println("The setting is: ", s)
 	if cov {
 		fmt.Println("TRIGGER EMAIL")

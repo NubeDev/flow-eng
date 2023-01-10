@@ -1,6 +1,7 @@
 package gmail
 
 import (
+	"encoding/json"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
@@ -31,4 +32,20 @@ func buildSchema() *schemas.Schema {
 		UiSchema: uiSchema,
 	}
 	return s
+}
+
+type nodeSettings struct {
+	FromAddress string `json:"fromAddress"`
+	Password    string `json:"password"`
+	ToAddress   string `json:"toAddress"`
+}
+
+func getSettings(body map[string]interface{}) (*nodeSettings, error) {
+	settings := &nodeSettings{}
+	marshal, err := json.Marshal(body)
+	if err != nil {
+		return settings, err
+	}
+	err = json.Unmarshal(marshal, &settings)
+	return settings, err
 }
