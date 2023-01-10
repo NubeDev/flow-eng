@@ -28,7 +28,7 @@ func NewDelayOff(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
 func (inst *DelayOff) Process() {
 	settings, _ := getDefaultSettings(inst.GetSettings())
 	if settings != nil {
-		subtitleText := fmt.Sprintf("%s %s", strconv.FormatFloat(settings.Duration, 'f', -1, 64), settings.TimeUnits)
+		subtitleText := fmt.Sprintf("%s %s", strconv.FormatFloat(settings.Interval, 'f', -1, 64), settings.TimeUnits)
 		inst.SetSubTitle(subtitleText)
 	}
 	in1, _ := inst.ReadPinAsBool(node.In)
@@ -57,7 +57,7 @@ func (inst *DelayOff) Process() {
 
 	// input is false, but output isn't so start a timer if it doesn't exist already
 	if inst.timer == nil {
-		onDelayDuration := ttime.Duration(settings.Duration, settings.TimeUnits)
+		onDelayDuration := ttime.Duration(settings.Interval, settings.TimeUnits)
 		inst.timer = time.AfterFunc(onDelayDuration, func() {
 			inst.WritePinFalse(node.Out)
 			inst.currOutput = false

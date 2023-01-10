@@ -55,13 +55,13 @@ func (inst *Delay) Process() {
 	if !float.ComparePtrValues(inst.lastValue, inputFloatPtr) {
 		settings, _ := getDefaultSettings(inst.GetSettings())
 		if settings != nil {
-			subtitleText := fmt.Sprintf("%s %s", strconv.FormatFloat(settings.Duration, 'f', -1, 64), settings.TimeUnits)
+			subtitleText := fmt.Sprintf("%s %s", strconv.FormatFloat(settings.Interval, 'f', -1, 64), settings.TimeUnits)
 			inst.SetSubTitle(subtitleText)
 		}
 
 		// TODO: Implement delay from wired input
 
-		delayDuration := ttime.Duration(settings.Duration, settings.TimeUnits)
+		delayDuration := ttime.Duration(settings.Interval, settings.TimeUnits)
 
 		newDelay := &DelayTimer{false, nil}
 		newDelay.Timer = time.AfterFunc(delayDuration, func() {

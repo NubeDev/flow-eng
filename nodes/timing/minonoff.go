@@ -37,7 +37,9 @@ func NewMinOnOff(body *node.Spec) (node.Node, error) {
 	minOffActive := node.BuildOutput(node.MinOffActive, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out, minOnActive, minOffActive)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	return &MinOnOff{body, false, true, false, false, 0, 0, 0, 0}, nil
+	node := &MinOnOff{body, false, true, false, false, 0, 0, 0, 0}
+	node.SetSchema(node.buildSchema())
+	return node, nil
 }
 
 func (inst *MinOnOff) Process() {
@@ -169,7 +171,13 @@ func (inst *MinOnOff) buildSchema() *schemas.Schema {
 	schema.Set(props)
 
 	uiSchema := array.Map{
-		"time_units": array.Map{
+		"min_on_time_units": array.Map{
+			"ui:widget": "radio",
+			"ui:options": array.Map{
+				"inline": true,
+			},
+		},
+		"min_off_time_units": array.Map{
 			"ui:widget": "radio",
 			"ui:options": array.Map{
 				"inline": true,
