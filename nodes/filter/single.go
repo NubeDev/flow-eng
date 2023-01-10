@@ -104,24 +104,6 @@ func NewPreventDuplicates(body *node.Spec) (node.Node, error) {
 	return &PreventDuplicates{body, 0}, nil
 }
 
-// func (inst *OnlyTrue) Process() {
-// 	v, _ := inst.ReadPinAsBool(node.In)
-// 	if v {
-// 		inst.WritePinTrue(node.Out)
-// 	} else {
-// 		inst.WritePinFalse(node.Out)
-// 	}
-// }
-
-// func (inst *OnlyFalse) Process() {
-// 	v, null := inst.ReadPinAsBool(node.In)
-// 	if !v || null {
-// 		inst.WritePinFalse(node.Out)
-// 	} else {
-// 		inst.WritePinTrue(node.Out)
-// 	}
-// }
-
 // preventNull, output the last known value if the input became null.
 // lastValue is defaulted to be 0
 func (inst *PreventNull) Process() {
@@ -144,7 +126,7 @@ func (inst *PreventEqualFloat) Process() {
 	if vNull || mNull {
 		inst.WritePinNull(node.Out)
 	} else {
-		if toFixed(v, 2) != toFixed(m, 2) {
+		if ToFixed(v, 2) != ToFixed(m, 2) {
 			inst.WritePinFloat(node.Out, v)
 			inst.lastValue = v
 		} else {
