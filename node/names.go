@@ -92,6 +92,8 @@ const (
 	InputC InputName = "c"
 	InputD InputName = "d"
 
+	InputMatch InputName = "match"
+
 	Connection   InputName = "topic"
 	URL          InputName = "url"
 	Topic        InputName = "topic"
