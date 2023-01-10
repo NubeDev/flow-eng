@@ -5,6 +5,13 @@ import (
 	"time"
 )
 
+const (
+	Ms  = "ms"
+	Sec = "sec"
+	Min = "min"
+	Hr  = "hour"
+)
+
 // TimeSince returns in a human readable format the elapsed time
 // eg 12 hours, 12 days
 func TimeSince(t time.Time) string {
@@ -30,4 +37,20 @@ func (rt *RealTime) Now(notUTC ...bool) time.Time {
 		return time.Now().UTC()
 	}
 	return time.Now()
+}
+
+func Duration(f time.Duration, format string) time.Duration {
+	if format == Ms {
+		return f * time.Millisecond
+	}
+	if format == Sec {
+		return f * time.Second
+	}
+	if format == Min {
+		return f * time.Minute
+	}
+	if format == Hr {
+		return f * time.Hour
+	}
+	return f * time.Second
 }

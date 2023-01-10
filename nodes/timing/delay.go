@@ -3,6 +3,7 @@ package timing
 import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/float"
+	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"strings"
 	"time"
@@ -30,7 +31,7 @@ func NewDelay(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(out)
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	body.SetSchema(buildSchema())
+	body.SetSchema(buildDefaultSchema())
 
 	delayArray := make([]*DelayTimer, 0)
 	return &Delay{body, delayArray, nil}, nil
@@ -52,7 +53,7 @@ func (inst *Delay) Process() {
 
 	// if (inputFloatPtr == nil && inst.lastValue != nil) || (inputFloatPtr != nil && inst.lastValue == nil) || *inputFloatPtr != *inst.lastValue {
 	if !float.ComparePtrValues(inst.lastValue, inputFloatPtr) {
-		settings, _ := getSettings(inst.GetSettings())
+		settings, _ := getDefaultSettings(inst.GetSettings())
 		if settings != nil {
 			t := strings.Replace(settings.Duration.String(), "ns", "", -1)
 			inst.SetSubTitle(fmt.Sprintf("setting: %s %s", t, settings.Time))
@@ -60,7 +61,7 @@ func (inst *Delay) Process() {
 
 		// TODO: Implement delay from wired input
 
-		delayDuration := duration(settings.Duration, settings.Time)
+		delayDuration := ttime.Duration(settings.Duration, settings.Time)
 
 		newDelay := &DelayTimer{false, nil}
 		newDelay.Timer = time.AfterFunc(delayDuration, func() {

@@ -13,6 +13,14 @@ type Schema struct {
 	UiSchema interface{} `json:"uiSchema"`
 }
 
+type Boolean struct {
+	Type     string `json:"type" default:"boolean"`
+	Title    string `json:"title" default:""`
+	Default  string `json:"default" default:"false"`
+	Help     string `json:"help" default:""`
+	ReadOnly bool   `json:"readOnly" default:"false"`
+}
+
 type String struct {
 	Type     string `json:"type" default:"string"`
 	Title    string `json:"title" default:""`

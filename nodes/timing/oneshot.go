@@ -1,8 +1,14 @@
 package timing
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/array"
+	pprint "github.com/NubeDev/flow-eng/helpers/print"
+	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
+	"github.com/NubeDev/flow-eng/schemas"
+	"github.com/NubeIO/lib-schema/schema"
 	"strings"
 	"time"
 )
@@ -13,6 +19,65 @@ type OneShot struct {
 	outputActive bool
 	lastIn       bool
 	lastReset    bool
+}
+
+type OneShotSchema struct {
+	Time      schemas.EnumString `json:"time"`
+	Duration  schemas.Number     `json:"duration"`
+	Retrigger schemas.Boolean    `json:"retrigger"`
+}
+
+type OneShotSettings struct {
+	Time      string        `json:"time"`
+	Duration  time.Duration `json:"duration"`
+	Retrigger bool          `json:"retrigger"`
+}
+
+func (inst *OneShot) getSettings(body map[string]interface{}) (*nodeSettings, error) {
+	settings := &nodeSettings{}
+	marshal, err := json.Marshal(body)
+	if err != nil {
+		return settings, err
+	}
+	err = json.Unmarshal(marshal, &settings)
+	return settings, err
+}
+
+func (inst *OneShot) buildSchema() *schemas.Schema {
+	props := &nodeSchema{}
+	// time selection
+	props.Duration.Title = "duration"
+	props.Duration.Default = 1
+
+	// time selection
+	props.Time.Title = "time"
+	props.Time.Default = ttime.Sec
+	props.Time.Options = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
+	props.Time.EnumName = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
+	pprint.PrintJSON(props)
+	schema.Set(props)
+
+	fmt.Println(fmt.Sprintf("buildSchema() props: %+v", props))
+	pprint.PrintJSON(props)
+
+	uiSchema := array.Map{
+		"time": array.Map{
+			"ui:widget": "radio",
+			"ui:options": array.Map{
+				"inline": true,
+			},
+		},
+	}
+	s := &schemas.Schema{
+		Schema: schemas.SchemaBody{
+			Title:      "Set delay time",
+			Properties: props,
+		},
+		UiSchema: uiSchema,
+	}
+	fmt.Println(fmt.Sprintf("buildSchema() s: %+v", s))
+	pprint.PrintJSON(s)
+	return s
 }
 
 func NewOneShot(body *node.Spec) (node.Node, error) {
@@ -40,7 +105,7 @@ func (inst *OneShot) Process() {
 	in, _ := inst.ReadPinAsBool(node.In)
 	if in && !inst.lastIn {
 		if retrigger || !inst.outputActive {
-			oneShotDuration := duration(settings.Duration, settings.Time)
+			oneShotDuration := ttime.Duration(settings.Duration, settings.Time)
 			inst.StartOneShot(oneShotDuration)
 		}
 	}

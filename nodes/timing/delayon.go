@@ -3,6 +3,7 @@ package timing
 import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/timer"
+	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"strings"
 	"time"
@@ -21,7 +22,7 @@ func NewDelayOn(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	body.SetSchema(buildSchema())
+	body.SetSchema(buildDefaultSchema())
 	return &DelayOn{body, nil, false}, nil
 }
 
@@ -31,7 +32,7 @@ start delay, after the delay set the output to true
 */
 
 func (inst *DelayOn) Process() {
-	settings, _ := getSettings(inst.GetSettings())
+	settings, _ := getDefaultSettings(inst.GetSettings())
 	if settings != nil {
 		t := strings.Replace(settings.Duration.String(), "ns", "", -1)
 		inst.SetSubTitle(fmt.Sprintf("setting: %s %s", t, settings.Time))
@@ -62,7 +63,7 @@ func (inst *DelayOn) Process() {
 
 	// input is active, but output isn't so start a timer if it doesn't exist already
 	if inst.timer == nil {
-		onDelayDuration := duration(settings.Duration, settings.Time)
+		onDelayDuration := ttime.Duration(settings.Duration, settings.Time)
 		inst.timer = time.AfterFunc(onDelayDuration, func() {
 			inst.WritePinTrue(node.Out)
 			inst.currOutput = true
