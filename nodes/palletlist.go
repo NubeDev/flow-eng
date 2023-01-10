@@ -160,13 +160,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	pointBool, _ := point.NewBoolean(nil)
 
 	// filter
-	// onlyTrue, _ := filter.NewOnlyTrue(nil)
-	// onlyFalse, _ := filter.NewOnlyFalse(nil)
 	preventNull, _ := filter.NewPreventNull(nil)
 	preventEqualFloat, _ := filter.NewPreventEqualFloat(nil)
 	preventEqualString, _ := filter.NewPreventEqualString(nil)
-	onlyEqualFloat, _ := filter.NewOnlyEqualFloat(nil)
-	onlyEqualString, _ := filter.NewOnlyEqualString(nil)
 	onlyBetween, _ := filter.NewOnlyBetween(nil)
 	onlyGreater, _ := filter.NewOnlyGreater(nil)
 	onlyLower, _ := filter.NewOnlyLower(nil)
@@ -284,13 +280,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(logNode),
 
-		// node.ConvertToSpec(onlyTrue),
-		// node.ConvertToSpec(onlyFalse),
 		node.ConvertToSpec(preventNull),
 		node.ConvertToSpec(preventEqualFloat),
 		node.ConvertToSpec(preventEqualString),
-		node.ConvertToSpec(onlyEqualFloat),
-		node.ConvertToSpec(onlyEqualString),
 		node.ConvertToSpec(onlyBetween),
 		node.ConvertToSpec(onlyGreater),
 		node.ConvertToSpec(onlyLower),
@@ -457,10 +449,6 @@ func builderFilter(body *node.Spec) (node.Node, error) {
 		return filter.NewPreventEqualFloat(body)
 	case preventEqualString:
 		return filter.NewPreventEqualString(body)
-	case onlyEqualFloat:
-		return filter.NewOnlyEqualFloat(body)
-	case onlyEqualString:
-		return filter.NewOnlyEqualString(body)
 	case onlyBetween:
 		return filter.NewOnlyBetween(body)
 	case onlyGreater:

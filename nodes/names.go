@@ -67,13 +67,9 @@ const (
 	flatLine = "flatLine"
 
 	//filters
-	onlyTrue           = "only-true"
-	onlyFalse          = "only-false"
 	preventNull        = "prevent-null"
 	preventEqualFloat  = "prevent-equal-float"
 	preventEqualString = "prevent-equal-string"
-	onlyEqualFloat     = "only-equal-float"
-	onlyEqualString    = "only-equal-string"
 	onlyBetween        = "only-between"
 	onlyGreater        = "only-greater"
 	onlyLower          = "only-lower"
