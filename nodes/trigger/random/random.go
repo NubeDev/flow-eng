@@ -3,6 +3,7 @@ package trigger
 import (
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/node"
+	"github.com/NubeDev/flow-eng/nodes/trigger"
 )
 
 type Random struct {
@@ -12,7 +13,7 @@ type Random struct {
 }
 
 func NewRandom(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, randomFloat, category)
+	body = node.Defaults(body, trigger.RandomFloat, trigger.Category)
 	min := node.BuildInput(node.MinInput, node.TypeFloat, nil, body.Inputs)
 	max := node.BuildInput(node.MaxInput, node.TypeFloat, nil, body.Inputs)
 	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs)
