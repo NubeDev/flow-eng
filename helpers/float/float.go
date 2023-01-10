@@ -2,11 +2,12 @@ package float
 
 import (
 	"fmt"
-	"github.com/NubeDev/flow-eng/helpers/str"
 	"math"
 	"math/rand"
 	"strconv"
 	"time"
+
+	"github.com/NubeDev/flow-eng/helpers/str"
 )
 
 func StringFloatErr(value *string) (*float64, float64, error) {
@@ -237,4 +238,14 @@ func ConvertInterfaceToFloatMultiple(values []interface{}) []*float64 {
 		output = append(output, ConvertInterfaceToFloat(value))
 	}
 	return output
+}
+
+// helper functions that round the input number up
+func round(num float64) int {
+	return int(num + math.Copysign(0.5, num))
+}
+
+func toFixed(num float64, precision int) float64 {
+	output := math.Pow(10, float64(precision))
+	return float64(round(num*output)) / output
 }
