@@ -2,9 +2,9 @@ package gmail
 
 import (
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"net/smtp"
 
-	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/notify"
 	"github.com/jordan-wright/email"
@@ -32,9 +32,22 @@ func NewGmail(body *node.Spec) (node.Node, error) {
 	return &Gmail{body}, nil
 }
 
-func (inst *Gmail) sendEmail(ed map[string]string) {
-	connection, err := inst.GetDB().GetConnection("")
-	pprint.Print(connection)
+type myNewInterface struct {
+	test     string
+	testBool bool
+}
+
+func (inst *Gmail) sendEmail(ed *myNewInterface) {
+	to := inst.GetInput(node.To).GetValue()
+	subject := inst.GetInput(node.Subject).GetValue()
+	message := inst.GetInput(node.Message).GetValue()
+
+	s, err := getSettings(inst.GetSettings())
+	if s == nil || err == nil {
+		log.Error("")
+		return
+	}
+
 	e := email.NewEmail()
 
 	e.From = ed["from"]
@@ -42,14 +55,14 @@ func (inst *Gmail) sendEmail(ed map[string]string) {
 	e.Subject = ed["subject"]
 	// e.Text = []byte(ed["message"])
 	e.HTML = []byte(ed["message"])
-	err = e.Send("smtp.gmail.com:587", smtp.PlainAuth("", ed["from"], ed["token"], "smtp.gmail.com"))
-	fmt.Println(err)
+	err = e.Send("smtp.gmail.com:587", smtp.PlainAuth("", s.FromAddress, ed["token"], "smtp.gmail.com"))
 	if err != nil {
 		return
 	}
 
 }
 
+// Process
 // instructions to generate gmail application token
 // 1. Go to your Google Account.
 // 2. Select Security.
@@ -57,27 +70,11 @@ func (inst *Gmail) sendEmail(ed map[string]string) {
 // 4. At the bottom, choose Select app and choose the app you using and then Select device and choose the device you’re using and then Generate.
 // refer to this page if unclear: https://support.google.com/accounts/answer/185833?visit_id=638089001343155683-2129707965&p=InvalidSecondFactor&rd=1
 func (inst *Gmail) Process() {
-	to := inst.GetInput(node.To).GetValue()
-	subject := inst.GetInput(node.Subject).GetValue()
-	message := inst.GetInput(node.Message).GetValue()
-
-	s, _ := getSettings(inst.GetSettings())
-
-	var ed map[string]string = make(map[string]string)
-	ed["from"] = s.FromAddress
-	ed["token"] = s.Token
-	ed["subject"] = subject.(string)
-	ed["message"] = message.(string)
-	if to != nil {
-		ed["to"] = to.(string)
-	} else {
-		ed["to"] = s.ToAddress
-	}
 
 	_, cov := inst.InputUpdated(node.TriggerInput)
 	if cov {
 		fmt.Println("TRIGGER EMAIL")
-		inst.sendEmail(ed)
+		inst.sendEmail()
 	}
 
 }
