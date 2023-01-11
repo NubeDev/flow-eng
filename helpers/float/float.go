@@ -2,11 +2,12 @@ package float
 
 import (
 	"fmt"
-	"github.com/NubeDev/flow-eng/helpers/str"
 	"math"
 	"math/rand"
 	"strconv"
 	"time"
+
+	"github.com/NubeDev/flow-eng/helpers/str"
 )
 
 func StringFloatErr(value *string) (*float64, float64, error) {

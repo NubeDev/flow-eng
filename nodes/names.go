@@ -42,8 +42,6 @@ const (
 
 	flowLoopCount = "flow-loop-count"
 
-	onlyTrue = "only-true"
-
 	getHttpNode   = "http-get"
 	writeHttpNode = "http-write"
 
@@ -72,6 +70,15 @@ const (
 	median    = "median"
 
 	flatLine = "flatLine"
+
+	//filters
+	preventNull        = "prevent-null"
+	preventEqualFloat  = "prevent-equal-float"
+	preventEqualString = "prevent-equal-string"
+	onlyBetween        = "only-between"
+	onlyGreater        = "only-greater"
+	onlyLower          = "only-lower"
+	preventDuplicates  = "prevent-duplicates"
 
 	// count
 	countBoolNode   = "count-bool"

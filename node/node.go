@@ -49,6 +49,7 @@ type Node interface {
 	InputsLen() int
 	OutputsLen() int
 	ReadPin(InputName) interface{}
+	ReadPinOrSettings(name InputName) interface{}
 	ReadPinAsString(name InputName) (value string, null bool)
 	ReadPinAsInt(name InputName) (value int, null bool)
 	ReadPinAsBool(name InputName) (value bool, null bool)

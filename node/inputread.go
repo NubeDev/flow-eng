@@ -67,6 +67,32 @@ func (n *Spec) InputHasConnectionOrValue(name InputName) bool {
 	return false
 }
 
+func (n *Spec) ReadPinOrSettings(name InputName) interface{} {
+	input := n.GetInput(name)
+	connection := n.InputHasConnection(name)
+	if !connection {
+		if n.Settings != nil {
+			val := reflect.ValueOf(n.Settings)
+			if val.Kind() == reflect.Map {
+				for _, e := range val.MapKeys() {
+					v := val.MapIndex(e)
+					if e.String() == string(name) { // add in case for string
+						f, ok := conversions.GetFloatOk(v)
+						if ok {
+							return f
+						}
+						i, ok := conversions.GetIntOk(v)
+						if ok {
+							return i
+						}
+					}
+				}
+			}
+		}
+	}
+	return input.GetValue()
+}
+
 func (n *Spec) ReadPin(name InputName) interface{} {
 	input := n.GetInput(name)
 	if input == nil {
