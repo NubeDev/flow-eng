@@ -16,7 +16,7 @@ func NewSetResetLatch(body *node.Spec) (node.Node, error) {
 
 	inputs := node.BuildInputs(set, reset)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs))
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &SetResetLatch{body, false}, nil
 }
 

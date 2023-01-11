@@ -31,6 +31,6 @@ func test() {
 		Title:      "addfsdf",
 		Properties: p,
 	}
-	pprint.PrintJOSN(s)
+	pprint.PrintJSON(s)
 
 }

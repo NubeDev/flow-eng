@@ -142,6 +142,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	delayOff, _ := timing.NewDelayOff(nil, nil)
 	dutyCycle, _ := timing.NewDutyCycle(nil)
 	minOnOff, _ := timing.NewMinOnOff(nil)
+	oneShot, _ := timing.NewOneShot(nil)
 
 	// number transformations
 	scaleNode, _ := transformations.NewScale(nil)
@@ -248,6 +249,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(delayOff),
 		node.ConvertToSpec(dutyCycle),
 		node.ConvertToSpec(minOnOff),
+		node.ConvertToSpec(oneShot),
 
 		node.ConvertToSpec(randomFloat),
 
@@ -701,6 +703,8 @@ func builderTiming(body *node.Spec) (node.Node, error) {
 		return timing.NewDutyCycle(body)
 	case minOnOff:
 		return timing.NewMinOnOff(body)
+	case oneShot:
+		return timing.NewOneShot(body)
 	}
 	return nil, nil
 }

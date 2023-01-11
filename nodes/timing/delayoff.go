@@ -3,8 +3,9 @@ package timing
 import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/timer"
+	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
-	"strings"
+	"strconv"
 	"time"
 )
 
@@ -20,15 +21,15 @@ func NewDelayOff(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
 	body.Inputs = node.BuildInputs(in)
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	body.Outputs = node.BuildOutputs(out)
-	body.SetSchema(buildSchema())
+	body.SetSchema(buildDefaultSchema())
 	return &DelayOff{body, nil, false}, nil
 }
 
 func (inst *DelayOff) Process() {
-	settings, _ := getSettings(inst.GetSettings())
+	settings, _ := getDefaultSettings(inst.GetSettings())
 	if settings != nil {
-		t := strings.Replace(settings.Duration.String(), "ns", "", -1)
-		inst.SetSubTitle(fmt.Sprintf("setting: %s %s", t, settings.Time))
+		subtitleText := fmt.Sprintf("%s %s", strconv.FormatFloat(settings.Interval, 'f', -1, 64), settings.TimeUnits)
+		inst.SetSubTitle(subtitleText)
 	}
 	in1, _ := inst.ReadPinAsBool(node.In)
 
@@ -56,13 +57,18 @@ func (inst *DelayOff) Process() {
 
 	// input is false, but output isn't so start a timer if it doesn't exist already
 	if inst.timer == nil {
-		onDelayDuration := duration(settings.Duration, settings.Time)
+		onDelayDuration := ttime.Duration(settings.Interval, settings.TimeUnits)
 		inst.timer = time.AfterFunc(onDelayDuration, func() {
 			inst.WritePinFalse(node.Out)
 			inst.currOutput = false
 			inst.timer = nil
 		})
 	}
+}
+
+func (inst *DelayOff) Start() {
+	inst.WritePinFalse(node.Out)
+	inst.currOutput = false
 }
 
 func (inst *DelayOff) Stop() {

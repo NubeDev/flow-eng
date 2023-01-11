@@ -30,7 +30,7 @@ func NewFlatline(body *node.Spec) (node.Node, error) {
 		}
 	*/
 	// body = node.BuildNode(body, inputs, outputs, settings)
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &Flatline{body, nil, 0, false}, nil
 }
 

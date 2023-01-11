@@ -19,7 +19,7 @@ func NewHysteresis(body *node.Spec) (node.Node, error) {
 	output := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	outNot := node.BuildOutput(node.OutNot, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(output, outNot)
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &Hysteresis{body, false}, nil
 }
 

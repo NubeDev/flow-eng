@@ -15,7 +15,7 @@ func NewFilter(body *node.Spec) (node.Node, error) {
 	equation := node.BuildInput(node.Filter, node.TypeString, nil, body.Inputs)
 	inputs := node.BuildInputs(in, equation)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &Filter{body}, nil
 }
 

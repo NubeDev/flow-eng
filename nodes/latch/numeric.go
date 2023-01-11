@@ -17,7 +17,7 @@ func NewNumLatch(body *node.Spec) (node.Node, error) {
 
 	inputs := node.BuildInputs(input, latch)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &NumLatch{body, 0, false}, nil
 }
 

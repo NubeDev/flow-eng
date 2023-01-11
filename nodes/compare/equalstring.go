@@ -17,7 +17,7 @@ func NewEqualString(body *node.Spec) (node.Node, error) {
 	equal := node.BuildOutput(node.Equal, node.TypeBool, nil, body.Outputs)
 	notEqual := node.BuildOutput(node.NotEqual, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(equal, notEqual)
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &CompareEqualString{body}, nil
 }
 

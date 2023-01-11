@@ -16,7 +16,7 @@ func NewString(body *node.Spec) (node.Node, error) {
 	asBool := node.BuildOutput(node.Boolean, node.TypeBool, nil, body.Outputs)
 	asString := node.BuildOutput(node.Float, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(asBool, asString)
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &String{body}, nil
 }
 

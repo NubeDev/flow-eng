@@ -17,7 +17,7 @@ func NewStringLatch(body *node.Spec) (node.Node, error) {
 
 	inputs := node.BuildInputs(input, latch)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, "", body.Outputs))
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &StringLatch{body, "", false}, nil
 }
 

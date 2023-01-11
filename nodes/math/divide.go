@@ -16,7 +16,7 @@ func NewDivide(body *node.Spec) (node.Node, error) {
 
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
 	return &Divide{body}, nil
 }

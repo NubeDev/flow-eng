@@ -16,7 +16,7 @@ func NewLoopCount(body *node.Spec) (node.Node, error) {
 	outToggle := node.BuildOutput(node.Trigger, node.TypeBool, nil, body.Outputs)
 	outToggle2 := node.BuildOutput(node.Toggle, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(outNum, outToggle, outToggle2)
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &Loop{body}, nil
 }
 

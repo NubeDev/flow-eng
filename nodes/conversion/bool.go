@@ -14,7 +14,7 @@ func NewBoolean(body *node.Spec) (node.Node, error) {
 	asFloat := node.BuildOutput(node.Float, node.TypeFloat, nil, body.Outputs)
 	asString := node.BuildOutput(node.String, node.TypeString, nil, body.Outputs)
 	outputs := node.BuildOutputs(asFloat, asString)
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &Boolean{body}, nil
 }
 

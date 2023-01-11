@@ -19,5 +19,5 @@ func TestEncodePallet(t *testing.T) {
 		return
 	}
 
-	pprint.PrintJOSN(palle2t)
+	pprint.PrintJSON(palle2t)
 }

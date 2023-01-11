@@ -22,7 +22,7 @@ func NewBetween(body *node.Spec) (node.Node, error) {
 	above := node.BuildOutput(node.Above, node.TypeBool, nil, body.Outputs)
 	below := node.BuildOutput(node.Below, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out, outNot, above, below)
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
 	return &Between{body}, nil
 }

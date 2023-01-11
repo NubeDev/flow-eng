@@ -16,7 +16,7 @@ func NewGreaterThan(body *node.Spec) (node.Node, error) {
 	graterThan := node.BuildOutput(node.GreaterThan, node.TypeBool, nil, body.Outputs)
 	equal := node.BuildOutput(node.GreaterThanEqual, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(graterThan, equal)
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &CompareGreaterThan{body}, nil
 }
 
