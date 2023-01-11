@@ -183,6 +183,7 @@ func (inst *MinOnOff) buildSchema() *schemas.Schema {
 				"inline": true,
 			},
 		},
+		"ui:order": array.Slice{"min_on_interval", "min_on_time_units", "min_off_interval", "min_off_time_units"},
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{

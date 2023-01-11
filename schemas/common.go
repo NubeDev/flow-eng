@@ -14,11 +14,12 @@ type Schema struct {
 }
 
 type Boolean struct {
-	Type     string `json:"type" default:"boolean"`
-	Title    string `json:"title" default:""`
-	Default  bool   `json:"default" default:"false"`
-	Help     string `json:"help" default:""`
-	ReadOnly bool   `json:"readOnly" default:"false"`
+	Type      string   `json:"type" default:"boolean"`
+	Title     string   `json:"title" default:""`
+	Default   bool     `json:"default" default:"false"`
+	Help      string   `json:"help" default:""`
+	ReadOnly  bool     `json:"readOnly" default:"false"`
+	EnumNames []string `json:"enumNames,omitempty"`
 }
 
 type String struct {

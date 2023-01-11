@@ -137,8 +137,9 @@ func (inst *OneShot) buildSchema() *schemas.Schema {
 	props.TimeUnits.EnumName = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
 
 	// retrigger selection
-	props.Retrigger.Title = "Allow Retrigger"
+	props.Retrigger.Title = "Retrigger"
 	props.Retrigger.Default = false
+	props.Retrigger.EnumNames = []string{"Retrigger While Output Is Active", "Only Retrigger While Output Is Inactive"}
 
 	schema.Set(props)
 
@@ -149,6 +150,10 @@ func (inst *OneShot) buildSchema() *schemas.Schema {
 				"inline": true,
 			},
 		},
+		"retrigger": array.Map{
+			"ui:widget": "select",
+		},
+		"ui:order": array.Slice{"interval", "time_units", "retrigger"},
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{
