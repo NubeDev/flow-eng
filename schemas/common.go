@@ -46,6 +46,8 @@ type Number struct {
 	Default  float64 `json:"default" default:"0"`
 	Help     string  `json:"help" default:""`
 	ReadOnly bool    `json:"readOnly" default:"false"`
+	Minimum  float64 `json:"minimum" default:"0"`
+	Maximum  float64 `json:"maximum" default:"10000"`
 }
 
 type NumberLimits struct {

@@ -2,9 +2,7 @@ package timing
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
-	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
@@ -41,11 +39,8 @@ func buildDefaultSchema() *schemas.Schema {
 	props.TimeUnits.Default = ttime.Sec
 	props.TimeUnits.Options = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
 	props.TimeUnits.EnumName = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
-	pprint.PrintJSON(props)
-	schema.Set(props)
 
-	fmt.Println(fmt.Sprintf("buildSchema() props: %+v", props))
-	pprint.PrintJSON(props)
+	schema.Set(props)
 
 	uiSchema := array.Map{
 		"time": array.Map{
@@ -54,6 +49,7 @@ func buildDefaultSchema() *schemas.Schema {
 				"inline": true,
 			},
 		},
+		"ui:order": array.Slice{"interval", "time_units"},
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{
@@ -62,8 +58,6 @@ func buildDefaultSchema() *schemas.Schema {
 		},
 		UiSchema: uiSchema,
 	}
-	fmt.Println(fmt.Sprintf("buildSchema() s: %+v", s))
-	pprint.PrintJSON(s)
 	return s
 }
 
