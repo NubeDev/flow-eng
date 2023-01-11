@@ -9,7 +9,6 @@ import (
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
-	log "github.com/sirupsen/logrus"
 	"time"
 )
 
@@ -100,10 +99,8 @@ func (inst *DutyCycle) restartDutyCycle(intervalSeconds, dutyCycle float64) erro
 
 func (inst *DutyCycle) startIteration(delayBetweenOnAndOffDuration time.Duration) {
 	inst.WritePinTrue(node.Out)
-	log.Infof("DutyCycle: ON")
 	inst.offTimer = time.AfterFunc(delayBetweenOnAndOffDuration, func() {
 		inst.WritePinFalse(node.Out)
-		log.Infof("DutyCycle: OFF")
 	})
 }
 
