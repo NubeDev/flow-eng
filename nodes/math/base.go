@@ -1,6 +1,7 @@
 package math
 
 import (
+	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
@@ -45,7 +46,7 @@ func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error)
 func process(body node.Node) {
 	equation := body.GetName()
 	count := body.InputsLen()
-	inputs := float.ConvertInterfaceToFloatMultiple(body.ReadMultiple(count))
+	inputs := conversions.ConvertInterfaceToFloatMultiple(body.ReadMultiple(count))
 	output := operation(equation, inputs)
 	if output == nil {
 		body.WritePinNull(node.Out)
