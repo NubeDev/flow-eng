@@ -10,8 +10,8 @@ type CompareEqual struct {
 
 func NewEqual(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, Equal, category)
-	a := node.BuildInput(node.InputA, node.TypeFloat, nil, body.Inputs)
-	b := node.BuildInput(node.InputB, node.TypeFloat, nil, body.Inputs)
+	a := node.BuildInput(node.InputA, node.TypeFloat, nil, body.Inputs, nil)
+	b := node.BuildInput(node.InputB, node.TypeFloat, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(a, b)
 
 	equal := node.BuildOutput(node.Equal, node.TypeBool, nil, body.Outputs)

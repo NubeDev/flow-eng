@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
+	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
-	"strconv"
 	"time"
 )
 
@@ -20,16 +20,16 @@ type MinOnOff struct {
 	minOffEnabled      bool
 	timeOn             int64
 	timeOff            int64
-	lastMinOnInterval  float64
-	lastMinOffInterval float64
+	lastMinOnInterval  time.Duration
+	lastMinOffInterval time.Duration
 }
 
 func NewMinOnOff(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, minOnOff, category)
-	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs)
-	onInterval := node.BuildInput(node.MinOnTime, node.TypeFloat, 0, body.Inputs)
-	offInterval := node.BuildInput(node.MinOffTime, node.TypeFloat, 0, body.Inputs)
-	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs)
+	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs, nil)
+	onInterval := node.BuildInput(node.MinOnTime, node.TypeFloat, 0, body.Inputs, str.New("min_on_interval"))
+	offInterval := node.BuildInput(node.MinOffTime, node.TypeFloat, 0, body.Inputs, str.New("min_off_interval"))
+	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(in, onInterval, offInterval, reset)
 
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
@@ -37,39 +37,19 @@ func NewMinOnOff(body *node.Spec) (node.Node, error) {
 	minOffActive := node.BuildOutput(node.MinOffActive, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out, minOnActive, minOffActive)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	node := &MinOnOff{body, false, true, false, false, 0, 0, 0, 0}
+	node := &MinOnOff{body, false, true, false, false, 0, 0, 1 * time.Second, 1 * time.Second}
 	node.SetSchema(node.buildSchema())
 	return node, nil
 }
 
 func (inst *MinOnOff) Process() {
-	settings, _ := inst.getSettings(inst.GetSettings())
 
-	// Select intervals from input links or node settings
-	minOnIntervalLink, onIntNull := inst.ReadPinAsFloat(node.MinOnTime)
-	var minOnIntervalDuration time.Duration
-	var minOnInterval float64
-	if onIntNull { // no interval input, so get value from settings
-		minOnInterval = settings.MinOnInterval
-		minOnIntervalDuration = ttime.Duration(settings.MinOnInterval, settings.MinOnTimeUnits)
-	} else {
-		minOnInterval = minOnIntervalLink
-		minOnIntervalDuration = ttime.Duration(minOnIntervalLink, settings.MinOnTimeUnits)
-	}
-	minOffIntervalLink, offIntNull := inst.ReadPinAsFloat(node.MinOffTime)
-	var minOffIntervalDuration time.Duration
-	var minOffInterval float64
-	if offIntNull { // no interval input, so get value from settings
-		minOffInterval = settings.MinOffInterval
-		minOffIntervalDuration = ttime.Duration(settings.MinOffInterval, settings.MinOffTimeUnits)
-	} else {
-		minOffInterval = minOffIntervalLink
-		minOffIntervalDuration = ttime.Duration(minOffIntervalLink, settings.MinOffTimeUnits)
-	}
-	if minOnInterval != inst.lastMinOnInterval || minOffInterval != inst.lastMinOffInterval {
-		inst.setSubtitle(minOnInterval, settings.MinOnTimeUnits, minOffInterval, settings.MinOffTimeUnits)
-		inst.lastMinOnInterval = minOnInterval
-		inst.lastMinOffInterval = minOffInterval
+	minOnIntervalDuration, _ := inst.ReadPinAsTimeSettings(node.MinOnTime)
+	minOffIntervalDuration, _ := inst.ReadPinAsTimeSettings(node.MinOffTime)
+	if minOnIntervalDuration != inst.lastMinOnInterval || minOffIntervalDuration != inst.lastMinOffInterval {
+		inst.setSubtitleFromDuration(minOnIntervalDuration, minOffIntervalDuration)
+		inst.lastMinOnInterval = minOnIntervalDuration
+		inst.lastMinOffInterval = minOffIntervalDuration
 	}
 
 	input, _ := inst.ReadPinAsBool(node.In)
@@ -127,8 +107,8 @@ func (inst *MinOnOff) Stop() {
 	inst.minOffEnabled = false
 }
 
-func (inst *MinOnOff) setSubtitle(minOnIntervalAmount float64, minOnTimeUnits string, minOffIntervalAmount float64, minOffTimeUnits string) {
-	subtitleText := fmt.Sprintf("min-on %s %s, min-off %s %s", strconv.FormatFloat(minOnIntervalAmount, 'f', -1, 64), minOnTimeUnits, strconv.FormatFloat(minOffIntervalAmount, 'f', -1, 64), minOffTimeUnits)
+func (inst *MinOnOff) setSubtitleFromDuration(minOnIntervalDuration, minOffIntervalDuration time.Duration) {
+	subtitleText := fmt.Sprintf("min-on %s, min-off %s", minOnIntervalDuration.String(), minOffIntervalDuration.String())
 	inst.SetSubTitle(subtitleText)
 }
 
@@ -136,16 +116,16 @@ func (inst *MinOnOff) setSubtitle(minOnIntervalAmount float64, minOnTimeUnits st
 
 type MinOnOffSettingsSchema struct {
 	MinOnInterval   schemas.Number     `json:"min_on_interval"`
-	MinOnTimeUnits  schemas.EnumString `json:"min_on_time_units"`
+	MinOnTimeUnits  schemas.EnumString `json:"min_on_interval_time_units"`
 	MinOffInterval  schemas.Number     `json:"min_off_interval"`
-	MinOffTimeUnits schemas.EnumString `json:"min_off_time_units"`
+	MinOffTimeUnits schemas.EnumString `json:"min_off_interval_time_units"`
 }
 
 type MinOnOffSettings struct {
 	MinOnInterval   float64 `json:"min_on_interval"`
-	MinOnTimeUnits  string  `json:"min_on_time_units"`
+	MinOnTimeUnits  string  `json:"min_on_interval_time_units"`
 	MinOffInterval  float64 `json:"min_off_interval"`
-	MinOffTimeUnits string  `json:"min_off_time_units"`
+	MinOffTimeUnits string  `json:"min_off_interval_time_units"`
 }
 
 func (inst *MinOnOff) buildSchema() *schemas.Schema {
@@ -158,12 +138,12 @@ func (inst *MinOnOff) buildSchema() *schemas.Schema {
 	props.MinOffInterval.Default = 1
 
 	// time selection
-	props.MinOnTimeUnits.Title = "Min ON Time Units"
+	props.MinOnTimeUnits.Title = "Min ON Interval Units"
 	props.MinOnTimeUnits.Default = ttime.Sec
 	props.MinOnTimeUnits.Options = []string{ttime.Sec, ttime.Min, ttime.Hr}
 	props.MinOnTimeUnits.EnumName = []string{ttime.Sec, ttime.Min, ttime.Hr}
 
-	props.MinOffTimeUnits.Title = "Min OFF Time Units"
+	props.MinOffTimeUnits.Title = "Min OFF Interval Units"
 	props.MinOffTimeUnits.Default = ttime.Sec
 	props.MinOffTimeUnits.Options = []string{ttime.Sec, ttime.Min, ttime.Hr}
 	props.MinOffTimeUnits.EnumName = []string{ttime.Sec, ttime.Min, ttime.Hr}
@@ -171,19 +151,19 @@ func (inst *MinOnOff) buildSchema() *schemas.Schema {
 	schema.Set(props)
 
 	uiSchema := array.Map{
-		"min_on_time_units": array.Map{
+		"min_on_interval_time_units": array.Map{
 			"ui:widget": "radio",
 			"ui:options": array.Map{
 				"inline": true,
 			},
 		},
-		"min_off_time_units": array.Map{
+		"min_off_interval_time_units": array.Map{
 			"ui:widget": "radio",
 			"ui:options": array.Map{
 				"inline": true,
 			},
 		},
-		"ui:order": array.Slice{"min_on_interval", "min_on_time_units", "min_off_interval", "min_off_time_units"},
+		"ui:order": array.Slice{"min_on_interval", "min_on_interval_time_units", "min_off_interval", "min_off_interval_time_units"},
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{

@@ -14,9 +14,9 @@ type Ramp struct {
 
 func NewRamp(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, rampNode, category)
-	duration := node.BuildInput(node.Duration, node.TypeFloat, nil, body.Inputs)
-	min := node.BuildInput(node.MinInput, node.TypeFloat, nil, body.Inputs)
-	max := node.BuildInput(node.MaxInput, node.TypeFloat, nil, body.Inputs)
+	duration := node.BuildInput(node.Duration, node.TypeFloat, nil, body.Inputs, nil)
+	min := node.BuildInput(node.MinInput, node.TypeFloat, nil, body.Inputs, nil)
+	max := node.BuildInput(node.MaxInput, node.TypeFloat, nil, body.Inputs, nil)
 	body.Inputs = node.BuildInputs(duration, min, max)
 	out := node.BuildOutput(node.CountOut, node.TypeFloat, nil, body.Outputs)
 	body.Outputs = node.BuildOutputs(out)

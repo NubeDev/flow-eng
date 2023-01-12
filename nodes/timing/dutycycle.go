@@ -5,29 +5,31 @@ import (
 	"errors"
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
+	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
+	"strconv"
 	"time"
 )
 
 type DutyCycle struct {
 	*node.Spec
-	onTicker         *time.Ticker
-	offTimer         *time.Timer
-	cancelChannel    chan bool
-	lastIntervalSecs float64
-	lastDuty         float64
-	lastEnable       bool
+	onTicker      *time.Ticker
+	offTimer      *time.Timer
+	cancelChannel chan bool
+	lastInterval  time.Duration
+	lastDuty      float64
+	lastEnable    bool
 }
 
 func NewDutyCycle(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, dutyCycle, category)
-	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs)
-	intervalSecs := node.BuildInput(node.IntervalSecs, node.TypeFloat, nil, body.Inputs)
-	dutyCycleInput := node.BuildInput(node.DutyCycle, node.TypeFloat, nil, body.Inputs)
-	inputs := node.BuildInputs(enable, intervalSecs, dutyCycleInput)
+	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, nil)
+	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, str.New("interval"))
+	dutyCycleInput := node.BuildInput(node.DutyCycle, node.TypeFloat, nil, body.Inputs, str.New("duty_cycle"))
+	inputs := node.BuildInputs(enable, interval, dutyCycleInput)
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
@@ -37,7 +39,6 @@ func NewDutyCycle(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *DutyCycle) Process() {
-	// settings, _ := getSettings(inst.GetSettings())
 
 	enable, _ := inst.ReadPinAsBool(node.Enable)
 	if !enable {
@@ -47,35 +48,37 @@ func (inst *DutyCycle) Process() {
 		return
 	}
 
-	intervalSecs, _ := inst.ReadPinAsFloat(node.IntervalSecs)
-	if intervalSecs <= 0 {
-		intervalSecs = 10
+	intervalDuration, _ := inst.ReadPinAsTimeSettings(node.Interval)
+	if intervalDuration <= 0 {
+		intervalDuration = 10 * time.Second
+	}
+	if intervalDuration != inst.lastInterval {
+		inst.setSubtitleFromDuration(intervalDuration)
 	}
 
-	dutyCyclePerc, dutyNull := inst.ReadPinAsFloat(node.DutyCycle)
-	if dutyCyclePerc < 0 || dutyCyclePerc > 100 || dutyNull {
+	dutyCyclePerc := inst.ReadPinOrSettingsFloat(node.DutyCycle)
+	if dutyCyclePerc < 0 || dutyCyclePerc > 100 {
 		dutyCyclePerc = 50
 	}
 
 	// Check if there are settings that require a restart
-	if enable && !inst.lastEnable || intervalSecs != inst.lastIntervalSecs || dutyCyclePerc != inst.lastDuty {
-		inst.restartDutyCycle(intervalSecs, dutyCyclePerc)
+	if enable && !inst.lastEnable || intervalDuration != inst.lastInterval || dutyCyclePerc != inst.lastDuty {
+		inst.restartDutyCycle(intervalDuration, dutyCyclePerc)
 	}
-	inst.lastIntervalSecs = intervalSecs
+	inst.lastInterval = intervalDuration
 	inst.lastDuty = dutyCyclePerc
 	inst.lastEnable = enable
 
 }
 
-func (inst *DutyCycle) restartDutyCycle(intervalSeconds, dutyCycle float64) error {
+func (inst *DutyCycle) restartDutyCycle(intervalDuration time.Duration, dutyCycle float64) error {
 	inst.disableDutyCycle() // stop existing timers
 
-	if intervalSeconds <= 0 || (dutyCycle < 0 || dutyCycle > 100) {
+	if intervalDuration <= 0 || (dutyCycle < 0 || dutyCycle > 100) {
 		return errors.New("restartDutyCycle() err: invalid inputs")
 	}
-	intervalDuration, _ := time.ParseDuration(fmt.Sprintf("%fs", intervalSeconds))
 
-	delayBetweenOnAndOff := intervalSeconds * (dutyCycle / 100)
+	delayBetweenOnAndOff := intervalDuration.Seconds() * (dutyCycle / 100)
 	delayBetweenOnAndOffDuration, _ := time.ParseDuration(fmt.Sprintf("%fs", delayBetweenOnAndOff))
 
 	cancel := make(chan bool)
@@ -124,6 +127,16 @@ func (inst *DutyCycle) Stop() {
 	inst.disableDutyCycle()
 }
 
+func (inst *DutyCycle) setSubtitle(intervalAmount float64, timeUnits string) {
+	subtitleText := fmt.Sprintf("%s %s", strconv.FormatFloat(intervalAmount, 'f', -1, 64), timeUnits)
+	inst.SetSubTitle(subtitleText)
+}
+
+func (inst *DutyCycle) setSubtitleFromDuration(intervalDuration time.Duration) {
+	subtitleText := intervalDuration.String()
+	inst.SetSubTitle(subtitleText)
+}
+
 // Custom Node Settings Schema
 
 type DutyCycleSettingsSchema struct {
@@ -141,11 +154,11 @@ type DutyCycleSettings struct {
 func (inst *DutyCycle) buildSchema() *schemas.Schema {
 	props := &DutyCycleSettingsSchema{}
 	// time selection
-	props.Interval.Title = "Interval"
+	props.Interval.Title = "Period"
 	props.Interval.Default = 1
 
 	// time selection
-	props.TimeUnits.Title = "Time Units"
+	props.TimeUnits.Title = "Period Units"
 	props.TimeUnits.Default = ttime.Sec
 	props.TimeUnits.Options = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
 	props.TimeUnits.EnumName = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}

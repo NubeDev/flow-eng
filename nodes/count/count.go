@@ -11,8 +11,8 @@ type CountBool struct {
 
 func NewCountBool(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, countBoolNode, category)
-	countUp := node.BuildInput(node.CountUp, node.TypeBool, nil, body.Inputs)
-	countDown := node.BuildInput(node.CountDown, node.TypeBool, nil, body.Inputs)
+	countUp := node.BuildInput(node.CountUp, node.TypeBool, nil, body.Inputs, nil)
+	countDown := node.BuildInput(node.CountDown, node.TypeBool, nil, body.Inputs, nil)
 	body.Inputs = node.BuildInputs(countUp, countDown)
 	out := node.BuildOutput(node.CountOut, node.TypeFloat, nil, body.Outputs)
 	body.Outputs = node.BuildOutputs(out)

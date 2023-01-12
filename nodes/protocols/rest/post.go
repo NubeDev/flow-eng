@@ -13,11 +13,11 @@ type HttpWrite struct {
 
 func NewHttpWrite(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, writeNode, category)
-	url := node.BuildInput(node.URL, node.TypeString, nil, body.Inputs)
-	reqBody := node.BuildInput(node.Body, node.TypeString, nil, body.Inputs)
-	filter := node.BuildInput(node.Filter, node.TypeString, nil, body.Inputs)
-	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs)
-	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs)
+	url := node.BuildInput(node.URL, node.TypeString, nil, body.Inputs, nil)
+	reqBody := node.BuildInput(node.Body, node.TypeString, nil, body.Inputs, nil)
+	filter := node.BuildInput(node.Filter, node.TypeString, nil, body.Inputs, nil)
+	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs, nil)
+	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, nil)
 
 	inputs := node.BuildInputs(url, reqBody, filter, trigger, enable)
 	out := node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs)

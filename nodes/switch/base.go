@@ -26,7 +26,7 @@ func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error)
 	//	count = 2
 	// }
 	var nodeInputs []*node.Input
-	selection := node.BuildInput(node.Selection, node.TypeFloat, nil, body.Inputs) // TODO: this input shouldn't have a manual override value
+	selection := node.BuildInput(node.Selection, node.TypeFloat, nil, body.Inputs, nil) // TODO: this input shouldn't have a manual override value
 	inputsCount := node.DynamicInputs(node.TypeFloat, nil, 2, 2, 20, body.Inputs, node.ABCs)
 	nodeInputs = append(nodeInputs, selection)
 	nodeInputs = append(nodeInputs, inputsCount...)

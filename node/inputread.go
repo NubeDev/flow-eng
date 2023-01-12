@@ -1,9 +1,11 @@
 package node
 
 import (
+	"errors"
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/helpers/integer"
+	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"reflect"
 	"strconv"
 	"time"
@@ -67,30 +69,79 @@ func (n *Spec) InputHasConnectionOrValue(name InputName) bool {
 	return false
 }
 
-func (n *Spec) ReadPinOrSettings(name InputName) interface{} {
+func (n *Spec) ReadPinOrSettingsFloat(name InputName) float64 {
 	input := n.GetInput(name)
-	connection := n.InputHasConnection(name)
-	if !connection {
+	useSetting := !n.InputHasConnection(name) && n.ReadPin(name) == nil && input.SettingName != nil
+	if useSetting {
 		if n.Settings != nil {
 			val := reflect.ValueOf(n.Settings)
 			if val.Kind() == reflect.Map {
 				for _, e := range val.MapKeys() {
 					v := val.MapIndex(e)
-					if e.String() == string(name) { // add in case for string
+					if e.String() == *input.SettingName {
 						f, ok := conversions.GetFloatOk(v)
 						if ok {
 							return f
-						}
-						i, ok := conversions.GetIntOk(v)
-						if ok {
-							return i
 						}
 					}
 				}
 			}
 		}
 	}
-	return input.GetValue()
+	return conversions.GetFloat(input.GetValue())
+}
+
+func (n *Spec) ReadPinAsTimeSettings(name InputName) (time.Duration, error) {
+	var settingsAmount float64
+	var useThisAmount float64
+	var units string
+	input := n.GetInput(name)
+
+	if n.Settings != nil {
+		val := reflect.ValueOf(n.Settings)
+		if val.Kind() == reflect.Map {
+			for _, e := range val.MapKeys() {
+				v := val.MapIndex(e)
+				if e.String() == *input.SettingName {
+					f, ok := conversions.GetFloatOk(v)
+					if ok {
+						settingsAmount = f
+					}
+				} else if e.String() == fmt.Sprintf("%s%s", *input.SettingName, "_time_units") {
+					s, ok := conversions.GetStringOk(v)
+					if ok {
+						switch s {
+						case ttime.Ms:
+							units = ttime.Ms
+						case ttime.Sec:
+							units = ttime.Sec
+						case ttime.Min:
+							units = ttime.Min
+						case ttime.Hr:
+							units = ttime.Hr
+						default:
+							return 0, errors.New("ReadPinAsTimeSettings() err: time units are invalid")
+						}
+					}
+				}
+			}
+		}
+	}
+
+	useSetting := !n.InputHasConnection(name) && n.ReadPin(name) == nil && input.SettingName != nil
+	if useSetting {
+		useThisAmount = settingsAmount
+	} else {
+		inputAmount, aNull := n.ReadPinAsFloat(name)
+		if aNull {
+			fmt.Println("ReadPinAsTimeSettings() err: something went wrong here, should have taken settings value if input link was null")
+			return 0, errors.New("ReadPinAsTimeSettings() err: something went wrong here, should have taken settings value if input link was null")
+		}
+		useThisAmount = inputAmount
+	}
+
+	durationResult := ttime.Duration(useThisAmount, units)
+	return durationResult, nil
 }
 
 func (n *Spec) ReadPin(name InputName) interface{} {
