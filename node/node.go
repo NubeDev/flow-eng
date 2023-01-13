@@ -49,7 +49,8 @@ type Node interface {
 	InputsLen() int
 	OutputsLen() int
 	ReadPin(InputName) interface{}
-	ReadPinOrSettings(name InputName) interface{}
+	ReadPinOrSettingsFloat(name InputName) float64
+	ReadPinAsTimeSettings(name InputName) (time.Duration, error)
 	ReadPinAsString(name InputName) (value string, null bool)
 	ReadPinAsInt(name InputName) (value int, null bool)
 	ReadPinAsBool(name InputName) (value bool, null bool)

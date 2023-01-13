@@ -11,8 +11,8 @@ type SetResetLatch struct {
 
 func NewSetResetLatch(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, setResetLatch, category)
-	set := node.BuildInput(node.Set, node.TypeBool, nil, body.Inputs)     // TODO: this input shouldn't have a manual override value
-	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs) // TODO: this input shouldn't have a manual override value
+	set := node.BuildInput(node.Set, node.TypeBool, nil, body.Inputs, nil)     // TODO: this input shouldn't have a manual override value
+	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, nil) // TODO: this input shouldn't have a manual override value
 
 	inputs := node.BuildInputs(set, reset)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs))

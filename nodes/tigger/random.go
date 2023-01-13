@@ -13,9 +13,9 @@ type Random struct {
 
 func NewRandom(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, randomFloat, category)
-	min := node.BuildInput(node.MinInput, node.TypeFloat, nil, body.Inputs)
-	max := node.BuildInput(node.MaxInput, node.TypeFloat, nil, body.Inputs)
-	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs)
+	min := node.BuildInput(node.MinInput, node.TypeFloat, nil, body.Inputs, nil)
+	max := node.BuildInput(node.MaxInput, node.TypeFloat, nil, body.Inputs, nil)
+	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(min, max, trigger)
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)

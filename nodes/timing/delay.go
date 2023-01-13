@@ -3,7 +3,7 @@ package timing
 import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/float"
-	"github.com/NubeDev/flow-eng/helpers/ttime"
+	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/node"
 	"strconv"
 	"time"
@@ -13,6 +13,7 @@ type Delay struct {
 	*node.Spec
 	activeDelays []*DelayTimer
 	lastValue    *float64
+	lastDelay    time.Duration
 }
 
 type DelayTimer struct {
@@ -22,23 +23,23 @@ type DelayTimer struct {
 
 func NewDelay(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, delay, category)
-	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs)
-	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs)
-	delay := node.BuildInput(node.Delay, node.TypeFloat, nil, body.Inputs)
-	inputs := node.BuildInputs(enable, in, delay)
+	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, nil)
+	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, nil)
+	delayInput := node.BuildInput(node.Delay, node.TypeFloat, nil, body.Inputs, str.New("interval"))
+	inputs := node.BuildInputs(enable, in, delayInput)
 
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
+
 	body.SetSchema(buildDefaultSchema())
 
 	delayArray := make([]*DelayTimer, 0)
-	return &Delay{body, delayArray, nil}, nil
+	return &Delay{body, delayArray, nil, 1 * time.Second}, nil
 }
 
 func (inst *Delay) Process() {
-
 	enable, _ := inst.ReadPinAsBool(node.Enable)
 	if !enable {
 		inst.ClearAllDelays()
@@ -53,15 +54,12 @@ func (inst *Delay) Process() {
 
 	// if (inputFloatPtr == nil && inst.lastValue != nil) || (inputFloatPtr != nil && inst.lastValue == nil) || *inputFloatPtr != *inst.lastValue {
 	if !float.ComparePtrValues(inst.lastValue, inputFloatPtr) {
-		settings, _ := getDefaultSettings(inst.GetSettings())
-		if settings != nil {
-			subtitleText := fmt.Sprintf("%s %s", strconv.FormatFloat(settings.Interval, 'f', -1, 64), settings.TimeUnits)
-			inst.SetSubTitle(subtitleText)
+
+		delayDuration, _ := inst.ReadPinAsTimeSettings(node.Delay)
+		if delayDuration != inst.lastDelay {
+			inst.setSubtitleFromDuration(delayDuration)
+			inst.lastDelay = delayDuration
 		}
-
-		// TODO: Implement delay from wired input
-
-		delayDuration := ttime.Duration(settings.Interval, settings.TimeUnits)
 
 		newDelay := &DelayTimer{false, nil}
 		newDelay.Timer = time.AfterFunc(delayDuration, func() {
@@ -107,4 +105,14 @@ func (inst *Delay) Start() {
 
 func (inst *Delay) Stop() {
 	inst.ClearAllDelays()
+}
+
+func (inst *Delay) setSubtitle(intervalAmount float64, timeUnits string) {
+	subtitleText := fmt.Sprintf("%s %s", strconv.FormatFloat(intervalAmount, 'f', -1, 64), timeUnits)
+	inst.SetSubTitle(subtitleText)
+}
+
+func (inst *Delay) setSubtitleFromDuration(intervalDuration time.Duration) {
+	subtitleText := intervalDuration.String()
+	inst.SetSubTitle(subtitleText)
 }

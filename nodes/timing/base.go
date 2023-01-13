@@ -19,26 +19,26 @@ const (
 )
 
 type defaultNodeSchema struct {
-	Interval  schemas.Number     `json:"interval"`
-	TimeUnits schemas.EnumString `json:"time"`
+	Interval          schemas.Number     `json:"interval"`
+	IntervalTimeUnits schemas.EnumString `json:"interval_time_units"`
 }
 
 type defaultNodeSettings struct {
-	Interval  float64 `json:"interval"`
-	TimeUnits string  `json:"time_units"`
+	Interval          float64 `json:"interval"`
+	IntervalTimeUnits string  `json:"interval_time_units"`
 }
 
 func buildDefaultSchema() *schemas.Schema {
 	props := &defaultNodeSchema{}
 	// time selection
-	props.Interval.Title = "Interval"
+	props.Interval.Title = "Delay"
 	props.Interval.Default = 1
 
 	// time selection
-	props.TimeUnits.Title = "Time Units"
-	props.TimeUnits.Default = ttime.Sec
-	props.TimeUnits.Options = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
-	props.TimeUnits.EnumName = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
+	props.IntervalTimeUnits.Title = "Delay Units"
+	props.IntervalTimeUnits.Default = ttime.Sec
+	props.IntervalTimeUnits.Options = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
+	props.IntervalTimeUnits.EnumName = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
 
 	schema.Set(props)
 
@@ -49,7 +49,7 @@ func buildDefaultSchema() *schemas.Schema {
 				"inline": true,
 			},
 		},
-		"ui:order": array.Slice{"interval", "time_units"},
+		"ui:order": array.Slice{"interval", "interval_time_units"},
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{

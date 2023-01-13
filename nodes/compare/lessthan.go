@@ -10,8 +10,8 @@ type CompareLessThan struct {
 
 func NewLessThan(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, LessThan, category)
-	a := node.BuildInput(node.InputA, node.TypeFloat, nil, body.Inputs)
-	b := node.BuildInput(node.InputB, node.TypeFloat, nil, body.Inputs)
+	a := node.BuildInput(node.InputA, node.TypeFloat, nil, body.Inputs, nil)
+	b := node.BuildInput(node.InputB, node.TypeFloat, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(a, b)
 	graterThan := node.BuildOutput(node.LessThan, node.TypeBool, nil, body.Outputs)
 	equal := node.BuildOutput(node.LessThanEqual, node.TypeBool, nil, body.Outputs)

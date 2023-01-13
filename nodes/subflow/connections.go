@@ -8,7 +8,7 @@ type InputFloat struct {
 
 func NewSubFlowInputFloat(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, inputFloat, category)
-	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs)
+	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, nil)
 	in.FolderExport = true
 	in.HideInput = true
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
@@ -26,7 +26,7 @@ type InputBool struct {
 
 func NewSubFlowInputBool(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, inputBool, category)
-	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs)
+	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs, nil)
 	in.FolderExport = true
 	in.HideInput = true
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
@@ -44,7 +44,7 @@ type InputString struct {
 
 func NewSubFlowInputString(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, inputString, category)
-	in := node.BuildInput(node.In, node.TypeString, nil, body.Inputs)
+	in := node.BuildInput(node.In, node.TypeString, nil, body.Inputs, nil)
 	in.FolderExport = true
 	in.HideInput = true
 	out := node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs)
@@ -62,7 +62,7 @@ type OutputFloat struct {
 
 func NewSubFlowOutputFloat(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, outputFloat, category)
-	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs)
+	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, nil)
 	in.FolderExport = true
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	out.HideOutput = true
@@ -80,7 +80,7 @@ type OutputBool struct {
 
 func NewSubFlowOutputBool(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, outputBool, category)
-	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs)
+	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs, nil)
 	in.FolderExport = true
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	out.HideOutput = true
@@ -98,7 +98,7 @@ type OutputString struct {
 
 func NewSubFlowOutputString(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, outputString, category)
-	in := node.BuildInput(node.In, node.TypeString, nil, body.Inputs)
+	in := node.BuildInput(node.In, node.TypeString, nil, body.Inputs, nil)
 	in.FolderExport = true
 	out := node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs)
 	out.HideOutput = true
