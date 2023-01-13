@@ -34,7 +34,6 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/subflow"
 	switches "github.com/NubeDev/flow-eng/nodes/switch"
 	"github.com/NubeDev/flow-eng/nodes/system"
-	trigger "github.com/NubeDev/flow-eng/nodes/tigger"
 	"github.com/NubeDev/flow-eng/nodes/timing"
 	"github.com/NubeDev/flow-eng/nodes/transformations"
 )
@@ -134,7 +133,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	rampNode, _ := count.NewRamp(nil)
 
 	// trigger
-	randomFloat, _ := trigger.NewRandom(nil)
+	// randomFloat, _ := trigger.NewRandom(nil)
 
 	// time
 	delay, _ := timing.NewDelay(nil)
@@ -249,7 +248,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(dutyCycle),
 		node.ConvertToSpec(minOnOff),
 
-		node.ConvertToSpec(randomFloat),
+		// node.ConvertToSpec(randomFloat),
 
 		node.ConvertToSpec(flatLine),
 
@@ -682,10 +681,10 @@ func builderCount(body *node.Spec) (node.Node, error) {
 }
 
 func builderTrigger(body *node.Spec) (node.Node, error) {
-	switch body.GetName() {
-	case randomFloat:
-		return trigger.NewRandom(body)
-	}
+	// switch body.GetName() {
+	// case randomFloat:
+	// 	return trigger.NewRandom(body)
+	// }
 	return nil, nil
 }
 
