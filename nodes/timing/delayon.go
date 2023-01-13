@@ -47,7 +47,7 @@ func (inst *DelayOn) Process() {
 
 	in1, _ := inst.ReadPinAsBool(node.In)
 	if !in1 { // any time input is false, set output false and cancel any running timers
-		inst.WritePinFalse(node.Out)
+		inst.WritePinFalse(node.Outp)
 		inst.currOutput = false
 		if inst.timer != nil {
 			inst.timer.Stop()
@@ -59,7 +59,7 @@ func (inst *DelayOn) Process() {
 	// input is true
 
 	if inst.currOutput { // input is still active, so output is still active, cancel any running timers (for safety)
-		inst.WritePinTrue(node.Out)
+		inst.WritePinTrue(node.Outp)
 		inst.currOutput = true
 		if inst.timer != nil {
 			inst.timer.Stop()
@@ -71,7 +71,7 @@ func (inst *DelayOn) Process() {
 	// input is active, but output isn't so start a timer if it doesn't exist already
 	if inst.timer == nil {
 		inst.timer = time.AfterFunc(delayDuration, func() {
-			inst.WritePinTrue(node.Out)
+			inst.WritePinTrue(node.Outp)
 			inst.currOutput = true
 			inst.timer = nil
 		})
@@ -79,7 +79,7 @@ func (inst *DelayOn) Process() {
 }
 
 func (inst *DelayOn) Start() {
-	inst.WritePinFalse(node.Out)
+	inst.WritePinFalse(node.Outp)
 	inst.currOutput = false
 }
 
@@ -99,4 +99,3 @@ func (inst *DelayOn) setSubtitleFromDuration(intervalDuration time.Duration) {
 	subtitleText := intervalDuration.String()
 	inst.SetSubTitle(subtitleText)
 }
-
