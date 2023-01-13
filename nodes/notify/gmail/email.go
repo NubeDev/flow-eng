@@ -2,7 +2,6 @@ package gmail
 
 import (
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"net/smtp"
 
 	"github.com/NubeDev/flow-eng/node"
@@ -32,34 +31,26 @@ func NewGmail(body *node.Spec) (node.Node, error) {
 	return &Gmail{body}, nil
 }
 
-type myNewInterface struct {
-	test     string
-	testBool bool
-}
-
-func (inst *Gmail) sendEmail(ed *myNewInterface) {
+func (inst *Gmail) sendEmail() {
 	to := inst.GetInput(node.To).GetValue()
 	subject := inst.GetInput(node.Subject).GetValue()
 	message := inst.GetInput(node.Message).GetValue()
 
-	s, err := getSettings(inst.GetSettings())
-	if s == nil || err == nil {
-		log.Error("")
+	settingMap := inst.GetSettings()
+	if settingMap == nil {
 		return
 	}
 
 	e := email.NewEmail()
-
-	e.From = ed["from"]
-	e.To = []string{ed["to"]}
-	e.Subject = ed["subject"]
+	e.From = settingMap["fromAddress"].(string)
+	e.To = []string{to.(string)}
+	e.Subject = subject.(string)
 	// e.Text = []byte(ed["message"])
-	e.HTML = []byte(ed["message"])
-	err = e.Send("smtp.gmail.com:587", smtp.PlainAuth("", s.FromAddress, ed["token"], "smtp.gmail.com"))
+	e.HTML = []byte(message.(string))
+	err := e.Send("smtp.gmail.com:587", smtp.PlainAuth("", settingMap["fromAddress"].(string), settingMap["token"].(string), "smtp.gmail.com"))
 	if err != nil {
 		return
 	}
-
 }
 
 // Process
@@ -70,11 +61,9 @@ func (inst *Gmail) sendEmail(ed *myNewInterface) {
 // 4. At the bottom, choose Select app and choose the app you using and then Select device and choose the device you’re using and then Generate.
 // refer to this page if unclear: https://support.google.com/accounts/answer/185833?visit_id=638089001343155683-2129707965&p=InvalidSecondFactor&rd=1
 func (inst *Gmail) Process() {
-
 	_, cov := inst.InputUpdated(node.TriggerInput)
 	if cov {
 		fmt.Println("TRIGGER EMAIL")
 		inst.sendEmail()
 	}
-
 }
