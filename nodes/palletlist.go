@@ -36,6 +36,9 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/system"
 	"github.com/NubeDev/flow-eng/nodes/timing"
 	"github.com/NubeDev/flow-eng/nodes/transformations"
+
+	"github.com/NubeDev/flow-eng/nodes/trigger/cov"
+	"github.com/NubeDev/flow-eng/nodes/trigger/random"
 )
 
 const (
@@ -132,8 +135,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	countString, _ := count.NewCountString(nil)
 	rampNode, _ := count.NewRamp(nil)
 
-	// trigger
-	// randomFloat, _ := trigger.NewRandom(nil)
+	// triggers
+	cov, _ := cov.NewCOV(nil)
+	random, _ := random.NewRandom(nil)
 
 	// time
 	delay, _ := timing.NewDelay(nil)
@@ -248,7 +252,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(dutyCycle),
 		node.ConvertToSpec(minOnOff),
 
-		// node.ConvertToSpec(randomFloat),
+		node.ConvertToSpec(cov),
+		node.ConvertToSpec(random),
 
 		node.ConvertToSpec(flatLine),
 
@@ -681,10 +686,12 @@ func builderCount(body *node.Spec) (node.Node, error) {
 }
 
 func builderTrigger(body *node.Spec) (node.Node, error) {
-	// switch body.GetName() {
-	// case randomFloat:
-	// 	return trigger.NewRandom(body)
-	// }
+	switch body.GetName() {
+	case covNode:
+		return cov.NewCOV(body)
+	case randomFloatNode:
+		return random.NewRandom(body)
+	}
 	return nil, nil
 }
 

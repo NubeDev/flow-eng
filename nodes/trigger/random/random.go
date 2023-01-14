@@ -1,4 +1,4 @@
-package trigger
+package random
 
 import (
 	"github.com/NubeDev/flow-eng/helpers/float"

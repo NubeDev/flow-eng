@@ -1,16 +1,16 @@
 package cov
 
 import (
+	"math"
+	"time"
+
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/trigger"
 )
 
 type COV struct {
 	*node.Spec
-	// Name         string
-	// Interval     float64
-	// Units        trigger.TimeUnits
-	// COVThreshold int
+	lastValue *float64
 }
 
 func NewCOV(body *node.Spec) (node.Node, error) {
@@ -23,19 +23,61 @@ func NewCOV(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(buildSchema())
-	return &COV{body}, nil
+	body.SetHelp("when ‘input’ changes value, output becomes ‘true’ for ‘interval’ duration, then ‘output’ changes back to ‘false’. For Numeric ‘input’ values, the change of value must be greater than the ‘threshold’ value to trigger the output. Interval value must be equal or larger than 1.")
+
+	return &COV{body, nil}, nil
 }
 
 func (inst *COV) Process() {
-	_, firstLoop := inst.Loop()
-	if firstLoop {
-		// settings, _ := getSettings(inst.GetSettings())
+	var diff float64
+	var covUnits interface{}
+
+	s := inst.GetSettings()
+	input, inputNull := inst.ReadPinAsFloat(node.Inp)
+	covInterval, intervalNull := inst.ReadPinAsFloat(node.Interval)
+	covThreshold, thresholdNull := inst.ReadPinAsFloat(node.Threshold)
+
+	// fall back values in setting
+	if thresholdNull && s["covThreshold"] != nil {
+		covThreshold = s["covThreshold"].(float64)
 	}
-	// min, _ := inst.ReadPinAsFloat(node.MinInput)
-	// max, _ := inst.ReadPinAsFloat(node.MaxInput)
-	// _, boolCov := inst.InputUpdated(node.TriggerInput)
-	// if boolCov || firstLoop {
-	// 	inst.value = float.RandFloat(min, max)
-	// }
-	// inst.WritePinFloat(node.Out, inst.value, inst.precision)
+	if intervalNull && s["interval"] != nil {
+		covInterval = s["interval"].(float64)
+	}
+	if s["units"] == nil {
+		covUnits = trigger.Seconds
+	} else {
+		covUnits = s["units"]
+	}
+
+	// outputs false if the input is nil or there is no lastValue
+	if inputNull || inst.lastValue == nil {
+		inst.WritePinBool(node.Outp, false)
+		// inst.WritePinNull(node.Outp)
+	} else {
+		diff = math.Abs(input - *inst.lastValue)
+		if diff > covThreshold {
+			go writeOutput(inst, covInterval, covUnits)
+		}
+	}
+	inst.lastValue = &input
+}
+
+func writeOutput(inst *COV, covInterval float64, covUnits interface{}) {
+	var duration time.Duration
+	switch covUnits.(string) {
+	case "seconds":
+		duration = time.Duration(covInterval) * time.Second
+	case "milliseconds":
+		duration = time.Duration(covInterval) * time.Millisecond
+	case "minutes":
+		duration = time.Duration(covInterval) * time.Minute
+	case "hours":
+		duration = time.Duration(covInterval) * time.Hour
+	}
+
+	// set the output pin to true for 'duration' period before setting it to false
+	inst.WritePinBool(node.Outp, true)
+	time.Sleep(duration)
+	inst.WritePinBool(node.Outp, false)
 }
