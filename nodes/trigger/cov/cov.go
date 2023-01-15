@@ -1,6 +1,7 @@
 package cov
 
 import (
+	"context"
 	"math"
 	"time"
 
@@ -10,7 +11,8 @@ import (
 
 type COV struct {
 	*node.Spec
-	lastValue *float64
+	lastValue  *float64
+	cancelFunc context.CancelFunc
 }
 
 func NewCOV(body *node.Spec) (node.Node, error) {
@@ -25,7 +27,7 @@ func NewCOV(body *node.Spec) (node.Node, error) {
 	body.SetSchema(buildSchema())
 	body.SetHelp("when ‘input’ changes value, output becomes ‘true’ for ‘interval’ duration, then ‘output’ changes back to ‘false’. For Numeric ‘input’ values, the change of value must be greater than the ‘threshold’ value to trigger the output. Interval value must be equal or larger than 1.")
 
-	return &COV{body, nil}, nil
+	return &COV{body, nil, nil}, nil
 }
 
 func (inst *COV) Process() {
@@ -57,13 +59,19 @@ func (inst *COV) Process() {
 	} else {
 		diff = math.Abs(input - *inst.lastValue)
 		if diff > covThreshold {
-			go writeOutput(inst, covInterval, covUnits)
+			if inst.cancelFunc != nil {
+				inst.cancelFunc()
+				// fmt.Println("cancel func called!!!!")
+			}
+			ctx, cancel := context.WithCancel(context.Background())
+			inst.cancelFunc = cancel
+			go writeOutput(inst, covInterval, covUnits, ctx)
 		}
 	}
 	inst.lastValue = &input
 }
 
-func writeOutput(inst *COV, covInterval float64, covUnits interface{}) {
+func writeOutput(inst *COV, covInterval float64, covUnits interface{}, ctx context.Context) {
 	var duration time.Duration
 	switch covUnits.(string) {
 	case "seconds":
@@ -78,6 +86,14 @@ func writeOutput(inst *COV, covInterval float64, covUnits interface{}) {
 
 	// set the output pin to true for 'duration' period before setting it to false
 	inst.WritePinBool(node.Outp, true)
-	time.Sleep(duration)
-	inst.WritePinBool(node.Outp, false)
+
+	select {
+	case <-time.After(duration):
+		inst.WritePinBool(node.Outp, false)
+		// fmt.Println("false wrote.")
+	case <-ctx.Done():
+		// fmt.Println("operation halted.")
+	}
+
+	// fmt.Println("reached bottom.")
 }
