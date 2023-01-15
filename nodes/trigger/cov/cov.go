@@ -13,6 +13,7 @@ type COV struct {
 	*node.Spec
 	lastValue  *float64
 	cancelFunc context.CancelFunc
+	s          map[string]interface{}
 }
 
 func NewCOV(body *node.Spec) (node.Node, error) {
@@ -25,31 +26,32 @@ func NewCOV(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(buildSchema())
+	s := body.GetSettings()
 	body.SetHelp("when ‘input’ changes value, output becomes ‘true’ for ‘interval’ duration, then ‘output’ changes back to ‘false’. For Numeric ‘input’ values, the change of value must be greater than the ‘threshold’ value to trigger the output. Interval value must be equal or larger than 1.")
 
-	return &COV{body, nil, nil}, nil
+	// fmt.Println("the cov settings are: ", s)
+	return &COV{body, nil, nil, s}, nil
 }
 
 func (inst *COV) Process() {
 	var diff float64
 	var covUnits interface{}
 
-	s := inst.GetSettings()
 	input, inputNull := inst.ReadPinAsFloat(node.Inp)
 	covInterval, intervalNull := inst.ReadPinAsFloat(node.Interval)
 	covThreshold, thresholdNull := inst.ReadPinAsFloat(node.Threshold)
 
 	// fall back values in setting
-	if thresholdNull && s["covThreshold"] != nil {
-		covThreshold = s["covThreshold"].(float64)
+	if thresholdNull && inst.s["covThreshold"] != nil {
+		covThreshold = inst.s["covThreshold"].(float64)
 	}
-	if intervalNull && s["interval"] != nil {
-		covInterval = s["interval"].(float64)
+	if intervalNull && inst.s["interval"] != nil {
+		covInterval = inst.s["interval"].(float64)
 	}
-	if s["units"] == nil {
+	if inst.s["units"] == nil {
 		covUnits = trigger.Seconds
 	} else {
-		covUnits = s["units"]
+		covUnits = inst.s["units"]
 	}
 
 	// outputs false if the input is nil or there is no lastValue
@@ -61,7 +63,6 @@ func (inst *COV) Process() {
 		if diff > covThreshold {
 			if inst.cancelFunc != nil {
 				inst.cancelFunc()
-				// fmt.Println("cancel func called!!!!")
 			}
 			ctx, cancel := context.WithCancel(context.Background())
 			inst.cancelFunc = cancel
@@ -90,10 +91,6 @@ func writeOutput(inst *COV, covInterval float64, covUnits interface{}, ctx conte
 	select {
 	case <-time.After(duration):
 		inst.WritePinBool(node.Outp, false)
-		// fmt.Println("false wrote.")
 	case <-ctx.Done():
-		// fmt.Println("operation halted.")
 	}
-
-	// fmt.Println("reached bottom.")
 }
