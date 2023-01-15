@@ -29,7 +29,6 @@ func NewCOV(body *node.Spec) (node.Node, error) {
 	s := body.GetSettings()
 	body.SetHelp("when ‘input’ changes value, output becomes ‘true’ for ‘interval’ duration, then ‘output’ changes back to ‘false’. For Numeric ‘input’ values, the change of value must be greater than the ‘threshold’ value to trigger the output. Interval value must be equal or larger than 1.")
 
-	// fmt.Println("the cov settings are: ", s)
 	return &COV{body, nil, nil, s}, nil
 }
 

@@ -89,6 +89,7 @@ const (
 	covNode         = "change-of-value"
 	randomFloatNode = "random-number"
 	injectNode      = "inject"
+	iteratorNode    = "iterator"
 
 	delay     = "delay"
 	delayOn   = "delay-on"

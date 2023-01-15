@@ -1,4 +1,4 @@
-package inject
+package iterator
 
 import (
 	"github.com/NubeDev/flow-eng/schemas"
