@@ -88,7 +88,7 @@ const (
 	// trigger
 	covNode         = "change-of-value"
 	randomFloatNode = "random-number"
-	inject          = "inject"
+	injectNode      = "inject"
 
 	delay     = "delay"
 	delayOn   = "delay-on"
