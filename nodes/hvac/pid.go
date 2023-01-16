@@ -1,8 +1,15 @@
 package hvac
 
 import (
+	"encoding/json"
+	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/pid"
+	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
+	"github.com/NubeDev/flow-eng/schemas"
+	"github.com/NubeIO/lib-schema/schema"
+	"strconv"
 )
 
 type PIDNode struct {
@@ -34,8 +41,10 @@ func NewPIDNode(body *node.Spec) (node.Node, error) {
 	inputs := node.BuildInputs(enable, processValue, setPoint, minOut, maxOut, inP, inI, inD, direction, intervalSecs, bias, manual, reset)
 	outputs := node.BuildOutputs(output)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	// body.SetSchema(buildSchema())
-	return &PIDNode{body, nil, 0, 0, false}, nil
+
+	node := &PIDNode{body, nil, 0, 0, false}
+	node.SetSchema(node.buildSchema())
+	return node, nil
 }
 
 func (inst *PIDNode) Process() {
@@ -43,7 +52,7 @@ func (inst *PIDNode) Process() {
 		inst.PID = pid.NewPid(0, 0, 1, 0, 0, 10, pid.DIRECT)
 	}
 
-	reset, _ := inst.ReadPinAsBool(node.Reset)
+	reset := inst.ReadPinOrSettingsBool(node.Reset)
 	if reset && !inst.lastReset {
 		inst.PID.Initialize()
 	}
@@ -109,4 +118,115 @@ func (inst *PIDNode) Process() {
 
 	inst.PID.Compute()
 	inst.WritePinFloat(node.Out, inst.PID.GetOutput())
+}
+
+func (inst *PIDNode) setSubtitle(intervalAmount float64, timeUnits string) {
+	subtitleText := fmt.Sprintf("%s %s", strconv.FormatFloat(intervalAmount, 'f', -1, 64), timeUnits)
+	inst.SetSubTitle(subtitleText)
+}
+
+// Custom Node Settings Schema
+
+type PIDNodeSettingsSchema struct {
+	Setpoint          schemas.Number     `json:"setpoint"`
+	MinOut            schemas.Number     `json:"min_out"`
+	MaxOut            schemas.Number     `json:"max_out"`
+	InP               schemas.Number     `json:"in_p"`
+	InI               schemas.Number     `json:"in_i"`
+	InD               schemas.Number     `json:"in_d"`
+	Direction         schemas.Boolean    `json:"direction"`
+	Interval          schemas.Number     `json:"interval"`
+	IntervalTimeUnits schemas.EnumString `json:"interval_time_units"`
+	Bias              schemas.Number     `json:"bias"`
+	Manual            schemas.Number     `json:"manual"`
+}
+
+type PIDNodeSettings struct {
+	Setpoint          float64 `json:"setpoint"`
+	MinOut            float64 `json:"min_out"`
+	MaxOut            float64 `json:"max_out"`
+	InP               float64 `json:"in_p"`
+	InI               float64 `json:"in_i"`
+	InD               float64 `json:"in_d"`
+	Direction         bool    `json:"direction"`
+	Interval          float64 `json:"interval"`
+	IntervalTimeUnits string  `json:"interval_time_units"`
+	Bias              float64 `json:"bias"`
+	Manual            float64 `json:"manual"`
+}
+
+func (inst *PIDNode) buildSchema() *schemas.Schema {
+	props := &PIDNodeSettingsSchema{}
+
+	// setpoint
+	props.Setpoint.Title = "Period"
+	props.Setpoint.Default = 0
+
+	// output limits
+	props.MinOut.Title = "Minimum Output"
+	props.MinOut.Default = 0
+	props.MaxOut.Title = "Maximum Output"
+	props.MaxOut.Default = 100
+
+	// tuning factors
+	props.InP.Title = "Proportional Factor (error multiplier)"
+	props.InP.Default = 1
+	props.InI.Title = "Integral Factor (repeats per second)"
+	props.InI.Default = 0
+	props.InD.Title = "Derivative Factor"
+	props.InD.Default = 0
+
+	// loop direction
+	props.Direction.Title = "Direction (Direct/Reverse)"
+	props.Direction.Default = true
+	props.Direction.EnumNames = []string{"False: Reverse/Heating (increase when pv < sp)", "True: Direct/Cooling (increase when pv > sp)"}
+
+	// time selection
+	props.Interval.Title = "Update Interval"
+	props.Interval.Default = 10
+	props.IntervalTimeUnits.Title = "Interval Units"
+	props.IntervalTimeUnits.Default = ttime.Sec
+	props.IntervalTimeUnits.Options = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
+	props.IntervalTimeUnits.EnumName = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
+
+	// bias
+	props.Bias.Title = "Bias (initial output)"
+	props.Bias.Default = 0
+
+	// manual
+	props.Bias.Title = "Manual (output when disabled)"
+	props.Bias.Default = 0
+
+	schema.Set(props)
+
+	uiSchema := array.Map{
+		"interval_time_units": array.Map{
+			"ui:widget": "radio",
+			"ui:options": array.Map{
+				"inline": true,
+			},
+		},
+		"direction": array.Map{
+			"ui:widget": "select",
+		},
+		"ui:order": array.Slice{"setpoint", "min_out", "max_out", "in_p", "in_i", "in_d", "direction", "interval", "interval_time_units", "bias", "manual"},
+	}
+	s := &schemas.Schema{
+		Schema: schemas.SchemaBody{
+			Title:      "Node Settings",
+			Properties: props,
+		},
+		UiSchema: uiSchema,
+	}
+	return s
+}
+
+func (inst *PIDNode) getSettings(body map[string]interface{}) (*PIDNodeSettings, error) {
+	settings := &PIDNodeSettings{}
+	marshal, err := json.Marshal(body)
+	if err != nil {
+		return settings, err
+	}
+	err = json.Unmarshal(marshal, &settings)
+	return settings, err
 }

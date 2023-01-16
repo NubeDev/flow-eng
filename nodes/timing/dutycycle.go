@@ -10,7 +10,6 @@ import (
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
-	"strconv"
 	"time"
 )
 
@@ -53,7 +52,7 @@ func (inst *DutyCycle) Process() {
 		intervalDuration = 10 * time.Second
 	}
 	if intervalDuration != inst.lastInterval {
-		inst.setSubtitleFromDuration(intervalDuration)
+		inst.setSubtitle(intervalDuration)
 	}
 
 	dutyCyclePerc := inst.ReadPinOrSettingsFloat(node.DutyCycle)
@@ -127,12 +126,7 @@ func (inst *DutyCycle) Stop() {
 	inst.disableDutyCycle()
 }
 
-func (inst *DutyCycle) setSubtitle(intervalAmount float64, timeUnits string) {
-	subtitleText := fmt.Sprintf("%s %s", strconv.FormatFloat(intervalAmount, 'f', -1, 64), timeUnits)
-	inst.SetSubTitle(subtitleText)
-}
-
-func (inst *DutyCycle) setSubtitleFromDuration(intervalDuration time.Duration) {
+func (inst *DutyCycle) setSubtitle(intervalDuration time.Duration) {
 	subtitleText := intervalDuration.String()
 	inst.SetSubTitle(subtitleText)
 }
@@ -141,13 +135,13 @@ func (inst *DutyCycle) setSubtitleFromDuration(intervalDuration time.Duration) {
 
 type DutyCycleSettingsSchema struct {
 	Interval  schemas.Number     `json:"interval"`
-	TimeUnits schemas.EnumString `json:"time_units"`
+	TimeUnits schemas.EnumString `json:"interval_time_units"`
 	DutyCycle schemas.Number     `json:"duty_cycle"`
 }
 
 type DutyCycleSettings struct {
 	Interval  float64 `json:"interval"`
-	TimeUnits string  `json:"time_units"`
+	TimeUnits string  `json:"interval_time_units"`
 	DutyCycle float64 `json:"duty_cycle"`
 }
 
@@ -172,13 +166,13 @@ func (inst *DutyCycle) buildSchema() *schemas.Schema {
 	schema.Set(props)
 
 	uiSchema := array.Map{
-		"time_units": array.Map{
+		"interval_time_units": array.Map{
 			"ui:widget": "radio",
 			"ui:options": array.Map{
 				"inline": true,
 			},
 		},
-		"ui:order": array.Slice{"interval", "time_units", "duty_cycle"},
+		"ui:order": array.Slice{"interval", "interval_time_units", "duty_cycle"},
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{

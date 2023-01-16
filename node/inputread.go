@@ -3,6 +3,7 @@ package node
 import (
 	"errors"
 	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/boolean"
 	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/helpers/integer"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
@@ -89,6 +90,35 @@ func (n *Spec) ReadPinOrSettingsFloat(name InputName) float64 {
 		}
 	}
 	return conversions.GetFloat(input.GetValue())
+}
+
+func (n *Spec) ReadPinOrSettingsBool(name InputName) bool {
+	input := n.GetInput(name)
+	useSetting := !n.InputHasConnection(name) && n.ReadPin(name) == nil && input.SettingName != nil
+	if useSetting {
+		if n.Settings != nil {
+			val := reflect.ValueOf(n.Settings)
+			if val.Kind() == reflect.Map {
+				for _, e := range val.MapKeys() {
+					v := val.MapIndex(e)
+					if e.String() == *input.SettingName {
+						f := boolean.ConvertInterfaceToBool(v)
+						if f != nil && *f {
+							return true
+						} else {
+							return false
+						}
+					}
+				}
+			}
+		}
+	}
+	pinInput := boolean.ConvertInterfaceToBool(input.GetValue())
+	if pinInput != nil && *pinInput {
+		return true
+	} else {
+		return false
+	}
 }
 
 func (n *Spec) ReadPinAsTimeSettings(name InputName) (time.Duration, error) {

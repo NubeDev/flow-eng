@@ -47,7 +47,7 @@ func (inst *MinOnOff) Process() {
 	minOnIntervalDuration, _ := inst.ReadPinAsTimeSettings(node.MinOnTime)
 	minOffIntervalDuration, _ := inst.ReadPinAsTimeSettings(node.MinOffTime)
 	if minOnIntervalDuration != inst.lastMinOnInterval || minOffIntervalDuration != inst.lastMinOffInterval {
-		inst.setSubtitleFromDuration(minOnIntervalDuration, minOffIntervalDuration)
+		inst.setSubtitle(minOnIntervalDuration, minOffIntervalDuration)
 		inst.lastMinOnInterval = minOnIntervalDuration
 		inst.lastMinOffInterval = minOffIntervalDuration
 	}
@@ -107,7 +107,7 @@ func (inst *MinOnOff) Stop() {
 	inst.minOffEnabled = false
 }
 
-func (inst *MinOnOff) setSubtitleFromDuration(minOnIntervalDuration, minOffIntervalDuration time.Duration) {
+func (inst *MinOnOff) setSubtitle(minOnIntervalDuration, minOffIntervalDuration time.Duration) {
 	subtitleText := fmt.Sprintf("min-on %s, min-off %s", minOnIntervalDuration.String(), minOffIntervalDuration.String())
 	inst.SetSubTitle(subtitleText)
 }
