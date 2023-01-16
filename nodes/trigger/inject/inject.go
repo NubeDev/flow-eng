@@ -12,7 +12,7 @@ type Inject struct {
 
 func NewInject(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, trigger.Inject, trigger.Category)
-	// message := node.DynamicInputs(node.DataTypes())
+	// TODO: input only accepts strings currently, where by definition, input supports all data type
 	message := node.BuildInput(node.Message, node.TypeString, nil, body.Inputs)
 	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs)
 	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs)

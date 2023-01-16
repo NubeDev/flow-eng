@@ -50,7 +50,6 @@ func (inst *Iterator) Process() {
 	iterations, iterationsNull := inst.ReadPinAsFloat(node.Iterations)
 	_, startBool := inst.InputUpdated(node.Start)
 	stop, _ := inst.ReadPinAsBool(node.Stop)
-	// fmt.Println("stop is: ", stop)
 
 	//fall back to values set in setting if input is not connected
 	if intervalNull && inst.s["interval"] != nil {
@@ -67,31 +66,40 @@ func (inst *Iterator) Process() {
 	}
 
 	if startBool && !inst.running {
-		// calculate period
-		period := interval / iterations
-		fmt.Println("the period is: ", period)
+		// output false to complete on iteration start
+		inst.WritePinBool(node.Complete, false)
+		// calculate period, output default period if any of the inputs is nil
+		// use the input period otherwise
+		var period float64
+		if intervalNull || iterationsNull {
+			period = inst.s["interval"].(float64) / inst.s["iterations"].(float64)
+		} else {
+			period = interval / iterations
+		}
 		inst.c = make(chan int, 1)
 		go iterate(inst, inst.c, period, iterations, units)
 		inst.running = true
 	}
 
+	// following block only executes when a iteration is running
 	// iteration halted
 	if inst.running && stop {
+		// give the pause signal to iterating routine only once when 'stop' becomes true
 		if !inst.instructedPause {
-			fmt.Println("entered pause outside!!!!!!!!!!!!!!")
 			go func(c chan int) {
 				c <- Pause
-				fmt.Println("entered pause inside!!!!!!!!!!!!!!")
 			}(inst.c)
+			// set 'instructedPause' to 'true' to prevent more pause signals send over the channel
 			inst.instructedPause = true
 		}
+		// iteration continues
 	} else if inst.running && !stop {
+		// give the run signal over the channel only if the iteration has been paused
 		if inst.instructedPause {
-			fmt.Println("stopped pause outside!!!!!!!!!!!!!!")
 			go func(c chan int) {
 				c <- Run
-				fmt.Println("stopped pause inside!!!!!!!!!!!!!!")
 			}(inst.c)
+			// reset 'instructedPause' after giving the 'run' signal
 			inst.instructedPause = false
 		}
 	}
@@ -99,17 +107,19 @@ func (inst *Iterator) Process() {
 }
 
 func iterate(inst *Iterator, c chan int, period float64, iterations float64, units interface{}) {
+	// set state to 'run' when iteration starts
 	state := Run
 	var duration time.Duration
+	halfPeriod := period / 2
 	switch units.(string) {
 	case string(trigger.Milliseconds):
-		duration = time.Duration(period/2) * time.Millisecond
+		duration = time.Duration(halfPeriod * float64(time.Millisecond))
 	case string(trigger.Seconds):
-		duration = time.Duration(period/2) * time.Second
+		duration = time.Duration(halfPeriod * float64(time.Second))
 	case string(trigger.Minutes):
-		duration = time.Duration(period/2) * time.Minute
+		duration = time.Duration(halfPeriod * float64(time.Minute))
 	case string(trigger.Hours):
-		duration = time.Duration(period/2) * time.Hour
+		duration = time.Duration(halfPeriod * float64(time.Hour))
 	}
 
 	for {
@@ -118,13 +128,14 @@ func iterate(inst *Iterator, c chan int, period float64, iterations float64, uni
 			inst.WritePinBool(node.Complete, true)
 			inst.iterationCompleted = 0
 			inst.running = false
+			close(c)
 			return
 		}
 		// start iterating
 		for i := 0; i <= int(iterations-inst.iterationCompleted); i++ {
+			// start iterating if no message received over the channel
 			select {
 			case state = <-c:
-				fmt.Println("state is: ", state)
 				switch state {
 				case Run:
 					fmt.Println("iterating...")
@@ -134,15 +145,19 @@ func iterate(inst *Iterator, c chan int, period float64, iterations float64, uni
 					fmt.Println("terminated...")
 					return
 				}
+			// check state at the beginning of each loop, break if state is 'Pause'
 			default:
 				if state == Pause {
 					break
 				}
+				// write the current iteration number, starting from 0
 				inst.WritePinFloat(node.CountOut, inst.iterationCompleted)
 				inst.iterationCompleted++
-				inst.WritePinBool(node.Outp, false)
-				time.Sleep(duration)
+				// write out the waveform, 'true' for first half period, and 'false' for the second half
+				// this arrangement allows the program to stop on false when stop become true
 				inst.WritePinBool(node.Outp, true)
+				time.Sleep(duration)
+				inst.WritePinBool(node.Outp, false)
 				time.Sleep(duration)
 			}
 		}

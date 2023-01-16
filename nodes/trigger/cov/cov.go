@@ -1,7 +1,6 @@
 package cov
 
 import (
-	"context"
 	"math"
 	"time"
 
@@ -11,9 +10,9 @@ import (
 
 type COV struct {
 	*node.Spec
-	lastValue  *float64
-	cancelFunc context.CancelFunc
-	s          map[string]interface{}
+	lastValue *float64
+	running   bool
+	s         map[string]interface{}
 }
 
 func NewCOV(body *node.Spec) (node.Node, error) {
@@ -29,7 +28,7 @@ func NewCOV(body *node.Spec) (node.Node, error) {
 	s := body.GetSettings()
 	body.SetHelp("when ‘input’ changes value, output becomes ‘true’ for ‘interval’ duration, then ‘output’ changes back to ‘false’. For Numeric ‘input’ values, the change of value must be greater than the ‘threshold’ value to trigger the output. Interval value must be equal or larger than 1.")
 
-	return &COV{body, nil, nil, s}, nil
+	return &COV{body, nil, false, s}, nil
 }
 
 func (inst *COV) Process() {
@@ -56,40 +55,34 @@ func (inst *COV) Process() {
 	// outputs false if the input is nil or there is no lastValue
 	if inputNull || inst.lastValue == nil {
 		inst.WritePinBool(node.Outp, false)
-		// inst.WritePinNull(node.Outp)
 	} else {
+		// call 'writeOutput' when the absolute diff between last two inputs are larger than 'covThreshold' and there are no previous routine running
 		diff = math.Abs(input - *inst.lastValue)
-		if diff > covThreshold {
-			if inst.cancelFunc != nil {
-				inst.cancelFunc()
-			}
-			ctx, cancel := context.WithCancel(context.Background())
-			inst.cancelFunc = cancel
-			go writeOutput(inst, covInterval, covUnits, ctx)
+		if diff > covThreshold && !inst.running {
+			go writeOutput(inst, covInterval, covUnits)
+			inst.running = true
 		}
 	}
 	inst.lastValue = &input
 }
 
-func writeOutput(inst *COV, covInterval float64, covUnits interface{}, ctx context.Context) {
+func writeOutput(inst *COV, covInterval float64, covUnits interface{}) {
 	var duration time.Duration
 	switch covUnits.(string) {
-	case "seconds":
-		duration = time.Duration(covInterval) * time.Second
-	case "milliseconds":
-		duration = time.Duration(covInterval) * time.Millisecond
-	case "minutes":
-		duration = time.Duration(covInterval) * time.Minute
-	case "hours":
-		duration = time.Duration(covInterval) * time.Hour
+	case string(trigger.Milliseconds):
+		duration = time.Duration(covInterval * float64(time.Millisecond))
+	case string(trigger.Seconds):
+		duration = time.Duration(covInterval * float64(time.Second))
+	case string(trigger.Minutes):
+		duration = time.Duration(covInterval * float64(time.Minute))
+	case string(trigger.Hours):
+		duration = time.Duration(covInterval * float64(time.Hour))
 	}
 
 	// set the output pin to true for 'duration' period before setting it to false
+	// set inst.running to false after routine is finished
 	inst.WritePinBool(node.Outp, true)
-
-	select {
-	case <-time.After(duration):
-		inst.WritePinBool(node.Outp, false)
-	case <-ctx.Done():
-	}
+	time.Sleep(duration)
+	inst.WritePinBool(node.Outp, false)
+	inst.running = false
 }
