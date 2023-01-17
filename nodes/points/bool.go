@@ -10,10 +10,10 @@ type Boolean struct {
 
 func NewBoolean(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, pointBoolean, category)
-	in1 := node.BuildInput(node.In1, node.TypeBool, nil, body.Inputs)
-	in2 := node.BuildInput(node.In2, node.TypeBool, nil, body.Inputs)
-	in3 := node.BuildInput(node.In3, node.TypeBool, nil, body.Inputs)
-	in4 := node.BuildInput(node.In4, node.TypeBool, nil, body.Inputs)
+	in1 := node.BuildInput(node.In1, node.TypeBool, nil, body.Inputs, nil)
+	in2 := node.BuildInput(node.In2, node.TypeBool, nil, body.Inputs, nil)
+	in3 := node.BuildInput(node.In3, node.TypeBool, nil, body.Inputs, nil)
+	in4 := node.BuildInput(node.In4, node.TypeBool, nil, body.Inputs, nil)
 	body.Inputs = node.BuildInputs(in1, in2, in3, in4)
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	body.Outputs = node.BuildOutputs(out)

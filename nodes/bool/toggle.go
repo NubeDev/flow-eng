@@ -12,13 +12,13 @@ type Toggle struct {
 
 func NewToggle(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, toggle, category)
-	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs) // TODO: this input shouldn't have a manual override value
+	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs, nil) // TODO: this input shouldn't have a manual override value
 	inputs := node.BuildInputs(in)
 
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
-	body = node.BuildNode(body, inputs, outputs, nil)
-	return &Toggle{body, false, false}, nil
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
+	return &Toggle{body, false, true}, nil
 }
 
 func (inst *Toggle) Process() {

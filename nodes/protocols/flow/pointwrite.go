@@ -30,10 +30,10 @@ type FFPointWrite struct {
 
 func NewFFPointWrite(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, flowPointWrite, category)
-	in1 := node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs)
-	in10 := node.BuildInput(node.In10, node.TypeFloat, nil, body.Inputs)
-	in15 := node.BuildInput(node.In15, node.TypeFloat, nil, body.Inputs)
-	in16 := node.BuildInput(node.In16, node.TypeFloat, nil, body.Inputs)
+	in1 := node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs, nil)
+	in10 := node.BuildInput(node.In10, node.TypeFloat, nil, body.Inputs, nil)
+	in15 := node.BuildInput(node.In15, node.TypeFloat, nil, body.Inputs, nil)
+	in16 := node.BuildInput(node.In16, node.TypeFloat, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(in1, in10, in15, in16)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body.SetAllowSettings()

@@ -18,6 +18,7 @@ type Input struct {
 	Help         InputHelp `json:"help"`
 	FolderExport bool      `json:"folderExport"`
 	HideInput    bool      `json:"hideInput"`
+	SettingName  *string   `json:"setting_name"`
 }
 
 func newInput(body *Input) *Input {
@@ -35,6 +36,7 @@ func newInput(body *Input) *Input {
 		"",
 		false,
 		false,
+		nil,
 	}
 }
 

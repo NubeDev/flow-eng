@@ -10,13 +10,13 @@ type DeadBand struct {
 
 func NewDeadBand(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, deadBandNode, category)
-	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs)
-	setPoint := node.BuildInput(node.Setpoint, node.TypeFloat, nil, body.Inputs)
-	deadBand := node.BuildInput(node.DeadBand, node.TypeFloat, nil, body.Inputs)
+	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, nil)
+	setPoint := node.BuildInput(node.Setpoint, node.TypeFloat, nil, body.Inputs, nil)
+	deadBand := node.BuildInput(node.DeadBand, node.TypeFloat, nil, body.Inputs, nil)
 
 	inputs := node.BuildInputs(in, setPoint, deadBand)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs))
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &DeadBand{body}, nil
 }
 

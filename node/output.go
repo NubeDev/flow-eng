@@ -71,7 +71,7 @@ func (p *Output) Copy(other *Input, debug *global.Debug) error {
 	}
 	if global.DebugConnections {
 		debug.OutputValue = p.GetValue()
-		pprint.PrintJOSN(debug)
+		pprint.PrintJSON(debug)
 	}
 	// pass the output value to the input
 	other.SetValue(p.GetValue())

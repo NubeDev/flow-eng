@@ -93,6 +93,11 @@ func GetFloatPointerOk(in interface{}) (val *float64, ok bool) {
 		val = float.New(float64(i))
 	case uint64:
 		val = float.New(float64(i))
+	case interface{}:
+		s := fmt.Sprint(in)
+		if s, err := strconv.ParseFloat(s, 64); err == nil {
+			val = float.New(s)
+		}
 	default:
 		return nil, false
 	}
@@ -200,4 +205,15 @@ func GetIntOk(in interface{}) (val int, ok bool) {
 		return 0, false
 	}
 	return val, true
+}
+
+func ConvertInterfaceToFloatMultiple(values []interface{}) []*float64 {
+	var output []*float64
+	for _, value := range values {
+		v, ok := GetFloatPointerOk(value)
+		if ok {
+			output = append(output, v)
+		}
+	}
+	return output
 }

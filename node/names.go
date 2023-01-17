@@ -60,6 +60,8 @@ const (
 	Count          InputName = "count"
 	CountUp        InputName = "count-up"
 	CountDown      InputName = "count-down"
+	StepSize       InputName = "step-size"
+	SetValue       InputName = "set-value"
 
 	MinInput InputName = "min"
 	MaxInput InputName = "max"

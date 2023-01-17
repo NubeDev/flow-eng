@@ -10,13 +10,13 @@ type Xor struct {
 
 func NewXor(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, xor, category)
-	in1 := node.BuildInput(node.In1, node.TypeBool, nil, body.Inputs) // TODO: this input shouldn't have a manual override value
-	in2 := node.BuildInput(node.In2, node.TypeBool, nil, body.Inputs) // TODO: this input shouldn't have a manual override value
+	in1 := node.BuildInput(node.In1, node.TypeBool, nil, body.Inputs, nil) // TODO: this input shouldn't have a manual override value
+	in2 := node.BuildInput(node.In2, node.TypeBool, nil, body.Inputs, nil) // TODO: this input shouldn't have a manual override value
 	inputs := node.BuildInputs(in1, in2)
 
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &Xor{body}, nil
 }
 

@@ -2,7 +2,7 @@ package statistics
 
 import (
 	"github.com/NubeDev/flow-eng/helpers/array"
-	"github.com/NubeDev/flow-eng/helpers/float"
+	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/node"
 )
 
@@ -21,7 +21,7 @@ func NewRange(body *node.Spec) (node.Node, error) {
 
 func (inst *Range) Process() {
 	count := inst.InputsLen()
-	inputs := float.ConvertInterfaceToFloatMultiple(inst.ReadMultiple(count))
+	inputs := conversions.ConvertInterfaceToFloatMultiple(inst.ReadMultiple(count))
 	var nonNilValues []float64
 	for _, value := range inputs {
 		if value != nil {

@@ -54,7 +54,7 @@ func (n *Spec) WritePinInt(name OutputName, value int) {
 func (n *Spec) WritePinFalse(name OutputName) {
 	out := n.GetOutput(name)
 	if out == nil {
-		log.Errorf("failed to find node to write oputput value FALSE node: %s", n.GetName())
+		log.Errorf("failed to find node to write output value FALSE name: %s node: %s", name, n.GetName())
 		return
 	}
 	if name == out.Name {
@@ -65,7 +65,7 @@ func (n *Spec) WritePinFalse(name OutputName) {
 func (n *Spec) WritePinTrue(name OutputName) {
 	out := n.GetOutput(name)
 	if out == nil {
-		log.Errorf("failed to find node to write oputput value TRUE node: %s", n.GetName())
+		log.Errorf("failed to find node to write output value TRUE name: %s node: %s", name, n.GetName())
 		return
 	}
 	if name == out.Name {

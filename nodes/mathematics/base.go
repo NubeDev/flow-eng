@@ -11,7 +11,7 @@ const (
 
 func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error) {
 	body = node.Defaults(body, nodeName, category)
-	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs))
+	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, nil))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(buildSchema())

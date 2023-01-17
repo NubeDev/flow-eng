@@ -44,13 +44,13 @@ func NewGmail(body *node.Spec) (node.Node, error) {
 	if err != nil {
 		return nil, err
 	}
-	to := node.BuildInput(node.To, node.TypeString, nil, body.Inputs)
-	subject := node.BuildInput(node.Subject, node.TypeString, nil, body.Inputs)
-	message := node.BuildInput(node.Message, node.TypeString, nil, body.Inputs)
-	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs)
+	to := node.BuildInput(node.To, node.TypeString, nil, body.Inputs, nil)
+	subject := node.BuildInput(node.Subject, node.TypeString, nil, body.Inputs, nil)
+	message := node.BuildInput(node.Message, node.TypeString, nil, body.Inputs, nil)
+	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(to, subject, message, trigger)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(buildSchema())
 	return &Gmail{body, address}, nil
 }

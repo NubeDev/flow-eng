@@ -16,11 +16,11 @@ func NewInput(body *node.Spec, store *Store) (node.Node, error) {
 		store = getStore()
 	}
 	body = node.Defaults(body, linkInput, category)
-	topic := node.BuildInput(node.Topic, node.TypeString, nil, body.Inputs)
-	value := node.BuildInput(node.In, node.TypeString, nil, body.Inputs)
+	topic := node.BuildInput(node.Topic, node.TypeString, nil, body.Inputs, nil)
+	value := node.BuildInput(node.In, node.TypeString, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(topic, value)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &Input{body}, nil
 }
 

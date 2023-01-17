@@ -13,6 +13,15 @@ type Schema struct {
 	UiSchema interface{} `json:"uiSchema"`
 }
 
+type Boolean struct {
+	Type      string   `json:"type" default:"boolean"`
+	Title     string   `json:"title" default:""`
+	Default   bool     `json:"default" default:"false"`
+	Help      string   `json:"help" default:""`
+	ReadOnly  bool     `json:"readOnly" default:"false"`
+	EnumNames []string `json:"enumNames,omitempty"`
+}
+
 type String struct {
 	Type     string `json:"type" default:"string"`
 	Title    string `json:"title" default:""`
@@ -32,11 +41,13 @@ type StringLimits struct {
 }
 
 type Number struct {
-	Type     string `json:"type" default:"number"`
-	Title    string `json:"title" default:""`
-	Default  int    `json:"default" default:"0"`
-	Help     string `json:"help" default:""`
-	ReadOnly bool   `json:"readOnly" default:"false"`
+	Type     string  `json:"type" default:"number"`
+	Title    string  `json:"title" default:""`
+	Default  float64 `json:"default" default:"0"`
+	Help     string  `json:"help" default:""`
+	ReadOnly bool    `json:"readOnly" default:"false"`
+	Minimum  float64 `json:"minimum" default:"0"`
+	Maximum  float64 `json:"maximum" default:"10000"`
 }
 
 type NumberLimits struct {

@@ -10,13 +10,13 @@ type Divide struct {
 
 func NewDivide(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, divide, category)
-	in1 := node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs)
-	in2 := node.BuildInput(node.In2, node.TypeFloat, nil, body.Inputs)
+	in1 := node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs, nil)
+	in2 := node.BuildInput(node.In2, node.TypeFloat, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(in1, in2)
 
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
 	return &Divide{body}, nil
 }

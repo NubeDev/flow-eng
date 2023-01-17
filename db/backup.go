@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
+	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/buntdb"
 	"sort"
 	"strings"
@@ -46,7 +47,7 @@ func strip(s string) string {
 func (inst *db) AddBackup(body *Backup) (*Backup, error) {
 
 	body.Time = ttime.New().Now()
-	body.Timestamp = body.Time.Format(time.RFC822)
+	body.Timestamp = body.Time.Format(time.RFC1123)
 	body.UUID = helpers.UUID("flo")
 	body.UserComment = strip(body.UserComment)
 	if body.UserComment == "" {
@@ -113,14 +114,16 @@ func (inst *db) GetLatestBackup() (*Backup, error) {
 		return nil, err
 	}
 	if len(backups) > 0 {
-		return &backups[0], nil
+		data := &backups[0]
+		log.Infof("uuid: %s", data.UUID)
+		log.Infof("downlaoded timestamp: %s", data.Timestamp)
+		return data, nil
 	}
 	return nil, errors.New("no flow backups have been taken yet")
 }
 
 func (inst *db) GetBackups() ([]Backup, error) {
 	var resp []Backup
-
 	err := inst.DB.View(func(tx *buntdb.Tx) error {
 		err := tx.Ascend("", func(key, value string) bool {
 			var data Backup
@@ -130,7 +133,7 @@ func (inst *db) GetBackups() ([]Backup, error) {
 			}
 			if matchBackupUUID(data.UUID) {
 				resp = append(resp, data)
-				//fmt.Printf("key: %s, value: %s\n", key, value)
+				// fmt.Printf("key: %s, value: %s\n", key, value)
 			}
 			return true
 		})
