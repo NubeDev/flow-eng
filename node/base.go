@@ -24,6 +24,7 @@ func ConvertToSpec(n Node) *Spec {
 	if n == nil {
 		return nil
 	}
+
 	return &Spec{
 		Inputs:        n.GetInputs(),
 		Outputs:       n.GetOutputs(),

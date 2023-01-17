@@ -40,8 +40,10 @@ type Node interface {
 	GetNodeName() string // my-node
 	SetNodeName(string)  // my-node
 	GetNodeValues() []*PortValues
+	SortInputs()
 	GetInputs() []*Input
 	GetInput(name InputName) *Input
+	SortOutputs()
 	GetOutputs() []*Output
 	GetOutput(name OutputName) *Output
 	InputUpdated(name InputName) (updated bool, boolCOV bool)
@@ -287,6 +289,22 @@ func (n *Spec) GetInputs() []*Input {
 	return n.Inputs
 }
 
+func (n *Spec) SortInputs() {
+	for i, input := range n.Inputs {
+		if !input.OverridePosition {
+			input.Position = i
+		}
+	}
+}
+
+func (n *Spec) SortOutputs() {
+	for i, output := range n.Outputs {
+		if !output.OverridePosition {
+			output.Position = i
+		}
+	}
+}
+
 type PortValues struct {
 	Type  DataTypes   `json:"type"`
 	Value interface{} `json:"value"`
@@ -364,6 +382,7 @@ type InputConnection struct {
 	OverrideValue interface{} `json:"overrideValue,omitempty"` // used for when the user has no node link and writes the value direct (or can be used to override a value)
 	CurrentValue  interface{} `json:"currentValue,omitempty"`
 	FallbackValue interface{} `json:"fallbackValue,omitempty"`
+	Hide          bool        `json:"hide"`
 	Disable       bool        `json:"disable,omitempty"`
 }
 
