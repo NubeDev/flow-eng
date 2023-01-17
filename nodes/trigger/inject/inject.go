@@ -13,9 +13,9 @@ type Inject struct {
 func NewInject(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, trigger.Inject, trigger.Category)
 	// TODO: input only accepts strings currently, where by definition, input supports all data type
-	message := node.BuildInput(node.Message, node.TypeString, nil, body.Inputs)
-	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs)
-	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs)
+	message := node.BuildInput(node.Message, node.TypeString, nil, body.Inputs, nil)
+	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, nil)
+	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(message, enable, trigger)
 
 	out := node.BuildOutput(node.Outp, node.TypeString, nil, body.Outputs)

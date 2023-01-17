@@ -3,6 +3,7 @@ package nodes
 import (
 	"errors"
 	"fmt"
+	"github.com/NubeDev/flow-eng/nodes/trigger"
 
 	"github.com/NubeDev/flow-eng/db"
 	"github.com/NubeDev/flow-eng/helpers/store"
@@ -37,10 +38,8 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/timing"
 	"github.com/NubeDev/flow-eng/nodes/transformations"
 
-	"github.com/NubeDev/flow-eng/nodes/trigger/cov"
 	"github.com/NubeDev/flow-eng/nodes/trigger/inject"
 	"github.com/NubeDev/flow-eng/nodes/trigger/iterator"
-	"github.com/NubeDev/flow-eng/nodes/trigger/random"
 )
 
 const (
@@ -137,8 +136,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	countString, _ := count.NewCountString(nil)
 
 	// triggers
-	cov, _ := cov.NewCOV(nil)
-	random, _ := random.NewRandom(nil)
+	cov, _ := trigger.NewCOVNode(nil)
+	random, _ := trigger.NewRandom(nil)
 	inject, _ := inject.NewInject(nil)
 	iterator, _ := iterator.NewIterator(nil)
 
@@ -691,9 +690,9 @@ func builderCount(body *node.Spec) (node.Node, error) {
 func builderTrigger(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case covNode:
-		return cov.NewCOV(body)
+		return trigger.NewCOVNode(body)
 	case randomFloatNode:
-		return random.NewRandom(body)
+		return trigger.NewRandom(body)
 	case injectNode:
 		return inject.NewInject(body)
 	case iteratorNode:

@@ -9,10 +9,3 @@ const (
 	Inject      = "inject"
 	RandomFloat = "random-number"
 )
-
-const (
-	Milliseconds TimeUnits = "milliseconds"
-	Seconds      TimeUnits = "seconds"
-	Minutes      TimeUnits = "minutes"
-	Hours        TimeUnits = "hours"
-)

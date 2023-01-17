@@ -26,10 +26,10 @@ const (
 func NewIterator(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, trigger.Iterator, trigger.Category)
 
-	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs)
-	iterations := node.BuildInput(node.Iterations, node.TypeFloat, nil, body.Inputs)
-	start := node.BuildInput(node.Start, node.TypeBool, nil, body.Inputs)
-	stop := node.BuildInput(node.Stop, node.TypeBool, nil, body.Inputs)
+	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, nil)
+	iterations := node.BuildInput(node.Iterations, node.TypeFloat, nil, body.Inputs, nil)
+	start := node.BuildInput(node.Start, node.TypeBool, nil, body.Inputs, nil)
+	stop := node.BuildInput(node.Stop, node.TypeBool, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(interval, iterations, start, stop)
 
 	out := node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs)
@@ -51,7 +51,7 @@ func (inst *Iterator) Process() {
 	_, startBool := inst.InputUpdated(node.Start)
 	stop, _ := inst.ReadPinAsBool(node.Stop)
 
-	//fall back to values set in setting if input is not connected
+	// fall back to values set in setting if input is not connected
 	if intervalNull && inst.s["interval"] != nil {
 		interval = inst.s["interval"].(float64)
 	}
