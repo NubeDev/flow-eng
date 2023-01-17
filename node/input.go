@@ -6,19 +6,21 @@ import (
 )
 
 type Input struct {
-	Name         InputName        `json:"name"` // in1
-	DataType     DataTypes        `json:"type"` // int
-	Connection   *InputConnection `json:"link,omitempty"`
-	value        interface{}
-	updated      bool // if the input updated or node
-	values       array.ArrStore
-	uuid         uuid.Value
-	direction    Direction
-	connector    *Connector
-	Help         InputHelp `json:"help"`
-	FolderExport bool      `json:"folderExport"`
-	HideInput    bool      `json:"hideInput"`
-	SettingName  *string   `json:"setting_name"`
+	Name             InputName        `json:"name"` // in1
+	DataType         DataTypes        `json:"type"` // int
+	Connection       *InputConnection `json:"link,omitempty"`
+	value            interface{}
+	updated          bool // if the input updated or node
+	values           array.ArrStore
+	uuid             uuid.Value
+	direction        Direction
+	connector        *Connector
+	Help             InputHelp `json:"help"`
+	FolderExport     bool      `json:"folderExport"`
+	HideInput        bool      `json:"hideInput"`
+	Position         int       `json:"position"`
+	OverridePosition bool      `json:"overridePosition"`
+	SettingName      *string   `json:"settingName"`
 }
 
 func newInput(body *Input) *Input {
@@ -35,6 +37,8 @@ func newInput(body *Input) *Input {
 		nil,
 		"",
 		false,
+		false,
+		0,
 		false,
 		nil,
 	}
