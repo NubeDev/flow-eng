@@ -31,7 +31,13 @@ func (n *Spec) ReadPayloadAsFloat() (value float64, null bool) {
 	if r.Any == nil {
 		return 0, true
 	}
-	return conversions.GetFloat(r.Any), false
+	m, ok := r.Any.(map[string]interface{})
+	if ok {
+		for _, v := range m {
+			return conversions.GetFloat(v), false
+		}
+	}
+	return 0, true
 }
 
 func (n *Spec) ReadPayloadAsString() (value string, null bool) {
