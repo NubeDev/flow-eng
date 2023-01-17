@@ -43,7 +43,7 @@ func buildDefaultSchema() *schemas.Schema {
 	schema.Set(props)
 
 	uiSchema := array.Map{
-		"time": array.Map{
+		"interval_time_units": array.Map{
 			"ui:widget": "radio",
 			"ui:options": array.Map{
 				"inline": true,

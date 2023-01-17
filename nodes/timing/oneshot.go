@@ -2,14 +2,12 @@ package timing
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
-	"strconv"
 	"time"
 )
 
@@ -44,7 +42,7 @@ func (inst *OneShot) Process() {
 
 	oneShotIntervalDuration, _ := inst.ReadPinAsTimeSettings(node.Interval)
 	if oneShotIntervalDuration != inst.lastInterval {
-		inst.setSubtitleFromDuration(oneShotIntervalDuration)
+		inst.setSubtitle(oneShotIntervalDuration)
 		inst.lastInterval = oneShotIntervalDuration
 	}
 
@@ -97,12 +95,7 @@ func (inst *OneShot) Stop() {
 	inst.StopOneShotTimer(true)
 }
 
-func (inst *OneShot) setSubtitle(intervalAmount float64, timeUnits string) {
-	subtitleText := fmt.Sprintf("%s %s", strconv.FormatFloat(intervalAmount, 'f', -1, 64), timeUnits)
-	inst.SetSubTitle(subtitleText)
-}
-
-func (inst *OneShot) setSubtitleFromDuration(intervalDuration time.Duration) {
+func (inst *OneShot) setSubtitle(intervalDuration time.Duration) {
 	subtitleText := intervalDuration.String()
 	inst.SetSubTitle(subtitleText)
 }

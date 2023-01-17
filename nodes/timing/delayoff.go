@@ -1,11 +1,9 @@
 package timing
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/helpers/timer"
 	"github.com/NubeDev/flow-eng/node"
-	"strconv"
 	"time"
 )
 
@@ -36,7 +34,7 @@ func NewDelayOff(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
 func (inst *DelayOff) Process() {
 	delayDuration, _ := inst.ReadPinAsTimeSettings(node.Delay)
 	if delayDuration != inst.lastDelay {
-		inst.setSubtitleFromDuration(delayDuration)
+		inst.setSubtitle(delayDuration)
 		inst.lastDelay = delayDuration
 	}
 
@@ -85,12 +83,7 @@ func (inst *DelayOff) Stop() {
 	}
 }
 
-func (inst *DelayOff) setSubtitle(intervalAmount float64, timeUnits string) {
-	subtitleText := fmt.Sprintf("%s %s", strconv.FormatFloat(intervalAmount, 'f', -1, 64), timeUnits)
-	inst.SetSubTitle(subtitleText)
-}
-
-func (inst *DelayOff) setSubtitleFromDuration(intervalDuration time.Duration) {
+func (inst *DelayOff) setSubtitle(intervalDuration time.Duration) {
 	subtitleText := intervalDuration.String()
 	inst.SetSubTitle(subtitleText)
 }

@@ -1,11 +1,9 @@
 package timing
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/node"
-	"strconv"
 	"time"
 )
 
@@ -57,7 +55,7 @@ func (inst *Delay) Process() {
 
 		delayDuration, _ := inst.ReadPinAsTimeSettings(node.Delay)
 		if delayDuration != inst.lastDelay {
-			inst.setSubtitleFromDuration(delayDuration)
+			inst.setSubtitle(delayDuration)
 			inst.lastDelay = delayDuration
 		}
 
@@ -107,12 +105,7 @@ func (inst *Delay) Stop() {
 	inst.ClearAllDelays()
 }
 
-func (inst *Delay) setSubtitle(intervalAmount float64, timeUnits string) {
-	subtitleText := fmt.Sprintf("%s %s", strconv.FormatFloat(intervalAmount, 'f', -1, 64), timeUnits)
-	inst.SetSubTitle(subtitleText)
-}
-
-func (inst *Delay) setSubtitleFromDuration(intervalDuration time.Duration) {
+func (inst *Delay) setSubtitle(intervalDuration time.Duration) {
 	subtitleText := intervalDuration.String()
 	inst.SetSubTitle(subtitleText)
 }
