@@ -24,5 +24,4 @@ func (inst *CountString) Process() {
 		inst.count++
 	}
 	inst.WritePinFloat(node.CountOut, inst.count)
-
 }
