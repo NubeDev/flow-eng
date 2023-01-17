@@ -43,7 +43,7 @@ func (inst *DelayOn) Process() {
 		inst.lastDelay = delayDuration
 	}
 
-	in1, _ := inst.ReadPinAsBool(node.In)
+	in1, _ := inst.ReadPinAsBool(node.Inp)
 	if !in1 { // any time input is false, set output false and cancel any running timers
 		inst.WritePinFalse(node.Outp)
 		inst.currOutput = false

@@ -26,13 +26,13 @@ type MinOnOff struct {
 
 func NewMinOnOff(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, minOnOff, category)
-	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs, nil)
+	in := node.BuildInput(node.Inp, node.TypeBool, nil, body.Inputs, nil)
 	onInterval := node.BuildInput(node.MinOnTime, node.TypeFloat, 0, body.Inputs, str.New("min_on_interval"))
 	offInterval := node.BuildInput(node.MinOffTime, node.TypeFloat, 0, body.Inputs, str.New("min_off_interval"))
 	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(in, onInterval, offInterval, reset)
 
-	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
+	out := node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs)
 	minOnActive := node.BuildOutput(node.MinOnActive, node.TypeBool, nil, body.Outputs)
 	minOffActive := node.BuildOutput(node.MinOffActive, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out, minOnActive, minOffActive)
@@ -52,7 +52,7 @@ func (inst *MinOnOff) Process() {
 		inst.lastMinOffInterval = minOffIntervalDuration
 	}
 
-	input, _ := inst.ReadPinAsBool(node.In)
+	input, _ := inst.ReadPinAsBool(node.Inp)
 
 	reset, _ := inst.ReadPinAsBool(node.Reset)
 
@@ -65,7 +65,7 @@ func (inst *MinOnOff) Process() {
 	inst.lastReset = reset
 
 	if !inst.minOnEnabled && !inst.minOffEnabled {
-		inst.WritePinBool(node.Out, input)
+		inst.WritePinBool(node.Outp, input)
 		if input && !inst.lastInput {
 			inst.timeOn = time.Now().Unix()
 			inst.minOnEnabled = true
@@ -85,7 +85,7 @@ func (inst *MinOnOff) Process() {
 			inst.minOnEnabled = false
 			inst.WritePinFalse(node.MinOnActive)
 			if input {
-				inst.WritePinTrue(node.Out)
+				inst.WritePinTrue(node.Outp)
 			}
 		}
 	} else if inst.minOffEnabled {
@@ -95,7 +95,7 @@ func (inst *MinOnOff) Process() {
 			inst.minOffEnabled = false
 			inst.WritePinFalse(node.MinOffActive)
 			if !input {
-				inst.WritePinFalse(node.Out)
+				inst.WritePinFalse(node.Outp)
 			}
 		}
 	}

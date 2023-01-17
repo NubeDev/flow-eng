@@ -22,11 +22,11 @@ type DelayTimer struct {
 func NewDelay(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, delay, category)
 	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, nil)
-	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, nil)
+	in := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, nil)
 	delayInput := node.BuildInput(node.Delay, node.TypeFloat, nil, body.Inputs, str.New("interval"))
 	inputs := node.BuildInputs(enable, in, delayInput)
 
-	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
+	out := node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
@@ -44,7 +44,7 @@ func (inst *Delay) Process() {
 		return
 	}
 
-	input, null := inst.ReadPinAsFloat(node.In)
+	input, null := inst.ReadPinAsFloat(node.Inp)
 	inputFloatPtr := float.New(input)
 	if null {
 		inputFloatPtr = nil
@@ -63,9 +63,9 @@ func (inst *Delay) Process() {
 		newDelay.Timer = time.AfterFunc(delayDuration, func() {
 			delayObj := newDelay
 			if inputFloatPtr == nil {
-				inst.WritePinNull(node.Out)
+				inst.WritePinNull(node.Outp)
 			} else {
-				inst.WritePinFloat(node.Out, *inputFloatPtr)
+				inst.WritePinFloat(node.Outp, *inputFloatPtr)
 			}
 			delayObj.HasTriggered = true
 		})
@@ -98,7 +98,7 @@ func (inst *Delay) ClearAllDelays() {
 }
 
 func (inst *Delay) Start() {
-	inst.WritePinNull(node.Out)
+	inst.WritePinNull(node.Outp)
 }
 
 func (inst *Delay) Stop() {
