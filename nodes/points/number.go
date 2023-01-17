@@ -18,8 +18,6 @@ func NewNumber(body *node.Spec) (node.Node, error) {
 	body.Inputs = node.BuildInputs(in1, in2, in3, in4)
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	body.Outputs = node.BuildOutputs(out)
-	body.SetAllowPayload()
-	body.SetPayloadType(node.TypeNumber)
 	body.SetIcon(string(emoji.Label))
 	return &Number{body}, nil
 }
