@@ -146,6 +146,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	// number transformations
 	scaleNode, _ := transformations.NewScale(nil)
 	limitNode, _ := transformations.NewLimit(nil)
+	fade, _ := transformations.NewFade(nil)
 
 	// bacnet
 	bacServer, _ := bacnetio.NewServer(nil, nil)
@@ -284,6 +285,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(scaleNode),
 		node.ConvertToSpec(limitNode),
+		node.ConvertToSpec(fade),
 
 		node.ConvertToSpec(logNode),
 
@@ -494,6 +496,8 @@ func builderTransformations(body *node.Spec) (node.Node, error) {
 		return transformations.NewLimit(body)
 	case scaleNode:
 		return transformations.NewScale(body)
+	case fade:
+		return transformations.NewFade(body)
 	}
 	return nil, nil
 }

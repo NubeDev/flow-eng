@@ -32,6 +32,7 @@ const (
 
 	scaleNode = "scale"
 	limitNode = "limit"
+	fade      = "fade"
 
 	dataStore  = "data-store"
 	jsonFilter = "json-filter"

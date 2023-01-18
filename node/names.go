@@ -184,6 +184,7 @@ const (
 	Connected OutputName = "connected"
 
 	CountOut OutputName = "count"
+	OutEqTo  OutputName = "out=to"
 
 	MinOnActive  OutputName = "min-on-active"
 	MinOffActive OutputName = "min-off-active"

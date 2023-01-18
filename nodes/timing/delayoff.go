@@ -69,6 +69,7 @@ func (inst *DelayOff) Process() {
 			inst.timer = nil
 		})
 	}
+	inst.WritePin(node.Outp, inst.currOutput)
 }
 
 func (inst *DelayOff) Start() {
