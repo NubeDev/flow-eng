@@ -23,6 +23,13 @@ const (
 	Run       = 2
 )
 
+const (
+	Milliseconds = "milliseconds"
+	Seconds      = "seconds"
+	Minutes      = "minutes"
+	Hours        = "hours"
+)
+
 func NewIterator(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, trigger.Iterator, trigger.Category)
 
@@ -112,13 +119,13 @@ func iterate(inst *Iterator, c chan int, period float64, iterations float64, uni
 	var duration time.Duration
 	halfPeriod := period / 2
 	switch units.(string) {
-	case string(trigger.Milliseconds):
+	case string(Milliseconds):
 		duration = time.Duration(halfPeriod * float64(time.Millisecond))
-	case string(trigger.Seconds):
+	case string(Seconds):
 		duration = time.Duration(halfPeriod * float64(time.Second))
-	case string(trigger.Minutes):
+	case string(Minutes):
 		duration = time.Duration(halfPeriod * float64(time.Minute))
-	case string(trigger.Hours):
+	case string(Hours):
 		duration = time.Duration(halfPeriod * float64(time.Hour))
 	}
 

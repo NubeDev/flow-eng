@@ -1,7 +1,6 @@
 package iterator
 
 import (
-	"github.com/NubeDev/flow-eng/nodes/trigger"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
 )
@@ -22,8 +21,8 @@ func buildSchema() *schemas.Schema {
 	props.Interval.Default = 4
 
 	props.Units.Title = "Units"
-	props.Units.Options = append(props.Units.Options, string(trigger.Milliseconds), string(trigger.Seconds), string(trigger.Minutes), string(trigger.Hours))
-	props.Units.Default = string(trigger.Seconds)
+	props.Units.Options = append(props.Units.Options, Milliseconds, Seconds, Minutes, Hours)
+	props.Units.Default = Seconds
 
 	props.Iterations.Title = "Iterations"
 	props.Iterations.Default = 10
