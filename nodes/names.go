@@ -69,7 +69,7 @@ const (
 	rank      = "rank"
 	median    = "median"
 
-	flatLine = "flatLine"
+	flatLine = "flatline"
 
 	// filters
 	preventNull        = "prevent-null"
