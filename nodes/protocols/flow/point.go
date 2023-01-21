@@ -1,6 +1,7 @@
 package flow
 
 import (
+	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
@@ -29,6 +30,7 @@ func NewFFPoint(body *node.Spec) (node.Node, error) {
 	return pnt, nil
 }
 
+// set add this point to the store
 func (inst *FFPoint) set() {
 	s := inst.GetStore()
 	if s == nil {
@@ -57,30 +59,61 @@ func (inst *FFPoint) set() {
 	}
 }
 
-func (inst *FFPoint) Process() {
-	_, firstLoop := inst.Loop()
-	if firstLoop {
-		selectedPoint, err := getPointSettings(inst.GetSettings())
-		var setTopic bool
-		if selectedPoint != nil && err == nil {
-			if selectedPoint.Point != "" {
-				t := makePointTopic(selectedPoint.Point)
-				if t != "" {
-					inst.topic = t
-					inst.set()
-					setTopic = true
-				}
-
+func (inst *FFPoint) checkStillExists() {
+	s := inst.GetStore()
+	if s == nil {
+		return
+	}
+	parentId := inst.GetParentId()
+	topic := fmt.Sprintf("pointsList_%s", parentId)
+	children, ok := s.Get(topic)
+	if ok {
+		existingPoints := children.([]*point)
+		var pointExists bool
+		for _, existingPoint := range existingPoints {
+			t := makePointTopic(existingPoint.Name)
+			if t == inst.topic {
+				pointExists = true
+				inst.SetSubTitle(existingPoint.Name)
+				inst.SetWaringMessage("")
+				inst.SetWaringIcon(string(emoji.GreenCircle))
 			}
-			inst.SetSubTitle(selectedPoint.Point)
-		} else {
-			inst.SetSubTitle("")
 		}
-		if !setTopic {
-			inst.SetWaringMessage("no point selected")
+		if !pointExists {
+			inst.SetWaringMessage(pointError)
 			inst.SetWaringIcon(string(emoji.OrangeCircle))
 			inst.SetSubTitle("")
 		}
+	}
+}
+
+func (inst *FFPoint) setTopic() {
+	selectedPoint, err := getPointSettings(inst.GetSettings())
+	if selectedPoint != nil && err == nil {
+		if selectedPoint.Point != "" {
+			t := makePointTopic(selectedPoint.Point)
+			if t != "" {
+				inst.topic = t
+				inst.set()
+				inst.SetSubTitle(selectedPoint.Point)
+				inst.SetWaringMessage("")
+				inst.SetWaringIcon(string(emoji.GreenCircle))
+			} else {
+				inst.SetWaringMessage(pointError)
+				inst.SetWaringIcon(string(emoji.OrangeCircle))
+				inst.SetSubTitle("")
+			}
+		}
+	}
+}
+
+func (inst *FFPoint) Process() {
+	loopCount, firstLoop := inst.Loop()
+	if firstLoop {
+		inst.setTopic()
+	}
+	if loopCount%50 == 0 {
+		inst.checkStillExists()
 	}
 	val, null := inst.GetPayloadNull()
 	var wroteValue bool

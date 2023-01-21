@@ -19,6 +19,10 @@ const (
 	flowPointWrite = "flow-point-write"
 )
 
+const (
+	pointError = "point deleted or never selected"
+)
+
 type covPayload struct {
 	Value    float64 `json:"value"`
 	ValueRaw float64 `json:"value_raw"`
