@@ -55,24 +55,28 @@ func (inst *Network) fetchPointsList() {
 	}
 }
 
+// pointsList
 // TODO: the points list topic gets a message on EVERY FF Point CRUD.  This produces MANY updates and many FF DB calls. Consider removing them.
 func (inst *Network) pointsList() {
 	callback := func(client mqtt.Client, message mqtt.Message) {
 		var points []*point
+
 		err := json.Unmarshal(message.Payload(), &points)
-		// log.Infof("Flow Network pointsList() points: %+v", points)
-		if err == nil {
-			if points != nil {
-				s := inst.GetStore()
-				inst.pointsCount = len(points)
-				if s != nil {
-					// fmt.Println(string(message.Payload()))
-					s.Set(fmt.Sprintf("pointsList_%s", inst.GetID()), points, 0)
-					inst.SetSubTitle(fmt.Sprintf("points count: %d", inst.pointsCount))
-				}
-			}
-		} else {
+		if err != nil {
 			log.Errorf("failed to get flow-framework points list err: %s", err.Error())
+			return
+		}
+		inst.pointsCount = len(points)
+		log.Infof("Flow Network pointsList() points count: %d", inst.pointsCount)
+		s := inst.GetStore()
+		topic := fmt.Sprintf("pointsList_%s", inst.GetID())
+		if s != nil {
+			s.Set(topic, points, 0)
+			inst.SetSubTitle(fmt.Sprintf("points count: %d", inst.pointsCount))
+			// var existingPoints []*point
+
+		} else {
+			log.Errorf("failed to get flow-framework points store err: %s", err.Error())
 		}
 	}
 	var topic = "rubix/platform/points/publish"
@@ -153,7 +157,7 @@ func (inst *Network) publish(loopCount uint64) {
 		names := spitPointNames(payload.netDevPntNames)
 		// log.Infof("spitPointNames(): %+v", names)
 		if len(names) != 4 {
-			log.Errorf("Flow Network publish() err: failed to get point name")
+			log.Errorf("Flow Network publish() err: failed to get point name, incorrect lenght")
 			continue
 		}
 		n := inst.GetNode(payload.nodeUUID)
@@ -172,7 +176,6 @@ func (inst *Network) publish(loopCount uint64) {
 		// TODO: Replace this next bit with Priority Array evaluation
 		if n.GetName() == flowPointWrite {
 			ffPointWriteNode := n.(*FFPointWrite)
-
 			priority = ffPointWriteNode.EvaluateInputsArray(republishLoop)
 			if len(priority) <= 0 {
 				continue
@@ -191,7 +194,7 @@ func (inst *Network) publish(loopCount uint64) {
 				continue
 			}
 			if inst.mqttClient != nil {
-				// fmt.Println("MQTT publish", string(data))
+				fmt.Println("MQTT publish", string(data))
 				err := inst.mqttClient.Publish(pointWriteTopic, mqttQOS, mqttRetain, data)
 				if err != nil {
 					log.Errorf("Flow Network publish() err: %s", err.Error())
