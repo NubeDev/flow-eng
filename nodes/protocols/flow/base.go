@@ -43,6 +43,15 @@ type MqttPoint struct {
 	Priority    *PointWriter `json:"priority,omitempty"`
 }
 
+type errorCode string
+
+const (
+	errorOk                    errorCode = ""
+	errorMQTTClientEmpty       errorCode = "failed to create mqtt client"
+	errorFetchPointMQTTConnect errorCode = "failed to connect to flow-framework"
+	errorFailedFetchPoint      errorCode = "failed to fetch points list from flow-framework"
+)
+
 type point struct {
 	UUID string `json:"uuid"`
 	Name string `json:"name"`

@@ -11,6 +11,7 @@ import (
 
 func (inst *Network) subscribe() {
 	callback := func(client mqtt.Client, message mqtt.Message) {
+		inst.fetchPointResponseCount = 0
 		// log.Infof("Flow Network subscribe(): %+v", message)
 		s := inst.GetStore()
 		children, ok := s.Get(inst.GetID())
@@ -47,11 +48,24 @@ func (inst *Network) subscribe() {
 
 func (inst *Network) fetchPointsList() {
 	var topic = "rubix/platform/points"
+	inst.fetchPointResponseCount++
 	if inst.mqttClient != nil {
 		err := inst.mqttClient.Publish(topic, mqttQOS, false, "")
 		if err != nil {
 			log.Errorf("Flow Network fetchPointsList(): %s err: %s", topic, err.Error())
+			inst.error = true
+			inst.errorCode = errorFetchPointMQTTConnect
+		} else {
+			inst.error = false
+			inst.errorCode = errorOk
 		}
+	} else {
+		inst.error = true
+		inst.errorCode = errorMQTTClientEmpty
+	}
+	if inst.fetchPointResponseCount > 5 {
+		inst.error = true
+		inst.errorCode = errorFailedFetchPoint
 	}
 }
 
@@ -60,7 +74,6 @@ func (inst *Network) fetchPointsList() {
 func (inst *Network) pointsList() {
 	callback := func(client mqtt.Client, message mqtt.Message) {
 		var points []*point
-
 		err := json.Unmarshal(message.Payload(), &points)
 		if err != nil {
 			log.Errorf("failed to get flow-framework points list err: %s", err.Error())

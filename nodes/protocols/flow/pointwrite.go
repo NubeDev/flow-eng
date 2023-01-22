@@ -3,9 +3,11 @@ package flow
 import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/float"
+	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/enescakir/emoji"
+	"time"
 )
 
 type InputData struct {
@@ -26,6 +28,7 @@ type FFPointWrite struct {
 	inputsArray            [17]InputData
 	lastSendFail           bool
 	lastPointPriorityWrite map[string]*float64
+	lastUpdate             time.Time
 }
 
 func NewFFPointWrite(body *node.Spec) (node.Node, error) {
@@ -35,11 +38,14 @@ func NewFFPointWrite(body *node.Spec) (node.Node, error) {
 	in15 := node.BuildInput(node.In15, node.TypeFloat, nil, body.Inputs, nil)
 	in16 := node.BuildInput(node.In16, node.TypeFloat, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(in1, in10, in15, in16)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
+	value := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
+	currentPriority := node.BuildOutput(node.CurrentPriority, node.TypeFloat, nil, body.Outputs)
+	lastUpdated := node.BuildOutput(node.LastUpdated, node.TypeString, nil, body.Outputs)
+	outputs := node.BuildOutputs(value, currentPriority, lastUpdated)
 	body.SetAllowSettings()
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body = node.SetNoParent(body)
-	return &FFPointWrite{body, "", "", [17]InputData{}, false, map[string]*float64{}}, nil
+	return &FFPointWrite{body, "", "", [17]InputData{}, false, map[string]*float64{}, time.Now()}, nil
 }
 
 func (inst *FFPointWrite) set() {
@@ -132,15 +138,19 @@ func (inst *FFPointWrite) Process() {
 		inst.setTopic()
 		inst.checkStillExists()
 	}
-	val, null := inst.GetPayloadNull()
-	if null {
+	val := inst.GetPayload()
+	if val == nil {
 		inst.WritePinNull(node.Out)
 	} else {
-		_, value, _, err := parseCOV(val)
+		_, value, currentPri, err := parseCOV(val.Any)
 		if err == nil {
 			inst.WritePinFloat(node.Out, value)
+			inst.WritePinFloat(node.CurrentPriority, float64(currentPri))
+			inst.lastUpdate = val.LastUpdate
 		}
 	}
+	inst.WritePin(node.LastUpdated, ttime.TimeSince(inst.lastUpdate))
+
 }
 
 func (inst *FFPointWrite) GetLastPriorityWrite() (priorityArrayWrite map[string]*float64) {
