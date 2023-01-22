@@ -2,6 +2,7 @@ package gmail
 
 import (
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"net/smtp"
 
 	"github.com/NubeDev/flow-eng/node"
@@ -45,10 +46,10 @@ func (inst *Gmail) sendEmail() {
 	e.From = settingMap["fromAddress"].(string)
 	e.To = []string{to.(string)}
 	e.Subject = subject.(string)
-	// e.Text = []byte(ed["message"])
 	e.HTML = []byte(message.(string))
 	err := e.Send("smtp.gmail.com:587", smtp.PlainAuth("", settingMap["fromAddress"].(string), settingMap["token"].(string), "smtp.gmail.com"))
 	if err != nil {
+		log.Error(err)
 		return
 	}
 }
@@ -63,7 +64,6 @@ func (inst *Gmail) sendEmail() {
 func (inst *Gmail) Process() {
 	_, cov := inst.InputUpdated(node.TriggerInput)
 	if cov {
-		fmt.Println("TRIGGER EMAIL")
 		inst.sendEmail()
 	}
 }
