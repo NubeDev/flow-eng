@@ -69,7 +69,7 @@ func (inst *AO) Process() {
 			ioType = string(points.IoTypeVolts)
 		}
 		inst.toFlowOptions.precision = settings.Decimal
-		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true, inst.application)
+		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true, inst.application, settings)
 		point.Name = inst.GetNodeName()
 		point, err = inst.store.AddPoint(point, false)
 		if err != nil {

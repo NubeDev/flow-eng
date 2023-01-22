@@ -66,7 +66,15 @@ func modbusBulkWrite(pointsList []*points.Point) [8]float64 {
 					if value > 0 {
 						value = 10
 					}
+				} else {
+					value = value + point.Offset // point offset
 				}
+			}
+			if value >= 10 {
+				value = 10
+			}
+			if value <= 0 {
+				value = 0
 			}
 			out[i] = value
 		}

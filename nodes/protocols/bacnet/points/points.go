@@ -16,6 +16,7 @@ type Point struct {
 	Enable                      bool
 	ValueFromRead               float64
 	PresentValue                float64
+	Offset                      float64
 	WriteValue                  *PriArray
 	WriteValueFromBACnet        *PriArray
 	PendingWriteValueFromBACnet bool
@@ -32,16 +33,6 @@ type ModbusPoints struct {
 	DeviceTwo   []*Point
 	DeviceThree []*Point
 	DeviceFour  []*Point
-}
-
-func (inst *Store) GetPoint(uuid string) *Point {
-	//for _, point := range inst.GetPoints() {
-	//	if point.UUID == uuid {
-	//		return point
-	//	}
-	//}
-
-	return nil
 }
 
 func (inst *Store) mergePriority(p2 *PriArray, in14, in15 *float64) *PriArray {

@@ -128,7 +128,7 @@ func (inst *Server) getPV(objType points.ObjectType, id points.ObjectID) (float6
 func (inst *Server) writePV(objType points.ObjectType, id points.ObjectID, value float64) error {
 	pnt, ok := inst.getPoint(objType, id)
 	if ok {
-		pnt.PresentValue = value
+		pnt.PresentValue = value + pnt.Offset
 		err := inst.updatePoint(objType, id, pnt)
 		if err != nil {
 			return err
