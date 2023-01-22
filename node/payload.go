@@ -3,13 +3,16 @@ package node
 import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/conversions"
+	"time"
 )
 
 type Payload struct {
-	Any any `json:"any,omitempty"`
+	Any        any `json:"any,omitempty"`
+	LastUpdate time.Time
 }
 
 func (n *Spec) SetPayload(body *Payload) {
+	body.LastUpdate = time.Now()
 	n.Payload = body
 }
 func (n *Spec) GetPayload() *Payload {

@@ -21,8 +21,9 @@ func NewFFPoint(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, flowPoint, category)
 	inputs := node.BuildInputs()
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
+	currentPriority := node.BuildOutput(node.CurrentPriority, node.TypeFloat, nil, body.Outputs)
 	lastUpdated := node.BuildOutput(node.LastUpdated, node.TypeString, nil, body.Outputs)
-	outputs := node.BuildOutputs(out, lastUpdated)
+	outputs := node.BuildOutputs(out, currentPriority, lastUpdated)
 	body.SetAllowSettings()
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body = node.SetNoParent(body)
@@ -120,11 +121,12 @@ func (inst *FFPoint) Process() {
 	if null {
 		inst.WritePinNull(node.Out)
 	} else {
-		p, value, _, err := parseCOV(val)
+		p, value, currentPri, err := parseCOV(val)
 		if err == nil && p != nil {
 			inst.lastPayload = p
 			wroteValue = true
 			inst.WritePinFloat(node.Out, value, 2)
+			inst.WritePinFloat(node.CurrentPriority, float64(currentPri))
 			if inst.lastValue != value {
 				inst.lastValue = value
 				inst.lastUpdate = time.Now()
