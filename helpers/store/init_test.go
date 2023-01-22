@@ -56,7 +56,7 @@ func TestInit(t *testing.T) {
 		Topic:    "xyz",
 		Payload:  "payload2",
 	})
-	pprint.PrintJOSN(mqttData)
+	pprint.PrintJSON(mqttData)
 	d, ok = s.Get("mqtt")
 	if !ok {
 		return

@@ -128,10 +128,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	mathAdvanced, _ := mathematics.NewAdvanced(nil)
 
 	// trigger
-	countBool, _ := count.NewCountBool(nil)
+	countNode, _ := count.NewCount(nil)
 	countNum, _ := count.NewCountNum(nil)
 	countString, _ := count.NewCountString(nil)
-	rampNode, _ := count.NewRamp(nil)
 
 	// trigger
 	randomFloat, _ := trigger.NewRandom(nil)
@@ -142,6 +141,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	delayOff, _ := timing.NewDelayOff(nil, nil)
 	dutyCycle, _ := timing.NewDutyCycle(nil)
 	minOnOff, _ := timing.NewMinOnOff(nil)
+	oneShot, _ := timing.NewOneShot(nil)
 
 	// number transformations
 	scaleNode, _ := transformations.NewScale(nil)
@@ -248,16 +248,15 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(delayOff),
 		node.ConvertToSpec(dutyCycle),
 		node.ConvertToSpec(minOnOff),
+		node.ConvertToSpec(oneShot),
 
 		node.ConvertToSpec(randomFloat),
 
 		node.ConvertToSpec(flatLine),
 
-		node.ConvertToSpec(countBool),
+		node.ConvertToSpec(countNode),
 		node.ConvertToSpec(countNum),
 		node.ConvertToSpec(countString),
-
-		node.ConvertToSpec(rampNode),
 
 		node.ConvertToSpec(funcNode),
 
@@ -669,14 +668,12 @@ func builderPoints(body *node.Spec) (node.Node, error) {
 
 func builderCount(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
-	case countBoolNode:
-		return count.NewCountBool(body)
+	case countNode:
+		return count.NewCount(body)
 	case countNumNode:
 		return count.NewCountNum(body)
 	case countStringNode:
 		return count.NewCountString(body)
-	case rampNode:
-		return count.NewRamp(body)
 	}
 	return nil, nil
 }
@@ -701,6 +698,8 @@ func builderTiming(body *node.Spec) (node.Node, error) {
 		return timing.NewDutyCycle(body)
 	case minOnOff:
 		return timing.NewMinOnOff(body)
+	case oneShot:
+		return timing.NewOneShot(body)
 	}
 	return nil, nil
 }

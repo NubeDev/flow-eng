@@ -13,9 +13,9 @@ type Flatline struct {
 }
 
 func NewFlatline(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, flatline, category)
+	body = node.Defaults(body, flatLine, category)
 
-	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs) // TODO: this input shouldn't have a manual override value
+	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, nil) // TODO: this input shouldn't have a manual override value
 	inputs := node.BuildInputs(in)
 	outputs := node.BuildOutputs(node.BuildOutput(node.FlatLine, node.TypeFloat, nil, body.Outputs))
 	/*
@@ -30,7 +30,7 @@ func NewFlatline(body *node.Spec) (node.Node, error) {
 		}
 	*/
 	// body = node.BuildNode(body, inputs, outputs, settings)
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &Flatline{body, nil, 0, false}, nil
 }
 

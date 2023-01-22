@@ -13,7 +13,7 @@ func TestNew(t *testing.T) {
 		Name:        "test",
 		Application: "flow",
 	})
-	pprint.PrintJOSN(connection)
+	pprint.PrintJSON(connection)
 	fmt.Println(err)
 
 	connections, err := db.GetConnections()

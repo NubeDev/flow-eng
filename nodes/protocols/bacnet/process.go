@@ -41,22 +41,3 @@ func fromFlow(body node.Node, objectId points.ObjectID) (*float64, *float64) {
 	}
 	return in14, in15
 }
-
-//func fromBacnet(msg interface{}, store *points.Store) error {
-//	payload := points.NewPayload()
-//	err := payload.NewMessage(msg)
-//	if err != nil {
-//		return err
-//	}
-//	topic := payload.GetTopic()
-//	objectType, objectId := payload.GetObjectID()
-//	point := store.GetPointByObject(objectType, objectId)
-//	if point == nil {
-//		return errors.New(fmt.Sprintf("mqtt-payload-priorty-array no point-found in store for type:%s-%d", objectType, objectId))
-//	}
-//	if topics.IsPri(topic) {
-//		value := payload.GetFullPriority()
-//		store.CreateSync(value, objectType, objectId, points.FromMqttPriory, nil, nil)
-//	}
-//	return nil
-//}

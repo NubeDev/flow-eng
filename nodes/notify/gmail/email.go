@@ -20,6 +20,7 @@ type Gmail struct {
 
 func NewGmail(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, gmailNode, notify.Category)
+
 	to := node.BuildInput(node.To, node.TypeString, nil, body.Inputs)
 	subject := node.BuildInput(node.Subject, node.TypeString, nil, body.Inputs)
 	message := node.BuildInput(node.Message, node.TypeString, nil, body.Inputs)
@@ -28,6 +29,12 @@ func NewGmail(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetHelp(fmt.Sprintln("Please format the message in HTML. Instructions to generate gmail application token. \n 1. Go to your Google Account. \n 2. Select Security. \n 3. Under 'Signing in to Google,' select App Passwords. You may need to sign in. 4. At the bottom, choose Select app and choose the app you using and then Select device and choose the device you’re using and then Generate."))
+
+	address, err := getSettings(body)
+	if err != nil {
+		return nil, err
+	}
+
 	body.SetSchema(buildSchema())
 	return &Gmail{body}, nil
 }

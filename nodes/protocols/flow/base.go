@@ -19,6 +19,10 @@ const (
 	flowPointWrite = "flow-point-write"
 )
 
+const (
+	pointError = "point deleted or never selected"
+)
+
 type covPayload struct {
 	Value    float64 `json:"value"`
 	ValueRaw float64 `json:"value_raw"`
@@ -38,6 +42,15 @@ type MqttPoint struct {
 	PointUUID   string       `json:"point_uuid,omitempty"`
 	Priority    *PointWriter `json:"priority,omitempty"`
 }
+
+type errorCode string
+
+const (
+	errorOk                    errorCode = ""
+	errorMQTTClientEmpty       errorCode = "failed to create mqtt client"
+	errorFetchPointMQTTConnect errorCode = "failed to connect to flow-framework"
+	errorFailedFetchPoint      errorCode = "failed to fetch points list from flow-framework"
+)
 
 type point struct {
 	UUID string `json:"uuid"`

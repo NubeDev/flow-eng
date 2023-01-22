@@ -69,9 +69,9 @@ const (
 	rank      = "rank"
 	median    = "median"
 
-	flatLine = "flatLine"
+	flatLine = "flatline"
 
-	//filters
+	// filters
 	preventNull        = "prevent-null"
 	preventEqualFloat  = "prevent-equal-float"
 	preventEqualString = "prevent-equal-string"
@@ -81,7 +81,7 @@ const (
 	preventDuplicates  = "prevent-duplicates"
 
 	// count
-	countBoolNode   = "count-bool"
+	countNode       = "count"
 	countNumNode    = "count-number"
 	countStringNode = "count-string"
 
@@ -94,6 +94,7 @@ const (
 	delayOff  = "delay-off"
 	dutyCycle = "duty-cycle"
 	minOnOff  = "min-on-off"
+	oneShot   = "one-shot"
 
 	// switch
 	switchNode = "switch"

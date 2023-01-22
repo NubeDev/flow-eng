@@ -163,7 +163,7 @@ func NewClient(options ClientOptions) (c *Client, err error) {
 	opts.SetPingTimeout(options.SetPingTimeout * time.Second)
 
 	opts.OnConnectionLost = func(c mqtt.Client, err error) {
-		topicLog{"error", "Lost link", nil}.logErr()
+		log.Errorf("mqtt lost connection: %s", err.Error())
 	}
 	opts.OnConnect = func(cc mqtt.Client) {
 		topicLog{"msg", "connected", nil}.logInfo()

@@ -11,11 +11,11 @@ type Filter struct {
 
 func NewFilter(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, jsonFilter, category)
-	in := node.BuildInput(node.In, node.TypeString, nil, body.Inputs)
-	equation := node.BuildInput(node.Filter, node.TypeString, nil, body.Inputs)
+	in := node.BuildInput(node.In, node.TypeString, nil, body.Inputs, nil)
+	equation := node.BuildInput(node.Filter, node.TypeString, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(in, equation)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &Filter{body}, nil
 }
 

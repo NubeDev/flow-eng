@@ -13,26 +13,26 @@ const (
 
 func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error) {
 	body = node.Defaults(body, nodeName, category)
-	//buildCount, setting, value, err := node.NewSetting(body, &node.SettingOptions{Type: node.Number, Title: node.InputCount, Min: 2, Max: 20})
-	//if err != nil {
+	// buildCount, setting, value, err := node.NewSetting(body, &node.SettingOptions{Type: node.Number, Title: node.InputCount, Min: 2, Max: 20})
+	// if err != nil {
 	//	return nil, err
-	//}
-	//settings, err := node.BuildSettings(setting)
-	//if err != nil {
+	// }
+	// settings, err := node.BuildSettings(setting)
+	// if err != nil {
 	//	return nil, err
-	//}
-	//count, ok := value.(int)
-	//if !ok {
+	// }
+	// count, ok := value.(int)
+	// if !ok {
 	//	count = 2
-	//}
+	// }
 	var nodeInputs []*node.Input
-	selection := node.BuildInput(node.Selection, node.TypeFloat, nil, body.Inputs) // TODO: this input shouldn't have a manual override value
+	selection := node.BuildInput(node.Selection, node.TypeFloat, nil, body.Inputs, nil) // TODO: this input shouldn't have a manual override value
 	inputsCount := node.DynamicInputs(node.TypeFloat, nil, 2, 2, 20, body.Inputs, node.ABCs)
 	nodeInputs = append(nodeInputs, selection)
 	nodeInputs = append(nodeInputs, inputsCount...)
 	inputs := node.BuildInputs(nodeInputs...)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
-	body = node.BuildNode(body, inputs, outputs, nil)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return body, nil
 }
 

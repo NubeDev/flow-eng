@@ -23,6 +23,6 @@ func Test_Decode(t *testing.T) {
 	json.Unmarshal(byteValue, &nodesParsed)
 	decode, err := Decode(nodesParsed)
 
-	pprint.PrintJOSN(FilterNodes(decode, FilterIsChild, ""))
+	pprint.PrintJSON(FilterNodes(decode, FilterIsChild, ""))
 
 }

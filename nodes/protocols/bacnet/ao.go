@@ -69,7 +69,7 @@ func (inst *AO) Process() {
 			ioType = string(points.IoTypeVolts)
 		}
 		inst.toFlowOptions.precision = settings.Decimal
-		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true, inst.application)
+		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true, inst.application, settings)
 		point.Name = inst.GetNodeName()
 		point, err = inst.store.AddPoint(point, false)
 		if err != nil {
@@ -81,7 +81,8 @@ func (inst *AO) Process() {
 	in14, in15 := fromFlow(inst, inst.objectID)
 	pnt := inst.writePointPri(points.AnalogOutput, inst.objectID, in14, in15)
 	if pnt != nil {
-		inst.WritePinFloat(node.Out, pnt.PresentValue, 2)
+		value := modbusScaleOutput(pnt.PresentValue, pnt.Offset)
+		inst.WritePinFloat(node.Out, value, 2)
 		currentPriority := points.GetHighest(pnt.WriteValue)
 		if currentPriority != nil {
 			inst.WritePinFloat(node.CurrentPriority, float64(currentPriority.Number), 0)
