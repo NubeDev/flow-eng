@@ -53,7 +53,7 @@ func (inst *AV) Process() {
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
 		settings, err := getSettings(inst.GetSettings())
 		inst.setObjectId(settings)
-		point := addPoint(points.IoTypeNumber, objectType, inst.objectID, isWriteable, isIO, true, inst.application)
+		point := addPoint(points.IoTypeNumber, objectType, inst.objectID, isWriteable, isIO, true, inst.application, settings)
 		point.Name = inst.GetNodeName()
 		point, err = inst.store.AddPoint(point, false)
 		if err != nil {

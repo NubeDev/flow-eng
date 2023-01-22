@@ -63,6 +63,7 @@ func GetBacnetSchema(body map[string]interface{}) (*BacnetSchema, error) {
 type nodeSchema struct {
 	Io      schemas.EnumString `json:"ioType"`
 	Decimal schemas.Number     `json:"decimal"`
+	Offset  schemas.Number     `json:"offset"`
 }
 
 func buildSchemaUI() *schemas.Schema {
@@ -71,8 +72,14 @@ func buildSchemaUI() *schemas.Schema {
 	props.Io.Default = string(points.IoTypeVolts)
 	props.Io.Options = []string{string(points.IoTypeVolts), string(points.IoTypeDigital), string(points.IoTypeTemp), string(points.IoTypeCurrent)}
 	props.Io.EnumName = []string{string(points.IoTypeVolts), string(points.IoTypeDigital), string(points.IoTypeTemp), string(points.IoTypeCurrent)}
+
 	props.Decimal.Title = "decimal places"
 	props.Decimal.Default = 2
+
+	props.Offset.Title = "offset"
+	props.Offset.Default = 0
+	props.Offset.Minimum = -100000000
+	props.Offset.Maximum = 100000000
 	schema.Set(props)
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{
@@ -90,8 +97,15 @@ func buildSchemaUO() *schemas.Schema {
 	props.Io.Default = string(points.IoTypeVolts)
 	props.Io.Options = []string{string(points.IoTypeVolts), string(points.IoTypeDigital)}
 	props.Io.EnumName = []string{string(points.IoTypeVolts), string(points.IoTypeDigital)}
+
 	props.Decimal.Title = "decimal places"
 	props.Decimal.Default = 2
+
+	props.Offset.Title = "offset"
+	props.Offset.Default = 0
+	props.Offset.Minimum = -100000000
+	props.Offset.Maximum = 100000000
+
 	schema.Set(props)
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{
@@ -104,8 +118,9 @@ func buildSchemaUO() *schemas.Schema {
 }
 
 type nodeSettings struct {
-	Io      string `json:"ioType"`
-	Decimal int    `json:"decimal"`
+	Io      string  `json:"ioType"`
+	Decimal int     `json:"decimal"`
+	Offset  float64 `json:"offset"`
 }
 
 func getSettings(body map[string]interface{}) (*nodeSettings, error) {
