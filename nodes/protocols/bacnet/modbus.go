@@ -52,6 +52,17 @@ func (inst *Server) modbusRunner(settings map[string]interface{}) {
 	}
 }
 
+func modbusScaleOutput(value, offset float64) float64 {
+	value = value + offset
+	if value >= 10 {
+		value = 10
+	}
+	if value <= 0 {
+		value = 0
+	}
+	return value
+}
+
 func modbusBulkWrite(pointsList []*points.Point) [8]float64 {
 	var out [8]float64
 	for i, point := range pointsList {
@@ -67,14 +78,8 @@ func modbusBulkWrite(pointsList []*points.Point) [8]float64 {
 						value = 10
 					}
 				} else {
-					value = value + point.Offset // point offset
+					value = modbusScaleOutput(value, point.Offset) // point offset
 				}
-			}
-			if value >= 10 {
-				value = 10
-			}
-			if value <= 0 {
-				value = 0
 			}
 			out[i] = value
 		}
