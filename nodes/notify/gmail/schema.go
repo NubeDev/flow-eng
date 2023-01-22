@@ -7,17 +7,17 @@ import (
 )
 
 type nodeSchema struct {
-	Address  schemas.String `json:"address"`
-	Password schemas.String `json:"password"`
+	FromAddress schemas.String `json:"fromAddress"`
+	Token       schemas.String `json:"token"`
 }
 
 func buildSchema() *schemas.Schema {
 	props := &nodeSchema{}
-	props.Address.Title = "address"
-	props.Address.Default = "noreply@nube-io.com, noreply@nube-io.com"
+	props.FromAddress.Title = "From Address"
+	props.FromAddress.Default = "noreply@nube-io.com"
 	schema.Set(props)
 	uiSchema := array.Map{
-		"password": array.Map{
+		"token": array.Map{
 			"ui:widget": "password",
 		},
 	}

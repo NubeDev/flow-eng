@@ -1,12 +1,11 @@
 package gmail
 
 import (
-	"fmt"
-	pprint "github.com/NubeDev/flow-eng/helpers/print"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/notify"
 	"github.com/jordan-wright/email"
 	"github.com/mitchellh/mapstructure"
+	log "github.com/sirupsen/logrus"
 	"net/smtp"
 	"strings"
 )
@@ -56,17 +55,22 @@ func NewGmail(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Gmail) sendEmail() {
-	connection, err := inst.GetDB().GetConnection("")
-	pprint.Print(connection)
+	to := inst.GetInput(node.To).GetValue()
+	subject := inst.GetInput(node.Subject).GetValue()
+	message := inst.GetInput(node.Message).GetValue()
+	settingMap := inst.GetSettings()
+	if settingMap == nil {
+		return
+	}
 	e := email.NewEmail()
-	e.From = "nubeio <noreply@nube-io.com>"
-	e.To = []string{"ap@nube-io.com"}
-	e.Subject = "test"
-	e.Text = []byte("Text Body is, of course, supported!")
-	e.HTML = []byte("<h1>Fancy HTML is supported, too!</h1>")
-	err = e.Send("smtp.gmail.com:587", smtp.PlainAuth("", "noreply@nube-io.com", "22222-11eb-111111111", "smtp.gmail.com"))
-	fmt.Println(err)
+	e.From = settingMap["fromAddress"].(string)
+	e.To = []string{to.(string)}
+	e.Subject = subject.(string)
+	// e.Text = []byte(ed["message"])
+	e.HTML = []byte(message.(string))
+	err := e.Send("smtp.gmail.com:587", smtp.PlainAuth("", settingMap["fromAddress"].(string), settingMap["token"].(string), "smtp.gmail.com"))
 	if err != nil {
+		log.Error(err)
 		return
 	}
 
@@ -75,8 +79,7 @@ func (inst *Gmail) sendEmail() {
 func (inst *Gmail) Process() {
 	_, cov := inst.InputUpdated(node.TriggerInput)
 	if cov {
-		fmt.Println("TRIGGER EMAIL")
-		// inst.sendEmail()
+		inst.sendEmail()
 	}
 
 }
