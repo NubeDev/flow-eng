@@ -19,6 +19,13 @@ func New() *Flow {
 }
 
 func (p *Flow) Get() *Flow {
+	var nodes []node.Node
+	for _, n := range p.nodes {
+		n.SortInputs()
+		n.SortOutputs()
+		nodes = append(nodes, n)
+	}
+	p.nodes = nodes
 	return p
 }
 

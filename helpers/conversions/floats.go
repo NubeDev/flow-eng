@@ -124,6 +124,11 @@ func GetFloat(in interface{}) (val float64) {
 		} else {
 			val = 0
 		}
+	case interface{}:
+		s := fmt.Sprint(in)
+		if s, err := strconv.ParseFloat(s, 64); err == nil {
+			val = s
+		}
 	default:
 		return 0
 	}

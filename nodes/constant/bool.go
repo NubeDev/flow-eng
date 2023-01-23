@@ -24,5 +24,4 @@ func (inst *Boolean) Process() {
 	} else {
 		inst.WritePinBool(node.Out, v)
 	}
-
 }

@@ -29,7 +29,7 @@ func NewDutyCycle(body *node.Spec) (node.Node, error) {
 	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, str.New("interval"))
 	dutyCycleInput := node.BuildInput(node.DutyCycle, node.TypeFloat, nil, body.Inputs, str.New("duty_cycle"))
 	inputs := node.BuildInputs(enable, interval, dutyCycleInput)
-	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
+	out := node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	node := &DutyCycle{body, nil, nil, nil, 10, 50, false}
@@ -43,7 +43,7 @@ func (inst *DutyCycle) Process() {
 	if !enable {
 		inst.disableDutyCycle()
 		inst.lastEnable = false
-		inst.WritePinFalse(node.Out)
+		inst.WritePinFalse(node.Outp)
 		return
 	}
 
@@ -100,9 +100,9 @@ func (inst *DutyCycle) restartDutyCycle(intervalDuration time.Duration, dutyCycl
 }
 
 func (inst *DutyCycle) startIteration(delayBetweenOnAndOffDuration time.Duration) {
-	inst.WritePinTrue(node.Out)
+	inst.WritePinTrue(node.Outp)
 	inst.offTimer = time.AfterFunc(delayBetweenOnAndOffDuration, func() {
-		inst.WritePinFalse(node.Out)
+		inst.WritePinFalse(node.Outp)
 	})
 }
 

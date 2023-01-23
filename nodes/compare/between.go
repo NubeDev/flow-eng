@@ -12,12 +12,12 @@ type Between struct {
 func NewBetween(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, betweenNode, category)
 
-	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, nil)
+	in := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, nil)
 	from := node.BuildInput(node.From, node.TypeFloat, nil, body.Inputs, nil)
 	to := node.BuildInput(node.To, node.TypeFloat, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(in, from, to)
 
-	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
+	out := node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs)
 	outNot := node.BuildOutput(node.OutNot, node.TypeBool, nil, body.Outputs)
 	above := node.BuildOutput(node.Above, node.TypeBool, nil, body.Outputs)
 	below := node.BuildOutput(node.Below, node.TypeBool, nil, body.Outputs)
@@ -28,19 +28,19 @@ func NewBetween(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Between) Process() {
-	in, inNull := inst.ReadPinAsFloat(node.In)
+	in, inNull := inst.ReadPinAsFloat(node.Inp)
 	from, fromNull := inst.ReadPinAsFloat(node.From)
 	to, toNull := inst.ReadPinAsFloat(node.To)
 
 	if inNull || fromNull || toNull {
-		inst.WritePin(node.Out, false)
+		inst.WritePin(node.Outp, false)
 		inst.WritePin(node.OutNot, true)
 		inst.WritePin(node.Above, false)
 		inst.WritePin(node.Below, false)
 	}
 
 	between, below, above := array.Between(in, from, to)
-	inst.WritePin(node.Out, between)
+	inst.WritePin(node.Outp, between)
 	inst.WritePin(node.OutNot, !between)
 	inst.WritePin(node.Above, above)
 	inst.WritePin(node.Below, below)

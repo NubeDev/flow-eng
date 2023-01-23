@@ -27,7 +27,7 @@ func NewOneShot(body *node.Spec) (node.Node, error) {
 	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, str.New("interval"))
 	inputs := node.BuildInputs(trigger, reset, interval)
 
-	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
+	out := node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
@@ -68,11 +68,11 @@ func (inst *OneShot) StartOneShot(duration time.Duration) {
 		inst.StopOneShotTimer(false)
 	}
 	inst.timer = time.AfterFunc(duration, func() {
-		inst.WritePinFalse(node.Out)
+		inst.WritePinFalse(node.Outp)
 		inst.outputActive = false
 		inst.timer = nil
 	})
-	inst.WritePinTrue(node.Out)
+	inst.WritePinTrue(node.Outp)
 	inst.outputActive = true
 }
 
@@ -81,13 +81,13 @@ func (inst *OneShot) StopOneShotTimer(reset bool) {
 		inst.timer.Stop()
 	}
 	if reset {
-		inst.WritePinFalse(node.Out)
+		inst.WritePinFalse(node.Outp)
 		inst.outputActive = false
 	}
 }
 
 func (inst *OneShot) Start() {
-	inst.WritePinFalse(node.Out)
+	inst.WritePinFalse(node.Outp)
 	inst.outputActive = false
 }
 

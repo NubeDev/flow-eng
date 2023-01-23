@@ -14,6 +14,8 @@ func NewNumber(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetHelp(constHelp)
+	body.SetAllowPayload()
+	body.SetPayloadType(node.TypeNumber)
 	return &Number{body}, nil
 }
 
@@ -23,5 +25,9 @@ func (inst *Number) Process() {
 		inst.WritePinNull(node.Out)
 	} else {
 		inst.WritePinFloat(node.Out, in1)
+	}
+	v, null := inst.ReadPayloadAsFloat()
+	if !null {
+		inst.OverrideInputValue(node.In, v)
 	}
 }

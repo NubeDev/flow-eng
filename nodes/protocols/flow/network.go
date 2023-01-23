@@ -12,13 +12,16 @@ import (
 
 type Network struct {
 	*node.Spec
-	firstLoop     bool
-	loopCount     uint64
-	connection    *db.Connection
-	mqttClient    *mqttclient.Client
-	mqttConnected bool
-	points        []*point
-	pointsCount   int
+	firstLoop               bool
+	loopCount               uint64
+	connection              *db.Connection
+	mqttClient              *mqttclient.Client
+	mqttConnected           bool
+	points                  []*point
+	pointsCount             int
+	errorCode               errorCode
+	error                   bool
+	fetchPointResponseCount int
 }
 
 var mqttQOS = mqttclient.AtMostOnce
@@ -31,7 +34,7 @@ func NewNetwork(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(node.BuildOutput(node.Connected, node.TypeBool, nil, body.Outputs))
 	body.IsParent = true
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	network := &Network{body, false, 0, nil, nil, false, nil, 0}
+	network := &Network{body, false, 0, nil, nil, false, nil, 0, "", false, 0}
 	return network, nil
 }
 
@@ -120,7 +123,18 @@ func (inst *Network) Process() {
 	}
 	if loopCount%50 == 0 { // get the points every 50 loops
 		inst.fetchPointsList()
+		inst.connectionError()
 	} else if loopCount%110 == 0 { // refresh point COV
 		inst.fetchAllPointValues()
+	}
+}
+
+func (inst *Network) connectionError() {
+	if inst.error {
+		inst.SetStatusError(string(inst.errorCode))
+		inst.SetErrorIcon(string(emoji.RedCircle))
+	} else {
+		inst.SetStatusError(string(inst.errorCode))
+		inst.SetErrorIcon(string(emoji.GreenCircle))
 	}
 }

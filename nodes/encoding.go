@@ -39,6 +39,8 @@ func Encode(graph *flowctrl.Flow) (*NodesList, error) {
 			// for a node we need its input and see if it has a link, if so we need the uuid of the node its link to
 			for _, input := range _node.GetInputs() {
 				inputsLinks := node.SchemaInputs{}
+				inputsLinks.Position = input.Position
+				inputsLinks.OverridePosition = input.OverridePosition
 				// check the input has links
 				destOutputName := input.Connection.NodePort
 				if destOutputName != "" {
@@ -48,15 +50,16 @@ func Encode(graph *flowctrl.Flow) (*NodesList, error) {
 					inputsLinks.Links = append(inputsLinks.Links, link)
 					links[string(input.Name)] = inputsLinks
 					nodeSchema.Inputs = links
+				} else if input.Connection.OverrideValue != nil {
+					inputsLinks.Value = input.Connection.OverrideValue
+					links[string(input.Name)] = inputsLinks
+					nodeSchema.Inputs = links
 				} else {
-					if input.Connection.OverrideValue != nil {
-						inputsLinks = node.SchemaInputs{}
-						inputsLinks.Value = input.Connection.OverrideValue
-						links[string(input.Name)] = inputsLinks
-						nodeSchema.Inputs = links
-					}
+					links[string(input.Name)] = inputsLinks
+					nodeSchema.Inputs = links
 				}
 			}
+			// fmt.Println(links)
 			listSchema = append(listSchema, nodeSchema)
 		} else { // if a node has no input then add it here
 			listSchema = append(listSchema, nodeSchema)
