@@ -16,6 +16,7 @@ const (
 	dutyCycle = "duty-cycle"
 	minOnOff  = "min-on-off"
 	oneShot   = "one-shot"
+	stopwatch = "stopwatch"
 )
 
 type defaultNodeSchema struct {

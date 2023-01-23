@@ -32,6 +32,7 @@ const (
 
 	scaleNode = "scale"
 	limitNode = "limit"
+	fade      = "fade"
 
 	dataStore  = "data-store"
 	jsonFilter = "json-filter"
@@ -97,6 +98,7 @@ const (
 	dutyCycle = "duty-cycle"
 	minOnOff  = "min-on-off"
 	oneShot   = "one-shot"
+	stopwatch = "stopwatch"
 
 	// switch
 	switchNode = "switch"
