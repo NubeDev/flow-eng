@@ -86,10 +86,10 @@ const (
 	countStringNode = "count-string"
 
 	// trigger
-	covNode         = "change-of-value"
-	randomFloatNode = "random-number"
-	injectNode      = "inject"
-	iterate         = "iterate"
+	covNode    = "change-of-value"
+	random     = "random"
+	injectNode = "inject"
+	iterate    = "iterate"
 
 	delay     = "delay"
 	delayOn   = "delay-on"

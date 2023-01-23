@@ -686,7 +686,7 @@ func builderTrigger(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case covNode:
 		return trigger.NewCOVNode(body)
-	case randomFloatNode:
+	case random:
 		return trigger.NewRandom(body)
 	case iterate:
 		return trigger.NewIterate(body)

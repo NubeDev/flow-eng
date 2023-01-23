@@ -7,5 +7,5 @@ const (
 	COV         = "change-of-value"
 	Iterator    = "iterate"
 	Inject      = "inject"
-	RandomFloat = "random-number"
+	RandomFloat = "random"
 )

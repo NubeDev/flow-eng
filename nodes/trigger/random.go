@@ -13,7 +13,8 @@ import (
 
 type Random struct {
 	*node.Spec
-	lastInput bool
+	lastInput  bool
+	lastOutput float64
 }
 
 func NewRandom(body *node.Spec) (node.Node, error) {
@@ -29,7 +30,7 @@ func NewRandom(body *node.Spec) (node.Node, error) {
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetHelp("When ‘trigger’ transitions from ‘false’ to ‘true’, a random number between ‘min’ and ‘max’ values is produced at ‘output’. The number of decimal places that ‘output’ values have can be set from settings.")
 
-	node := &Random{body, true}
+	node := &Random{body, true, 0}
 	node.SetSchema(node.buildSchema())
 	return node, nil
 }
@@ -46,9 +47,12 @@ func (inst *Random) Process() {
 			return
 		}
 		precision := settings.Precision
-		inst.WritePinFloat(node.Outp, float.RandFloat(min, max), precision)
+		random := float.RandFloat(min, max)
+		inst.WritePinFloat(node.Outp, random, precision)
+		inst.lastOutput = random
 	}
 	inst.lastInput = input
+	inst.WritePinFloat(node.Outp, inst.lastOutput)
 }
 
 // Custom Node Settings Schema

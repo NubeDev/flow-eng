@@ -9,6 +9,7 @@ import (
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
 	"math"
+	"strconv"
 	"time"
 
 	"github.com/NubeDev/flow-eng/node"
@@ -72,9 +73,8 @@ func (inst *Iterate) Process() {
 		inst.WritePinBool(node.Complete, false)
 		// calculate period
 		period := time.Duration(int64(intervalDuration) / int64(iterations))
-		fmt.Println("Interval: ", intervalDuration.String(), "  Iterations: ", iterations, " iterationPeriod:", period.String())
 		inst.c = make(chan int, 1)
-		go iterate(inst, inst.c, period, iterations)
+		go iterate(inst, inst.c, period, iterations, stop)
 		inst.running = true
 	}
 	inst.lastStart = start
@@ -102,11 +102,22 @@ func (inst *Iterate) Process() {
 			inst.instructedPause = false
 		}
 	}
+	complete := inst.iterationCompleted == iterations
+	inst.WritePinBool(node.Complete, complete)
+	inst.WritePinFloat(node.CountOut, inst.iterationCompleted)
+	if !inst.running {
+		inst.WritePinBool(node.Outp, false)
+	}
 }
 
-func iterate(inst *Iterate, c chan int, duration time.Duration, iterations float64) {
+func iterate(inst *Iterate, c chan int, duration time.Duration, iterations float64, startOnPause bool) {
 	// set state to 'run' when iteration starts
 	state := Run
+	if startOnPause {
+		state = Pause
+		inst.WritePinFloat(node.CountOut, 0)
+		inst.WritePinBool(node.Outp, false)
+	}
 	for {
 		// check for terminal condition
 		if iterations-inst.iterationCompleted == 0 {
@@ -135,9 +146,9 @@ func iterate(inst *Iterate, c chan int, duration time.Duration, iterations float
 				if state == Pause {
 					break
 				}
-				// write the current iteration number, starting from 0
-				inst.WritePinFloat(node.CountOut, inst.iterationCompleted)
+				// write the current iteration number, starting from 1
 				inst.iterationCompleted++
+				inst.WritePinFloat(node.CountOut, inst.iterationCompleted)
 				// write out the waveform, 'true' for first half period, and 'false' for the second half
 				// this arrangement allows the program to stop on false when stop become true
 				inst.WritePinBool(node.Outp, true)
@@ -150,8 +161,9 @@ func iterate(inst *Iterate, c chan int, duration time.Duration, iterations float
 }
 
 func (inst *Iterate) setSubtitle(intervalDuration time.Duration, iterations int) {
-	subtitleText := intervalDuration.String()
-	subtitleText += fmt.Sprintf(";  Iterations: %f", iterations)
+	subtitleText := strconv.Itoa(iterations)
+	subtitleText += " iterations over "
+	subtitleText += intervalDuration.String()
 	inst.SetSubTitle(subtitleText)
 }
 
@@ -180,7 +192,7 @@ func (inst *Iterate) buildSchema() *schemas.Schema {
 
 	// time selection
 	props.Interval.Title = "Interval"
-	props.Interval.Default = 1
+	props.Interval.Default = 10
 	props.IntervalTimeUnits.Title = "Interval Units"
 	props.IntervalTimeUnits.Default = ttime.Sec
 	props.IntervalTimeUnits.Options = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
@@ -188,7 +200,7 @@ func (inst *Iterate) buildSchema() *schemas.Schema {
 
 	// iterations
 	props.Iterations.Title = "Iterations"
-	props.Iterations.Default = 2
+	props.Iterations.Default = 5
 
 	schema.Set(props)
 

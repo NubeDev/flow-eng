@@ -49,6 +49,7 @@ func (inst *COVNode) Process() {
 		inst.lastInterval = intervalDuration
 		inst.lastThreshold = covThreshold
 	}
+	intervalDuration.Seconds()
 
 	// outputs false if the input is nil or there is no lastValue
 	if inputNull || inst.lastValue == nil {
@@ -74,8 +75,8 @@ func writeOutput(inst *COVNode, duration time.Duration) {
 }
 
 func (inst *COVNode) setSubtitle(intervalDuration time.Duration, threshold float64) {
-	subtitleText := intervalDuration.String()
-	subtitleText += fmt.Sprintf("  %f", threshold)
+	subtitleText := fmt.Sprintf("theshold:  %f, interval: ", threshold)
+	subtitleText += intervalDuration.String()
 	inst.SetSubTitle(subtitleText)
 }
 
