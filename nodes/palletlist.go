@@ -3,6 +3,7 @@ package nodes
 import (
 	"errors"
 	"fmt"
+	"github.com/NubeDev/flow-eng/nodes/trigger"
 
 	"github.com/NubeDev/flow-eng/db"
 	"github.com/NubeDev/flow-eng/helpers/store"
@@ -34,7 +35,6 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/subflow"
 	switches "github.com/NubeDev/flow-eng/nodes/switch"
 	"github.com/NubeDev/flow-eng/nodes/system"
-	trigger "github.com/NubeDev/flow-eng/nodes/tigger"
 	"github.com/NubeDev/flow-eng/nodes/timing"
 	"github.com/NubeDev/flow-eng/nodes/transformations"
 )
@@ -132,8 +132,10 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	countNum, _ := count.NewCountNum(nil)
 	countString, _ := count.NewCountString(nil)
 
-	// trigger
-	randomFloat, _ := trigger.NewRandom(nil)
+	// triggers
+	cov, _ := trigger.NewCOVNode(nil)
+	random, _ := trigger.NewRandom(nil)
+	iterate, _ := trigger.NewIterate(nil)
 
 	// time
 	delay, _ := timing.NewDelay(nil)
@@ -250,7 +252,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(minOnOff),
 		node.ConvertToSpec(oneShot),
 
-		node.ConvertToSpec(randomFloat),
+		node.ConvertToSpec(cov),
+		node.ConvertToSpec(random),
+		node.ConvertToSpec(iterate),
 
 		node.ConvertToSpec(flatLine),
 
@@ -680,8 +684,12 @@ func builderCount(body *node.Spec) (node.Node, error) {
 
 func builderTrigger(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
-	case randomFloat:
+	case covNode:
+		return trigger.NewCOVNode(body)
+	case random:
 		return trigger.NewRandom(body)
+	case iterate:
+		return trigger.NewIterate(body)
 	}
 	return nil, nil
 }

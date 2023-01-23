@@ -103,15 +103,15 @@ func (inst *OneShot) setSubtitle(intervalDuration time.Duration) {
 // Custom Node Settings Schema
 
 type OneShotSettingsSchema struct {
-	Interval  schemas.Number     `json:"interval"`
-	TimeUnits schemas.EnumString `json:"interval_time_units"`
-	Retrigger schemas.Boolean    `json:"retrigger"`
+	Interval          schemas.Number     `json:"interval"`
+	IntervalTimeUnits schemas.EnumString `json:"interval_time_units"`
+	Retrigger         schemas.Boolean    `json:"retrigger"`
 }
 
 type OneShotSettings struct {
-	Interval  float64 `json:"interval"`
-	TimeUnits string  `json:"interval_time_units"`
-	Retrigger bool    `json:"retrigger"`
+	Interval          float64 `json:"interval"`
+	IntervalTimeUnits string  `json:"interval_time_units"`
+	Retrigger         bool    `json:"retrigger"`
 }
 
 func (inst *OneShot) buildSchema() *schemas.Schema {
@@ -121,10 +121,10 @@ func (inst *OneShot) buildSchema() *schemas.Schema {
 	props.Interval.Default = 1
 
 	// time selection
-	props.TimeUnits.Title = "Interval Units"
-	props.TimeUnits.Default = ttime.Sec
-	props.TimeUnits.Options = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
-	props.TimeUnits.EnumName = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
+	props.IntervalTimeUnits.Title = "Interval Units"
+	props.IntervalTimeUnits.Default = ttime.Sec
+	props.IntervalTimeUnits.Options = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
+	props.IntervalTimeUnits.EnumName = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
 
 	// retrigger selection
 	props.Retrigger.Title = "Retrigger"
