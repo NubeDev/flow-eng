@@ -100,7 +100,7 @@ func (inst *COVNode) buildSchema() *schemas.Schema {
 
 	// name
 	props.Name.Title = "Name"
-	props.Name.Default = "Random"
+	props.Name.Default = "Change-Of-Value"
 
 	// time selection
 	props.Interval.Title = "Interval"

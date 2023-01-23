@@ -5,7 +5,7 @@ type TimeUnits string
 const (
 	Category    = "trigger"
 	COV         = "change-of-value"
-	Iterator    = "iterator"
+	Iterator    = "iterate"
 	Inject      = "inject"
 	RandomFloat = "random-number"
 )

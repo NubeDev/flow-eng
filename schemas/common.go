@@ -75,3 +75,13 @@ type EnumInt struct {
 	Options  []int  `json:"enum" default:"[]"`
 	EnumName []int  `json:"enumNames" default:"[]"`
 }
+
+type Integer struct {
+	Type     string  `json:"type" default:"integer"`
+	Title    string  `json:"title" default:""`
+	Default  int     `json:"default" default:"0"`
+	Help     string  `json:"help" default:""`
+	ReadOnly bool    `json:"readOnly" default:"false"`
+	Minimum  float64 `json:"minimum" default:"0"`
+	Maximum  float64 `json:"maximum" default:"100"`
+}

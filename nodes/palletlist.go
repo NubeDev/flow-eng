@@ -37,9 +37,6 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/system"
 	"github.com/NubeDev/flow-eng/nodes/timing"
 	"github.com/NubeDev/flow-eng/nodes/transformations"
-
-	"github.com/NubeDev/flow-eng/nodes/trigger/inject"
-	"github.com/NubeDev/flow-eng/nodes/trigger/iterator"
 )
 
 const (
@@ -138,8 +135,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	// triggers
 	cov, _ := trigger.NewCOVNode(nil)
 	random, _ := trigger.NewRandom(nil)
-	inject, _ := inject.NewInject(nil)
-	iterator, _ := iterator.NewIterator(nil)
+	iterate, _ := trigger.NewIterate(nil)
 
 	// time
 	delay, _ := timing.NewDelay(nil)
@@ -258,8 +254,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(cov),
 		node.ConvertToSpec(random),
-		node.ConvertToSpec(inject),
-		node.ConvertToSpec(iterator),
+		node.ConvertToSpec(iterate),
 
 		node.ConvertToSpec(flatLine),
 
@@ -693,10 +688,8 @@ func builderTrigger(body *node.Spec) (node.Node, error) {
 		return trigger.NewCOVNode(body)
 	case randomFloatNode:
 		return trigger.NewRandom(body)
-	case injectNode:
-		return inject.NewInject(body)
-	case iteratorNode:
-		return iterator.NewIterator(body)
+	case iterate:
+		return trigger.NewIterate(body)
 	}
 	return nil, nil
 }
