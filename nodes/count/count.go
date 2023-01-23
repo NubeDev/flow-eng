@@ -21,8 +21,8 @@ func NewCount(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, countNode, category)
 	countUp := node.BuildInput(node.CountUp, node.TypeBool, nil, body.Inputs, nil)
 	countDown := node.BuildInput(node.CountDown, node.TypeBool, nil, body.Inputs, nil)
-	stepSize := node.BuildInput(node.StepSize, node.TypeBool, nil, body.Inputs, str.New("step_size"))
-	setValue := node.BuildInput(node.SetValue, node.TypeBool, nil, body.Inputs, str.New("set_value"))
+	stepSize := node.BuildInput(node.StepSize, node.TypeFloat, nil, body.Inputs, str.New("step_size"))
+	setValue := node.BuildInput(node.SetValue, node.TypeFloat, nil, body.Inputs, str.New("set_value"))
 	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, nil)
 	body.Inputs = node.BuildInputs(countUp, countDown, stepSize, setValue, reset)
 

@@ -52,6 +52,7 @@ const (
 	MinOffTime InputName = "min-off-time"
 	Interval   InputName = "interval"
 	DutyCycle  InputName = "duty-cycle"
+	Iterations InputName = "iterations"
 
 	Duration InputName = "duration"
 
@@ -98,6 +99,9 @@ const (
 	Match     InputName = "match"
 	Value     InputName = "value"
 	Threshold InputName = "threshold"
+
+	Start InputName = "start"
+	Stop  InputName = "stop"
 
 	Connection   InputName = "topic"
 	URL          InputName = "url"
@@ -160,6 +164,8 @@ const (
 	PollingCount OutputName = "polling-count"
 
 	FlatLine OutputName = "flatline"
+
+	Complete OutputName = "complete"
 
 	Trigger OutputName = "trigger"
 	Toggle  OutputName = "toggle"

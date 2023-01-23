@@ -3,9 +3,11 @@ package flow
 import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/float"
+	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/enescakir/emoji"
+	"time"
 )
 
 type InputData struct {
@@ -26,6 +28,7 @@ type FFPointWrite struct {
 	inputsArray            [17]InputData
 	lastSendFail           bool
 	lastPointPriorityWrite map[string]*float64
+	lastUpdate             time.Time
 }
 
 func NewFFPointWrite(body *node.Spec) (node.Node, error) {
@@ -35,11 +38,14 @@ func NewFFPointWrite(body *node.Spec) (node.Node, error) {
 	in15 := node.BuildInput(node.In15, node.TypeFloat, nil, body.Inputs, nil)
 	in16 := node.BuildInput(node.In16, node.TypeFloat, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(in1, in10, in15, in16)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
+	value := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
+	currentPriority := node.BuildOutput(node.CurrentPriority, node.TypeFloat, nil, body.Outputs)
+	lastUpdated := node.BuildOutput(node.LastUpdated, node.TypeString, nil, body.Outputs)
+	outputs := node.BuildOutputs(value, currentPriority, lastUpdated)
 	body.SetAllowSettings()
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body = node.SetNoParent(body)
-	return &FFPointWrite{body, "", "", [17]InputData{}, false, map[string]*float64{}}, nil
+	return &FFPointWrite{body, "", "", [17]InputData{}, false, map[string]*float64{}, time.Now()}, nil
 }
 
 func (inst *FFPointWrite) set() {
@@ -74,44 +80,77 @@ func (inst *FFPointWrite) set() {
 	}
 }
 
-func (inst *FFPointWrite) Process() {
-	_, firstLoop := inst.Loop()
-	if firstLoop {
-		selectedPoint, err := getPointSettings(inst.GetSettings())
-		var setTopic bool
-		if selectedPoint != nil && err == nil {
-			if selectedPoint.Point != "" {
-				t := makePointTopic(selectedPoint.Point)
-				if t != "" {
-					inst.topic = t
-					inst.netDevicePoint = selectedPoint.Point
-					inst.set()
-					setTopic = true
-				}
+func (inst *FFPointWrite) checkStillExists() {
+	s := inst.GetStore()
+	if s == nil {
+		return
+	}
+	parentId := inst.GetParentId()
+	topic := fmt.Sprintf("pointsList_%s", parentId)
+	children, ok := s.Get(topic)
+	if ok {
+		existingPoints := children.([]*point)
+		var pointExists bool
+		for _, existingPoint := range existingPoints {
+			t := makePointTopic(existingPoint.Name)
+			if t == inst.topic {
+				pointExists = true
+				inst.SetSubTitle(existingPoint.Name)
+				inst.SetWaringMessage("")
+				inst.SetWaringIcon(string(emoji.GreenCircle))
 			}
-			inst.SetSubTitle(selectedPoint.Point)
 		}
-		if !setTopic {
-			inst.SetWaringMessage("no point selected")
+		if !pointExists {
+			inst.SetWaringMessage(pointError)
 			inst.SetWaringIcon(string(emoji.OrangeCircle))
 			inst.SetSubTitle("")
 		}
 	}
+}
 
-	val, null := inst.GetPayloadNull()
-	var wroteValue bool
-	if null {
-		inst.WritePinNull(node.Out)
-	} else {
-		_, value, _, err := parseCOV(val)
-		if err == nil {
-			wroteValue = true
-			inst.WritePin(node.Out, value)
+func (inst *FFPointWrite) setTopic() {
+	selectedPoint, err := getPointSettings(inst.GetSettings())
+	if selectedPoint != nil && err == nil {
+		if selectedPoint.Point != "" {
+			t := makePointTopic(selectedPoint.Point)
+			if t != "" {
+				inst.topic = t
+				inst.netDevicePoint = selectedPoint.Point
+				inst.SetSubTitle(selectedPoint.Point)
+				inst.SetWaringMessage("")
+				inst.SetWaringIcon(string(emoji.GreenCircle))
+				inst.set()
+			} else {
+				inst.SetWaringMessage(pointError)
+				inst.SetWaringIcon(string(emoji.OrangeCircle))
+				inst.SetSubTitle("")
+			}
 		}
 	}
-	if !wroteValue {
-		inst.WritePinNull(node.Out)
+}
+
+func (inst *FFPointWrite) Process() {
+	loopCount, firstLoop := inst.Loop()
+	if firstLoop {
+		inst.setTopic()
 	}
+	if loopCount%50 == 0 {
+		inst.setTopic()
+		inst.checkStillExists()
+	}
+	val := inst.GetPayload()
+	if val == nil {
+		inst.WritePinNull(node.Out)
+	} else {
+		_, value, currentPri, err := parseCOV(val.Any)
+		if err == nil {
+			inst.WritePinFloat(node.Out, value)
+			inst.WritePinFloat(node.CurrentPriority, float64(currentPri))
+			inst.lastUpdate = val.LastUpdate
+		}
+	}
+	inst.WritePin(node.LastUpdated, ttime.TimeSince(inst.lastUpdate))
+
 }
 
 func (inst *FFPointWrite) GetLastPriorityWrite() (priorityArrayWrite map[string]*float64) {

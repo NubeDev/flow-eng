@@ -3,13 +3,16 @@ package node
 import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/conversions"
+	"time"
 )
 
 type Payload struct {
-	Any any `json:"any,omitempty"`
+	Any        any `json:"any,omitempty"`
+	LastUpdate time.Time
 }
 
 func (n *Spec) SetPayload(body *Payload) {
+	body.LastUpdate = time.Now()
 	n.Payload = body
 }
 func (n *Spec) GetPayload() *Payload {
@@ -31,7 +34,13 @@ func (n *Spec) ReadPayloadAsFloat() (value float64, null bool) {
 	if r.Any == nil {
 		return 0, true
 	}
-	return conversions.GetFloat(r.Any), false
+	m, ok := r.Any.(map[string]interface{})
+	if ok {
+		for _, v := range m {
+			return conversions.GetFloat(v), false
+		}
+	}
+	return 0, true
 }
 
 func (n *Spec) ReadPayloadAsString() (value string, null bool) {

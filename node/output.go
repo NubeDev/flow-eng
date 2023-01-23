@@ -10,16 +10,18 @@ import (
 var ErrTypesMismatch = errors.New("provided types are different")
 
 type Output struct {
-	Name         OutputName          `json:"name"` // out1
-	DataType     DataTypes           `json:"type"` // int8
-	Connections  []*OutputConnection `json:"connections,omitempty"`
-	value        interface{}
-	uuid         uuid.Value
-	direction    Direction
-	connectors   []*Connector
-	Help         OutputHelp `json:"help"`
-	FolderExport bool       `json:"folderExport"`
-	HideOutput   bool       `json:"hideOutput"`
+	Name             OutputName          `json:"name"` // out1
+	DataType         DataTypes           `json:"type"` // int8
+	Connections      []*OutputConnection `json:"connections,omitempty"`
+	value            interface{}
+	uuid             uuid.Value
+	direction        Direction
+	connectors       []*Connector
+	Help             OutputHelp `json:"help"`
+	FolderExport     bool       `json:"folderExport"`
+	Position         int        `json:"position"`
+	OverridePosition bool       `json:"overridePosition"`
+	HideOutput       bool       `json:"hideOutput"`
 }
 
 func newOutput(body *Output) *Output {
@@ -32,6 +34,8 @@ func newOutput(body *Output) *Output {
 		DirectionOutput,
 		make([]*Connector, 0, 1),
 		"",
+		false,
+		0,
 		false,
 		false,
 	}

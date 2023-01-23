@@ -17,7 +17,6 @@ func Decode(encodedNodes *NodesList) ([]*node.Spec, error) {
 		decodedNode.ParentId = encodedNode.ParentId
 		decodedNode.Info.Icon = encodedNode.Icon
 		decodedNode.Info.NodeName = encodedNode.NodeName
-
 		if encodedNode.Payload != nil {
 			decodedNode.Payload = &node.Payload{Any: encodedNode.Payload}
 		}
@@ -28,6 +27,8 @@ func Decode(encodedNodes *NodesList) ([]*node.Spec, error) {
 		}
 		for _, input := range newNode.GetInputs() { // add the input connections as required
 			for inputName, links := range encodedNode.Inputs { // these would be the input connections
+				input.Position = links.Position
+				input.OverridePosition = links.OverridePosition
 				if input.Name == node.InputName(inputName) {
 					if links.Value != nil { // user has set a value and no input is connected
 						input.Connection.OverrideValue = links.Value

@@ -64,7 +64,7 @@ func (inst *AI) Process() {
 		}
 		inst.toFlowOptions.precision = settings.Decimal
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
-		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true, inst.application)
+		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true, inst.application, settings)
 		point.Name = inst.GetNodeName()
 		if err != nil {
 			log.Errorf("bacnet-server add new point type:%s-%d err:%s", objectType, inst.objectID, err.Error())
@@ -77,10 +77,6 @@ func (inst *AI) Process() {
 		}
 		point, err = inst.store.AddPoint(point, true)
 		s.Set(setUUID(inst.GetParentId(), points.AnalogInput, inst.objectID), point, 0)
-	}
-	s := inst.GetStore()
-	if s == nil {
-		return
 	}
 
 	pv, err := inst.getPV(points.AnalogInput, inst.objectID)

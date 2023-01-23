@@ -13,7 +13,7 @@ type Flatline struct {
 }
 
 func NewFlatline(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, flatline, category)
+	body = node.Defaults(body, flatLine, category)
 
 	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, nil) // TODO: this input shouldn't have a manual override value
 	inputs := node.BuildInputs(in)

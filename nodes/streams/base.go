@@ -5,5 +5,5 @@ const (
 )
 
 const (
-	flatline = "flatline"
+	flatLine = "flatline"
 )
