@@ -10,6 +10,7 @@ const (
 	Sec = "sec"
 	Min = "min"
 	Hr  = "hour"
+	Day = "day"
 )
 
 // TimeSince returns in a human readable format the elapsed time

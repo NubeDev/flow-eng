@@ -1,59 +1,132 @@
 package streams
 
 import (
+	"encoding/json"
+	"github.com/NubeDev/flow-eng/helpers/array"
+	"github.com/NubeDev/flow-eng/helpers/float"
+	"github.com/NubeDev/flow-eng/helpers/str"
+	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
+	"github.com/NubeDev/flow-eng/schemas"
+	"github.com/NubeIO/lib-schema/schema"
 	"time"
 )
 
 type Flatline struct {
 	*node.Spec
-	timeout     *time.Timer
-	lastVal     float64 // TODO: input value should be allowed to be nil
-	alertStatus bool
+	lastVal      *float64
+	alertStatus  bool
+	lastInterval time.Duration
+	lastCOVTime  int64
 }
 
 func NewFlatline(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, flatLine, category)
 
 	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, nil) // TODO: this input shouldn't have a manual override value
-	inputs := node.BuildInputs(in)
-	outputs := node.BuildOutputs(node.BuildOutput(node.FlatLine, node.TypeFloat, nil, body.Outputs))
-	/*
-		// TODO: alert delay value should be set by input value OR by fallback to settings value
-		_, setting, _, err := node.NewSetting(body, &node.SettingOptions{Type: node.Number, Title: node.AlertDelayMins, Min: 1, Max: 50000, Value: 1})
-		if err != nil {
-			return nil, err
-		}
-		settings, err := node.BuildSettings(setting)
-		if err != nil {
-			return nil, err
-		}
-	*/
-	// body = node.BuildNode(body, inputs, outputs, settings)
+	delayInput := node.BuildInput(node.Delay, node.TypeFloat, nil, body.Inputs, str.New("interval"))
+	inputs := node.BuildInputs(in, delayInput)
+
+	out := node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs)
+	outputs := node.BuildOutputs(out)
+
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	return &Flatline{body, nil, 0, false}, nil
+
+	node := &Flatline{body, nil, false, -1, -1}
+	node.SetSchema(node.buildSchema())
+	return node, nil
 }
 
 func (inst *Flatline) Process() {
-	in, _ := inst.ReadPinAsFloat(node.In) // TODO: input value should be allowed to be nil
-	if in != inst.lastVal {               // COV
-		inst.lastVal = in
-		inst.WritePin(node.FlatLine, 0)
+	intervalDuration, _ := inst.ReadPinAsTimeSettings(node.Delay)
+	if intervalDuration != inst.lastInterval {
+		inst.setSubtitle(intervalDuration)
+		inst.lastInterval = intervalDuration
+	}
+
+	newCOV := false
+
+	in, inNull := inst.ReadPinAsFloat(node.In)
+	if inNull && inst.lastVal != nil || inNull && inst.lastCOVTime == -1 {
+		newCOV = true
+		inst.lastVal = nil
+	} else if !inNull && inst.lastVal == nil {
+		newCOV = true
+		inst.lastVal = float.New(in)
+	} else if !inNull && (in != *inst.lastVal) {
+		newCOV = true
+		inst.lastVal = float.New(in)
+	}
+
+	if newCOV {
+		inst.lastCOVTime = time.Now().Unix()
+		inst.WritePinBool(node.Outp, false)
 		inst.alertStatus = false
-		// create timeout function with specified delay
-		f := func() {
-			inst.WritePin(node.FlatLine, 1)
+	} else {
+		now := time.Now().Unix()
+		if float64(now-inst.lastCOVTime) >= intervalDuration.Seconds() {
+			inst.WritePinBool(node.Outp, true)
 			inst.alertStatus = true
 		}
-		/*
-			delayValue := inst.GetPropValueInt(node.AlertDelayMins, 30)
-			alertDelayDuration, _ := time.ParseDuration(fmt.Sprintf("%dm", delayValue)) // TODO: value should come from input, or from settings value as a fallback.
-			if alertDelayDuration <= 1*time.Second {
-				alertDelayDuration = 1 * time.Minute
-			}
-			inst.timeout = time.AfterFunc(alertDelayDuration, f)
-		*/
-		inst.timeout = time.AfterFunc(30*time.Minute, f)
 	}
-	inst.WritePin(node.FlatLine, inst.alertStatus)
+}
+
+func (inst *Flatline) setSubtitle(intervalDuration time.Duration) {
+	subtitleText := intervalDuration.String()
+	inst.SetSubTitle(subtitleText)
+}
+
+// Custom Node Settings Schema
+
+type FlatlineSettingsSchema struct {
+	Interval          schemas.Number     `json:"interval"`
+	IntervalTimeUnits schemas.EnumString `json:"interval_time_units"`
+}
+
+type FlatlineSettings struct {
+	Interval          float64 `json:"interval"`
+	IntervalTimeUnits string  `json:"interval_time_units"`
+}
+
+func (inst *Flatline) buildSchema() *schemas.Schema {
+	props := &FlatlineSettingsSchema{}
+	// time selection
+	props.Interval.Title = "Interval"
+	props.Interval.Default = 30
+
+	// time selection
+	props.IntervalTimeUnits.Title = "Interval Units"
+	props.IntervalTimeUnits.Default = ttime.Min
+	props.IntervalTimeUnits.Options = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
+	props.IntervalTimeUnits.EnumName = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
+
+	schema.Set(props)
+
+	uiSchema := array.Map{
+		"interval_time_units": array.Map{
+			"ui:widget": "radio",
+			"ui:options": array.Map{
+				"inline": true,
+			},
+		},
+		"ui:order": array.Slice{"interval", "interval_time_units"},
+	}
+	s := &schemas.Schema{
+		Schema: schemas.SchemaBody{
+			Title:      "Node Settings",
+			Properties: props,
+		},
+		UiSchema: uiSchema,
+	}
+	return s
+}
+
+func (inst *Flatline) getSettings(body map[string]interface{}) (*FlatlineSettings, error) {
+	settings := &FlatlineSettings{}
+	marshal, err := json.Marshal(body)
+	if err != nil {
+		return settings, err
+	}
+	err = json.Unmarshal(marshal, &settings)
+	return settings, err
 }

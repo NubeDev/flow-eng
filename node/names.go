@@ -180,6 +180,8 @@ const (
 	Out      OutputName = "out"
 	Outp     OutputName = "output"
 
+	Elapsed OutputName = "elapsed"
+
 	MinOutput OutputName = "min"
 	MaxOutput OutputName = "max"
 	AvgOutput OutputName = "avg"
