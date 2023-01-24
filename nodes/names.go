@@ -47,6 +47,7 @@ const (
 	writeHttpNode = "http-write"
 
 	deadBandNode   = "dead-band"
+	leadLagSwitch  = "lead-lag-switch"
 	pidNode        = "pid"
 	pacControlNode = "pac-control"
 

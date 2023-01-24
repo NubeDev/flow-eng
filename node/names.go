@@ -152,6 +152,12 @@ const (
 	Bias         InputName = "bias"
 	Manual       InputName = "manual"
 	IntervalSecs InputName = "interval-secs"
+
+	AccumulationIn InputName = "accumulation-in"
+
+	RotateLead InputName = "rotate-lead"
+	Stage1     InputName = "stage-1"
+	Stage2     InputName = "stage-2"
 )
 
 const (
@@ -220,4 +226,14 @@ const (
 	ReversingValve OutputName = "reversing-valve"
 	Compressor1    OutputName = "compressor-1"
 	Compressor2    OutputName = "compressor-2"
+
+	LeadUnit     OutputName = "lead-unit"
+	LeadUnitBool OutputName = "lead-unit-bool"
+	EnableA      OutputName = "enable-A"
+	EnableB      OutputName = "enable-B"
+
+	PeriodConsumption OutputName = "period-consumption"
+	LastAccumulation  OutputName = "last-accumulation"
+	PeriodDuration    OutputName = "period-duration"
+	NextTrigger       OutputName = "next-trigger"
 )
