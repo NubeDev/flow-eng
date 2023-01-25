@@ -15,7 +15,6 @@ type serverSchema struct {
 
 func selectIO16() string {
 	for i, _ := range ioOptions {
-		fmt.Println("!!!!!!!!!1", i)
 		return fmt.Sprintf("%d", i)
 	}
 	return "0"
@@ -60,14 +59,25 @@ func GetBacnetSchema(body map[string]interface{}) (*BacnetSchema, error) {
 	return settings, err
 }
 
+type nodeUISchema struct {
+	Io          schemas.EnumString     `json:"ioType"`
+	Decimal     schemas.Number         `json:"decimal"`
+	Offset      schemas.NumberNoLimits `json:"offset"`
+	ScaleEnable schemas.Boolean        `json:"scaleEnable"`
+	ScaleInMin  schemas.NumberNoLimits `json:"scaleInMin"`
+	ScaleInMax  schemas.NumberNoLimits `json:"scaleInMax"`
+	ScaleOutMin schemas.NumberNoLimits `json:"scaleOutMin"`
+	ScaleOutMax schemas.NumberNoLimits `json:"scaleOutMax"`
+}
+
 type nodeSchema struct {
-	Io      schemas.EnumString `json:"ioType"`
-	Decimal schemas.Number     `json:"decimal"`
-	Offset  schemas.Number     `json:"offset"`
+	Io      schemas.EnumString     `json:"ioType"`
+	Decimal schemas.Number         `json:"decimal"`
+	Offset  schemas.NumberNoLimits `json:"offset"`
 }
 
 func buildSchemaUI() *schemas.Schema {
-	props := &nodeSchema{}
+	props := &nodeUISchema{}
 	props.Io.Title = "io-type"
 	props.Io.Default = string(points.IoTypeVolts)
 	props.Io.Options = []string{string(points.IoTypeVolts), string(points.IoTypeDigital), string(points.IoTypeTemp), string(points.IoTypeCurrent)}
@@ -78,8 +88,13 @@ func buildSchemaUI() *schemas.Schema {
 
 	props.Offset.Title = "offset"
 	props.Offset.Default = 0
-	props.Offset.Minimum = -100000000
-	props.Offset.Maximum = 100000000
+
+	props.ScaleEnable.Title = "enable scale"
+	props.ScaleInMin.Title = "scale in min"
+	props.ScaleInMax.Title = "scale in max"
+	props.ScaleOutMin.Title = "scale out min"
+	props.ScaleOutMax.Title = "scale out max"
+
 	schema.Set(props)
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{
@@ -103,8 +118,6 @@ func buildSchemaUO() *schemas.Schema {
 
 	props.Offset.Title = "offset"
 	props.Offset.Default = 0
-	props.Offset.Minimum = -100000000
-	props.Offset.Maximum = 100000000
 
 	schema.Set(props)
 	s := &schemas.Schema{

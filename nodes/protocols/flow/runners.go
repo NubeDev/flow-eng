@@ -86,8 +86,6 @@ func (inst *Network) pointsList() {
 		if s != nil {
 			s.Set(topic, points, 0)
 			inst.SetSubTitle(fmt.Sprintf("points count: %d", inst.pointsCount))
-			// var existingPoints []*point
-
 		} else {
 			log.Errorf("failed to get flow-framework points store err: %s", err.Error())
 		}
@@ -126,7 +124,6 @@ func (inst *Network) fetchAllPointValues() {
 			if !exists {
 				pointUUIDList = append(pointUUIDList, &pnt)
 			}
-
 		}
 	}
 	data, err := json.Marshal(pointUUIDList)

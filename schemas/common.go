@@ -40,6 +40,14 @@ type StringLimits struct {
 	ReadOnly bool   `json:"readOnly" default:"false"`
 }
 
+type NumberNoLimits struct {
+	Type     string  `json:"type" default:"number"`
+	Title    string  `json:"title" default:""`
+	Default  float64 `json:"default" default:"0"`
+	Help     string  `json:"help" default:""`
+	ReadOnly bool    `json:"readOnly" default:"false"`
+}
+
 type Number struct {
 	Type     string  `json:"type" default:"number"`
 	Title    string  `json:"title" default:""`
