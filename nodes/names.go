@@ -9,6 +9,7 @@ const (
 	divide   = "divide"
 	sub      = "subtract"
 	multiply = "multiply"
+	modulo   = "modulo"
 
 	mathAdvanced = "advanced"
 
@@ -50,6 +51,7 @@ const (
 	leadLagSwitch  = "lead-lag-switch"
 	pidNode        = "pid"
 	pacControlNode = "pac-control"
+	psychroDBRH    = "psychrometrics-db-rh"
 
 	greaterThan = "greater-than"
 	lessThan    = "less-than"

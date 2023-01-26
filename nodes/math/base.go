@@ -16,6 +16,7 @@ const (
 	add      = "add"
 	sub      = "subtract"
 	multiply = "multiply"
+	modulo   = "modulo"
 )
 
 const (

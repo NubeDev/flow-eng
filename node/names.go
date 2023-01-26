@@ -158,6 +158,11 @@ const (
 	RotateLead InputName = "rotate-lead"
 	Stage1     InputName = "stage-1"
 	Stage2     InputName = "stage-2"
+
+	DryBulbTemp  InputName = "dry-bulb-temp"
+	WetBulbTemp  InputName = "wet-bulb-temp"
+	DewPointTemp InputName = "dew-point-temp"
+	RelHumid     InputName = "rel-humidity-%"
 )
 
 const (
@@ -236,4 +241,13 @@ const (
 	LastAccumulation  OutputName = "last-accumulation"
 	PeriodDuration    OutputName = "period-duration"
 	NextTrigger       OutputName = "next-trigger"
+
+	WetBulbTempO     OutputName = "wet-bulb-temp"
+	DewPointTempO    OutputName = "dew-point-temp"
+	RelHumPercO      OutputName = "rel-humidity-%"
+	HumRatioO        OutputName = "humidity-ratio"
+	VaporPres        OutputName = "vapor-pressure"
+	MoistAirEnthalpy OutputName = "moist-air-enthalpy"
+	MoistAirVolume   OutputName = "moist-air-volume"
+	DegreeSaturation OutputName = "degree-of-saturation"
 )
