@@ -4,10 +4,9 @@ package hvac
 import "C"
 
 import (
-	"C"
 	"encoding/json"
-	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
+	"github.com/NubeDev/flow-eng/helpers/psychrometrics"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
@@ -21,6 +20,7 @@ const (
 type PsychroDBRH struct {
 	*node.Spec
 	unitSystem string
+	isImperial bool
 }
 
 func NewPsychroDBRH(body *node.Spec) (node.Node, error) {
@@ -40,7 +40,7 @@ func NewPsychroDBRH(body *node.Spec) (node.Node, error) {
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
-	node := &PsychroDBRH{body, "Metric/SI"}
+	node := &PsychroDBRH{body, "Metric/SI", false}
 	node.SetSchema(node.buildSchema())
 	return node, nil
 }
@@ -48,20 +48,39 @@ func NewPsychroDBRH(body *node.Spec) (node.Node, error) {
 func (inst *PsychroDBRH) Process() {
 	settings, _ := inst.getSettings(inst.GetSettings())
 	units := settings.UnitSystem
-	// altitude := settings.Altitude
+	altitude := settings.Altitude
 
 	if units != inst.unitSystem {
 		inst.setSubtitle()
+		inst.unitSystem = units
+
 	}
-	fmt.Println("C.SI: ", C.SI)
 	if units == "Metric/SI" {
-		C.SetUnitSystem(C.SI)
+		inst.isImperial = false
 	} else {
-		// C.SetUnitSystem(C.IP)
+		inst.isImperial = true
 	}
-	// readUnitSystem := C.GetUnitSystem()
-	// atmPress := C.GetStandardAtmPressure(altitude)
-	// fmt.Println("readUnitSystem: ", readUnitSystem, "  atmPress: ", atmPress)
+	atmPress, err := psychrometrics.GetStandardAtmPressure(altitude, inst.isImperial)
+	if err != nil {
+		// TODO: set node error message
+		return
+	}
+	dryBulbT := inst.ReadPinOrSettingsFloat(node.DryBulbTemp)
+	relHumPerc := inst.ReadPinOrSettingsFloat(node.RelHumid)
+
+	HumRatio, TWetBulb, TDewPoint, VapPres, MoistAirEnthalpy, MoistAirVolume, DegreeOfSaturation, err := psychrometrics.CalcPsychrometricsFromRelHum(dryBulbT, relHumPerc, atmPress, inst.isImperial)
+	if err != nil {
+		// TODO: set node error message
+		return
+	}
+	inst.WritePinFloat(node.HumRatioO, HumRatio)
+	inst.WritePinFloat(node.WetBulbTempO, TWetBulb)
+	inst.WritePinFloat(node.DewPointTempO, TDewPoint)
+	inst.WritePinFloat(node.VaporPres, VapPres)
+	inst.WritePinFloat(node.MoistAirEnthalpy, MoistAirEnthalpy)
+	inst.WritePinFloat(node.MoistAirVolume, MoistAirVolume)
+	inst.WritePinFloat(node.DegreeSaturation, DegreeOfSaturation)
+
 }
 
 func (inst *PsychroDBRH) setSubtitle() {
