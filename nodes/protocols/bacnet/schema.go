@@ -131,9 +131,14 @@ func buildSchemaUO() *schemas.Schema {
 }
 
 type nodeSettings struct {
-	Io      string  `json:"ioType"`
-	Decimal int     `json:"decimal"`
-	Offset  float64 `json:"offset"`
+	Io          string  `json:"ioType"`
+	Decimal     int     `json:"decimal"`
+	Offset      float64 `json:"offset"`
+	ScaleEnable bool    `json:"scaleEnable"`
+	ScaleInMin  float64 `json:"scaleInMin"`
+	ScaleInMax  float64 `json:"scaleInMax"`
+	ScaleOutMin float64 `json:"scaleOutMin"`
+	ScaleOutMax float64 `json:"scaleOutMax"`
 }
 
 func getSettings(body map[string]interface{}) (*nodeSettings, error) {

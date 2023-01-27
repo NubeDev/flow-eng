@@ -20,7 +20,7 @@ func currentRegs() (start int, count int) {
 	return start, 8
 }
 
-//DecodeUI use this for when reading as a temp, voltage or amps
+// DecodeUI use this for when reading as a temp, voltage or amps
 func DecodeUI(in uint16) float64 {
 	v := float64(in) / 100
 	return v
@@ -76,6 +76,7 @@ func convert(raw []byte) [8]float64 {
 	for i, u := range decode {
 		out[i] = DecodeUI(u)
 	}
+	// log.Print(out)
 	return out
 }
 
@@ -86,10 +87,12 @@ func (inst *Modbus) readRegisters(slave, start, count int, holding bool) (raw []
 	}
 	if holding {
 		registers, _, err := inst.client.ReadHoldingRegisters(uint16(start), uint16(count))
+		// log.Print(registers)
 		return registers, err
 	} else {
-		//fmt.Println("READ INPUTS", slave, uint16(start), uint16(count))
+		// fmt.Println("READ INPUTS", slave, uint16(start), uint16(count))
 		registers, _, err := inst.client.ReadInputRegisters(uint16(start), uint16(count))
+		// log.Print(registers)
 		return registers, err
 	}
 }

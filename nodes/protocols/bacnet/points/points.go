@@ -17,6 +17,11 @@ type Point struct {
 	ValueFromRead               float64
 	PresentValue                float64
 	Offset                      float64
+	ScaleEnable                 bool
+	ScaleInMin                  float64
+	ScaleInMax                  float64
+	ScaleOutMin                 float64
+	ScaleOutMax                 float64
 	WriteValue                  *PriArray
 	WriteValueFromBACnet        *PriArray
 	PendingWriteValueFromBACnet bool
