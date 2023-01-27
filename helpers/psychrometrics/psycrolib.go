@@ -342,6 +342,7 @@ func GetVapPresFromRelHum(TDryBulb float64, RelHum float64, isIP bool) (float64,
 	if err != nil {
 		return INVALID, err
 	}
+	fmt.Println("SatVapPres:", SatVapPres)
 	return RelHum * SatVapPres, nil
 }
 
@@ -429,6 +430,13 @@ func GetTDewPointFromVapPres(TDryBulb, VapPres float64, isIP bool) (float64, err
 	var TDewPoint_iter float64 // Value of TDewPoint used in NR calculation
 	var lnVP_iter float64      // Value of log of vapor water pressure used in NR calculation
 
+	var tolerance float64
+	if isIP {
+		tolerance = (0.001 * 9) / 5
+	} else {
+		tolerance = 0.001
+	}
+
 	index := 1
 	for {
 		// Current point
@@ -454,7 +462,7 @@ func GetTDewPointFromVapPres(TDryBulb, VapPres float64, isIP bool) (float64, err
 			return INVALID, errors.New("convergence not reached in GetTDewPointFromVapPres. Stopping")
 		}
 		index++
-		if math.Abs(TDewPoint-TDewPoint_iter) <= PSYCHROLIB_TOLERANCE {
+		if math.Abs(TDewPoint-TDewPoint_iter) <= tolerance {
 			break
 		}
 	}
@@ -485,32 +493,53 @@ func GetTWetBulbFromHumRatio(TDryBulb, HumRatio, Pressure float64, isIP bool) (f
 	var index int = 1
 
 	if HumRatio < 0 {
-		return 0, errors.New("humidity ratio is negative")
+		return INVALID, errors.New("humidity ratio is negative")
 	}
 	BoundedHumRatio = math.Max(HumRatio, MIN_HUM_RATIO)
 
-	TDewPoint, _ = GetTDewPointFromHumRatio(TDryBulb, BoundedHumRatio, Pressure, isIP)
+	TDewPoint, err := GetTDewPointFromHumRatio(TDryBulb, BoundedHumRatio, Pressure, isIP)
+	if err != nil {
+		return INVALID, err
+	}
+	fmt.Println("GetTWetBulbFromHumRatio() TDewPoint: ", TDewPoint)
+	fmt.Println("GetTWetBulbFromHumRatio() TDryBulb: ", TDryBulb)
 
+	// Initial guesses
 	TWetBulbSup = TDryBulb
 	TWetBulbInf = TDewPoint
 	TWetBulb = (TWetBulbInf + TWetBulbSup) / 2
+	fmt.Println("GetTWetBulbFromHumRatio() TWetBulb ORIGINAL: ", TWetBulb)
 
+	var tolerance float64
+	if isIP {
+		tolerance = (0.001 * 9) / 5
+	} else {
+		tolerance = 0.001
+	}
+
+	// Bisection loop
 	for {
+		// Compute humidity ratio at temperature Tstar
 		Wstar, err := GetHumRatioFromTWetBulb(TDryBulb, TWetBulb, Pressure, isIP)
 		if err != nil {
 			return INVALID, err
 		}
+		fmt.Println("Wstar: ", Wstar)
+		// Get new bounds
 		if Wstar > BoundedHumRatio {
 			TWetBulbSup = TWetBulb
 		} else {
 			TWetBulbInf = TWetBulb
 		}
+		// New guess of wet bulb temperature
 		TWetBulb = (TWetBulbSup + TWetBulbInf) / 2
+		fmt.Println("TWetBulb: ", TWetBulb)
 		if index > MAX_ITER_COUNT {
 			return 0, errors.New("convergence not reached in GetTWetBulbFromHumRatio. stopping")
 		}
 		index++
-		if math.Abs(TWetBulbSup-TWetBulbInf) <= PSYCHROLIB_TOLERANCE {
+
+		if (TWetBulbSup - TWetBulbInf) <= tolerance {
 			break
 		}
 	}
@@ -534,18 +563,23 @@ func GetHumRatioFromTWetBulb(TDryBulb, TWetBulb, Pressure float64, isIP bool) (f
 	if err != nil {
 		return INVALID, err
 	}
+	fmt.Println("Wsstar:", Wsstar)
 
 	if isIP {
 		if TWetBulb >= FREEZING_POINT_WATER_IP {
-			HumRatio = (1093-0.556*TWetBulb)*Wsstar - 0.24*(TDryBulb-TWetBulb)/(1093+0.444*TDryBulb-TWetBulb)
+			fmt.Println("1")
+			HumRatio = ((1093-0.556*TWetBulb)*Wsstar - 0.24*(TDryBulb-TWetBulb)) / (1093 + 0.444*TDryBulb - TWetBulb)
 		} else {
-			HumRatio = (1220-0.04*TWetBulb)*Wsstar - 0.24*(TDryBulb-TWetBulb)/(1220+0.444*TDryBulb-0.48*TWetBulb)
+			fmt.Println("2")
+			HumRatio = ((1220-0.04*TWetBulb)*Wsstar - 0.24*(TDryBulb-TWetBulb)) / (1220 + 0.444*TDryBulb - 0.48*TWetBulb)
 		}
 	} else {
 		if TWetBulb >= FREEZING_POINT_WATER_SI {
-			HumRatio = (2501-2.326*TWetBulb)*Wsstar - 1.006*(TDryBulb-TWetBulb)/(2501+1.86*TDryBulb-4.186*TWetBulb)
+			fmt.Println("3")
+			HumRatio = ((2501-2.326*TWetBulb)*Wsstar - 1.006*(TDryBulb-TWetBulb)) / (2501 + 1.86*TDryBulb - 4.186*TWetBulb)
 		} else {
-			HumRatio = (2830-0.24*TWetBulb)*Wsstar - 1.006*(TDryBulb-TWetBulb)/(2830+1.86*TDryBulb-2.1*TWetBulb)
+			fmt.Println("4")
+			HumRatio = ((2830-0.24*TWetBulb)*Wsstar - 1.006*(TDryBulb-TWetBulb)) / (2830 + 1.86*TDryBulb - 2.1*TWetBulb)
 		}
 	}
 	// Validity check.
@@ -566,6 +600,7 @@ func GetHumRatioFromRelHum(TDryBulb, RelHum, Pressure float64, isIP bool) (float
 	if err != nil {
 		return INVALID, err
 	}
+	fmt.Println("VapPres:", VapPres)
 	return GetHumRatioFromVapPres(VapPres, Pressure)
 }
 
@@ -816,7 +851,7 @@ func GetSatVapPres(TDryBulb float64, isIP bool) (float64, error) {
 		}
 	} else {
 		if !(TDryBulb >= -100 && TDryBulb <= 200) {
-			return INVALID, errors.New("dry bulb temperature is outside range [-100, 200]")
+			return INVALID, errors.New(fmt.Sprintf("dry bulb temperature (%f) is outside range [-100, 200]", TDryBulb))
 		}
 
 		T = GetTKelvinFromTCelsius(TDryBulb)
@@ -1208,31 +1243,45 @@ func CalcPsychrometricsFromTDewPoint(TDryBulb, TDewPoint, Pressure float64, isIP
 func CalcPsychrometricsFromRelHum(TDryBulb, RelHum, Pressure float64, isIP bool) (HumRatio float64, TWetBulb float64, TDewPoint float64, VapPres float64, MoistAirEnthalpy float64, MoistAirVolume float64, DegreeOfSaturation float64, err error) {
 	HumRatio, err = GetHumRatioFromRelHum(TDryBulb, RelHum, Pressure, isIP)
 	if err != nil {
+		fmt.Println("GetHumRatioFromRelHum")
 		return INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, err
 	}
+	fmt.Println("HumRatio:", HumRatio)
 	TWetBulb, err = GetTWetBulbFromHumRatio(TDryBulb, HumRatio, Pressure, isIP)
 	if err != nil {
+		fmt.Println("GetTWetBulbFromHumRatio")
 		return INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, err
 	}
+	fmt.Println("TWetBulb:", TWetBulb)
 	TDewPoint, err = GetTDewPointFromHumRatio(TDryBulb, HumRatio, Pressure, isIP)
 	if err != nil {
+		fmt.Println("GetTDewPointFromHumRatio")
 		return INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, err
 	}
+	fmt.Println("TDewPoint:", TDewPoint)
 	VapPres, err = GetVapPresFromHumRatio(HumRatio, Pressure)
 	if err != nil {
+		fmt.Println("GetVapPresFromHumRatio")
 		return INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, err
 	}
+	fmt.Println("VapPres:", VapPres)
 	MoistAirEnthalpy, err = GetMoistAirEnthalpy(TDryBulb, HumRatio, isIP)
 	if err != nil {
+		fmt.Println("GetMoistAirEnthalpy")
 		return INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, err
 	}
+	fmt.Println("MoistAirEnthalpy:", MoistAirEnthalpy)
 	MoistAirVolume, err = GetMoistAirVolume(TDryBulb, HumRatio, Pressure, isIP)
 	if err != nil {
+		fmt.Println("GetMoistAirVolume")
 		return INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, err
 	}
+	fmt.Println("MoistAirVolume:", MoistAirVolume)
 	DegreeOfSaturation, err = GetDegreeOfSaturation(TDryBulb, HumRatio, Pressure, isIP)
 	if err != nil {
+		fmt.Println("GetDegreeOfSaturation")
 		return INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, err
 	}
+	fmt.Println("DegreeOfSaturation:", DegreeOfSaturation)
 	return HumRatio, TDewPoint, RelHum, VapPres, MoistAirEnthalpy, MoistAirVolume, DegreeOfSaturation, nil
 }

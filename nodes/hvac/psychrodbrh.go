@@ -1,10 +1,8 @@
 package hvac
 
-// #include "/home/user/Documents/Nube/Rubix-Flow-Engine/flow-eng/helpers/psychrometrics/psychrolib.h"
-import "C"
-
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/psychrometrics"
 	"github.com/NubeDev/flow-eng/node"
@@ -67,10 +65,14 @@ func (inst *PsychroDBRH) Process() {
 	}
 	dryBulbT := inst.ReadPinOrSettingsFloat(node.DryBulbTemp)
 	relHumPerc := inst.ReadPinOrSettingsFloat(node.RelHumid)
+	relHumPerc = relHumPerc / 100
+
+	fmt.Println("units: ", units, "dryBulbT: ", dryBulbT, "relHumPerc: ", relHumPerc, "atmPress: ", atmPress)
 
 	HumRatio, TWetBulb, TDewPoint, VapPres, MoistAirEnthalpy, MoistAirVolume, DegreeOfSaturation, err := psychrometrics.CalcPsychrometricsFromRelHum(dryBulbT, relHumPerc, atmPress, inst.isImperial)
 	if err != nil {
 		// TODO: set node error message
+		fmt.Println("CalcPsychrometricsFromRelHum(): err: ", err)
 		return
 	}
 	inst.WritePinFloat(node.HumRatioO, HumRatio)
