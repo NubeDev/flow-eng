@@ -100,15 +100,20 @@ func (inst *AV) writePointPri(objType points.ObjectType, id points.ObjectID, in1
 	if p == nil {
 		return nil
 	}
+
 	if p.WriteValueFromBACnet != nil {
 		p.WriteValueFromBACnet.P14 = in14
 		p.WriteValueFromBACnet.P15 = in15
 		p.WriteValue = p.WriteValueFromBACnet
 		currentPriority := points.GetHighest(p.WriteValue)
+		// fmt.Println(p.WriteValueFromBACnet == nil, "WriteValueFromBACnet", "currentPriority", currentPriority)
 		if currentPriority != nil {
 			p.PresentValue = currentPriority.Value
 		}
-		inst.updatePoint(objType, id, p)
+		err := inst.updatePoint(objType, id, p)
+		if err != nil {
+			log.Errorf("error")
+		}
 		return p
 	} else {
 		if p.WriteValue == nil {

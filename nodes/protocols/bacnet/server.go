@@ -87,9 +87,13 @@ func (inst *Server) Process() {
 			}
 		}
 	}
-	if inst.pingFailed || inst.reconnectedOk { // on failed resubscribe
+
+	if inst.pingFailed { // on failed resubscribe
+		// log.Error("bacnet node failed")
+		fmt.Println("!!!!!! pingFailed")
 	}
 	if !inst.pingLock {
+
 	}
 	if !runnersLock {
 		go inst.protocolRunner()
@@ -99,6 +103,7 @@ func (inst *Server) Process() {
 	}
 	inst.loopCount = loopCount
 	if loopCount%100 == 0 {
+		go inst.mqttReconnect()
 		p, ok := inst.getPoints()
 		if ok {
 			for _, point := range p {
@@ -156,7 +161,10 @@ func (inst *Server) updateFromBACnet(objType points.ObjectType, id points.Object
 	if p != nil {
 		p.WriteValueFromBACnet = array
 		p.PendingWriteValueFromBACnet = true
-		inst.updatePoint(objType, id, p)
+		err := inst.updatePoint(objType, id, p)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
