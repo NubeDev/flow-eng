@@ -71,3 +71,46 @@ func getSettings(body map[string]interface{}) (*nodeSettings, error) {
 	err = json.Unmarshal(marshal, &settings)
 	return settings, err
 }
+
+func getScheduleSettings(body map[string]interface{}) (*scheduleSettings, error) {
+	settings := &scheduleSettings{}
+	marshal, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(marshal, &settings)
+	if err != nil {
+		return nil, err
+	}
+	return settings, err
+}
+
+type scheduleNodeSchema struct {
+	Schedule schemas.EnumString `json:"schedule"`
+}
+
+type scheduleSettings struct {
+	Schedule string `json:"schedule"`
+}
+
+func (inst *FFSchedule) buildSchema() *schemas.Schema {
+	_, names, _ := inst.getSchedules()
+	props := &scheduleNodeSchema{}
+	if len(names) > 0 {
+		props.Schedule.Default = names[0]
+	} else {
+		names = nil
+	}
+	props.Schedule.Title = "schedule"
+	props.Schedule.Options = names
+	props.Schedule.EnumName = names
+	schema.Set(props)
+	sch := &schemas.Schema{
+		Schema: schemas.SchemaBody{
+			Title:      "settings",
+			Properties: props,
+		},
+		UiSchema: nil,
+	}
+	return sch
+}

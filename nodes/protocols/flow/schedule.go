@@ -24,8 +24,8 @@ func NewFFSchedule(body *node.Spec) (node.Node, error) {
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	lastUpdated := node.BuildOutput(node.LastUpdated, node.TypeString, nil, body.Outputs)
 	outputs := node.BuildOutputs(out, lastUpdated)
-	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetAllowSettings()
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body = node.SetNoParent(body)
 	pnt := &FFSchedule{body, "", nil, false, time.Now()}
 	return pnt, nil
@@ -51,7 +51,7 @@ func (inst *FFSchedule) getSchedules() ([]*Schedule, []string, error) {
 }
 
 func (inst *FFSchedule) getResult() {
-	settings, err := getScheduleSettings(inst.Settings)
+	settings, err := getScheduleSettings(inst.GetSettings())
 	if err != nil {
 		log.Errorf("Flow Network Schedules getResult() err: %s", err.Error())
 	}
@@ -60,7 +60,7 @@ func (inst *FFSchedule) getResult() {
 		log.Errorf("Flow Network Schedules getResult() err: %s", err.Error())
 	}
 	for _, schedule := range schedules {
-		if settings.Name == schedule.Name {
+		if settings.Schedule == schedule.Name {
 			value := schedule.IsActive
 			if inst.lastValue != value {
 				inst.lastValue = value
@@ -68,14 +68,15 @@ func (inst *FFSchedule) getResult() {
 			}
 			inst.WritePin(node.Out, value)
 			inst.WritePin(node.LastUpdated, ttime.TimeSince(inst.lastUpdate))
+			inst.SetSubTitle(schedule.Name)
 		}
 	}
 
 }
 
 func (inst *FFSchedule) Process() {
-	loopCount, firstLoop := inst.Loop()
-	if firstLoop {
+	loopCount, _ := inst.Loop()
+	if loopCount == 3 {
 		inst.getResult()
 	}
 	if loopCount%50 == 0 {

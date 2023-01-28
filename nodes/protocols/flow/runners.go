@@ -11,8 +11,8 @@ import (
 
 func (inst *Network) subscribeToEachPoint() {
 	callback := func(client mqtt.Client, message mqtt.Message) {
-		inst.fetchPointResponseCount = 0
-		// log.Infof("Flow Network subscribe(): %+v", message)
+		// log.Infof("Flow Network subscribe(): %+v", string(message.Payload()))
+		// log.Infof("Flow Network subscribe(): %+v", string(message.Topic()))
 		s := inst.GetStore()
 		children, ok := s.Get(inst.GetID())
 		payloads := getPayloads(children, ok)
@@ -75,10 +75,11 @@ func (inst *Network) fetchPointsList() {
 // TODO: the points list topic gets a message on EVERY FF Point CRUD.  This produces MANY updates and many FF DB calls. Consider removing them.
 func (inst *Network) pointsList() {
 	callback := func(client mqtt.Client, message mqtt.Message) {
+		inst.fetchPointResponseCount = 0
 		var points []*point
 		err := json.Unmarshal(message.Payload(), &points)
 		if err != nil {
-			log.Errorf("failed to get flow-framework points list err: %s", err.Error())
+			log.Errorf("failed to unmarshal flow-framework points list err: %s", err.Error())
 			return
 		}
 		inst.pointsCount = len(points)
@@ -107,7 +108,6 @@ func (inst *Network) pointsList() {
 
 func (inst *Network) fetchSchedulesList() {
 	var topic = "rubix/platform/schedules"
-	inst.fetchPointResponseCount++
 	if inst.mqttClient != nil {
 		err := inst.mqttClient.Publish(topic, mqttQOS, false, "")
 		if err != nil {
@@ -134,7 +134,7 @@ func (inst *Network) schedulesList() {
 		var schedules []*Schedule
 		err := json.Unmarshal(message.Payload(), &schedules)
 		if err != nil {
-			log.Errorf("failed to get flow-framework points list err: %s", err.Error())
+			log.Errorf("failed to unmarshal flow-framework schedules list err: %s", err.Error())
 			return
 		}
 		log.Infof("Flow Network schedulesList() schedules count: %d", len(schedules))
@@ -218,6 +218,8 @@ func (inst *Network) publish(loopCount uint64) {
 	}
 	children, ok := s.Get(inst.GetID())
 	payloads := getPayloads(children, ok)
+	// log.Infof("Flow Network publish() point count to write: %d", len(payloads))
+
 	for _, payload := range payloads {
 		// fmt.Println(fmt.Sprintf("Flow Network publish() payload: %+v", payload))
 		if !payload.isWriteable {
@@ -247,6 +249,7 @@ func (inst *Network) publish(loopCount uint64) {
 			ffPointWriteNode := n.(*FFPointWrite)
 			priority = ffPointWriteNode.EvaluateInputsArray(republishLoop)
 			if len(priority) <= 0 {
+				// log.Infof("Flow Network publish() nothing to write name: %s", payload.netDevPntNames)
 				continue
 			}
 
@@ -267,6 +270,8 @@ func (inst *Network) publish(loopCount uint64) {
 				if err != nil {
 					log.Errorf("Flow Network publish() err: %s", err.Error())
 				}
+			} else {
+				log.Errorf("Flow Network publish() mqtt client is empty")
 			}
 		}
 	}
