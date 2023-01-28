@@ -3,7 +3,7 @@ package nodes
 import (
 	"encoding/json"
 	"fmt"
-	pprint "github.com/NubeDev/flow-eng/helpers/print"
+	pprint "github.com/NubeDev/flow-eng/helpers/pprint"
 	"io/ioutil"
 	"os"
 	"testing"

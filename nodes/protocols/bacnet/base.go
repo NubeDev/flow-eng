@@ -109,6 +109,11 @@ func addPoint(ioType points.IoType, objectType points.ObjectType, id points.Obje
 		IsWriteable: isWriteable,
 		Enable:      enable,
 		Offset:      settings.Offset,
+		ScaleEnable: settings.ScaleEnable,
+		ScaleInMin:  settings.ScaleInMin,
+		ScaleInMax:  settings.ScaleInMax,
+		ScaleOutMin: settings.ScaleOutMin,
+		ScaleOutMax: settings.ScaleOutMax,
 	}
 	return point
 

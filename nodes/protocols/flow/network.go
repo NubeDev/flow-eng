@@ -12,16 +12,19 @@ import (
 
 type Network struct {
 	*node.Spec
-	firstLoop               bool
-	loopCount               uint64
-	connection              *db.Connection
-	mqttClient              *mqttclient.Client
-	mqttConnected           bool
-	points                  []*point
-	pointsCount             int
-	errorCode               errorCode
-	error                   bool
-	fetchPointResponseCount int
+	firstLoop                    bool
+	loopCount                    uint64
+	connection                   *db.Connection
+	mqttClient                   *mqttclient.Client
+	mqttConnected                bool
+	points                       []*point
+	pointsCount                  int
+	errorCode                    errorCode
+	error                        bool
+	fetchPointResponseCount      int
+	subscribeFailedPoints        bool
+	subscribeFailedPointsList    bool
+	subscribeFailedSchedulesList bool
 }
 
 var mqttQOS = mqttclient.AtMostOnce
@@ -34,7 +37,7 @@ func NewNetwork(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(node.BuildOutput(node.Connected, node.TypeBool, nil, body.Outputs))
 	body.IsParent = true
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	network := &Network{body, false, 0, nil, nil, false, nil, 0, "", false, 0}
+	network := &Network{body, false, 0, nil, nil, false, nil, 0, "", false, 0, false, false, false}
 	return network, nil
 }
 
@@ -43,9 +46,7 @@ func (inst *Network) setConnection() {
 	if err != nil {
 		errMes := fmt.Sprintf("flow-network, add mqtt broker failed to get settings err:%s", err.Error())
 		log.Errorf(errMes)
-		inst.SetStatusError(errMes)
-		inst.SetErrorIcon(string(emoji.RedCircle))
-		inst.SetSubTitle("")
+		inst.setError(errMes, false)
 		return
 	}
 	var connection *db.Connection
@@ -55,9 +56,7 @@ func (inst *Network) setConnection() {
 	if err != nil {
 		errMes := fmt.Sprintf("flow-network error in getting connection err:%s", err.Error())
 		log.Errorf(errMes)
-		inst.SetStatusError(errMes)
-		inst.SetErrorIcon(string(emoji.RedCircle))
-		inst.SetSubTitle("")
+		inst.setError(errMes, false)
 		return
 	}
 
@@ -66,9 +65,7 @@ func (inst *Network) setConnection() {
 		if err != nil {
 			errMes := fmt.Sprintf("flow-network error in getting connection err:%s", err.Error())
 			log.Errorf(errMes)
-			inst.SetStatusError(errMes)
-			inst.SetErrorIcon(string(emoji.RedCircle))
-			inst.SetSubTitle("")
+			inst.setError(errMes, false)
 			return
 		}
 	}
@@ -76,8 +73,7 @@ func (inst *Network) setConnection() {
 	if connection == nil {
 		errMes := fmt.Sprintf("no flow-network mqtt connection, please select a connection")
 		log.Errorf(errMes)
-		inst.SetStatusError(errMes)
-		inst.SetErrorIcon(string(emoji.RedCircle))
+		inst.setError(errMes, false)
 		return
 	}
 	inst.connection = connection
@@ -89,11 +85,11 @@ func (inst *Network) setConnection() {
 	if err != nil {
 		errMes := fmt.Sprintf("flow-network mqtt connect err: %s", err.Error())
 		log.Error(errMes)
-		inst.SetStatusError(errMes)
-		inst.SetErrorIcon(string(emoji.RedCircle))
+		inst.setError(errMes, false)
 	} else {
 		inst.mqttClient = mqttClient
 		inst.mqttConnected = true
+		inst.setError("", true)
 	}
 
 }
@@ -105,13 +101,23 @@ func (inst *Network) GetSchema() *schemas.Schema {
 
 func (inst *Network) Process() {
 	loopCount, firstLoop := inst.Loop()
-	if firstLoop {
+	if firstLoop || !inst.mqttConnected {
 		go inst.setConnection()
 	}
 	if loopCount == 2 {
-		go inst.subscribe()
+		go inst.subscribeToEachPoint()
 		go inst.pointsList()
+		go inst.schedulesList()
 		go inst.publish(loopCount)
+	}
+	if inst.subscribeFailedPoints {
+		go inst.subscribeToEachPoint()
+	}
+	if inst.subscribeFailedPointsList {
+		go inst.pointsList()
+	}
+	if inst.subscribeFailedSchedulesList {
+		go inst.schedulesList()
 	}
 	if inst.mqttConnected {
 		inst.WritePinTrue(node.Connected)
@@ -123,18 +129,28 @@ func (inst *Network) Process() {
 	}
 	if loopCount%50 == 0 { // get the points every 50 loops
 		inst.fetchPointsList()
+		inst.fetchSchedulesList()
 		inst.connectionError()
 	} else if loopCount%110 == 0 { // refresh point COV
 		inst.fetchAllPointValues()
 	}
 }
 
+func (inst *Network) setError(msg string, reset bool) {
+	if reset {
+		inst.SetStatusError("error cleared")
+		inst.SetErrorIcon(string(emoji.YellowCircle))
+	} else {
+		inst.SetStatusError(msg)
+		inst.SetErrorIcon(string(emoji.RedCircle))
+		inst.mqttConnected = false
+	}
+}
+
 func (inst *Network) connectionError() {
 	if inst.error {
-		inst.SetStatusError(string(inst.errorCode))
-		inst.SetErrorIcon(string(emoji.RedCircle))
+		inst.setError(string(inst.errorCode), false)
 	} else {
-		inst.SetStatusError(string(inst.errorCode))
-		inst.SetErrorIcon(string(emoji.GreenCircle))
+		inst.setError("", true)
 	}
 }

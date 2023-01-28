@@ -78,6 +78,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	flowNetwork, _ := flow.NewNetwork(nil)
 	flowPoint, _ := flow.NewFFPoint(nil)
 	flowPointWrite, _ := flow.NewFFPointWrite(nil)
+	flowSchedule, _ := flow.NewFFSchedule(nil)
 
 	flowLoopCount, _ := system.NewLoopCount(nil)
 	subFlowFolder, _ := subflow.NewSubFlowFolder(nil)
@@ -232,6 +233,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(flowNetwork),
 		node.ConvertToSpec(flowPoint),
 		node.ConvertToSpec(flowPointWrite),
+		node.ConvertToSpec(flowSchedule),
 
 		node.ConvertToSpec(deadBand),
 		node.ConvertToSpec(pid),
@@ -526,6 +528,8 @@ func builderFlowNetworks(body *node.Spec, opts []interface{}) (node.Node, error)
 		return flow.NewFFPoint(body)
 	case flowPointWrite:
 		return flow.NewFFPointWrite(body)
+	case flowSchedule:
+		return flow.NewFFSchedule(body)
 	}
 	return nil, nil
 }

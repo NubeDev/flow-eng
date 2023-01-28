@@ -1,7 +1,7 @@
 package schema
 
 import (
-	pprint "github.com/NubeDev/flow-eng/helpers/print"
+	pprint "github.com/NubeDev/flow-eng/helpers/pprint"
 )
 
 type UiOptions struct {

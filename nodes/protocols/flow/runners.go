@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func (inst *Network) subscribe() {
+func (inst *Network) subscribeToEachPoint() {
 	callback := func(client mqtt.Client, message mqtt.Message) {
 		inst.fetchPointResponseCount = 0
 		// log.Infof("Flow Network subscribe(): %+v", message)
@@ -32,6 +32,7 @@ func (inst *Network) subscribe() {
 	s := inst.GetStore()
 	children, ok := s.Get(inst.GetID())
 	payloads := getPayloads(children, ok)
+	inst.subscribeFailedPoints = true
 	for _, payload := range payloads {
 		if payload.topic != "" {
 			if inst.mqttClient != nil {
@@ -40,6 +41,7 @@ func (inst *Network) subscribe() {
 					log.Errorf("Flow Network subscribe(): %s err: %s", payload.topic, err.Error())
 				} else {
 					log.Infof("Flow Network subscribe(): %s", payload.topic)
+					inst.subscribeFailedPoints = false
 				}
 			}
 		}
@@ -91,12 +93,69 @@ func (inst *Network) pointsList() {
 		}
 	}
 	var topic = "rubix/platform/points/publish"
+	inst.subscribeFailedPointsList = true
 	if inst.mqttClient != nil {
 		err := inst.mqttClient.Subscribe(topic, mqttQOS, callback)
 		if err != nil {
 			log.Errorf("Flow Network pointsList() :%s Subscribe() err: %s", topic, err.Error())
 		} else {
 			log.Infof("Flow Network pointsList() Subscribe() : %s", topic)
+			inst.subscribeFailedPointsList = false
+		}
+	}
+}
+
+func (inst *Network) fetchSchedulesList() {
+	var topic = "rubix/platform/schedules"
+	inst.fetchPointResponseCount++
+	if inst.mqttClient != nil {
+		err := inst.mqttClient.Publish(topic, mqttQOS, false, "")
+		if err != nil {
+			log.Errorf("Flow Network fetchSchedulesList(): %s err: %s", topic, err.Error())
+			inst.error = true
+			inst.errorCode = errorFetchPointMQTTConnect
+		} else {
+			inst.error = false
+			inst.errorCode = errorOk
+		}
+	} else {
+		inst.error = true
+		inst.errorCode = errorMQTTClientEmpty
+	}
+	if inst.fetchPointResponseCount > 5 {
+		inst.error = true
+		inst.errorCode = errorFailedFetchPoint
+	}
+}
+
+// schedulesList
+func (inst *Network) schedulesList() {
+	callback := func(client mqtt.Client, message mqtt.Message) {
+		var schedules []*Schedule
+		err := json.Unmarshal(message.Payload(), &schedules)
+		if err != nil {
+			log.Errorf("failed to get flow-framework points list err: %s", err.Error())
+			return
+		}
+		log.Infof("Flow Network schedulesList() schedules count: %d", len(schedules))
+		s := inst.GetStore()
+		topic := fmt.Sprintf("schedulesList_%s", inst.GetID())
+		if s != nil {
+			s.Set(topic, schedules, 0)
+		} else {
+			log.Errorf("failed to get flow-framework schedules store err: %s", err.Error())
+		}
+	}
+	var topic = "rubix/platform/schedules/publish"
+	inst.subscribeFailedSchedulesList = true
+	if inst.mqttClient != nil {
+		err := inst.mqttClient.Subscribe(topic, mqttQOS, callback)
+		if err != nil {
+			log.Errorf("Flow Network schedulesList() :%s Subscribe() err: %s", topic, err.Error())
+
+		} else {
+			log.Infof("Flow Network schedulesList() Subscribe() : %s", topic)
+			inst.subscribeFailedSchedulesList = false
 		}
 	}
 }
@@ -204,7 +263,6 @@ func (inst *Network) publish(loopCount uint64) {
 				continue
 			}
 			if inst.mqttClient != nil {
-				fmt.Println("MQTT publish", string(data))
 				err := inst.mqttClient.Publish(pointWriteTopic, mqttQOS, mqttRetain, data)
 				if err != nil {
 					log.Errorf("Flow Network publish() err: %s", err.Error())

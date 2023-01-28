@@ -27,12 +27,12 @@ func Test_Write(t *testing.T) {
 
 }
 
-func Test_Read(t *testing.T) {
+func Test_ReadTemp(t *testing.T) {
 
 	cli := &Modbus{
 		IsSerial: true,
 		Serial: &modbus.Serial{
-			SerialPort: "/dev/ttyUSB0",
+			SerialPort: "/dev/ttyUSB1",
 		},
 	}
 	init, err := cli.Init(cli)
@@ -40,7 +40,51 @@ func Test_Read(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
-	registers, err := init.readRegisters(2, 200, 2, false)
+	registers, err := init.ReadTemps(1)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(registers)
+
+}
+
+func Test_ReadVoltage(t *testing.T) {
+
+	cli := &Modbus{
+		IsSerial: true,
+		Serial: &modbus.Serial{
+			SerialPort: "/dev/ttyUSB1",
+		},
+	}
+	init, err := cli.Init(cli)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	registers, err := init.ReadVolts(1)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(registers)
+
+}
+
+func Test_Read(t *testing.T) {
+
+	cli := &Modbus{
+		IsSerial: true,
+		Serial: &modbus.Serial{
+			SerialPort: "/dev/ttyUSB1",
+		},
+	}
+	init, err := cli.Init(cli)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	registers, err := init.readRegisters(1, 200, 2, false)
 	if err != nil {
 		fmt.Println(err)
 		return

@@ -3,7 +3,7 @@ package node
 import (
 	"errors"
 	"github.com/NubeDev/flow-eng/helpers/global"
-	pprint "github.com/NubeDev/flow-eng/helpers/print"
+	pprint "github.com/NubeDev/flow-eng/helpers/pprint"
 	"github.com/NubeDev/flow-eng/helpers/uuid"
 )
 

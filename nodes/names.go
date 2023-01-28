@@ -39,6 +39,7 @@ const (
 
 	flowNetwork    = "flow-network"
 	flowPoint      = "flow-point"
+	flowSchedule   = "flow-schedule"
 	flowPointWrite = "flow-point-write"
 
 	flowLoopCount = "flow-loop-count"
