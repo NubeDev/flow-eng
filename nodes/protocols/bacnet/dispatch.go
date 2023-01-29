@@ -2,7 +2,6 @@ package bacnetio
 
 import (
 	log "github.com/sirupsen/logrus"
-	"time"
 )
 
 /*
@@ -21,11 +20,10 @@ type toFlowOptions struct {
 // mqttPubRunner send messages to the broker, as in read a modbus point and send it to the bacnet server
 func (inst *Server) writeRunner() {
 	log.Info("start mqtt-pub-runner")
-	for {
-		p, _ := inst.getPoints()
-		for _, point := range p {
-			inst.mqttPublishPV(point)
-		}
-		time.Sleep(runnerDelay * time.Millisecond)
+	p, _ := inst.getPoints()
+
+	for _, point := range p {
+		inst.mqttPublishPV(point)
 	}
+
 }

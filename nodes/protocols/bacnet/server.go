@@ -32,6 +32,7 @@ type Server struct {
 	firstMessageFromBacnet bool
 	deviceCount            string
 	pollingCount           int64
+	finishModbusLoop       bool
 }
 
 var runnersLock bool
@@ -65,7 +66,7 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	body.IsParent = true
 	body = node.BuildNode(body, nil, outputs, body.Settings)
 	clients := &clients{}
-	server := &Server{body, clients, false, false, false, opts.Store, application, 0, false, "", 0}
+	server := &Server{body, clients, false, false, false, opts.Store, application, 0, false, "", 0, false}
 	server.clients.mqttClient = opts.MqttClient
 	body.SetSchema(BuildSchemaServer())
 	if application == names.Modbus {

@@ -44,10 +44,12 @@ func (inst *Server) modbusRunner(settings map[string]interface{}) {
 		inst.pollingCount = count
 		pointsListRead, _ := inst.getPointsReadOnly()
 		inst.modbusInputsRunner(init, pointsListRead) // process the inputs
+		time.Sleep(modbusDelay * time.Millisecond)
 		inst.modbusOutputsDispatch(init)
+		go inst.writeRunner() // publish all mqtt values
+		time.Sleep(500 * time.Millisecond)
 		inst.SetNotifyMessage(pollStats(inst.pollingCount))
 		inst.SetNotifyIcon(string(emoji.GreenCircle)) // process the outs
-		time.Sleep(500 * time.Millisecond)
 		count++
 	}
 }
@@ -101,26 +103,29 @@ func (inst *Server) modbusOutputsDispatch(cli *modbuscli.Modbus) {
 		if err != nil {
 			log.Errorf("modbus write %s slave: %d", err.Error(), 1)
 		}
+		time.Sleep(modbusDelay * time.Millisecond)
 	}
 	if len(pointsList.DeviceTwo) > 0 {
 		err := cli.Write(2, modbusBulkWrite(pointsList.DeviceTwo))
 		if err != nil {
 			log.Errorf("modbus write %s slave: %d", err.Error(), 2)
 		}
+		time.Sleep(modbusDelay * time.Millisecond)
 	}
 	if len(pointsList.DeviceThree) > 0 {
 		err := cli.Write(3, modbusBulkWrite(pointsList.DeviceThree))
 		if err != nil {
 			log.Errorf("modbus write %s slave: %d", err.Error(), 3)
 		}
+		time.Sleep(modbusDelay * time.Millisecond)
 	}
 	if len(pointsList.DeviceFour) > 0 {
 		err := cli.Write(4, modbusBulkWrite(pointsList.DeviceFour))
 		if err != nil {
 			log.Errorf("modbus write %s slave: %d", err.Error(), 4)
 		}
+		time.Sleep(modbusDelay * time.Millisecond)
 	}
-
 }
 
 func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*points.Point) {
@@ -139,16 +144,18 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 				continue
 			}
 			if !completedTemp && (point.IoType == points.IoTypeTemp || point.IoType == points.IoTypeDigital) {
-				tempList, err = cli.ReadTemps(slaveId) // DO MODBUS READ FOR TEMPS
+				tempList, err = cli.ReadTemps(slaveId) // DO MODBUS READ FOR TEMPS OR DIs
 				if err != nil {
 					log.Errorf("modbus read temp %s slave: %d", err.Error(), slaveId)
 				}
+				time.Sleep(modbusDelay * time.Millisecond)
 			}
 			if !completedVolt && point.IoType == points.IoTypeVolts {
 				voltList, err = cli.ReadVolts(slaveId) // DO MODBUS READ FOR VOLTS
 				if err != nil {
 					log.Errorf("modbus read voltages %s slave: %d", err.Error(), slaveId)
 				}
+				time.Sleep(modbusDelay * time.Millisecond)
 			}
 			// update the store
 			io16Pin := addr.IoPin - 1
@@ -163,7 +170,10 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 			if point.IoType == points.IoTypeVolts { // update anypoint that is type voltage
 				returnedValue = voltList[io16Pin]
 			}
-			inst.writePV(point.ObjectType, point.ObjectID, returnedValue)
+			err := inst.writePV(point.ObjectType, point.ObjectID, returnedValue)
+			if err != nil {
+				log.Errorf("modbus modbusInputsRunner() writePv %s slave: %d", err.Error(), slaveId)
+			}
 		}
 	}
 }
