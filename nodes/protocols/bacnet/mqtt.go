@@ -29,7 +29,6 @@ func (inst *Server) mqttReconnect() {
 			inst.reconnectedOk = true
 		}
 	}
-	// time.Sleep(1 * time.Minute)
 	inst.pingLock = false
 }
 
@@ -87,11 +86,6 @@ func (inst *Server) mqttPublishPV(point *points.Point) error {
 		}
 	}
 	return nil
-}
-
-type bacnetName struct {
-	name string
-	uuid string
 }
 
 // mqttPublishNames write the point names to the server

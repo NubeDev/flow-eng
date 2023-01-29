@@ -90,7 +90,6 @@ func (inst *Server) Process() {
 
 	if inst.pingFailed { // on failed resubscribe
 		// log.Error("bacnet node failed")
-		fmt.Println("!!!!!! pingFailed")
 	}
 	if !inst.pingLock {
 

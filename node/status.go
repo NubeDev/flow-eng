@@ -40,7 +40,7 @@ func (n *Spec) SetSubTitle(message string) {
 	if n.Status == nil {
 		n.Status = &Status{}
 	}
-	if n.GetNodeName() == "" {
+	if n.GetNodeName() == "" && n.Info.Category != "bacnet" {
 		n.SetNodeName(n.GetName())
 	}
 	n.Status.SubTitle = message

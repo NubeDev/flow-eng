@@ -65,7 +65,8 @@ func modbusScaleOutput(value, offset float64) float64 {
 
 func modbusBulkWrite(pointsList []*points.Point) [8]float64 {
 	var out [8]float64
-	for i, point := range pointsList {
+	for _, point := range pointsList {
+		ioNumber, _ := points.ModbusBuildOutput(points.IoTypeVolts, point.ObjectID)
 		v := points.GetHighest(point.WriteValue)
 		if v != nil {
 			var value = v.Value
@@ -81,7 +82,8 @@ func modbusBulkWrite(pointsList []*points.Point) [8]float64 {
 					value = modbusScaleOutput(value, point.Offset) // point offset
 				}
 			}
-			out[i] = value
+			// fmt.Println("POINT", point.ObjectID, value)
+			out[ioNumber.IoPin-1] = value
 		}
 	}
 	return out
@@ -90,30 +92,32 @@ func modbusBulkWrite(pointsList []*points.Point) [8]float64 {
 func (inst *Server) modbusOutputsDispatch(cli *modbuscli.Modbus) {
 	pointsList := inst.GetModbusWriteablePoints()
 	if pointsList == nil {
+		log.Errorf("modbus modbusOutputsDispatch() points is empty")
+		return
 
 	}
 	if len(pointsList.DeviceOne) > 0 {
 		err := cli.Write(1, modbusBulkWrite(pointsList.DeviceOne))
 		if err != nil {
-			log.Error(err)
+			log.Errorf("modbus write %s slave: %d", err.Error(), 1)
 		}
 	}
 	if len(pointsList.DeviceTwo) > 0 {
 		err := cli.Write(2, modbusBulkWrite(pointsList.DeviceTwo))
 		if err != nil {
-			log.Error(err)
+			log.Errorf("modbus write %s slave: %d", err.Error(), 2)
 		}
 	}
 	if len(pointsList.DeviceThree) > 0 {
 		err := cli.Write(3, modbusBulkWrite(pointsList.DeviceThree))
 		if err != nil {
-			log.Error(err)
+			log.Errorf("modbus write %s slave: %d", err.Error(), 3)
 		}
 	}
 	if len(pointsList.DeviceFour) > 0 {
 		err := cli.Write(4, modbusBulkWrite(pointsList.DeviceFour))
 		if err != nil {
-			log.Error(err)
+			log.Errorf("modbus write %s slave: %d", err.Error(), 4)
 		}
 	}
 
@@ -137,17 +141,18 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 			if !completedTemp && (point.IoType == points.IoTypeTemp || point.IoType == points.IoTypeDigital) {
 				tempList, err = cli.ReadTemps(slaveId) // DO MODBUS READ FOR TEMPS
 				if err != nil {
-					log.Errorf("modbus read temp %s", err.Error())
+					log.Errorf("modbus read temp %s slave: %d", err.Error(), slaveId)
 				}
 			}
 			if !completedVolt && point.IoType == points.IoTypeVolts {
 				voltList, err = cli.ReadVolts(slaveId) // DO MODBUS READ FOR VOLTS
 				if err != nil {
-					log.Errorf("modbus read voltages %s", err.Error())
+					log.Errorf("modbus read voltages %s slave: %d", err.Error(), slaveId)
 				}
 			}
 			// update the store
 			io16Pin := addr.IoPin - 1
+			// fmt.Println("SLAVE", slaveId, tempList)
 			if point.IoType == points.IoTypeTemp || point.IoType == points.IoTypeDigital { // update anypoint that is type temp
 				if point.IoType == points.IoTypeDigital {
 					returnedValue = modbuscli.TempToDI(tempList[io16Pin]) // covert them temp value to a DI value
