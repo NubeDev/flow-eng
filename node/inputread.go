@@ -121,6 +121,29 @@ func (n *Spec) ReadPinOrSettingsBool(name InputName) bool {
 	}
 }
 
+func (n *Spec) ReadPinOrSettingsString(name InputName) string {
+	input := n.GetInput(name)
+	useSetting := !n.InputHasConnection(name) && n.ReadPin(name) == nil && input.SettingName != nil
+	if useSetting {
+		if n.Settings != nil {
+			val := reflect.ValueOf(n.Settings)
+			if val.Kind() == reflect.Map {
+				for _, e := range val.MapKeys() {
+					v := val.MapIndex(e)
+					if e.String() == *input.SettingName {
+						s, ok := conversions.GetStringOk(v)
+						if ok {
+							return s
+						}
+					}
+				}
+			}
+		}
+	}
+	inputString, _ := conversions.GetStringOk(input.GetValue())
+	return inputString
+}
+
 func (n *Spec) ReadPinAsTimeSettings(name InputName) (time.Duration, error) {
 	var settingsAmount float64
 	var useThisAmount float64

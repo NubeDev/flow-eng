@@ -101,8 +101,10 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	// hvac
 	deadBand, _ := hvac.NewDeadBand(nil)
+	leadLagSwitch, _ := hvac.NewLeadLagSwitch(nil)
 	pid, _ := hvac.NewPIDNode(nil)
 	pacControl, _ := hvac.NewPACControl(nil)
+	psychroDBRH, _ := hvac.NewPsychroDBRH(nil)
 
 	gmailNode, _ := gmail.NewGmail(nil)
 	pingNode, _ := ping.NewPing(nil)
@@ -125,6 +127,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	sub, _ := math.NewSub(nil)
 	multiply, _ := math.NewMultiply(nil)
 	divide, _ := math.NewDivide(nil)
+	modulo, _ := math.NewModulo(nil)
 
 	mathAdvanced, _ := mathematics.NewAdvanced(nil)
 
@@ -195,6 +198,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(sub),
 		node.ConvertToSpec(multiply),
 		node.ConvertToSpec(divide),
+		node.ConvertToSpec(modulo),
 		node.ConvertToSpec(mathAdvanced),
 
 		node.ConvertToSpec(and),
@@ -236,8 +240,10 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(flowSchedule),
 
 		node.ConvertToSpec(deadBand),
+		node.ConvertToSpec(leadLagSwitch),
 		node.ConvertToSpec(pid),
 		node.ConvertToSpec(pacControl),
+		node.ConvertToSpec(psychroDBRH),
 
 		node.ConvertToSpec(pointNum),
 		node.ConvertToSpec(pointBool),
@@ -538,10 +544,14 @@ func builderHVAC(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case deadBandNode:
 		return hvac.NewDeadBand(body)
+	case leadLagSwitch:
+		return hvac.NewLeadLagSwitch(body)
 	case pidNode:
 		return hvac.NewPIDNode(body)
 	case pacControlNode:
 		return hvac.NewPACControl(body)
+	case psychroDBRH:
+		return hvac.NewPsychroDBRH(body)
 	}
 	return nil, nil
 }
@@ -588,6 +598,8 @@ func builderMath(body *node.Spec) (node.Node, error) {
 		return math.NewMultiply(body)
 	case divide:
 		return math.NewDivide(body)
+	case modulo:
+		return math.NewModulo(body)
 	case mathAdvanced:
 		return mathematics.NewAdvanced(body)
 	}

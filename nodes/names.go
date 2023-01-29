@@ -9,6 +9,7 @@ const (
 	divide   = "divide"
 	sub      = "subtract"
 	multiply = "multiply"
+	modulo   = "modulo"
 
 	mathAdvanced = "advanced"
 
@@ -48,8 +49,10 @@ const (
 	writeHttpNode = "http-write"
 
 	deadBandNode   = "dead-band"
+	leadLagSwitch  = "lead-lag-switch"
 	pidNode        = "pid"
 	pacControlNode = "pac-control"
+	psychroDBRH    = "psychrometrics-db-rh"
 
 	greaterThan = "greater-than"
 	lessThan    = "less-than"

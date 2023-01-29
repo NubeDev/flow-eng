@@ -14,9 +14,11 @@ require (
 	github.com/enescakir/emoji v1.0.0
 	github.com/go-co-op/gocron v1.17.0
 	github.com/go-resty/resty/v2 v2.7.0
+	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/rvflash/elapsed v0.3.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/tidwall/buntdb v1.2.8
@@ -34,7 +36,6 @@ require (
 	github.com/grid-x/serial v0.0.0-20191104121038-e24bc9bf6f08 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.4 // indirect
-	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/tidwall/btree v0.7.1 // indirect
 	github.com/tidwall/grect v0.1.4 // indirect
 	github.com/tidwall/match v1.1.1 // indirect

@@ -5,6 +5,7 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/boolean"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
+	"github.com/NubeIO/lib-schema/schema"
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -31,7 +32,7 @@ type nodeSettings struct {
 
 func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error) {
 	body = node.Defaults(body, nodeName, category)
-	settings := &nodeSettings{}
+	settings := &BoolDefaultSettings{}
 	err := mapstructure.Decode(body.Settings, &settings)
 	if err != nil {
 		return nil, err
@@ -43,7 +44,7 @@ func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error)
 	inputs := node.BuildInputs(node.DynamicInputs(node.TypeBool, nil, count, 2, 20, body.Inputs)...)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	body.SetSchema(schemas.GetInputCount())
+	body.SetSchema(buildBoolDefaultSchema())
 	body.SetDynamicInputs()
 	return body, nil
 }
@@ -72,4 +73,36 @@ func operation(operation string, values []*bool) bool {
 		return array.OneIsTrue(nonNilValues)
 	}
 	return false
+}
+
+// Custom Node Settings Schema
+
+type BoolDefaultSettingsSchema struct {
+	InputCount schemas.Integer `json:"inputCount"`
+}
+
+type BoolDefaultSettings struct {
+	InputCount int `json:"inputCount"`
+}
+
+func buildBoolDefaultSchema() *schemas.Schema {
+	props := &BoolDefaultSettingsSchema{}
+	props.InputCount.Title = "Input Count"
+	props.InputCount.Default = 2
+	props.InputCount.Minimum = 2
+	props.InputCount.Maximum = 20
+
+	schema.Set(props)
+
+	uiSchema := array.Map{
+		"ui:order": array.Slice{"inputCount"},
+	}
+	s := &schemas.Schema{
+		Schema: schemas.SchemaBody{
+			Title:      "Node Settings",
+			Properties: props,
+		},
+		UiSchema: uiSchema,
+	}
+	return s
 }

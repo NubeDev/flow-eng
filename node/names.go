@@ -152,6 +152,17 @@ const (
 	Bias         InputName = "bias"
 	Manual       InputName = "manual"
 	IntervalSecs InputName = "interval-secs"
+
+	AccumulationIn InputName = "accumulation-in"
+
+	RotateLead InputName = "rotate-lead"
+	Stage1     InputName = "stage-1"
+	Stage2     InputName = "stage-2"
+
+	DryBulbTemp  InputName = "dry-bulb-temp"
+	WetBulbTemp  InputName = "wet-bulb-temp"
+	DewPointTemp InputName = "dew-point-temp"
+	RelHumid     InputName = "rel-humidity-%"
 )
 
 const (
@@ -220,4 +231,23 @@ const (
 	ReversingValve OutputName = "reversing-valve"
 	Compressor1    OutputName = "compressor-1"
 	Compressor2    OutputName = "compressor-2"
+
+	LeadUnit     OutputName = "lead-unit"
+	LeadUnitBool OutputName = "lead-unit-bool"
+	EnableA      OutputName = "enable-A"
+	EnableB      OutputName = "enable-B"
+
+	PeriodConsumption OutputName = "period-consumption"
+	LastAccumulation  OutputName = "last-accumulation"
+	PeriodDuration    OutputName = "period-duration"
+	NextTrigger       OutputName = "next-trigger"
+
+	WetBulbTempO     OutputName = "wet-bulb-temp"
+	DewPointTempO    OutputName = "dew-point-temp"
+	RelHumPercO      OutputName = "rel-humidity-%"
+	HumRatioO        OutputName = "humidity-ratio"
+	VaporPres        OutputName = "vapor-pressure"
+	MoistAirEnthalpy OutputName = "moist-air-enthalpy"
+	MoistAirVolume   OutputName = "moist-air-volume"
+	DegreeSaturation OutputName = "degree-of-saturation"
 )

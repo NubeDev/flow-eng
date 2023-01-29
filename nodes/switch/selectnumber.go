@@ -2,10 +2,13 @@ package switches
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
+	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
+	"github.com/mitchellh/mapstructure"
 	"math"
 )
 
@@ -15,28 +18,32 @@ type SelectNum struct {
 
 func NewSelectNum(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, selectNum, category)
-	/*
-		buildCount, setting, value, err := node.NewSetting(body, &node.SettingOptions{Type: node.Number, Title: node.InputCount, Min: 2, Max: 20})
-		if err != nil {return nil, err
-		}
-		settings, err := node.BuildSettings(setting)
-		if err != nil {return nil, err
-		}
-		count, ok := value.(int)
-		if !ok {count = 2
-		}
+	settings := &SelectNumSettings{}
+	err := mapstructure.Decode(body.Settings, &settings)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(fmt.Sprintf("SELECT settings: %+v", settings))
+	if settings == nil {
+		body.Settings = map[string]interface{}{}
+		body.Settings["inputCount"] = 2
+	} else if settings.InputCount < 2 {
+		body.Settings["inputCount"] = 2
+	}
+	inputsCount := int(conversions.GetFloat(body.Settings["inputCount"]))
+	inSelect := node.BuildInput(node.Selection, node.TypeFloat, nil, body.Inputs, nil) // TODO: this input shouldn't have a manual override value
+	dynamicInputs := node.DynamicInputs(node.TypeFloat, nil, inputsCount, 2, 20, body.Inputs)
+	inputsArray := []*node.Input{inSelect}
+	inputsArray = append(inputsArray, dynamicInputs...)
+	inputs := node.BuildInputs(inputsArray...)
 
-		node.DynamicInputs(node.TypeFloat, nil, count, 2, 20, body.Inputs)...
-
-		inSelect := node.BuildInput(node.Selection, node.TypeFloat, nil, body.Inputs, nil) // TODO: this input shouldn't have a manual override value
-		// inputs := node.BuildInputs(inSwitch, inTrue, inFalse)
-		inputs := node.BuildInputs(inSelect, node.DynamicInputs(node.TypeFloat, nil, count, 2, 20, body.Inputs)...)
-
-		out := node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs)
-		outputs := node.BuildOutputs(out)
-		body = node.BuildNode(body, inputs, outputs, body.Settings)
-	*/
-	return &Switch{body}, nil
+	out := node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs)
+	outputs := node.BuildOutputs(out)
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
+	body.SetDynamicInputs()
+	node := &SelectNum{body}
+	node.SetSchema(node.buildSchema())
+	return node, nil
 }
 
 func (inst *SelectNum) Process() {
@@ -45,40 +52,45 @@ func (inst *SelectNum) Process() {
 		inst.WritePinNull(node.Outp)
 	} else {
 		selectInput = math.Floor(selectInput)
-
+		settings, _ := inst.getSettings(inst.GetSettings())
+		count := settings.InputCount
+		if selectInput > 0 && int(selectInput) <= count {
+			selectedInputName := node.InputName(fmt.Sprintf("in%d", int(selectInput)))
+			input, inNull := inst.ReadPinAsFloat(selectedInputName)
+			if inNull {
+				inst.WritePinNull(node.Outp)
+			} else {
+				inst.WritePinFloat(node.Outp, input)
+			}
+		} else {
+			inst.WritePinNull(node.Outp)
+		}
 	}
 }
 
 // Custom Node Settings Schema
 
 type SelectNumSettingsSchema struct {
-	Interval          schemas.Number     `json:"interval"`
-	IntervalTimeUnits schemas.EnumString `json:"interval_time_units"`
-	Retrigger         schemas.Boolean    `json:"retrigger"`
+	InputCount schemas.Integer `json:"inputCount"`
 }
 
 type SelectNumSettings struct {
-	Interval          float64 `json:"interval"`
-	IntervalTimeUnits string  `json:"interval_time_units"`
-	Retrigger         bool    `json:"retrigger"`
+	InputCount int `json:"inputCount"`
 }
 
 func (inst *SelectNum) buildSchema() *schemas.Schema {
 	props := &SelectNumSettingsSchema{}
 
+	// inputs count
+	props.InputCount.Title = "Inputs Count"
+	props.InputCount.Default = 2
+	props.InputCount.Minimum = 2
+	props.InputCount.Maximum = 20
+
 	schema.Set(props)
 
 	uiSchema := array.Map{
-		"interval_time_units": array.Map{
-			"ui:widget": "radio",
-			"ui:options": array.Map{
-				"inline": true,
-			},
-		},
-		"retrigger": array.Map{
-			"ui:widget": "select",
-		},
-		"ui:order": array.Slice{"interval", "interval_time_units", "retrigger"},
+		"ui:order": array.Slice{"inputCount"},
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{
