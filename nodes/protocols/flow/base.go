@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/NubeDev/flow-eng/node"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"time"
 )
 
 func setError(body *node.Spec, message string) *node.Spec {
@@ -16,6 +17,7 @@ const (
 	category       = "flow"
 	flowNetwork    = "flow-network"
 	flowPoint      = "flow-point"
+	flowSchedule   = "flow-schedule"
 	flowPointWrite = "flow-point-write"
 )
 
@@ -58,9 +60,10 @@ type point struct {
 }
 
 type pointStore struct {
-	parentID string
-	points   []*point
-	payloads []*pointDetails
+	parentID  string
+	points    []*point
+	payloads  []*pointDetails
+	schedules []*Schedule
 }
 
 type pointDetails struct {
@@ -106,4 +109,20 @@ func addUpdatePayload(nodeUUID string, p *pointStore, newPayload *pointDetails) 
 		p.payloads = append(p.payloads, newPayload)
 	}
 	return p, found
+}
+
+type Schedule struct {
+	Uuid            string    `json:"uuid"`
+	Name            string    `json:"name"`
+	Enable          bool      `json:"enable"`
+	ThingClass      string    `json:"thing_class"`
+	ThingType       string    `json:"thing_type"`
+	IsActive        bool      `json:"is_active"`
+	IsGlobal        bool      `json:"is_global"`
+	TimeZone        string    `json:"timezone"`
+	ActiveWeekly    bool      `json:"active_weekly"`
+	ActiveException bool      `json:"active_exception"`
+	ActiveEvent     bool      `json:"active_event"`
+	CreatedOn       time.Time `json:"created_on"`
+	UpdatedOn       time.Time `json:"updated_on"`
 }

@@ -2,6 +2,7 @@ package bacnetio
 
 import (
 	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
@@ -31,6 +32,7 @@ type Server struct {
 	firstMessageFromBacnet bool
 	deviceCount            string
 	pollingCount           int64
+	finishModbusLoop       bool
 }
 
 var runnersLock bool
@@ -64,7 +66,7 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	body.IsParent = true
 	body = node.BuildNode(body, nil, outputs, body.Settings)
 	clients := &clients{}
-	server := &Server{body, clients, false, false, false, opts.Store, application, 0, false, "", 0}
+	server := &Server{body, clients, false, false, false, opts.Store, application, 0, false, "", 0, false}
 	server.clients.mqttClient = opts.MqttClient
 	body.SetSchema(BuildSchemaServer())
 	if application == names.Modbus {
@@ -86,9 +88,12 @@ func (inst *Server) Process() {
 			}
 		}
 	}
-	if inst.pingFailed || inst.reconnectedOk { // on failed resubscribe
+
+	if inst.pingFailed { // on failed resubscribe
+		// log.Error("bacnet node failed")
 	}
 	if !inst.pingLock {
+
 	}
 	if !runnersLock {
 		go inst.protocolRunner()
@@ -98,6 +103,7 @@ func (inst *Server) Process() {
 	}
 	inst.loopCount = loopCount
 	if loopCount%100 == 0 {
+		go inst.mqttReconnect()
 		p, ok := inst.getPoints()
 		if ok {
 			for _, point := range p {
@@ -128,6 +134,9 @@ func (inst *Server) getPV(objType points.ObjectType, id points.ObjectID) (float6
 func (inst *Server) writePV(objType points.ObjectType, id points.ObjectID, value float64) error {
 	pnt, ok := inst.getPoint(objType, id)
 	if ok {
+		if pnt.ScaleEnable {
+			value = float.Scale(value, pnt.ScaleInMin, pnt.ScaleInMax, pnt.ScaleOutMin, pnt.ScaleOutMax)
+		}
 		pnt.PresentValue = value + pnt.Offset
 		err := inst.updatePoint(objType, id, pnt)
 		if err != nil {
@@ -152,7 +161,10 @@ func (inst *Server) updateFromBACnet(objType points.ObjectType, id points.Object
 	if p != nil {
 		p.WriteValueFromBACnet = array
 		p.PendingWriteValueFromBACnet = true
-		inst.updatePoint(objType, id, p)
+		err := inst.updatePoint(objType, id, p)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

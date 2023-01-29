@@ -2,7 +2,6 @@ package modbuscli
 
 import (
 	"errors"
-	"fmt"
 	"github.com/NubeIO/nubeio-rubix-lib-modbus-go/modbus"
 )
 
@@ -36,9 +35,8 @@ func (inst *Modbus) WriteRegister(slave, register int, value float64) (err error
 	if err != nil {
 		return err
 	}
-	fmt.Println(slave, register, encodeUO(value))
+	// fmt.Println(slave, register, encodeUO(value))
 	_, _, err = inst.client.WriteSingleRegister(uint16(register), encodeUO(value))
-
 	if err != nil {
 		return err
 	}

@@ -10,7 +10,6 @@ import (
 	"github.com/enescakir/emoji"
 	log "github.com/sirupsen/logrus"
 	"strings"
-	"time"
 )
 
 func (inst *Server) mqttReconnect() {
@@ -30,7 +29,6 @@ func (inst *Server) mqttReconnect() {
 			inst.reconnectedOk = true
 		}
 	}
-	time.Sleep(1 * time.Minute)
 	inst.pingLock = false
 }
 
@@ -41,7 +39,9 @@ func (inst *Server) subscribeToBacnetServer() {
 			err := inst.fromBacnet(mes)
 			log.Infof("mqtt-bacnet message from server topic: %s -> value: %s", mes.Msg.Topic(), string(mes.Msg.Payload()))
 			if err != nil {
-				//log.Error(err)
+				if err.Error() != points.ErrStopMQTTLoop {
+					log.Error(err)
+				}
 			}
 		}
 	}
@@ -74,7 +74,7 @@ func (inst *Server) mqttPublishPV(point *points.Point) error {
 		return err
 	}
 	topic := fmt.Sprintf("bacnet/%s/%d/write/pv", obj, objectId) // bacnet/ao/1/write/pv
-	//topic := fmt.Sprintf("bacnet/%s/%d/write/pri/15", obj, objectId) // bacnet/ao/1/write/pv
+	// topic := fmt.Sprintf("bacnet/%s/%d/write/pri/15", obj, objectId) // bacnet/ao/1/write/pv
 	payload := buildPayload("", point.PresentValue)
 	log.Infof("mqtt-bacnet publish topic: %s -> value: %s", topic, payload)
 	if payload != "" {
@@ -86,11 +86,6 @@ func (inst *Server) mqttPublishPV(point *points.Point) error {
 		}
 	}
 	return nil
-}
-
-type bacnetName struct {
-	name string
-	uuid string
 }
 
 // mqttPublishNames write the point names to the server
@@ -107,7 +102,7 @@ func (inst *Server) mqttPublishNames(point *points.Point) {
 		return
 	}
 	topic := fmt.Sprintf("bacnet/%s/%d/write/name", obj, objectId) // bacnet/ao/1/write/pv
-	//topic := fmt.Sprintf("bacnet/%s/%d/write/pri/15", obj, objectId) // bacnet/ao/1/write/pv
+	// topic := fmt.Sprintf("bacnet/%s/%d/write/pri/15", obj, objectId) // bacnet/ao/1/write/pv
 	name := point.Name
 	if name == "" {
 		name = fmt.Sprintf("%s_%d", obj, objectId)
@@ -166,7 +161,10 @@ func (inst *Server) fromBacnet(msg interface{}) error {
 	}
 	if topics.IsPri(topic) {
 		value := payload.GetFullPriority()
-		inst.updateFromBACnet(objectType, objectId, value)
+		err := inst.updateFromBACnet(objectType, objectId, value)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
