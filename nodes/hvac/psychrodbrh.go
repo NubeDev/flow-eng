@@ -67,8 +67,6 @@ func (inst *PsychroDBRH) Process() {
 	relHumPerc := inst.ReadPinOrSettingsFloat(node.RelHumid)
 	relHumPerc = relHumPerc / 100
 
-	fmt.Println("units: ", units, "dryBulbT: ", dryBulbT, "relHumPerc: ", relHumPerc, "atmPress: ", atmPress)
-
 	HumRatio, TWetBulb, TDewPoint, VapPres, MoistAirEnthalpy, MoistAirVolume, DegreeOfSaturation, err := psychrometrics.CalcPsychrometricsFromRelHum(dryBulbT, relHumPerc, atmPress, inst.isImperial)
 	if err != nil {
 		// TODO: set node error message
