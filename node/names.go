@@ -187,6 +187,10 @@ const (
 
 	OutNot OutputName = "out not"
 
+	OutPayload OutputName = "payload"
+	NextStart  OutputName = "next start"
+	NextStop   OutputName = "next stop"
+
 	OutTopic OutputName = "topic"
 	Out      OutputName = "out"
 	Outp     OutputName = "output"

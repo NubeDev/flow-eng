@@ -96,11 +96,8 @@ type scheduleSettings struct {
 func (inst *FFSchedule) buildSchema() *schemas.Schema {
 	_, names, _ := inst.getSchedules()
 	props := &scheduleNodeSchema{}
-	if len(names) > 0 {
-		props.Schedule.Default = names[0]
-	} else {
-		names = nil
-	}
+	props.Schedule.Default = "please select a schedule"
+	names = append(names, "please select a schedule")
 	props.Schedule.Title = "schedule"
 	props.Schedule.Options = names
 	props.Schedule.EnumName = names

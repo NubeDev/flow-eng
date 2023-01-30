@@ -34,6 +34,21 @@ func TempToDI(v float64) float64 {
 	return 0
 }
 
+func decodeDI(in bool) float64 {
+	if in {
+		return 1
+	}
+	return 0
+}
+
+func decodeDIs(in []bool) [8]float64 {
+	var out [8]float64
+	for i, b := range in {
+		out[i] = decodeDI(b)
+	}
+	return out
+}
+
 func (inst *Modbus) ReadTemps(slave int) (raw [8]float64, err error) {
 	start, count := tempRegs()
 	registers, err := inst.readRegisters(slave, start, count, false)
@@ -44,6 +59,18 @@ func (inst *Modbus) ReadTemps(slave int) (raw [8]float64, err error) {
 		return raw, errors.New("read length must be 8")
 	}
 	return convert(registers), err
+}
+
+func (inst *Modbus) ReadDIs(slave int) (raw [8]float64, err error) {
+	start, count := tempRegs()
+	registers, err := inst.readDiscreteInputs(slave, start, count)
+	if err != nil {
+		return raw, err
+	}
+	if len(registers) < 8 {
+		return raw, errors.New("read length must be 8")
+	}
+	return decodeDIs(registers), err
 }
 
 func (inst *Modbus) ReadVolts(slave int) (raw [8]float64, err error) {
@@ -78,6 +105,16 @@ func convert(raw []byte) [8]float64 {
 	}
 	// log.Print(out)
 	return out
+}
+
+func (inst *Modbus) readDiscreteInputs(slave, start, count int) (raw []bool, err error) {
+	err = inst.SetSlave(slave)
+	if err != nil {
+		return nil, err
+	}
+	registers, _, err := inst.client.ReadDiscreteInputs(uint16(start), uint16(count))
+	// log.Print(registers)
+	return registers, err
 }
 
 func (inst *Modbus) readRegisters(slave, start, count int, holding bool) (raw []byte, err error) {

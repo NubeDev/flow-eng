@@ -32,7 +32,7 @@ func Test_ReadTemp(t *testing.T) {
 	cli := &Modbus{
 		IsSerial: true,
 		Serial: &modbus.Serial{
-			SerialPort: "/dev/ttyUSB1",
+			SerialPort: "/dev/ttyUSB0",
 		},
 	}
 	init, err := cli.Init(cli)
@@ -54,7 +54,7 @@ func Test_ReadVoltage(t *testing.T) {
 	cli := &Modbus{
 		IsSerial: true,
 		Serial: &modbus.Serial{
-			SerialPort: "/dev/ttyUSB1",
+			SerialPort: "/dev/ttyUSB0",
 		},
 	}
 	init, err := cli.Init(cli)
@@ -76,7 +76,7 @@ func Test_Read(t *testing.T) {
 	cli := &Modbus{
 		IsSerial: true,
 		Serial: &modbus.Serial{
-			SerialPort: "/dev/ttyUSB1",
+			SerialPort: "/dev/ttyUSB0",
 		},
 	}
 	init, err := cli.Init(cli)

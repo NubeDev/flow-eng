@@ -23,7 +23,10 @@ func NewFFSchedule(body *node.Spec) (node.Node, error) {
 	inputs := node.BuildInputs()
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	lastUpdated := node.BuildOutput(node.LastUpdated, node.TypeString, nil, body.Outputs)
-	outputs := node.BuildOutputs(out, lastUpdated)
+	payload := node.BuildOutput(node.OutPayload, node.TypeFloat, nil, body.Outputs)
+	nextStart := node.BuildOutput(node.NextStart, node.TypeString, nil, body.Outputs)
+	nextStop := node.BuildOutput(node.NextStop, node.TypeString, nil, body.Outputs)
+	outputs := node.BuildOutputs(out, lastUpdated, payload, nextStart, nextStop)
 	body.SetAllowSettings()
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body = node.SetNoParent(body)
@@ -68,6 +71,9 @@ func (inst *FFSchedule) getResult() {
 			}
 			inst.WritePin(node.Out, value)
 			inst.WritePin(node.LastUpdated, ttime.TimeSince(inst.lastUpdate))
+			inst.WritePinFloat(node.OutPayload, schedule.Payload)
+			inst.WritePin(node.NextStart, schedule.NextStartString)
+			inst.WritePin(node.NextStop, schedule.NextStopString)
 			inst.SetSubTitle(schedule.Name)
 		}
 	}
