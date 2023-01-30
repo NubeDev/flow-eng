@@ -105,6 +105,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	pid, _ := hvac.NewPIDNode(nil)
 	pacControl, _ := hvac.NewPACControl(nil)
 	psychroDBRH, _ := hvac.NewPsychroDBRH(nil)
+	psychroDBDP, _ := hvac.NewPsychroDBDP(nil)
+	psychroDBWB, _ := hvac.NewPsychroDBWB(nil)
 
 	gmailNode, _ := gmail.NewGmail(nil)
 	pingNode, _ := ping.NewPing(nil)
@@ -244,6 +246,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(pid),
 		node.ConvertToSpec(pacControl),
 		node.ConvertToSpec(psychroDBRH),
+		node.ConvertToSpec(psychroDBDP),
+		node.ConvertToSpec(psychroDBWB),
 
 		node.ConvertToSpec(pointNum),
 		node.ConvertToSpec(pointBool),
@@ -552,6 +556,10 @@ func builderHVAC(body *node.Spec) (node.Node, error) {
 		return hvac.NewPACControl(body)
 	case psychroDBRH:
 		return hvac.NewPsychroDBRH(body)
+	case psychroDBDP:
+		return hvac.NewPsychroDBDP(body)
+	case psychroDBWB:
+		return hvac.NewPsychroDBWB(body)
 	}
 	return nil, nil
 }

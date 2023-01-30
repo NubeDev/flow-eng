@@ -53,6 +53,8 @@ const (
 	pidNode        = "pid"
 	pacControlNode = "pac-control"
 	psychroDBRH    = "psychrometrics-db-rh"
+	psychroDBDP    = "psychrometrics-db-dp"
+	psychroDBWB    = "psychrometrics-db-wb"
 
 	greaterThan = "greater-than"
 	lessThan    = "less-than"

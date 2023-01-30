@@ -246,7 +246,7 @@ func GetTWetBulbFromRelHum(
 	Pressure float64,
 	isIP bool) (float64, error) {
 	if RelHum < 0 || RelHum > 1 {
-		return INVALID, errors.New("relative humidity is outside range [0,1]")
+		return INVALID, errors.New("relative humidity is outside valid range")
 	}
 
 	HumRatio, err := GetHumRatioFromRelHum(TDryBulb, RelHum, Pressure, isIP)
@@ -299,7 +299,7 @@ func GetRelHumFromTWetBulb(TDryBulb, TWetBulb, Pressure float64, isIP bool) (flo
 func GetTDewPointFromRelHum(TDryBulb float64, RelHum float64, isIP bool) (float64, error) {
 	var VapPres float64
 	if !(RelHum >= 0 && RelHum <= 1) {
-		return INVALID, errors.New("relative humidity is outside range [0,1]")
+		return INVALID, errors.New("relative humidity is outside valid range")
 	}
 	VapPres, err := GetVapPresFromRelHum(TDryBulb, RelHum, isIP)
 	if err != nil {
@@ -336,7 +336,7 @@ func GetTDewPointFromTWetBulb(TDryBulb, TWetBulb, Pressure float64, isIP bool) (
 // (o) Partial pressure of water vapor in moist air in Psi [IP] or Pa [SI]
 func GetVapPresFromRelHum(TDryBulb float64, RelHum float64, isIP bool) (float64, error) {
 	if !(RelHum >= 0 && RelHum <= 1) {
-		return 0, errors.New("relative humidity is outside range [0,1]")
+		return 0, errors.New("relative humidity is outside valid range")
 	}
 	SatVapPres, err := GetSatVapPres(TDryBulb, isIP)
 	if err != nil {
@@ -583,7 +583,7 @@ func GetHumRatioFromTWetBulb(TDryBulb, TWetBulb, Pressure float64, isIP bool) (f
 // (o) Humidity Ratio in lb_H₂O lb_Air⁻¹ [IP] or kg_H₂O kg_Air⁻¹ [SI]
 func GetHumRatioFromRelHum(TDryBulb, RelHum, Pressure float64, isIP bool) (float64, error) {
 	if RelHum < 0 || RelHum > 1 {
-		return INVALID, errors.New("relative humidity is outside range [0,1]")
+		return INVALID, errors.New("relative humidity is outside valid range")
 	}
 	VapPres, err := GetVapPresFromRelHum(TDryBulb, RelHum, isIP)
 	if err != nil {
@@ -1186,7 +1186,7 @@ func CalcPsychrometricsFromTDewPoint(TDryBulb, TDewPoint, Pressure float64, isIP
 	if err != nil {
 		return INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, err
 	}
-	TDewPoint, err = GetTDewPointFromHumRatio(TDryBulb, HumRatio, Pressure, isIP)
+	TWetBulb, err = GetTWetBulbFromHumRatio(TDryBulb, HumRatio, Pressure, isIP)
 	if err != nil {
 		return INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, err
 	}
@@ -1210,7 +1210,7 @@ func CalcPsychrometricsFromTDewPoint(TDryBulb, TDewPoint, Pressure float64, isIP
 	if err != nil {
 		return INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, err
 	}
-	return HumRatio, TDewPoint, RelHum, VapPres, MoistAirEnthalpy, MoistAirVolume, DegreeOfSaturation, nil
+	return HumRatio, TWetBulb, RelHum, VapPres, MoistAirEnthalpy, MoistAirVolume, DegreeOfSaturation, nil
 }
 
 // CalcPsychrometricsFromRelHum Utility function to calculate humidity ratio, wet-bulb temperature, dew-point temperature,
@@ -1257,5 +1257,5 @@ func CalcPsychrometricsFromRelHum(TDryBulb, RelHum, Pressure float64, isIP bool)
 	if err != nil {
 		return INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, err
 	}
-	return HumRatio, TDewPoint, RelHum, VapPres, MoistAirEnthalpy, MoistAirVolume, DegreeOfSaturation, nil
+	return HumRatio, TWetBulb, TDewPoint, VapPres, MoistAirEnthalpy, MoistAirVolume, DegreeOfSaturation, nil
 }
