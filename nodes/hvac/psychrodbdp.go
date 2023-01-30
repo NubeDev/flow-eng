@@ -11,35 +11,35 @@ import (
 	"github.com/enescakir/emoji"
 )
 
-type PsychroDBRH struct {
+type PsychroDBDP struct {
 	*node.Spec
 	unitSystem string
 	isImperial bool
 }
 
-func NewPsychroDBRH(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, psychroDBRH, category)
+func NewPsychroDBDP(body *node.Spec) (node.Node, error) {
+	body = node.Defaults(body, psychroDBDP, category)
 	dryBulbT := node.BuildInput(node.DryBulbTemp, node.TypeFloat, nil, body.Inputs, nil)
-	relHumPerc := node.BuildInput(node.RelHumid, node.TypeFloat, nil, body.Inputs, nil)
-	inputs := node.BuildInputs(dryBulbT, relHumPerc)
+	dewPointT := node.BuildInput(node.DewPointTemp, node.TypeFloat, nil, body.Inputs, nil)
+	inputs := node.BuildInputs(dryBulbT, dewPointT)
 
 	humRatio := node.BuildOutput(node.HumRatioO, node.TypeFloat, nil, body.Outputs)
 	wetBulbT := node.BuildOutput(node.WetBulbTempO, node.TypeFloat, nil, body.Outputs)
-	dewPointT := node.BuildOutput(node.DewPointTempO, node.TypeFloat, nil, body.Outputs)
+	relHumPerc := node.BuildOutput(node.RelHumPercO, node.TypeFloat, nil, body.Outputs)
 	vapPres := node.BuildOutput(node.VaporPres, node.TypeFloat, nil, body.Outputs)
 	enthalpy := node.BuildOutput(node.MoistAirEnthalpy, node.TypeFloat, nil, body.Outputs)
 	volume := node.BuildOutput(node.MoistAirVolume, node.TypeFloat, nil, body.Outputs)
 	degSaturation := node.BuildOutput(node.DegreeSaturation, node.TypeFloat, nil, body.Outputs)
-	outputs := node.BuildOutputs(humRatio, wetBulbT, dewPointT, vapPres, enthalpy, volume, degSaturation)
+	outputs := node.BuildOutputs(humRatio, wetBulbT, relHumPerc, vapPres, enthalpy, volume, degSaturation)
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
-	node := &PsychroDBRH{body, "Metric/SI", false}
+	node := &PsychroDBDP{body, "Metric/SI", false}
 	node.SetSchema(node.buildSchema())
 	return node, nil
 }
 
-func (inst *PsychroDBRH) Process() {
+func (inst *PsychroDBDP) Process() {
 	settings, _ := inst.getSettings(inst.GetSettings())
 	units := settings.UnitSystem
 	altitude := settings.Altitude
@@ -61,10 +61,9 @@ func (inst *PsychroDBRH) Process() {
 		return
 	}
 	dryBulbT := inst.ReadPinOrSettingsFloat(node.DryBulbTemp)
-	relHumPerc := inst.ReadPinOrSettingsFloat(node.RelHumid)
-	relHumPerc = relHumPerc / 100
+	dewPointT := inst.ReadPinOrSettingsFloat(node.DewPointTemp)
 
-	HumRatio, TWetBulb, TDewPoint, VapPres, MoistAirEnthalpy, MoistAirVolume, DegreeOfSaturation, err := psychrometrics.CalcPsychrometricsFromRelHum(dryBulbT, relHumPerc, atmPress, inst.isImperial)
+	HumRatio, TWetBulb, RelHum, VapPres, MoistAirEnthalpy, MoistAirVolume, DegreeOfSaturation, err := psychrometrics.CalcPsychrometricsFromTDewPoint(dryBulbT, dewPointT, atmPress, inst.isImperial)
 	if err != nil {
 		inst.SetWaringMessage(err.Error())
 		inst.SetWaringIcon(string(emoji.RedCircle))
@@ -77,7 +76,7 @@ func (inst *PsychroDBRH) Process() {
 
 	inst.WritePinFloat(node.HumRatioO, HumRatio, 4)
 	inst.WritePinFloat(node.WetBulbTempO, TWetBulb, 4)
-	inst.WritePinFloat(node.DewPointTempO, TDewPoint, 4)
+	inst.WritePinFloat(node.RelHumPercO, RelHum*100, 4)
 	inst.WritePinFloat(node.VaporPres, VapPres, 4)
 	inst.WritePinFloat(node.MoistAirEnthalpy, MoistAirEnthalpy, 4)
 	inst.WritePinFloat(node.MoistAirVolume, MoistAirVolume, 4)
@@ -85,25 +84,25 @@ func (inst *PsychroDBRH) Process() {
 
 }
 
-func (inst *PsychroDBRH) setSubtitle() {
+func (inst *PsychroDBDP) setSubtitle() {
 	subtitleText := inst.unitSystem
 	inst.SetSubTitle(subtitleText)
 }
 
 // Custom Node Settings Schema
 
-type PsychroDBRHSettingsSchema struct {
+type PsychroDBDPSettingsSchema struct {
 	UnitSystem schemas.EnumString `json:"unit-system"`
 	Altitude   schemas.Number     `json:"altitude"`
 }
 
-type PsychroDBRHSettings struct {
+type PsychroDBDPSettings struct {
 	UnitSystem string  `json:"unit-system"`
 	Altitude   float64 `json:"altitude"`
 }
 
-func (inst *PsychroDBRH) buildSchema() *schemas.Schema {
-	props := &PsychroDBRHSettingsSchema{}
+func (inst *PsychroDBDP) buildSchema() *schemas.Schema {
+	props := &PsychroDBDPSettingsSchema{}
 
 	// unit system
 	props.UnitSystem.Title = "Unit System"
@@ -132,8 +131,8 @@ func (inst *PsychroDBRH) buildSchema() *schemas.Schema {
 	return s
 }
 
-func (inst *PsychroDBRH) getSettings(body map[string]interface{}) (*PsychroDBRHSettings, error) {
-	settings := &PsychroDBRHSettings{}
+func (inst *PsychroDBDP) getSettings(body map[string]interface{}) (*PsychroDBDPSettings, error) {
+	settings := &PsychroDBDPSettings{}
 	marshal, err := json.Marshal(body)
 	if err != nil {
 		return settings, err
