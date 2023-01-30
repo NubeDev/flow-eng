@@ -112,17 +112,22 @@ func addUpdatePayload(nodeUUID string, p *pointStore, newPayload *pointDetails) 
 }
 
 type Schedule struct {
-	Uuid            string    `json:"uuid"`
-	Name            string    `json:"name"`
-	Enable          bool      `json:"enable"`
-	ThingClass      string    `json:"thing_class"`
-	ThingType       string    `json:"thing_type"`
-	IsActive        bool      `json:"is_active"`
-	IsGlobal        bool      `json:"is_global"`
-	TimeZone        string    `json:"timezone"`
-	ActiveWeekly    bool      `json:"active_weekly"`
-	ActiveException bool      `json:"active_exception"`
-	ActiveEvent     bool      `json:"active_event"`
-	CreatedOn       time.Time `json:"created_on"`
-	UpdatedOn       time.Time `json:"updated_on"`
+	Uuid              string    `json:"uuid"`
+	Name              string    `json:"name"`
+	Enable            bool      `json:"enable"`
+	ThingClass        string    `json:"thing_class"`
+	ThingType         string    `json:"thing_type"`
+	IsActive          bool      `json:"is_active"`
+	IsGlobal          bool      `json:"is_global"`
+	TimeZone          string    `json:"timezone"`
+	ActiveWeekly      bool      `json:"active_weekly"`
+	ActiveException   bool      `json:"active_exception"`
+	ActiveEvent       bool      `json:"active_event"`
+	Payload           float64   `json:"payload"`
+	PeriodStartString string    `json:"period_start_string"` // human readable timestamp
+	PeriodStopString  string    `json:"period_stop_string"`  // human readable timestamp
+	NextStartString   string    `json:"next_start_string"`   // human readable timestamp
+	NextStopString    string    `json:"next_stop_string"`    // human readable timestamp
+	CreatedOn         time.Time `json:"created_on"`
+	UpdatedOn         time.Time `json:"updated_on"`
 }
