@@ -32,11 +32,12 @@ func (n *Spec) WritePinFloat(name OutputName, value float64, precision ...int) {
 		return
 	}
 	if name == out.Name {
-		var p = 2
+		var p = 4
 		if len(precision) > 0 {
 			p = precision[0]
 		}
-		out.Write(conversions.FloatToFixed(value, p))
+		// out.Write(conversions.FloatToFixed(value, p))
+		out.Write(conversions.TruncateFloat(value, p))
 	}
 }
 

@@ -1,7 +1,8 @@
 package point
 
 const (
-	pointNumber  = "point-num"
-	pointBoolean = "point-bool"
-	category     = "points"
+	booleanWriteable = "boolean-writeable"
+	numericWriteable = "numeric-writeable"
+	stringWriteable  = "string-writeable"
+	category         = "points"
 )

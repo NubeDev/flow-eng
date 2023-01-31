@@ -6,27 +6,27 @@ import (
 
 type DeadBand struct {
 	*node.Spec
+	out bool
 }
 
 func NewDeadBand(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, deadBandNode, category)
-	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, nil)
+	in := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, nil)
 	setPoint := node.BuildInput(node.Setpoint, node.TypeFloat, nil, body.Inputs, nil)
 	deadBand := node.BuildInput(node.DeadBand, node.TypeFloat, nil, body.Inputs, nil)
 
 	inputs := node.BuildInputs(in, setPoint, deadBand)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	return &DeadBand{body}, nil
+	return &DeadBand{body, false}, nil
 }
 
 func (inst *DeadBand) Process() {
-	input, null := inst.ReadPinAsFloat(node.In)
+	input, null := inst.ReadPinAsFloat(node.Inp)
 	if null {
-		inst.WritePinNull(node.Out)
+		inst.WritePinNull(node.Outp)
 		return
 	}
-	var out bool
 	setPoint, _ := inst.ReadPinAsFloat(node.Setpoint)
 	deadBand, _ := inst.ReadPinAsFloat(node.DeadBand)
 	risingEdge := setPoint + deadBand/2
@@ -34,23 +34,18 @@ func (inst *DeadBand) Process() {
 
 	if risingEdge >= fallingEdge {
 		if input <= fallingEdge {
-			out = false
+			inst.out = false
 		}
 		if input >= risingEdge {
-			out = true
+			inst.out = true
 		}
 	} else if risingEdge < fallingEdge {
 		if input >= fallingEdge {
-			out = false
+			inst.out = false
 		}
 		if input <= risingEdge {
-			out = true
+			inst.out = true
 		}
 	}
-	if out {
-		inst.WritePin(node.Out, true)
-	} else {
-		inst.WritePin(node.Out, false)
-	}
-
+	inst.WritePinBool(node.Outp, inst.out)
 }

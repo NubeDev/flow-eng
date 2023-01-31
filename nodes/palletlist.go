@@ -44,8 +44,8 @@ const (
 )
 
 func All() []*node.Spec { // get all the nodes, will be used for the UI to list all the nodes
-	constNum, _ := constant.NewNumber(nil)
 	constBool, _ := constant.NewBoolean(nil)
+	constNum, _ := constant.NewNumber(nil)
 	constStr, _ := constant.NewString(nil)
 
 	// bool
@@ -100,6 +100,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	dataStore, _ := nodejson.NewStore(nil)
 
 	// hvac
+	accumPeriod, _ := hvac.NewAccumulationPeriod(nil)
 	deadBand, _ := hvac.NewDeadBand(nil)
 	leadLagSwitch, _ := hvac.NewLeadLagSwitch(nil)
 	pid, _ := hvac.NewPIDNode(nil)
@@ -125,6 +126,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	linkOutputNum, _ := link.NewOutputNum(nil, nil)
 
 	// math
+	abs, _ := math.NewAbsolute(nil)
 	add, _ := math.NewAdd(nil)
 	sub, _ := math.NewSub(nil)
 	multiply, _ := math.NewMultiply(nil)
@@ -153,9 +155,10 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	stopwatch, _ := timing.NewStopwatch(nil)
 
 	// number transformations
-	scaleNode, _ := transformations.NewScale(nil)
-	limitNode, _ := transformations.NewLimit(nil)
 	fade, _ := transformations.NewFade(nil)
+	limitNode, _ := transformations.NewLimit(nil)
+	rateLimit, _ := transformations.NewRateLimit(nil)
+	scaleNode, _ := transformations.NewScale(nil)
 
 	// bacnet
 	bacServer, _ := bacnetio.NewServer(nil, nil)
@@ -170,8 +173,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	logNode, _ := debugging.NewLog(nil)
 
-	pointNum, _ := point.NewNumber(nil)
-	pointBool, _ := point.NewBoolean(nil)
+	boolWriteable, _ := point.NewBooleanWriteable(nil)
+	numWriteable, _ := point.NewNumericWriteable(nil)
+	stringWriteable, _ := point.NewStringWriteable(nil)
 
 	// filter
 	preventNull, _ := filter.NewPreventNull(nil)
@@ -192,10 +196,11 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	// }
 
 	return node.BuildNodes(
-		node.ConvertToSpec(constNum),
 		node.ConvertToSpec(constBool),
+		node.ConvertToSpec(constNum),
 		node.ConvertToSpec(constStr),
 
+		node.ConvertToSpec(abs),
 		node.ConvertToSpec(add),
 		node.ConvertToSpec(sub),
 		node.ConvertToSpec(multiply),
@@ -241,6 +246,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(flowPointWrite),
 		node.ConvertToSpec(flowSchedule),
 
+		node.ConvertToSpec(accumPeriod),
 		node.ConvertToSpec(deadBand),
 		node.ConvertToSpec(leadLagSwitch),
 		node.ConvertToSpec(pid),
@@ -249,8 +255,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(psychroDBDP),
 		node.ConvertToSpec(psychroDBWB),
 
-		node.ConvertToSpec(pointNum),
-		node.ConvertToSpec(pointBool),
+		node.ConvertToSpec(boolWriteable),
+		node.ConvertToSpec(numWriteable),
+		node.ConvertToSpec(stringWriteable),
 
 		node.ConvertToSpec(jsonFilter),
 		node.ConvertToSpec(dataStore),
@@ -301,9 +308,10 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(mqttSub),
 		node.ConvertToSpec(mqttPub),
 
-		node.ConvertToSpec(scaleNode),
-		node.ConvertToSpec(limitNode),
 		node.ConvertToSpec(fade),
+		node.ConvertToSpec(limitNode),
+		node.ConvertToSpec(rateLimit),
+		node.ConvertToSpec(scaleNode),
 
 		node.ConvertToSpec(logNode),
 
@@ -516,6 +524,8 @@ func builderTransformations(body *node.Spec) (node.Node, error) {
 		return transformations.NewScale(body)
 	case fade:
 		return transformations.NewFade(body)
+	case rateLimit:
+		return transformations.NewRateLimit(body)
 	}
 	return nil, nil
 }
@@ -546,6 +556,8 @@ func builderFlowNetworks(body *node.Spec, opts []interface{}) (node.Node, error)
 
 func builderHVAC(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
+	case accumulationPeriod:
+		return hvac.NewAccumulationPeriod(body)
 	case deadBandNode:
 		return hvac.NewDeadBand(body)
 	case leadLagSwitch:
@@ -598,6 +610,8 @@ func builderConst(body *node.Spec) (node.Node, error) {
 
 func builderMath(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
+	case abs:
+		return math.NewAbsolute(body)
 	case add:
 		return math.NewAdd(body)
 	case sub:
@@ -692,10 +706,12 @@ func builderStatistics(body *node.Spec) (node.Node, error) {
 
 func builderPoints(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
-	case pointNumber:
-		return point.NewNumber(body)
-	case pointBoolean:
-		return point.NewBoolean(body)
+	case boolWriteable:
+		return point.NewBooleanWriteable(body)
+	case numWriteable:
+		return point.NewNumericWriteable(body)
+	case stringWriteable:
+		return point.NewStringWriteable(body)
 	}
 	return nil, nil
 }

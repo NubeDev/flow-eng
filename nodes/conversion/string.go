@@ -29,7 +29,7 @@ func (inst *String) Process() {
 	}
 	f, ok := conversions.GetFloatOk(in1)
 	if ok { // to float
-		inst.WritePin(node.Float, f)
+		inst.WritePinFloat(node.Float, f)
 	} else {
 		inst.WritePinNull(node.Float)
 	}
@@ -37,7 +37,7 @@ func (inst *String) Process() {
 	if err != nil {
 		inst.WritePinNull(node.Boolean)
 	} else {
-		inst.WritePin(node.Boolean, result)
+		inst.WritePinBool(node.Boolean, result)
 	}
 
 }

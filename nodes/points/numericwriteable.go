@@ -1,32 +1,21 @@
-package math
+package point
 
 import (
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/conversions"
-	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
 	"github.com/mitchellh/mapstructure"
 )
 
-const (
-	category = "math"
-	divide   = "divide"
-	add      = "add"
-	sub      = "subtract"
-	multiply = "multiply"
-	modulo   = "modulo"
-	absolute = "absolute-value"
-)
+type NumericWriteable struct {
+	*node.Spec
+}
 
-const (
-	mathHelp string = "perform a math operation: "
-)
-
-func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error) {
-	body = node.Defaults(body, nodeName, category)
-	settings := &MathDefaultSettings{}
+func NewNumericWriteable(body *node.Spec) (node.Node, error) {
+	body = node.Defaults(body, numericWriteable, category)
+	settings := &NumericWriteableSettings{}
 	err := mapstructure.Decode(body.Settings, &settings)
 	if err != nil {
 		return nil, err
@@ -36,37 +25,42 @@ func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error)
 		count = settings.InputCount
 	}
 	inputs := node.BuildInputs(node.DynamicInputs(node.TypeFloat, nil, count, 2, 20, body.Inputs)...)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	body.SetSchema(buildMathDefaultSchema())
+	body.SetSchema(buildNumericWriteableSchema())
 	body.SetDynamicInputs()
-	return body, nil
+	return &NumericWriteable{body}, nil
 }
 
-func process(body node.Node) {
-	equation := body.GetName()
-	count := body.InputsLen()
-	inputs := conversions.ConvertInterfaceToFloatMultiple(body.ReadMultiple(count))
-	output := operation(equation, inputs)
-	if output == nil {
-		body.WritePinNull(node.Out)
-	} else {
-		body.WritePinFloat(node.Out, float.NonNil(output))
+func (inst *NumericWriteable) Process() {
+	// fmt.Println("NumericWriteable() Process()")
+	count := inst.InputsLen()
+	inputs := conversions.ConvertInterfaceToFloatMultiple(inst.ReadMultiple(count))
+	for _, val := range inputs {
+		if val != nil {
+			// fmt.Println("NumericWriteable() i: ", i, "  val:", *val)
+			inst.WritePinFloat(node.Outp, *val)
+			return
+		} else {
+			// fmt.Println("NumericWriteable() i: ", i, "  val: null")
+		}
+
 	}
+	inst.WritePinNull(node.Outp)
 }
 
 // Custom Node Settings Schema
 
-type MathDefaultSettingsSchema struct {
+type NumericWriteableSettingsSchema struct {
 	InputCount schemas.Integer `json:"inputCount"`
 }
 
-type MathDefaultSettings struct {
+type NumericWriteableSettings struct {
 	InputCount int `json:"inputCount"`
 }
 
-func buildMathDefaultSchema() *schemas.Schema {
-	props := &MathDefaultSettingsSchema{}
+func buildNumericWriteableSchema() *schemas.Schema {
+	props := &NumericWriteableSettingsSchema{}
 	props.InputCount.Title = "Input Count"
 	props.InputCount.Default = 2
 	props.InputCount.Minimum = 2

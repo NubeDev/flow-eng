@@ -41,8 +41,8 @@ func (inst *MinMaxAvg) Process() {
 		minValue := array.MinFloat64(nonNilValues)
 		maxValue := array.MaxFloat64(nonNilValues)
 		avgValue := average(nonNilValues)
-		inst.WritePin(node.MinOutput, minValue)
-		inst.WritePin(node.MaxOutput, maxValue)
-		inst.WritePin(node.AvgOutput, avgValue)
+		inst.WritePinFloat(node.MinOutput, minValue)
+		inst.WritePinFloat(node.MaxOutput, maxValue)
+		inst.WritePinFloat(node.AvgOutput, avgValue)
 	}
 }

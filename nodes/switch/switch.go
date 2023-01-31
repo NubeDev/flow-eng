@@ -30,13 +30,13 @@ func (inst *Switch) Process() {
 		if inTrueNull {
 			inst.WritePinNull(node.Outp)
 		} else {
-			inst.WritePin(node.Outp, inTrue)
+			inst.WritePinFloat(node.Outp, inTrue)
 		}
 	} else {
 		if inFalseNull {
 			inst.WritePinNull(node.Outp)
 		} else {
-			inst.WritePin(node.Outp, inFalse)
+			inst.WritePinFloat(node.Outp, inFalse)
 		}
 	}
 }

@@ -34,6 +34,6 @@ func (inst *Range) Process() {
 		minValue := array.MinFloat64(nonNilValues)
 		maxValue := array.MaxFloat64(nonNilValues)
 		rangeValue := maxValue - minValue
-		inst.WritePin(node.Out, rangeValue)
+		inst.WritePinFloat(node.Out, rangeValue)
 	}
 }

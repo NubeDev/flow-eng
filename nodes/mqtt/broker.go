@@ -23,7 +23,7 @@ var mqttQOS = mqttclient.AtMostOnce
 var mqttRetain = false
 
 func NewBroker(body *node.Spec) (node.Node, error) {
-	//var err error
+	// var err error
 	body = node.Defaults(body, mqttBroker, category)
 	inputs := node.BuildInputs()
 	outputs := node.BuildOutputs(node.BuildOutput(node.Connected, node.TypeBool, nil, body.Outputs))
@@ -97,7 +97,6 @@ func (inst *Broker) publish() {
 							log.Errorf("mqtt-broker publish err:%s", err.Error())
 						}
 					}
-
 				}
 			}
 		}

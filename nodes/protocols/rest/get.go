@@ -56,7 +56,7 @@ func (inst *Get) Process() {
 		go inst.do()
 
 	} else {
-		inst.WritePin(node.Out, nil)
+		inst.WritePinNull(node.Out)
 	}
 
 }

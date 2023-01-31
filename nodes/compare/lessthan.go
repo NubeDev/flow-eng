@@ -10,9 +10,9 @@ type CompareLessThan struct {
 
 func NewLessThan(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, LessThan, category)
-	a := node.BuildInput(node.InputA, node.TypeFloat, nil, body.Inputs, nil)
-	b := node.BuildInput(node.InputB, node.TypeFloat, nil, body.Inputs, nil)
-	inputs := node.BuildInputs(a, b)
+	in1 := node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs, nil)
+	in2 := node.BuildInput(node.In2, node.TypeFloat, nil, body.Inputs, nil)
+	inputs := node.BuildInputs(in1, in2)
 	greaterThan := node.BuildOutput(node.LessThan, node.TypeBool, nil, body.Outputs)
 	equal := node.BuildOutput(node.LessThanEqual, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(greaterThan, equal)
@@ -21,12 +21,12 @@ func NewLessThan(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *CompareLessThan) Process() {
-	a, aNull := inst.ReadPinAsFloat(node.InputA)
-	b, bNull := inst.ReadPinAsFloat(node.InputB)
+	a, aNull := inst.ReadPinAsFloat(node.In1)
+	b, bNull := inst.ReadPinAsFloat(node.In2)
 
 	if aNull || bNull {
-		inst.WritePin(node.LessThan, false)
-		inst.WritePin(node.LessThanEqual, false)
+		inst.WritePinBool(node.LessThan, false)
+		inst.WritePinBool(node.LessThanEqual, false)
 		return
 	}
 

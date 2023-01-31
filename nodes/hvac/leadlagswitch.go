@@ -38,13 +38,13 @@ func (inst *LeadLagSwitch) Process() {
 	stage2, _ := inst.ReadPinAsBool(node.Stage2)
 	if !inst.swapLead {
 		inst.WritePin(node.LeadUnit, "A")
-		inst.WritePin(node.LeadUnitBool, false)
-		inst.WritePin(node.EnableA, stage1)
-		inst.WritePin(node.EnableB, stage2)
+		inst.WritePinBool(node.LeadUnitBool, false)
+		inst.WritePinBool(node.EnableA, stage1)
+		inst.WritePinBool(node.EnableB, stage2)
 	} else {
 		inst.WritePin(node.LeadUnit, "B")
-		inst.WritePin(node.LeadUnitBool, true)
-		inst.WritePin(node.EnableA, stage2)
-		inst.WritePin(node.EnableB, stage1)
+		inst.WritePinBool(node.LeadUnitBool, true)
+		inst.WritePinBool(node.EnableA, stage2)
+		inst.WritePinBool(node.EnableB, stage1)
 	}
 }

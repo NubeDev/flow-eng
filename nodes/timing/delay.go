@@ -9,9 +9,10 @@ import (
 
 type Delay struct {
 	*node.Spec
-	activeDelays []*DelayTimer
-	lastValue    *float64
-	lastDelay    time.Duration
+	activeDelays  []*DelayTimer
+	lastValue     *float64
+	lastDelay     time.Duration
+	currentOutput *float64
 }
 
 type DelayTimer struct {
@@ -34,13 +35,15 @@ func NewDelay(body *node.Spec) (node.Node, error) {
 	body.SetSchema(buildDefaultSchema())
 
 	delayArray := make([]*DelayTimer, 0)
-	return &Delay{body, delayArray, nil, 1 * time.Second}, nil
+	return &Delay{body, delayArray, nil, 1 * time.Second, nil}, nil
 }
 
 func (inst *Delay) Process() {
 	enable, _ := inst.ReadPinAsBool(node.Enable)
 	if !enable {
 		inst.ClearAllDelays()
+		inst.WritePinNull(node.Outp)
+		inst.currentOutput = nil
 		return
 	}
 
@@ -52,7 +55,6 @@ func (inst *Delay) Process() {
 
 	// if (inputFloatPtr == nil && inst.lastValue != nil) || (inputFloatPtr != nil && inst.lastValue == nil) || *inputFloatPtr != *inst.lastValue {
 	if !float.ComparePtrValues(inst.lastValue, inputFloatPtr) {
-
 		delayDuration, _ := inst.ReadPinAsTimeSettings(node.Delay)
 		if delayDuration != inst.lastDelay {
 			inst.setSubtitle(delayDuration)
@@ -64,14 +66,21 @@ func (inst *Delay) Process() {
 			delayObj := newDelay
 			if inputFloatPtr == nil {
 				inst.WritePinNull(node.Outp)
+				inst.currentOutput = nil
 			} else {
 				inst.WritePinFloat(node.Outp, *inputFloatPtr)
+				inst.currentOutput = float.New(*inputFloatPtr)
 			}
 			delayObj.HasTriggered = true
 		})
 		inst.activeDelays = append(inst.activeDelays, newDelay)
 	}
 	inst.lastValue = inputFloatPtr
+	if inst.currentOutput == nil {
+		inst.WritePinNull(node.Outp)
+	} else {
+		inst.WritePinFloat(node.Outp, *inst.currentOutput)
+	}
 	inst.ClearCompletedDelays()
 }
 

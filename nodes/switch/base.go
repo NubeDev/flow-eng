@@ -44,9 +44,9 @@ func process(body node.Node) {
 	if op == selectNum {
 		output := selectValue(selection, inputs)
 		if output == nil {
-			body.WritePin(node.Out, nil)
+			body.WritePinNull(node.Out)
 		} else {
-			body.WritePin(node.Out, conversions.GetFloat(output))
+			body.WritePinFloat(node.Out, conversions.GetFloat(output))
 		}
 
 	}
