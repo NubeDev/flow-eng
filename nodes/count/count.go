@@ -53,7 +53,7 @@ func (inst *Count) Process() {
 	}
 	inst.lastCountUp = countUp
 
-	countDown, _ := inst.ReadPinAsBool(node.CountUp)
+	countDown, _ := inst.ReadPinAsBool(node.CountDown)
 	if countDown && !inst.lastCountDown {
 		inst.count -= stepSize
 	}

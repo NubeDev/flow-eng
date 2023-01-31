@@ -242,7 +242,7 @@ const (
 	EnableB      OutputName = "enable-B"
 
 	PeriodConsumption OutputName = "period-consumption"
-	LastAccumulation  OutputName = "last-accumulation"
+	LastPeriodEndVal  OutputName = "last-period-end-value"
 	PeriodDuration    OutputName = "period-duration"
 	NextTrigger       OutputName = "next-trigger"
 

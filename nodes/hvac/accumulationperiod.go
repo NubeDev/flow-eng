@@ -2,6 +2,7 @@ package hvac
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
@@ -14,24 +15,29 @@ import (
 
 type AccumulationPeriod struct {
 	*node.Spec
-	lastAccumulation float64
-	cron             *cron.Cron
-	cronExp          string
+	lastAccumulation          float64
+	lastPeriodEndAccumulation float64
+	lastPeriodConsumption     float64
+	cron                      *cron.Cron
+	cronExp                   string
 }
 
 func NewAccumulationPeriod(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, deadBandNode, category)
+	body = node.Defaults(body, accumulationPeriod, category)
 	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, nil)
 	input := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(enable, input)
 
 	periodConsumption := node.BuildOutput(node.PeriodConsumption, node.TypeFloat, nil, body.Outputs)
-	lastAccum := node.BuildOutput(node.LastAccumulation, node.TypeFloat, nil, body.Outputs)
+	lastAccum := node.BuildOutput(node.LastPeriodEndVal, node.TypeFloat, nil, body.Outputs)
 	periodDuration := node.BuildOutput(node.PeriodDuration, node.TypeFloat, nil, body.Outputs)
 	nextTrigger := node.BuildOutput(node.NextTrigger, node.TypeString, nil, body.Outputs)
 	outputs := node.BuildOutputs(periodConsumption, lastAccum, periodDuration, nextTrigger)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	return &AccumulationPeriod{body, -1, nil, ""}, nil
+
+	node := &AccumulationPeriod{body, 0, 0, 0, nil, ""}
+	node.SetSchema(node.buildSchema())
+	return node, nil
 }
 
 func (inst *AccumulationPeriod) Process() {
@@ -52,33 +58,31 @@ func (inst *AccumulationPeriod) Process() {
 		nextTrigger := cronexpr.MustParse(inst.cronExp).Next(time.Now())
 		inst.WritePin(node.NextTrigger, nextTrigger)
 		input, inNull := inst.ReadPinAsFloat(node.Inp)
-		if inNull {
-			inst.WritePinNull(node.PeriodConsumption)
-			inst.WritePinNull(node.LastAccumulation)
-			inst.WritePinNull(node.NextTrigger)
-		} else {
-			inst.WritePinFloat(node.LastAccumulation, input)
+		if !inNull {
 			inst.lastAccumulation = input
-			nextTrigger := cronexpr.MustParse(inst.cronExp).Next(time.Now())
-			inst.WritePin(node.NextTrigger, nextTrigger)
 		}
+		inst.WritePinFloat(node.PeriodConsumption, inst.lastPeriodConsumption)
+		inst.WritePinFloat(node.LastPeriodEndVal, inst.lastPeriodEndAccumulation)
 	}
 }
 
 func (inst *AccumulationPeriod) calculateAccumulation() {
+	fmt.Println("AccumulationPeriod calculateAccumulation()")
 	input, inNull := inst.ReadPinAsFloat(node.Inp)
-	if inNull {
-		inst.WritePinNull(node.PeriodConsumption)
-		inst.WritePinNull(node.LastAccumulation)
-		inst.WritePinNull(node.NextTrigger)
-	} else {
-		periodAccum := input - inst.lastAccumulation
-		inst.WritePinFloat(node.PeriodConsumption, periodAccum)
-		inst.WritePinFloat(node.LastAccumulation, inst.lastAccumulation)
-		nextTrigger := cronexpr.MustParse(inst.cronExp).Next(time.Now())
-		inst.WritePin(node.NextTrigger, nextTrigger)
+	if !inNull {
+		inst.lastAccumulation = input
 	}
 
+	inst.lastPeriodConsumption = inst.lastAccumulation - inst.lastPeriodEndAccumulation
+	inst.lastPeriodEndAccumulation = inst.lastAccumulation
+	inst.WritePinFloat(node.PeriodConsumption, inst.lastPeriodConsumption)
+	inst.WritePinFloat(node.LastPeriodEndVal, inst.lastPeriodEndAccumulation)
+	nextTrigger := cronexpr.MustParse(inst.cronExp).Next(time.Now())
+	inst.WritePin(node.NextTrigger, nextTrigger)
+}
+
+func (inst *AccumulationPeriod) Stop() {
+	inst.cron.Stop()
 }
 
 // Custom Node Settings Schema
