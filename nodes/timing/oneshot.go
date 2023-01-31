@@ -61,7 +61,7 @@ func (inst *OneShot) Process() {
 		}
 	}
 	inst.lastReset = reset
-	inst.WritePin(node.Outp, inst.outputActive)
+	inst.WritePinBool(node.Outp, inst.outputActive)
 }
 
 func (inst *OneShot) StartOneShot(duration time.Duration) {

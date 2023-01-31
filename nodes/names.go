@@ -5,6 +5,7 @@ const (
 	constBool = "const-bool"
 	constStr  = "const-string"
 
+	abs      = "absolute-value"
 	add      = "add"
 	divide   = "divide"
 	sub      = "subtract"
@@ -26,14 +27,16 @@ const (
 	stringLatch   = "string-latch"
 	setResetLatch = "set-reset-latch"
 
-	pointNumber  = "point-num"
-	pointBoolean = "point-bool"
+	boolWriteable   = "boolean-writeable"
+	numWriteable    = "numeric-writeable"
+	stringWriteable = "string-writeable"
 
 	rampNode = "ramp"
 
 	scaleNode = "scale"
 	limitNode = "limit"
 	fade      = "fade"
+	rateLimit = "rate-limit"
 
 	dataStore  = "data-store"
 	jsonFilter = "json-filter"
@@ -48,13 +51,14 @@ const (
 	getHttpNode   = "http-get"
 	writeHttpNode = "http-write"
 
-	deadBandNode   = "dead-band"
-	leadLagSwitch  = "lead-lag-switch"
-	pidNode        = "pid"
-	pacControlNode = "pac-control"
-	psychroDBRH    = "psychrometrics-db-rh"
-	psychroDBDP    = "psychrometrics-db-dp"
-	psychroDBWB    = "psychrometrics-db-wb"
+	accumulationPeriod = "accumulation-period"
+	deadBandNode       = "dead-band"
+	leadLagSwitch      = "lead-lag-switch"
+	pidNode            = "pid"
+	pacControlNode     = "pac-control"
+	psychroDBRH        = "psychrometrics-db-rh"
+	psychroDBDP        = "psychrometrics-db-dp"
+	psychroDBWB        = "psychrometrics-db-wb"
 
 	greaterThan = "greater-than"
 	lessThan    = "less-than"

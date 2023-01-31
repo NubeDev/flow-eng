@@ -69,7 +69,7 @@ func (inst *FFSchedule) getResult() {
 				inst.lastValue = value
 				inst.lastUpdate = time.Now()
 			}
-			inst.WritePin(node.Out, value)
+			inst.WritePinBool(node.Out, value)
 			inst.WritePin(node.LastUpdated, ttime.TimeSince(inst.lastUpdate))
 			inst.WritePinFloat(node.OutPayload, schedule.Payload)
 			inst.WritePin(node.NextStart, schedule.NextStartString)

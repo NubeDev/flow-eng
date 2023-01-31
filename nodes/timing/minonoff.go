@@ -22,6 +22,9 @@ type MinOnOff struct {
 	timeOff            int64
 	lastMinOnInterval  time.Duration
 	lastMinOffInterval time.Duration
+	currentOutput      bool
+	currentMinOn       bool
+	currentMinOff      bool
 }
 
 func NewMinOnOff(body *node.Spec) (node.Node, error) {
@@ -37,13 +40,12 @@ func NewMinOnOff(body *node.Spec) (node.Node, error) {
 	minOffActive := node.BuildOutput(node.MinOffActive, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out, minOnActive, minOffActive)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	node := &MinOnOff{body, false, true, false, false, 0, 0, 1 * time.Second, 1 * time.Second}
+	node := &MinOnOff{body, false, true, false, false, 0, 0, 1 * time.Second, 1 * time.Second, false, false, false}
 	node.SetSchema(node.buildSchema())
 	return node, nil
 }
 
 func (inst *MinOnOff) Process() {
-
 	minOnIntervalDuration, _ := inst.ReadPinAsTimeSettings(node.MinOnTime)
 	minOffIntervalDuration, _ := inst.ReadPinAsTimeSettings(node.MinOffTime)
 	if minOnIntervalDuration != inst.lastMinOnInterval || minOffIntervalDuration != inst.lastMinOffInterval {
@@ -60,12 +62,15 @@ func (inst *MinOnOff) Process() {
 		inst.minOnEnabled = false
 		inst.minOffEnabled = false
 		inst.WritePinFalse(node.MinOnActive)
+		inst.currentMinOn = false
 		inst.WritePinFalse(node.MinOffActive)
+		inst.currentMinOff = false
 	}
 	inst.lastReset = reset
 
 	if !inst.minOnEnabled && !inst.minOffEnabled {
 		inst.WritePinBool(node.Outp, input)
+		inst.currentOutput = input
 		if input && !inst.lastInput {
 			inst.timeOn = time.Now().Unix()
 			inst.minOnEnabled = true
@@ -84,8 +89,10 @@ func (inst *MinOnOff) Process() {
 		if elapsed >= int64(minOnIntervalSecs) {
 			inst.minOnEnabled = false
 			inst.WritePinFalse(node.MinOnActive)
+			inst.currentMinOn = false
 			if input {
 				inst.WritePinTrue(node.Outp)
+				inst.currentOutput = true
 			}
 		}
 	} else if inst.minOffEnabled {
@@ -94,12 +101,18 @@ func (inst *MinOnOff) Process() {
 		if elapsed >= int64(minOffIntervalSecs) {
 			inst.minOffEnabled = false
 			inst.WritePinFalse(node.MinOffActive)
+			inst.currentMinOff = false
 			if !input {
 				inst.WritePinFalse(node.Outp)
+				inst.currentOutput = false
 			}
 		}
 	}
 	inst.lastInput = input
+	inst.WritePinBool(node.Outp, inst.currentOutput)
+	inst.WritePinBool(node.MinOffActive, inst.currentMinOff)
+	inst.WritePinBool(node.MinOnActive, inst.currentMinOn)
+
 }
 
 func (inst *MinOnOff) Stop() {

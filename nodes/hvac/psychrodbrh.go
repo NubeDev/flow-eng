@@ -79,7 +79,7 @@ func (inst *PsychroDBRH) Process() {
 	inst.WritePinFloat(node.WetBulbTempO, TWetBulb, 4)
 	inst.WritePinFloat(node.DewPointTempO, TDewPoint, 4)
 	inst.WritePinFloat(node.VaporPres, VapPres, 4)
-	inst.WritePinFloat(node.MoistAirEnthalpy, MoistAirEnthalpy, 4)
+	inst.WritePinFloat(node.MoistAirEnthalpy, MoistAirEnthalpy/1000, 4)
 	inst.WritePinFloat(node.MoistAirVolume, MoistAirVolume, 4)
 	inst.WritePinFloat(node.DegreeSaturation, DegreeOfSaturation, 4)
 

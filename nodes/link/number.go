@@ -27,7 +27,7 @@ func NewInputNum(body *node.Spec, store *Store) (node.Node, error) {
 
 func (inst *InputNum) Process() {
 	in1, _ := inst.ReadPinAsFloat(node.In)
-	inst.WritePin(node.Out, in1)
+	inst.WritePinFloat(node.Out, in1)
 	topic, _ := inst.ReadPinAsString(node.Topic)
 	if topic != "" {
 		topic = fmt.Sprintf("num-%s", topic)

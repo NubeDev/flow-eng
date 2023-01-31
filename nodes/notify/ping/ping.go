@@ -78,7 +78,7 @@ func (inst *Ping) Process() {
 		// value := gjson.ParseBytes(out)
 		inst.WritePin(node.Out, string(out))
 	} else {
-		inst.WritePin(node.Out, nil)
+		inst.WritePinNull(node.Out)
 	}
 
 }

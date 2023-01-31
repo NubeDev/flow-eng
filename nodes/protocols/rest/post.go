@@ -51,7 +51,7 @@ func (inst *HttpWrite) do() {
 	}
 	resp, err := inst.request(method, reqBody)
 	if err != nil {
-		inst.WritePin(node.Out, nil)
+		inst.WritePinNull(node.Out)
 		return
 	}
 	if filter != "" {
@@ -73,7 +73,7 @@ func (inst *HttpWrite) Process() {
 		go inst.do()
 
 	} else {
-		inst.WritePin(node.Out, nil)
+		inst.WritePinNull(node.Out)
 	}
 
 }

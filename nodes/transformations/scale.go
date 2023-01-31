@@ -28,5 +28,5 @@ func (inst *Scale) Process() {
 	maxIn, _ := inst.ReadPinAsFloat(node.InMax)
 	minOut, _ := inst.ReadPinAsFloat(node.OutMin)
 	maxOut, _ := inst.ReadPinAsFloat(node.OutMax)
-	inst.WritePin(node.Out, float.Scale(in, minIn, maxIn, minOut, maxOut))
+	inst.WritePinFloat(node.Out, float.Scale(in, minIn, maxIn, minOut, maxOut))
 }

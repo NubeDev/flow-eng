@@ -2,6 +2,7 @@ package filter
 
 import (
 	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/str"
 
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/node"
@@ -14,10 +15,12 @@ type PreventNull struct {
 
 type PreventEqualFloat struct {
 	*node.Spec
+	lastValue *float64
 }
 
 type PreventEqualString struct {
 	*node.Spec
+	lastValue *string
 }
 
 type OnlyBetween struct {
@@ -27,10 +30,12 @@ type OnlyBetween struct {
 
 type OnlyGreater struct {
 	*node.Spec
+	lastValue float64
 }
 
 type OnlyLower struct {
 	*node.Spec
+	lastValue float64
 }
 
 type PreventDuplicates struct {
@@ -53,7 +58,7 @@ func NewPreventEqualFloat(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
 	body.SetHelp(fmt.Sprintln("This node filters ‘input’ values. All ‘input’ values are passed to ‘output’ EXCEPT ‘input’ values which are equal to ‘match’. Output the last known input float value if two inputs equal to each other. Out put nil if any of the inputs are nil."))
-	return &PreventEqualFloat{body}, nil
+	return &PreventEqualFloat{body, nil}, nil
 }
 
 func NewPreventEqualString(body *node.Spec) (node.Node, error) {
@@ -62,7 +67,7 @@ func NewPreventEqualString(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
 	body.SetHelp(fmt.Sprintln("This node filters ‘input’ values. All ‘input’ values are passed to ‘output’ EXCEPT ‘input’ values which are equal to ‘match’. Output the last known input string value if two inputs equal to each other. Out put nil if any of the inputs are nil."))
-	return &PreventEqualString{body}, nil
+	return &PreventEqualString{body, str.New("")}, nil
 }
 
 func NewOnlyBetween(body *node.Spec) (node.Node, error) {
@@ -80,7 +85,7 @@ func NewOnlyGreater(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
 	body.SetHelp(fmt.Sprintln("This node filters ‘input’ values. Only Numeric ‘input’ values greater than ‘OutMax’ are passed to ‘output’. Output the last known input float value if the input is less than 'OutMax'. Out put nil if any of the inputs are nil."))
-	return &OnlyGreater{body}, nil
+	return &OnlyGreater{body, 0}, nil
 }
 
 func NewOnlyLower(body *node.Spec) (node.Node, error) {
@@ -89,20 +94,19 @@ func NewOnlyLower(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
 	body.SetHelp(fmt.Sprintln("This node filters ‘input’ values. Only Numeric ‘input’ values less than 'InMax' are passed to ‘output’. Output the last known input float value if the input is greater than 'OutMin'. Out put nil if any of the inputs are nil."))
-	return &OnlyLower{body}, nil
+	return &OnlyLower{body, 0}, nil
 }
 
 func NewPreventDuplicates(body *node.Spec) (node.Node, error) {
-	var init float64 = 0
 	body = node.Defaults(body, preventDuplicates, category)
 	inputs := node.BuildInputs(node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, nil))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
 	body.SetHelp(fmt.Sprintln("This node filters ‘input’ values. All ‘input’ values are passed to ‘output’ EXCEPT ‘input’ values which are equal to the previous ‘input’ value. Output the last known input float value if the subsequent input value is the same. Out put nil if the input is nil."))
-	return &PreventDuplicates{body, &init}, nil
+	return &PreventDuplicates{body, nil}, nil
 }
 
-// preventNull, output the last known value if the input became null.
+// PreventNull, output the last known value if the input became null.
 // lastValue is defaulted to be 0
 func (inst *PreventNull) Process() {
 	input, null := inst.ReadPinAsFloat(node.Inp)
@@ -115,7 +119,7 @@ func (inst *PreventNull) Process() {
 	}
 }
 
-// preventEqualFloat, output the last known value if two inputs equal to each other.
+// PreventEqualFloat, output the last known value if two inputs equal to each other.
 // filter outputs lastValue if match is null
 // lastValue is defaulted to be null
 func (inst *PreventEqualFloat) Process() {
@@ -124,15 +128,23 @@ func (inst *PreventEqualFloat) Process() {
 
 	if matchNull && !inputNull { // if the `match` value is null, and the input value isn't, then the value passes through.
 		inst.WritePinFloat(node.Outp, input)
+		inst.lastValue = float.New(input)
 	} else if !matchNull && inputNull { // if the `match` value isn't null, and the input value is null, then the null passes through.
 		inst.WritePinNull(node.Outp)
-	} else if !matchNull && !inputNull && float.RoundTo(input, 4) != float.RoundTo(match, 4) { // if the `match` value and the input value aren't null, and the values don't match, then the input value passes through.
+		inst.lastValue = nil
+	} else if !matchNull && !inputNull && input != match { // if the `match` value and the input value aren't null, and the values don't match, then the input value passes through.
 		inst.WritePinFloat(node.Outp, input)
-	} // Otherwise the values must match and so the output value doesn't change
-
+		inst.lastValue = float.New(input)
+	} else { // Otherwise the values must match and so the output value doesn't change
+		if inst.lastValue == nil {
+			inst.WritePinNull(node.Outp)
+		} else {
+			inst.WritePinFloat(node.Outp, *inst.lastValue)
+		}
+	}
 }
 
-// preventEqualString, output the last known value if two inputs equal to each other.
+// PreventEqualString, output the last known value if two inputs equal to each other.
 // filter outputs lastValue if match is null
 // lastValue is defaulted to be "defaultString"
 func (inst *PreventEqualString) Process() {
@@ -142,14 +154,23 @@ func (inst *PreventEqualString) Process() {
 	// TODO: need to confirm if there is a null value for strings (ie. and empty string is treated as null)
 	if matchNull && !inputNull { // if the `match` value is null, and the input value isn't, then the value passes through.
 		inst.WritePin(node.Outp, input)
+		inst.lastValue = str.New(input)
 	} else if !matchNull && inputNull { // if the `match` value isn't null, and the input value is null, then the null passes through.
 		inst.WritePinNull(node.Outp)
+		inst.lastValue = nil
 	} else if !matchNull && !inputNull && input != match { // if the `match` value and the input value aren't null, and the values don't match, then the input value passes through.
 		inst.WritePin(node.Outp, input)
-	} // Otherwise the values must match and so the output value doesn't change
+		inst.lastValue = str.New(input)
+	} else { // Otherwise the values must match and so the output value doesn't change
+		if inst.lastValue == nil {
+			inst.WritePinNull(node.Outp)
+		} else {
+			inst.WritePin(node.Outp, *inst.lastValue)
+		}
+	}
 }
 
-// onlyBetween, Output the last known input float value if the input is not in range.
+// OnlyBetween, Output the last known input float value if the input is not in range.
 // filter behaves like onlyLower or onlyGreater if one of the Min and Max value is null.
 // all values except for null are allow to pass through the filter if both Min and Max are null.
 // lastValue is defaulted to be 0
@@ -180,10 +201,11 @@ func (inst *OnlyBetween) Process() {
 				inst.lastValue = input
 			}
 		}
+		inst.WritePinFloat(node.Outp, inst.lastValue)
 	}
 }
 
-// onlyLower, Output the last known input float value if the input is greater than 'threshold'.
+// OnlyGreater, Output the last known input float value if the input is greater than 'threshold'.
 // filter outputs lastValue if min(threshold) is null
 // lastValue is defaulted to be null
 func (inst *OnlyGreater) Process() {
@@ -196,10 +218,11 @@ func (inst *OnlyGreater) Process() {
 		if minNull || input > min {
 			inst.WritePinFloat(node.Outp, input)
 		}
+		inst.WritePinFloat(node.Outp, inst.lastValue)
 	}
 }
 
-// onlyLower, Output the last known input float value if the input is lower than 'threshold'.
+// OnlyLower, Output the last known input float value if the input is lower than 'threshold'.
 // filter outputs lastValue if max(threshold) is null
 // lastValue is defaulted to be null
 func (inst *OnlyLower) Process() {
@@ -212,10 +235,11 @@ func (inst *OnlyLower) Process() {
 		if maxNull || input < max {
 			inst.WritePinFloat(node.Outp, input)
 		}
+		inst.WritePinFloat(node.Outp, inst.lastValue)
 	}
 }
 
-// preventDuplicates, don't do anything if the subsequent input value is the same. Out put nil if the input is nil.
+// PreventDuplicates, don't do anything if the subsequent input value is the same. Out put nil if the input is nil.
 // lastValue is defaulted to be the address of value 0
 func (inst *PreventDuplicates) Process() {
 	input, inputNull := inst.ReadPinAsFloat(node.Inp)
@@ -226,7 +250,7 @@ func (inst *PreventDuplicates) Process() {
 	} else if (inst.lastValue == nil && !inputNull) || (inst.lastValue != nil && *inst.lastValue != input) {
 		// if last value is null and input is not null
 		// if last value is not null and last value is not the same as current input
-		inst.WritePin(node.Outp, input)
+		inst.WritePinFloat(node.Outp, input)
 		inst.lastValue = float.New(input)
 	}
 }

@@ -24,6 +24,7 @@ type Iterate struct {
 	lastStart          bool
 	lastInterval       time.Duration
 	lastIterations     int
+	currentOutput      bool
 }
 
 const (
@@ -49,7 +50,7 @@ func NewIterate(body *node.Spec) (node.Node, error) {
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetHelp("This node generates a sequence of 'false' to 'true' transitions on 'output'.  The number of 'false' to 'true' transitions will be equal to 'count' value (or 'Iterations' setting);  these values are sent over the 'interval' duration (unless interrupted by 'stop' input).  For example, if 'interval' is set to 5 (seconds) and 'iterations' is set to 5, a 'false' to 'true' transition will occur on 'output' every 1 second.  If 'stop' input is 'true' then the next 'true' value will not be sent from 'output' until 'stop' is 'false' again. 'interval' units can be configured from settings. Maximum 'interval' setting is 587 hours.")
 
-	node := &Iterate{body, nil, 0, false, false, true, -1, -1}
+	node := &Iterate{body, nil, 0, false, false, true, -1, -1, false}
 	node.SetSchema(node.buildSchema())
 	return node, nil
 }
@@ -107,6 +108,8 @@ func (inst *Iterate) Process() {
 	inst.WritePinFloat(node.CountOut, inst.iterationCompleted)
 	if !inst.running {
 		inst.WritePinBool(node.Outp, false)
+	} else {
+		inst.WritePinBool(node.Outp, inst.currentOutput)
 	}
 }
 
@@ -117,6 +120,7 @@ func iterate(inst *Iterate, c chan int, duration time.Duration, iterations float
 		state = Pause
 		inst.WritePinFloat(node.CountOut, 0)
 		inst.WritePinBool(node.Outp, false)
+		inst.currentOutput = false
 	}
 	for {
 		// check for terminal condition
@@ -152,8 +156,10 @@ func iterate(inst *Iterate, c chan int, duration time.Duration, iterations float
 				// write out the waveform, 'true' for first half period, and 'false' for the second half
 				// this arrangement allows the program to stop on false when stop become true
 				inst.WritePinBool(node.Outp, true)
+				inst.currentOutput = true
 				time.Sleep(duration / 2)
 				inst.WritePinBool(node.Outp, false)
+				inst.currentOutput = false
 				time.Sleep(duration / 2)
 			}
 		}

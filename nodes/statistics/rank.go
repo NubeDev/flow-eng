@@ -41,17 +41,17 @@ func (inst *Rank) Process() {
 		sort.Float64s(nonNilValues)
 		// TODO: Add in minimum rank
 		if len(nonNilValues) == 1 {
-			inst.WritePin(node.Out1, nonNilValues[0])
+			inst.WritePinFloat(node.Out1, nonNilValues[0])
 			inst.WritePinNull(node.Out2)
 			inst.WritePinNull(node.Out3)
 		} else if len(nonNilValues) == 2 {
-			inst.WritePin(node.Out1, nonNilValues[1])
-			inst.WritePin(node.Out2, nonNilValues[0])
+			inst.WritePinFloat(node.Out1, nonNilValues[1])
+			inst.WritePinFloat(node.Out2, nonNilValues[0])
 			inst.WritePinNull(node.Out3)
 		} else if len(nonNilValues) >= 3 {
-			inst.WritePin(node.Out1, nonNilValues[len(nonNilValues)-1])
-			inst.WritePin(node.Out2, nonNilValues[len(nonNilValues)-2])
-			inst.WritePin(node.Out3, nonNilValues[len(nonNilValues)-3])
+			inst.WritePinFloat(node.Out1, nonNilValues[len(nonNilValues)-1])
+			inst.WritePinFloat(node.Out2, nonNilValues[len(nonNilValues)-2])
+			inst.WritePinFloat(node.Out3, nonNilValues[len(nonNilValues)-3])
 		}
 	}
 }

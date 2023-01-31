@@ -20,6 +20,7 @@ type COVNode struct {
 	running       bool
 	lastInterval  time.Duration
 	lastThreshold float64
+	currentOutput bool
 }
 
 func NewCOVNode(body *node.Spec) (node.Node, error) {
@@ -35,7 +36,7 @@ func NewCOVNode(body *node.Spec) (node.Node, error) {
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetHelp("when ‘input’ changes value, output becomes ‘true’ for ‘interval’ duration, then ‘output’ changes back to ‘false’. For Numeric ‘input’ values, the change of value must be greater than the ‘threshold’ value to trigger the output. Interval value must be equal or larger than 1.")
 
-	node := &COVNode{body, nil, false, 10 * time.Second, -1}
+	node := &COVNode{body, nil, false, 10 * time.Second, -1, false}
 	node.SetSchema(node.buildSchema())
 	return node, nil
 }
@@ -54,6 +55,7 @@ func (inst *COVNode) Process() {
 	// outputs false if the input is nil or there is no lastValue
 	if inputNull || inst.lastValue == nil {
 		inst.WritePinBool(node.Outp, false)
+		inst.currentOutput = false
 	} else {
 		// call 'writeOutput' when the absolute diff between last two inputs are larger than 'covThreshold' and there are no previous routine running
 		diff := math.Abs(input - *inst.lastValue)
@@ -63,14 +65,17 @@ func (inst *COVNode) Process() {
 		}
 	}
 	inst.lastValue = &input
+	inst.WritePinBool(node.Outp, inst.currentOutput)
 }
 
 func writeOutput(inst *COVNode, duration time.Duration) {
 	// set the output pin to true for 'duration' period before setting it to false
 	// set inst.running to false after routine is finished
 	inst.WritePinBool(node.Outp, true)
+	inst.currentOutput = true
 	time.Sleep(duration)
 	inst.WritePinBool(node.Outp, false)
+	inst.currentOutput = false
 	inst.running = false
 }
 

@@ -23,7 +23,7 @@ func NewLoopCount(body *node.Spec) (node.Node, error) {
 func (inst *Loop) Process() {
 	counter, _ := inst.Loop()
 	toggleOnCount, _ := inst.ReadPinAsUint64(node.TriggerOnCount)
-	inst.WritePin(node.Out, counter)
+	inst.WritePinFloat(node.Out, float64(counter))
 	if toggleOnCount <= 0 {
 		toggleOnCount = 1
 	}

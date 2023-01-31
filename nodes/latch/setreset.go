@@ -20,7 +20,7 @@ func NewSetResetLatch(body *node.Spec) (node.Node, error) {
 	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, nil) // TODO: this input shouldn't have a manual override value
 
 	inputs := node.BuildInputs(set, reset)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
 	node := &SetResetLatch{body, false}
@@ -29,11 +29,7 @@ func NewSetResetLatch(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *SetResetLatch) Process() {
-	set, null := inst.ReadPinAsBool(node.Set)
-	if null {
-		inst.WritePinNull(node.Out)
-		return
-	}
+	set, _ := inst.ReadPinAsBool(node.Set)
 	reset, _ := inst.ReadPinAsBool(node.Reset)
 
 	settings, err := inst.getSettings(inst.GetSettings())
@@ -50,7 +46,7 @@ func (inst *SetResetLatch) Process() {
 	} else if !set && inst.currentVal && reset {
 		inst.currentVal = false
 	}
-	inst.WritePin(node.Out, inst.currentVal)
+	inst.WritePinBool(node.Outp, inst.currentVal)
 }
 
 // Custom Node Settings Schema

@@ -21,6 +21,7 @@ type DutyCycle struct {
 	lastInterval  time.Duration
 	lastDuty      float64
 	lastEnable    bool
+	currentOutput bool
 }
 
 func NewDutyCycle(body *node.Spec) (node.Node, error) {
@@ -32,7 +33,7 @@ func NewDutyCycle(body *node.Spec) (node.Node, error) {
 	out := node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	node := &DutyCycle{body, nil, nil, nil, 10, 50, false}
+	node := &DutyCycle{body, nil, nil, nil, 10, 50, false, false}
 	node.SetSchema(node.buildSchema())
 	return node, nil
 }
@@ -44,6 +45,7 @@ func (inst *DutyCycle) Process() {
 		inst.disableDutyCycle()
 		inst.lastEnable = false
 		inst.WritePinFalse(node.Outp)
+		inst.currentOutput = false
 		return
 	}
 
@@ -67,6 +69,7 @@ func (inst *DutyCycle) Process() {
 	inst.lastInterval = intervalDuration
 	inst.lastDuty = dutyCyclePerc
 	inst.lastEnable = enable
+	inst.WritePinBool(node.Outp, inst.currentOutput)
 
 }
 
@@ -101,8 +104,10 @@ func (inst *DutyCycle) restartDutyCycle(intervalDuration time.Duration, dutyCycl
 
 func (inst *DutyCycle) startIteration(delayBetweenOnAndOffDuration time.Duration) {
 	inst.WritePinTrue(node.Outp)
+	inst.currentOutput = true
 	inst.offTimer = time.AfterFunc(delayBetweenOnAndOffDuration, func() {
 		inst.WritePinFalse(node.Outp)
+		inst.currentOutput = false
 	})
 }
 

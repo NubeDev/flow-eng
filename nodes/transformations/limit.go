@@ -24,5 +24,5 @@ func (inst *Limit) Process() {
 	in, _ := inst.ReadPinAsFloat(node.In)
 	min, _ := inst.ReadPinAsFloat(node.MinInput)
 	max, _ := inst.ReadPinAsFloat(node.MaxInput)
-	inst.WritePin(node.Out, float.LimitToRange(in, min, max))
+	inst.WritePinFloat(node.Out, float.LimitToRange(in, min, max))
 }

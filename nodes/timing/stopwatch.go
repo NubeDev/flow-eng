@@ -48,7 +48,7 @@ func (inst *Stopwatch) Process() {
 	if reset && !inst.lastReset {
 		inst.accumulation = 0
 		inst.lastOutput = 0
-		inst.WritePin(node.Elapsed, 0)
+		inst.WritePinFloat(node.Elapsed, 0)
 	}
 	inst.lastReset = reset
 

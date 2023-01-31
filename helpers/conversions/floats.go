@@ -19,6 +19,13 @@ func FloatToFixed(num float64, precision int) float64 {
 	return float64(round(num*output)) / output
 }
 
+func TruncateFloat(num float64, precision int) float64 {
+	if precision < 0 {
+		precision = 0
+	}
+	return math.Trunc(num*math.Pow(10, float64(precision))) / math.Pow(10, float64(precision))
+}
+
 type number interface {
 	int | int8 | int16 | int32 | int64 | float32 | float64
 }

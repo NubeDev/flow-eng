@@ -33,15 +33,15 @@ func (inst *Between) Process() {
 	to, toNull := inst.ReadPinAsFloat(node.To)
 
 	if inNull || fromNull || toNull {
-		inst.WritePin(node.Outp, false)
-		inst.WritePin(node.OutNot, true)
-		inst.WritePin(node.Above, false)
-		inst.WritePin(node.Below, false)
+		inst.WritePinBool(node.Outp, false)
+		inst.WritePinBool(node.OutNot, true)
+		inst.WritePinBool(node.Above, false)
+		inst.WritePinBool(node.Below, false)
 	}
 
 	between, below, above := array.Between(in, from, to)
-	inst.WritePin(node.Outp, between)
-	inst.WritePin(node.OutNot, !between)
-	inst.WritePin(node.Above, above)
-	inst.WritePin(node.Below, below)
+	inst.WritePinBool(node.Outp, between)
+	inst.WritePinBool(node.OutNot, !between)
+	inst.WritePinBool(node.Above, above)
+	inst.WritePinBool(node.Below, below)
 }
