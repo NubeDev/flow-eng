@@ -7,10 +7,10 @@ const (
 const (
 	folder      = "folder"
 	inputFloat  = "input-float"
-	inputBool   = "input-bool"
+	inputBool   = "input-boolean"
 	inputString = "input-string"
 
 	outputFloat  = "output-float"
-	outputBool   = "output-bool"
+	outputBool   = "output-boolean"
 	outputString = "output-string"
 )

@@ -1,8 +1,8 @@
-package transformations
+package numtransform
 
 const (
 	scaleNode = "scale"
 	limitNode = "limit"
 	fade      = "fade"
-	category  = "transformations"
+	category  = "numeric-transform"
 )

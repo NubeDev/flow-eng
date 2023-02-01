@@ -9,7 +9,7 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/store"
 	"github.com/NubeDev/flow-eng/helpers/timer"
 	"github.com/NubeDev/flow-eng/node"
-	"github.com/NubeDev/flow-eng/nodes/bool"
+	"github.com/NubeDev/flow-eng/nodes/boolean"
 	"github.com/NubeDev/flow-eng/nodes/compare"
 	"github.com/NubeDev/flow-eng/nodes/constant"
 	"github.com/NubeDev/flow-eng/nodes/conversion"
@@ -26,6 +26,7 @@ import (
 	broker "github.com/NubeDev/flow-eng/nodes/mqtt"
 	"github.com/NubeDev/flow-eng/nodes/notify/gmail"
 	"github.com/NubeDev/flow-eng/nodes/notify/ping"
+	"github.com/NubeDev/flow-eng/nodes/numtransform"
 	point "github.com/NubeDev/flow-eng/nodes/points"
 	bacnetio "github.com/NubeDev/flow-eng/nodes/protocols/bacnet"
 	"github.com/NubeDev/flow-eng/nodes/protocols/flow"
@@ -36,7 +37,6 @@ import (
 	switches "github.com/NubeDev/flow-eng/nodes/switch"
 	"github.com/NubeDev/flow-eng/nodes/system"
 	"github.com/NubeDev/flow-eng/nodes/timing"
-	"github.com/NubeDev/flow-eng/nodes/transformations"
 )
 
 const (
@@ -48,12 +48,12 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	constNum, _ := constant.NewNumber(nil)
 	constStr, _ := constant.NewString(nil)
 
-	// bool
-	and, _ := bool.NewAnd(nil)
-	or, _ := bool.NewOr(nil)
-	xor, _ := bool.NewXor(nil)
-	not, _ := bool.NewNot(nil)
-	toggle, _ := bool.NewToggle(nil)
+	// boolean
+	and, _ := boolean.NewAnd(nil)
+	or, _ := boolean.NewOr(nil)
+	xor, _ := boolean.NewXor(nil)
+	not, _ := boolean.NewNot(nil)
+	toggle, _ := boolean.NewToggle(nil)
 
 	// compare
 	greaterthan, _ := compare.NewGreaterThan(nil)
@@ -154,11 +154,11 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	oneShot, _ := timing.NewOneShot(nil)
 	stopwatch, _ := timing.NewStopwatch(nil)
 
-	// number transformations
-	fade, _ := transformations.NewFade(nil)
-	limitNode, _ := transformations.NewLimit(nil)
-	rateLimit, _ := transformations.NewRateLimit(nil)
-	scaleNode, _ := transformations.NewScale(nil)
+	// number numtransform
+	fade, _ := numtransform.NewFade(nil)
+	limitNode, _ := numtransform.NewLimit(nil)
+	rateLimit, _ := numtransform.NewRateLimit(nil)
+	scaleNode, _ := numtransform.NewScale(nil)
 
 	// bacnet
 	bacServer, _ := bacnetio.NewServer(nil, nil)
@@ -196,17 +196,24 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	// }
 
 	return node.BuildNodes(
-		node.ConvertToSpec(constBool),
-		node.ConvertToSpec(constNum),
-		node.ConvertToSpec(constStr),
 
-		node.ConvertToSpec(abs),
-		node.ConvertToSpec(add),
-		node.ConvertToSpec(sub),
-		node.ConvertToSpec(multiply),
-		node.ConvertToSpec(divide),
-		node.ConvertToSpec(modulo),
-		node.ConvertToSpec(mathAdvanced),
+		node.ConvertToSpec(bacServer),
+		node.ConvertToSpec(bacPointAI),
+		node.ConvertToSpec(bacPointAO),
+		node.ConvertToSpec(bacPointAV),
+		node.ConvertToSpec(bacPointBV),
+
+		node.ConvertToSpec(flowNetwork),
+		node.ConvertToSpec(flowPoint),
+		node.ConvertToSpec(flowPointWrite),
+		node.ConvertToSpec(flowSchedule),
+
+		node.ConvertToSpec(getNode),
+		node.ConvertToSpec(writeNode),
+
+		node.ConvertToSpec(mqttBroker),
+		node.ConvertToSpec(mqttSub),
+		node.ConvertToSpec(mqttPub),
 
 		node.ConvertToSpec(and),
 		node.ConvertToSpec(or),
@@ -221,30 +228,29 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(between),
 		node.ConvertToSpec(hysteresis),
 
-		node.ConvertToSpec(min),
-		node.ConvertToSpec(max),
-		node.ConvertToSpec(avg),
-		node.ConvertToSpec(minMaxAvg),
-		node.ConvertToSpec(rangeNode),
-		node.ConvertToSpec(rank),
-		node.ConvertToSpec(median),
+		node.ConvertToSpec(constBool),
+		node.ConvertToSpec(constNum),
+		node.ConvertToSpec(constStr),
 
-		node.ConvertToSpec(gmailNode),
-		node.ConvertToSpec(pingNode),
+		node.ConvertToSpec(conversionString),
+		node.ConvertToSpec(conversionNum),
+		node.ConvertToSpec(conversionBool),
 
-		node.ConvertToSpec(flowLoopCount),
-		node.ConvertToSpec(subFlowFolder),
-		node.ConvertToSpec(subInputFloat),
-		node.ConvertToSpec(subInputString),
-		node.ConvertToSpec(subInputBool),
-		node.ConvertToSpec(subOutputFloat),
-		node.ConvertToSpec(subOutputBool),
-		node.ConvertToSpec(subOutputString),
+		node.ConvertToSpec(countNode),
+		node.ConvertToSpec(countNum),
+		node.ConvertToSpec(countString),
 
-		node.ConvertToSpec(flowNetwork),
-		node.ConvertToSpec(flowPoint),
-		node.ConvertToSpec(flowPointWrite),
-		node.ConvertToSpec(flowSchedule),
+		node.ConvertToSpec(logNode),
+
+		node.ConvertToSpec(preventNull),
+		node.ConvertToSpec(preventEqualFloat),
+		node.ConvertToSpec(preventEqualString),
+		node.ConvertToSpec(onlyBetween),
+		node.ConvertToSpec(onlyGreater),
+		node.ConvertToSpec(onlyLower),
+		node.ConvertToSpec(preventDuplicates),
+
+		node.ConvertToSpec(funcNode),
 
 		node.ConvertToSpec(accumPeriod),
 		node.ConvertToSpec(deadBand),
@@ -255,16 +261,59 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(psychroDBDP),
 		node.ConvertToSpec(psychroDBWB),
 
-		node.ConvertToSpec(boolWriteable),
-		node.ConvertToSpec(numWriteable),
-		node.ConvertToSpec(stringWriteable),
-
 		node.ConvertToSpec(jsonFilter),
 		node.ConvertToSpec(dataStore),
 
 		node.ConvertToSpec(numLatch),
 		node.ConvertToSpec(stringLatch),
 		node.ConvertToSpec(setResetLatch),
+
+		node.ConvertToSpec(linkInput),
+		node.ConvertToSpec(linkInputNum),
+		node.ConvertToSpec(linkOutput),
+		node.ConvertToSpec(linkOutputNum),
+
+		node.ConvertToSpec(abs),
+		node.ConvertToSpec(add),
+		node.ConvertToSpec(sub),
+		node.ConvertToSpec(multiply),
+		node.ConvertToSpec(divide),
+		node.ConvertToSpec(modulo),
+		node.ConvertToSpec(mathAdvanced),
+
+		node.ConvertToSpec(fade),
+		node.ConvertToSpec(limitNode),
+		node.ConvertToSpec(rateLimit),
+		node.ConvertToSpec(scaleNode),
+
+		node.ConvertToSpec(gmailNode),
+		node.ConvertToSpec(pingNode),
+
+		node.ConvertToSpec(boolWriteable),
+		node.ConvertToSpec(numWriteable),
+		node.ConvertToSpec(stringWriteable),
+
+		node.ConvertToSpec(min),
+		node.ConvertToSpec(max),
+		node.ConvertToSpec(avg),
+		node.ConvertToSpec(minMaxAvg),
+		node.ConvertToSpec(rangeNode),
+		node.ConvertToSpec(rank),
+		node.ConvertToSpec(median),
+
+		node.ConvertToSpec(flatLine),
+
+		node.ConvertToSpec(flowLoopCount),
+		node.ConvertToSpec(subFlowFolder),
+		node.ConvertToSpec(subInputFloat),
+		node.ConvertToSpec(subInputString),
+		node.ConvertToSpec(subInputBool),
+		node.ConvertToSpec(subOutputFloat),
+		node.ConvertToSpec(subOutputBool),
+		node.ConvertToSpec(subOutputString),
+
+		node.ConvertToSpec(switchNode),
+		node.ConvertToSpec(selectNode),
 
 		node.ConvertToSpec(delay),
 		node.ConvertToSpec(delayOn),
@@ -277,54 +326,6 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(cov),
 		node.ConvertToSpec(random),
 		node.ConvertToSpec(iterate),
-
-		node.ConvertToSpec(flatLine),
-
-		node.ConvertToSpec(countNode),
-		node.ConvertToSpec(countNum),
-		node.ConvertToSpec(countString),
-
-		node.ConvertToSpec(funcNode),
-
-		node.ConvertToSpec(switchNode),
-		node.ConvertToSpec(selectNode),
-
-		node.ConvertToSpec(conversionString),
-		node.ConvertToSpec(conversionNum),
-		node.ConvertToSpec(conversionBool),
-
-		node.ConvertToSpec(linkInput),
-		node.ConvertToSpec(linkInputNum),
-		node.ConvertToSpec(linkOutput),
-		node.ConvertToSpec(linkOutputNum),
-
-		node.ConvertToSpec(bacServer),
-		node.ConvertToSpec(bacPointAI),
-		node.ConvertToSpec(bacPointAO),
-		node.ConvertToSpec(bacPointAV),
-		node.ConvertToSpec(bacPointBV),
-
-		node.ConvertToSpec(mqttBroker),
-		node.ConvertToSpec(mqttSub),
-		node.ConvertToSpec(mqttPub),
-
-		node.ConvertToSpec(fade),
-		node.ConvertToSpec(limitNode),
-		node.ConvertToSpec(rateLimit),
-		node.ConvertToSpec(scaleNode),
-
-		node.ConvertToSpec(logNode),
-
-		node.ConvertToSpec(preventNull),
-		node.ConvertToSpec(preventEqualFloat),
-		node.ConvertToSpec(preventEqualString),
-		node.ConvertToSpec(onlyBetween),
-		node.ConvertToSpec(onlyGreater),
-		node.ConvertToSpec(onlyLower),
-		node.ConvertToSpec(preventDuplicates),
-
-		node.ConvertToSpec(getNode),
-		node.ConvertToSpec(writeNode),
 	)
 }
 
@@ -519,13 +520,13 @@ func builderNotify(body *node.Spec) (node.Node, error) {
 func builderTransformations(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case limitNode:
-		return transformations.NewLimit(body)
+		return numtransform.NewLimit(body)
 	case scaleNode:
-		return transformations.NewScale(body)
+		return numtransform.NewScale(body)
 	case fade:
-		return transformations.NewFade(body)
+		return numtransform.NewFade(body)
 	case rateLimit:
-		return transformations.NewRateLimit(body)
+		return numtransform.NewRateLimit(body)
 	}
 	return nil, nil
 }
@@ -653,15 +654,15 @@ func builderSwitch(body *node.Spec) (node.Node, error) {
 func builderBoolean(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case and:
-		return bool.NewAnd(body)
+		return boolean.NewAnd(body)
 	case or:
-		return bool.NewOr(body)
+		return boolean.NewOr(body)
 	case xor:
-		return bool.NewXor(body)
+		return boolean.NewXor(body)
 	case not:
-		return bool.NewNot(body)
+		return boolean.NewNot(body)
 	case toggle:
-		return bool.NewToggle(body)
+		return boolean.NewToggle(body)
 	}
 	return nil, nil
 }

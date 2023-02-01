@@ -2,7 +2,7 @@ package constant
 
 const (
 	constNum  = "const-num"
-	constBool = "const-bool"
+	constBool = "const-boolean"
 	constStr  = "const-string"
 	category  = "constant"
 )

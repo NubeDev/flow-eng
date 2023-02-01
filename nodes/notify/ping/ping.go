@@ -35,7 +35,7 @@ func NewPing(body *node.Spec) (node.Node, error) {
 	ip := node.BuildInput(node.Ip, node.TypeString, nil, body.Inputs, nil)
 	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs, nil)
 	body.Inputs = node.BuildInputs(ip, trigger)
-	msg := node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs)
+	msg := node.BuildOutput(node.Outp, node.TypeString, nil, body.Outputs)
 	body.Outputs = node.BuildOutputs(msg)
 	var res []result
 	return &Ping{body, false, 0, time.Now(), time.Now(), false, res}, nil
@@ -75,10 +75,10 @@ func (inst *Ping) Process() {
 	}
 	if len(inst.results) > 0 {
 		out, _ := json.Marshal(inst.results)
-		// value := gjson.ParseBytes(out)
-		inst.WritePin(node.Out, string(out))
+		// value := json.ParseBytes(out)
+		inst.WritePin(node.Outp, string(out))
 	} else {
-		inst.WritePinNull(node.Out)
+		inst.WritePinNull(node.Outp)
 	}
 
 }

@@ -2,7 +2,7 @@ package nodes
 
 const (
 	constNum  = "const-num"
-	constBool = "const-bool"
+	constBool = "const-boolean"
 	constStr  = "const-string"
 
 	abs      = "absolute-value"
@@ -70,7 +70,7 @@ const (
 
 	conversionString = "conversion-string"
 	conversionNum    = "conversion-number"
-	conversionBool   = "conversion-bool"
+	conversionBool   = "conversion-boolean"
 
 	max       = "max"
 	min       = "min"
@@ -135,10 +135,10 @@ const (
 
 	subFlowFolder = "folder"
 	inputFloat    = "input-float"
-	inputBool     = "input-bool"
+	inputBool     = "input-boolean"
 	inputString   = "input-string"
 
 	outputFloat  = "output-float"
-	outputBool   = "output-bool"
+	outputBool   = "output-boolean"
 	outputString = "output-string"
 )

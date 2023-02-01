@@ -130,7 +130,7 @@ func (runner *Runner) processConnectors() error {
 		}
 		err := conn.Trigger(debug)
 		if err != nil {
-			log.Errorf("error from runner: %s from: %s to: %s", err.Error(), conn.from.Name, conn.to.Name)
+			log.Errorf("error from runner: %s node: %s from: %s to: %s", err.Error(), runner.Name(), conn.from.Name, conn.to.Name)
 			return err
 		}
 	}

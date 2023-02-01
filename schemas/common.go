@@ -77,7 +77,7 @@ type EnumString struct {
 }
 
 type EnumInt struct {
-	Type     string `json:"type" default:"string"`
+	Type     string `json:"type" default:"number"`
 	Title    string `json:"title" default:""`
 	Default  int    `json:"default" default:""`
 	Options  []int  `json:"enum" default:"[]"`

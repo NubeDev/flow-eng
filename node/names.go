@@ -237,12 +237,12 @@ const (
 	Compressor2    OutputName = "compressor-2"
 
 	LeadUnit     OutputName = "lead-unit"
-	LeadUnitBool OutputName = "lead-unit-bool"
+	LeadUnitBool OutputName = "lead-unit-boolean"
 	EnableA      OutputName = "enable-A"
 	EnableB      OutputName = "enable-B"
 
 	PeriodConsumption OutputName = "period-consumption"
-	LastAccumulation  OutputName = "last-accumulation"
+	LastPeriodEndVal  OutputName = "last-period-end-value"
 	PeriodDuration    OutputName = "period-duration"
 	NextTrigger       OutputName = "next-trigger"
 

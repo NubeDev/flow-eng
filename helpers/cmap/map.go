@@ -29,12 +29,12 @@ func (t MapUtil) GetAll() map[string]interface{} {
 	return t.m
 }
 
-//func (t MapUtil) GetAll(keys ...string) MapUtil {
+// func (t MapUtil) GetAll(keys ...string) MapUtil {
 //	for _, k := range keys {
 //		t = t.child(k)
 //	}
 //	return t
-//}
+// }
 
 // Key represents either the index of an array (int) or the key in a map (string).
 type Key struct {
@@ -71,7 +71,7 @@ type SetFunc func(k Key, value interface{}) (interface{}, bool)
 
 // SetAll traverses all []interface{} and map[string]interface{} types and calls the
 // fn (SetFunc) for each key/value pair. If the SetFunc for a given key/value pair
-// returns bool(true) as its 2nd return value, then said value will be updated to
+// returns boolean(true) as its 2nd return value, then said value will be updated to
 // whatever SetFunc returned as the interface{}.
 func (t MapUtil) SetAll(fn SetFunc) int {
 	if t.m == nil {
