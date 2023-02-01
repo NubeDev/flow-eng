@@ -132,9 +132,11 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 	var err error
 	var tempList [8]float64
 	var voltList [8]float64
+	var currentList [8]float64
 	var diList [8]float64
 	var completedTemp bool
 	var completedVolt bool
+	var completedCurrent bool
 	var completedDis bool
 	var returnedValue float64
 	for _, point := range pointsList { // do modbus read
@@ -165,6 +167,19 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 					log.Errorf("modbus read voltages %s slave: %d", err.Error(), slaveId)
 				} else {
 					returnedValue = voltList[io16Pin]
+					err := inst.writePV(point.ObjectType, point.ObjectID, returnedValue)
+					if err != nil {
+						log.Errorf("modbus modbusInputsRunner() writePv %s slave: %d", err.Error(), slaveId)
+					}
+				}
+				time.Sleep(modbusDelay * time.Millisecond)
+			}
+			if !completedCurrent && point.IoType == points.IoTypeCurrent {
+				currentList, err = cli.ReadCurrent(slaveId) // DO MODBUS READ FOR VOLTS
+				if err != nil {
+					log.Errorf("modbus read current %s slave: %d", err.Error(), slaveId)
+				} else {
+					returnedValue = currentList[io16Pin]
 					err := inst.writePV(point.ObjectType, point.ObjectID, returnedValue)
 					if err != nil {
 						log.Errorf("modbus modbusInputsRunner() writePv %s slave: %d", err.Error(), slaveId)
