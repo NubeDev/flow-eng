@@ -117,6 +117,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	stringLatch, _ := latch.NewStringLatch(nil)
 	setResetLatch, _ := latch.NewSetResetLatch(nil)
 
+	numOutputSelect, _ := switches.NewNumOutputSelect(nil)
 	selectNode, _ := switches.NewSelectNum(nil)
 	switchNode, _ := switches.NewSwitch(nil)
 
@@ -154,7 +155,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	oneShot, _ := timing.NewOneShot(nil)
 	stopwatch, _ := timing.NewStopwatch(nil)
 
-	// number numtransform
+	// numtransform
 	fade, _ := numtransform.NewFade(nil)
 	limitNode, _ := numtransform.NewLimit(nil)
 	rateLimit, _ := numtransform.NewRateLimit(nil)
@@ -312,6 +313,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(subOutputBool),
 		node.ConvertToSpec(subOutputString),
 
+		node.ConvertToSpec(numOutputSelect),
 		node.ConvertToSpec(switchNode),
 		node.ConvertToSpec(selectNode),
 
@@ -647,6 +649,8 @@ func builderSwitch(body *node.Spec) (node.Node, error) {
 		return switches.NewSwitch(body)
 	case selectNum:
 		return switches.NewSelectNum(body)
+	case numOutputSelect:
+		return switches.NewNumOutputSelect(body)
 	}
 	return nil, nil
 }

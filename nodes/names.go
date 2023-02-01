@@ -111,8 +111,9 @@ const (
 	stopwatch = "stopwatch"
 
 	// switch
-	switchNode = "switch"
-	selectNum  = "select-numeric"
+	switchNode      = "switch"
+	selectNum       = "select-numeric"
+	numOutputSelect = "output-select-numeric"
 
 	linkInput     = "link-input-string"
 	linkOutput    = "link-output-string"

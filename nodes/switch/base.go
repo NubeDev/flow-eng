@@ -6,9 +6,10 @@ import (
 )
 
 const (
-	selectNum  = "select-numeric"
-	switchNode = "switch"
-	category   = "switch"
+	selectNum       = "select-numeric"
+	numOutputSelect = "output-select-numeric"
+	switchNode      = "switch"
+	category        = "switch"
 )
 
 func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error) {
