@@ -60,15 +60,14 @@ func (inst *Flatline) Process() {
 
 	if newCOV {
 		inst.lastCOVTime = time.Now().Unix()
-		inst.WritePinBool(node.Outp, false)
 		inst.alertStatus = false
 	} else {
 		now := time.Now().Unix()
 		if float64(now-inst.lastCOVTime) >= intervalDuration.Seconds() {
-			inst.WritePinBool(node.Outp, true)
 			inst.alertStatus = true
 		}
 	}
+	inst.WritePinBool(node.Outp, inst.alertStatus)
 }
 
 func (inst *Flatline) setSubtitle(intervalDuration time.Duration) {

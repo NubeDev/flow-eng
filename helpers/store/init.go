@@ -9,19 +9,19 @@ type Store struct {
 	Store *cache.Cache
 }
 
-//Init init store
+// Init init store
 func Init() *Store {
 	newStore := cache.New(cache.NoExpiration, cache.DefaultExpiration)
 	store := &Store{Store: newStore}
 	return store
 }
 
-//All get everything from the store
+// All get everything from the store
 func (inst *Store) All() map[string]cache.Item {
 	return inst.Store.Items()
 }
 
-// Get an item from the store. Returns the item or nil, and a bool indicating
+// Get an item from the store. Returns the item or nil, and a boolean indicating
 // whether the key was found.
 func (inst *Store) Get(key string) (interface{}, bool) {
 	value, found := inst.Store.Get(key)

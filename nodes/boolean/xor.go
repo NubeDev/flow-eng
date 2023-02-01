@@ -1,4 +1,4 @@
-package bool
+package boolean
 
 import (
 	"github.com/NubeDev/flow-eng/node"
@@ -14,7 +14,7 @@ func NewXor(body *node.Spec) (node.Node, error) {
 	in2 := node.BuildInput(node.In2, node.TypeBool, nil, body.Inputs, nil) // TODO: this input shouldn't have a manual override value
 	inputs := node.BuildInputs(in1, in2)
 
-	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
+	out := node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &Xor{body}, nil
@@ -25,8 +25,8 @@ func (inst *Xor) Process() {
 	in2, _ := inst.ReadPinAsBool(node.In2)
 
 	if (in1 && !in2) || (!in1 && in2) {
-		inst.WritePinTrue(node.Out)
+		inst.WritePinTrue(node.Outp)
 	} else {
-		inst.WritePinFalse(node.Out)
+		inst.WritePinFalse(node.Outp)
 	}
 }

@@ -1,4 +1,4 @@
-package transformations
+package numtransform
 
 import (
 	"encoding/json"

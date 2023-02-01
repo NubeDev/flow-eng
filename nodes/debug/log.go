@@ -22,7 +22,7 @@ func NewLog(body *node.Spec) (node.Node, error) {
 	str := node.BuildInput(node.InString, node.TypeString, nil, body.Inputs, nil)
 	b := node.BuildInput(node.InBoolean, node.TypeBool, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(comment, num, str, b)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &Log{body}, nil
 }
@@ -42,6 +42,7 @@ func (inst *Log) Process() {
 		log.Infof("log: comment: %v string: %s", comment, str)
 	}
 	if inst.InputHasConnection(node.InBoolean) {
-		log.Infof("log: comment: %s bool: %t", comment, inBool)
+		log.Infof("log: comment: %s boolean: %t", comment, inBool)
 	}
+	inst.WritePinFloat(node.Outp, 0)
 }

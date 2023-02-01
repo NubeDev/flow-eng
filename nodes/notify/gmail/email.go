@@ -48,7 +48,7 @@ func NewGmail(body *node.Spec) (node.Node, error) {
 	message := node.BuildInput(node.Message, node.TypeString, nil, body.Inputs, nil)
 	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(to, subject, message, trigger)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(buildSchema())
 	return &Gmail{body, address}, nil
@@ -81,5 +81,6 @@ func (inst *Gmail) Process() {
 	if cov {
 		inst.sendEmail()
 	}
+	inst.WritePin(node.Outp, "")
 
 }

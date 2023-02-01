@@ -36,7 +36,7 @@ func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error)
 		count = settings.InputCount
 	}
 	inputs := node.BuildInputs(node.DynamicInputs(node.TypeFloat, nil, count, 2, 20, body.Inputs)...)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(buildMathDefaultSchema())
 	body.SetDynamicInputs()
@@ -49,9 +49,9 @@ func process(body node.Node) {
 	inputs := conversions.ConvertInterfaceToFloatMultiple(body.ReadMultiple(count))
 	output := operation(equation, inputs)
 	if output == nil {
-		body.WritePinNull(node.Out)
+		body.WritePinNull(node.Outp)
 	} else {
-		body.WritePinFloat(node.Out, float.NonNil(output))
+		body.WritePinFloat(node.Outp, float.NonNil(output))
 	}
 }
 

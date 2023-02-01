@@ -1,4 +1,4 @@
-package bool
+package boolean
 
 import (
 	"github.com/NubeDev/flow-eng/node"

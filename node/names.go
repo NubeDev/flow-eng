@@ -237,7 +237,7 @@ const (
 	Compressor2    OutputName = "compressor-2"
 
 	LeadUnit     OutputName = "lead-unit"
-	LeadUnitBool OutputName = "lead-unit-bool"
+	LeadUnitBool OutputName = "lead-unit-boolean"
 	EnableA      OutputName = "enable-A"
 	EnableB      OutputName = "enable-B"
 

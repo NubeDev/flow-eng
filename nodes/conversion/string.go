@@ -33,7 +33,7 @@ func (inst *String) Process() {
 	} else {
 		inst.WritePinNull(node.Float)
 	}
-	result, err := strconv.ParseBool(in1) // to bool
+	result, err := strconv.ParseBool(in1) // to boolean
 	if err != nil {
 		inst.WritePinNull(node.Boolean)
 	} else {

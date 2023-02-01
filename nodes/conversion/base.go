@@ -4,5 +4,5 @@ const (
 	category         = "conversion"
 	conversionString = "conversion-string"
 	conversionNum    = "conversion-number"
-	conversionBool   = "conversion-bool"
+	conversionBool   = "conversion-boolean"
 )

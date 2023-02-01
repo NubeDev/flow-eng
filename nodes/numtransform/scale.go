@@ -1,4 +1,4 @@
-package transformations
+package numtransform
 
 import (
 	"github.com/NubeDev/flow-eng/helpers/float"
