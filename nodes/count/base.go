@@ -1,7 +1,7 @@
 package count
 
 const (
-	category        = "counters"
+	category        = "count"
 	countNode       = "count"
 	countNumNode    = "count-number"
 	countStringNode = "count-string"
