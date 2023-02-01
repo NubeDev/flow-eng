@@ -137,7 +137,7 @@ func (inst *Server) writePV(objType points.ObjectType, id points.ObjectID, value
 		if pnt.ScaleEnable {
 			value = float.Scale(value, pnt.ScaleInMin, pnt.ScaleInMax, pnt.ScaleOutMin, pnt.ScaleOutMax)
 		}
-		pnt.PresentValue = value + pnt.Offset
+		pnt.PresentValue = value * pnt.Offset
 		err := inst.updatePoint(objType, id, pnt)
 		if err != nil {
 			return err
