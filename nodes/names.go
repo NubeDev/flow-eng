@@ -5,13 +5,14 @@ const (
 	constBool = "const-boolean"
 	constStr  = "const-string"
 
-	abs      = "absolute-value"
-	add      = "add"
-	divide   = "divide"
-	sub      = "subtract"
-	multiply = "multiply"
-	modulo   = "modulo"
-
+	abs          = "absolute-value"
+	add          = "add"
+	divide       = "divide"
+	sub          = "subtract"
+	multiply     = "multiply"
+	modulo       = "modulo"
+	floor        = "floor"
+	ceiling      = "ceiling"
 	mathAdvanced = "advanced"
 
 	and    = "and"
@@ -20,8 +21,8 @@ const (
 	xor    = "xor"
 	toggle = "toggle"
 
-	gmailNode = "gmail"
-	pingNode  = "ping"
+	gmail    = "gmail"
+	pingNode = "ping"
 
 	numLatch      = "numeric-latch"
 	stringLatch   = "string-latch"
@@ -37,6 +38,7 @@ const (
 	limitNode = "limit"
 	fade      = "fade"
 	rateLimit = "rate-limit"
+	waveform  = "waveform"
 
 	dataStore  = "data-store"
 	jsonFilter = "json-filter"
@@ -56,6 +58,7 @@ const (
 	leadLagSwitch      = "lead-lag-switch"
 	pidNode            = "pid"
 	pacControlNode     = "pac-control"
+	sensorSelect       = "sensor-select"
 	psychroDBRH        = "psychrometrics-db-rh"
 	psychroDBDP        = "psychrometrics-db-dp"
 	psychroDBWB        = "psychrometrics-db-wb"

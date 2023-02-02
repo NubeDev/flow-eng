@@ -1,15 +1,10 @@
-package ping
+package notify
 
 import (
 	"encoding/json"
 	"github.com/NubeDev/flow-eng/helpers"
 	"github.com/NubeDev/flow-eng/node"
-	"github.com/NubeDev/flow-eng/nodes/notify"
 	"time"
-)
-
-const (
-	pingNode = "ping"
 )
 
 type result struct {
@@ -30,7 +25,7 @@ type Ping struct {
 }
 
 func NewPing(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, pingNode, notify.Category)
+	body = node.Defaults(body, ping, category)
 
 	ip := node.BuildInput(node.Ip, node.TypeString, nil, body.Inputs, nil)
 	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs, nil)

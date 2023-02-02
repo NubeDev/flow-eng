@@ -31,7 +31,8 @@ func NewNumOutputSelect(body *node.Spec) (node.Node, error) {
 	}
 
 	inSelect := node.BuildInput(node.Selection, node.TypeFloat, nil, body.Inputs, nil) // TODO: this input shouldn't have a manual override value
-	inputs := node.BuildInputs(inSelect)
+	input := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, nil)          // TODO: this input shouldn't have a manual override value
+	inputs := node.BuildInputs(inSelect, input)
 
 	outputsCount := int(conversions.GetFloat(body.Settings["outputCount"]))
 	dynamicOutputs := node.DynamicOutputs(node.TypeFloat, nil, outputsCount, 2, 20, body.Outputs)
@@ -45,36 +46,20 @@ func NewNumOutputSelect(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *NumOutputSelect) Process() {
-	selectInput, selectNull := inst.ReadPinAsFloat(node.Selection)
-	if selectNull {
-		inst.WritePinNull(node.Outp)
-	} else {
-		selectInput = math.Floor(selectInput)
-		settings, _ := inst.getSettings(inst.GetSettings())
-		count := settings.OutputCount
-		if selectInput > 0 && int(selectInput) <= count {
-			selectedInputName := node.InputName(fmt.Sprintf("in%d", int(selectInput)))
-			input, inNull := inst.ReadPinAsFloat(selectedInputName)
-			if inNull {
-				inst.WritePinNull(node.Outp)
-			} else {
-				inst.WritePinFloat(node.Outp, input)
-			}
-		} else {
-			inst.WritePinNull(node.Outp)
-		}
-	}
-}
-
-func (inst *NumOutputSelect) SetOutputs(selectIn int, writeValue *float64) {
+	selectInput, _ := inst.ReadPinAsFloat(node.Selection)
+	selectInput = math.Floor(selectInput)
+	in, inNull := inst.ReadPinAsFloat(node.Inp)
 	settings, _ := inst.getSettings(inst.GetSettings())
 	count := settings.OutputCount
+	nullNonSelected := settings.NullNonSelected
 	for i := 1; i <= count; i++ {
 		selectedOutputName := node.OutputName(fmt.Sprintf("out%d", i))
-		if selectIn <= 0 || selectIn > count || selectIn != count || writeValue == nil {
+		if nullNonSelected && (selectInput <= 0 || selectInput > float64(count) || selectInput != float64(i) || inNull) {
 			inst.WritePinNull(selectedOutputName)
 		} else {
-			inst.WritePinFloat(selectedOutputName, *writeValue)
+			if selectInput == float64(i) {
+				inst.WritePinFloat(selectedOutputName, in)
+			}
 		}
 	}
 }
@@ -82,11 +67,13 @@ func (inst *NumOutputSelect) SetOutputs(selectIn int, writeValue *float64) {
 // Custom Node Settings Schema
 
 type NumOutputSelectSettingsSchema struct {
-	OutputCount schemas.Integer `json:"outputCount"`
+	OutputCount     schemas.Integer `json:"outputCount"`
+	NullNonSelected schemas.Boolean `json:"null-non-selected"`
 }
 
 type NumOutputSelectSettings struct {
-	OutputCount int `json:"outputCount"`
+	OutputCount     int  `json:"outputCount"`
+	NullNonSelected bool `json:"null-non-selected"`
 }
 
 func (inst *NumOutputSelect) buildSchema() *schemas.Schema {
@@ -98,10 +85,14 @@ func (inst *NumOutputSelect) buildSchema() *schemas.Schema {
 	props.OutputCount.Minimum = 2
 	props.OutputCount.Maximum = 20
 
+	// null non selected
+	props.NullNonSelected.Title = "Null Non-Selected Outputs"
+	props.NullNonSelected.Default = true
+
 	schema.Set(props)
 
 	uiSchema := array.Map{
-		"ui:order": array.Slice{"outputCount"},
+		"ui:order": array.Slice{"outputCount", "null-non-selected"},
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{

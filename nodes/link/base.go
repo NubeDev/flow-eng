@@ -3,11 +3,11 @@ package link
 import log "github.com/sirupsen/logrus"
 
 const (
-	linkInput     = "link-input-string"
-	linkOutput    = "link-output-string"
-	linkInputNum  = "link-input-number"
-	linkOutputNum = "link-output-number"
-	category      = "link"
+	linkInputString  = "link-input-string"
+	linkOutputString = "link-output-string"
+	linkInputNum     = "link-input-number"
+	linkOutputNum    = "link-output-number"
+	category         = "link"
 )
 
 var db *Store
