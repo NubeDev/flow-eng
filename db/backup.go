@@ -6,9 +6,7 @@ import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
-	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/buntdb"
-	"sort"
 	"strings"
 	"time"
 )
@@ -109,31 +107,18 @@ func (inst *db) GetBackup(uuid string) (*Backup, error) {
 }
 
 func (inst *db) GetLatestBackup() (*Backup, error) {
-	backups, err := inst.GetBackups()
-	if err != nil {
-		return nil, err
-	}
-	if len(backups) > 0 {
-		data := &backups[0]
-		log.Infof("uuid: %s", data.UUID)
-		log.Infof("downlaoded timestamp: %s", data.Timestamp)
-		return data, nil
-	}
-	return nil, errors.New("no flow backups have been taken yet")
-}
-
-func (inst *db) GetBackups() ([]Backup, error) {
-	var resp []Backup
+	latestBackup := Backup{}
 	err := inst.DB.View(func(tx *buntdb.Tx) error {
 		err := tx.Ascend("", func(key, value string) bool {
-			var data Backup
-			err := json.Unmarshal([]byte(value), &data)
+			var backup Backup
+			err := json.Unmarshal([]byte(value), &backup)
 			if err != nil {
 				return false
 			}
-			if matchBackupUUID(data.UUID) {
-				resp = append(resp, data)
-				// fmt.Printf("key: %s, value: %s\n", key, value)
+			if matchBackupUUID(backup.UUID) {
+				if backup.Time.After(latestBackup.Time) {
+					latestBackup = backup
+				}
 			}
 			return true
 		})
@@ -141,10 +126,7 @@ func (inst *db) GetBackups() ([]Backup, error) {
 	})
 	if err != nil {
 		fmt.Printf("Error: %s", err)
-		return []Backup{}, err
+		return nil, err
 	}
-	sort.Slice(resp, func(i, j int) bool {
-		return resp[i].Time.After(resp[j].Time)
-	})
-	return resp, nil
+	return &latestBackup, nil
 }
