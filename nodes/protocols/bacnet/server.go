@@ -57,6 +57,7 @@ var mqttQOS = mqttclient.AtMostOnce
 var mqttRetain = false
 
 func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
+	fmt.Println(fmt.Sprintf("NewServer() opts: %+v", opts.Store))
 	opts = bacnetOpts(opts)
 	var application = opts.Application
 	var err error
