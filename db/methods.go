@@ -4,9 +4,8 @@ type DB interface {
 	Close() error
 	AddBackup(backup *Backup) (*Backup, error)
 	GetBackup(uuid string) (*Backup, error)
-	GetLatestBackup() (*Backup, error)
 	DeleteBackup(uuid string) error
-	GetBackups() ([]Backup, error)
+	GetLatestBackup() (*Backup, error)
 	AddSettings(body *Settings) (*Settings, error)
 	UpdateSettings(uuid string, body *Settings) (*Settings, error)
 	DeleteSettings() error
