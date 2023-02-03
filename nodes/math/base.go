@@ -18,6 +18,8 @@ const (
 	multiply = "multiply"
 	modulo   = "modulo"
 	absolute = "absolute-value"
+	floor    = "floor"
+	ceiling  = "ceiling"
 )
 
 const (

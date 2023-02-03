@@ -53,6 +53,8 @@ const (
 	Interval   InputName = "interval"
 	DutyCycle  InputName = "duty-cycle"
 	Iterations InputName = "iterations"
+	Period     InputName = "period"
+	Amplitude  InputName = "amplitude"
 
 	Duration InputName = "duration"
 
@@ -159,6 +161,8 @@ const (
 	Stage1     InputName = "stage-1"
 	Stage2     InputName = "stage-2"
 
+	Fallback InputName = "fallback"
+
 	DryBulbTemp  InputName = "dry-bulb-temp"
 	WetBulbTemp  InputName = "wet-bulb-temp"
 	DewPointTemp InputName = "dew-point-temp"
@@ -240,6 +244,8 @@ const (
 	LeadUnitBool OutputName = "lead-unit-boolean"
 	EnableA      OutputName = "enable-A"
 	EnableB      OutputName = "enable-B"
+
+	ValidOutput OutputName = "valid-output"
 
 	PeriodConsumption OutputName = "period-consumption"
 	LastPeriodEndVal  OutputName = "last-period-end-value"

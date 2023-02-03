@@ -3,6 +3,7 @@ package nodes
 import (
 	"errors"
 	"fmt"
+	"github.com/NubeDev/flow-eng/nodes/notify"
 	"github.com/NubeDev/flow-eng/nodes/trigger"
 
 	"github.com/NubeDev/flow-eng/db"
@@ -24,8 +25,6 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/math"
 	"github.com/NubeDev/flow-eng/nodes/mathematics"
 	broker "github.com/NubeDev/flow-eng/nodes/mqtt"
-	"github.com/NubeDev/flow-eng/nodes/notify/gmail"
-	"github.com/NubeDev/flow-eng/nodes/notify/ping"
 	"github.com/NubeDev/flow-eng/nodes/numtransform"
 	point "github.com/NubeDev/flow-eng/nodes/points"
 	bacnetio "github.com/NubeDev/flow-eng/nodes/protocols/bacnet"
@@ -105,25 +104,27 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	leadLagSwitch, _ := hvac.NewLeadLagSwitch(nil)
 	pid, _ := hvac.NewPIDNode(nil)
 	pacControl, _ := hvac.NewPACControl(nil)
+	sensorSelect, _ := hvac.NewSensorSelect(nil)
 	psychroDBRH, _ := hvac.NewPsychroDBRH(nil)
 	psychroDBDP, _ := hvac.NewPsychroDBDP(nil)
 	psychroDBWB, _ := hvac.NewPsychroDBWB(nil)
 
-	gmailNode, _ := gmail.NewGmail(nil)
-	pingNode, _ := ping.NewPing(nil)
+	gmail, _ := notify.NewGmail(nil)
+	pingNode, _ := notify.NewPing(nil)
 
 	// latch
 	numLatch, _ := latch.NewNumLatch(nil)
 	stringLatch, _ := latch.NewStringLatch(nil)
 	setResetLatch, _ := latch.NewSetResetLatch(nil)
 
+	numOutputSelect, _ := switches.NewNumOutputSelect(nil)
 	selectNode, _ := switches.NewSelectNum(nil)
 	switchNode, _ := switches.NewSwitch(nil)
 
-	linkInput, _ := link.NewInput(nil, nil)
-	linkInputNum, _ := link.NewInputNum(nil, nil)
-	linkOutput, _ := link.NewOutput(nil, nil)
-	linkOutputNum, _ := link.NewOutputNum(nil, nil)
+	linkInput, _ := link.NewStringLinkInput(nil, nil)
+	linkInputNum, _ := link.NewNumLinkInput(nil, nil)
+	linkOutput, _ := link.NewStringLinkOutput(nil, nil)
+	linkOutputNum, _ := link.NewNumLinkOutput(nil, nil)
 
 	// math
 	abs, _ := math.NewAbsolute(nil)
@@ -132,6 +133,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	multiply, _ := math.NewMultiply(nil)
 	divide, _ := math.NewDivide(nil)
 	modulo, _ := math.NewModulo(nil)
+	ceiling, _ := math.NewCeiling(nil)
+	floor, _ := math.NewFloor(nil)
 
 	mathAdvanced, _ := mathematics.NewAdvanced(nil)
 
@@ -154,11 +157,12 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	oneShot, _ := timing.NewOneShot(nil)
 	stopwatch, _ := timing.NewStopwatch(nil)
 
-	// number numtransform
+	// numtransform
 	fade, _ := numtransform.NewFade(nil)
 	limitNode, _ := numtransform.NewLimit(nil)
 	rateLimit, _ := numtransform.NewRateLimit(nil)
 	scaleNode, _ := numtransform.NewScale(nil)
+	waveform, _ := numtransform.NewWaveform(nil)
 
 	// bacnet
 	bacServer, _ := bacnetio.NewServer(nil, nil)
@@ -257,6 +261,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(leadLagSwitch),
 		node.ConvertToSpec(pid),
 		node.ConvertToSpec(pacControl),
+		node.ConvertToSpec(sensorSelect),
 		node.ConvertToSpec(psychroDBRH),
 		node.ConvertToSpec(psychroDBDP),
 		node.ConvertToSpec(psychroDBWB),
@@ -268,10 +273,10 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(stringLatch),
 		node.ConvertToSpec(setResetLatch),
 
-		node.ConvertToSpec(linkInput),
 		node.ConvertToSpec(linkInputNum),
-		node.ConvertToSpec(linkOutput),
 		node.ConvertToSpec(linkOutputNum),
+		node.ConvertToSpec(linkInput),
+		node.ConvertToSpec(linkOutput),
 
 		node.ConvertToSpec(abs),
 		node.ConvertToSpec(add),
@@ -279,14 +284,17 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(multiply),
 		node.ConvertToSpec(divide),
 		node.ConvertToSpec(modulo),
+		node.ConvertToSpec(ceiling),
+		node.ConvertToSpec(floor),
 		node.ConvertToSpec(mathAdvanced),
 
 		node.ConvertToSpec(fade),
 		node.ConvertToSpec(limitNode),
 		node.ConvertToSpec(rateLimit),
 		node.ConvertToSpec(scaleNode),
+		node.ConvertToSpec(waveform),
 
-		node.ConvertToSpec(gmailNode),
+		node.ConvertToSpec(gmail),
 		node.ConvertToSpec(pingNode),
 
 		node.ConvertToSpec(boolWriteable),
@@ -312,6 +320,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(subOutputBool),
 		node.ConvertToSpec(subOutputString),
 
+		node.ConvertToSpec(numOutputSelect),
 		node.ConvertToSpec(switchNode),
 		node.ConvertToSpec(selectNode),
 
@@ -453,13 +462,13 @@ func builderMisc(body *node.Spec) (node.Node, error) {
 	case funcNode:
 		return functions.NewFunc(body)
 	case linkInput:
-		return link.NewInput(body, con)
+		return link.NewStringLinkInput(body, con)
 	case linkOutput:
-		return link.NewOutput(body, con)
+		return link.NewStringLinkOutput(body, con)
 	case linkInputNum:
-		return link.NewInputNum(body, con)
+		return link.NewNumLinkInput(body, con)
 	case linkOutputNum:
-		return link.NewOutputNum(body, con)
+		return link.NewNumLinkOutput(body, con)
 	}
 
 	return nil, nil
@@ -509,10 +518,10 @@ func builderRest(body *node.Spec) (node.Node, error) {
 
 func builderNotify(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
-	case gmailNode:
-		return gmail.NewGmail(body)
+	case gmail:
+		return notify.NewGmail(body)
 	case pingNode:
-		return ping.NewPing(body)
+		return notify.NewPing(body)
 	}
 	return nil, nil
 }
@@ -527,6 +536,8 @@ func builderTransformations(body *node.Spec) (node.Node, error) {
 		return numtransform.NewFade(body)
 	case rateLimit:
 		return numtransform.NewRateLimit(body)
+	case waveform:
+		return numtransform.NewWaveform(body)
 	}
 	return nil, nil
 }
@@ -567,6 +578,8 @@ func builderHVAC(body *node.Spec) (node.Node, error) {
 		return hvac.NewPIDNode(body)
 	case pacControlNode:
 		return hvac.NewPACControl(body)
+	case sensorSelect:
+		return hvac.NewSensorSelect(body)
 	case psychroDBRH:
 		return hvac.NewPsychroDBRH(body)
 	case psychroDBDP:
@@ -623,6 +636,10 @@ func builderMath(body *node.Spec) (node.Node, error) {
 		return math.NewDivide(body)
 	case modulo:
 		return math.NewModulo(body)
+	case ceiling:
+		return math.NewCeiling(body)
+	case floor:
+		return math.NewFloor(body)
 	case mathAdvanced:
 		return mathematics.NewAdvanced(body)
 	}
@@ -647,6 +664,8 @@ func builderSwitch(body *node.Spec) (node.Node, error) {
 		return switches.NewSwitch(body)
 	case selectNum:
 		return switches.NewSelectNum(body)
+	case numOutputSelect:
+		return switches.NewNumOutputSelect(body)
 	}
 	return nil, nil
 }

@@ -23,7 +23,7 @@ func NewSelectNum(body *node.Spec) (node.Node, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(fmt.Sprintf("SELECT settings: %+v", settings))
+
 	if settings == nil {
 		body.Settings = map[string]interface{}{}
 		body.Settings["inputCount"] = 2
