@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
+	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/buntdb"
+	"sort"
 	"strings"
 	"time"
 )
@@ -42,8 +44,9 @@ func strip(s string) string {
 	return result.String()
 }
 
-func (inst *db) AddBackup(body *Backup) (*Backup, error) {
-
+// AddBackup
+// if backupLimit count == 0 then only keep the latest backup
+func (inst *db) AddBackup(body *Backup, backupLimit int) (*Backup, error) {
 	body.Time = ttime.New().Now()
 	body.Timestamp = body.Time.Format(time.RFC1123)
 	body.UUID = helpers.UUID("flo")
@@ -60,6 +63,27 @@ func (inst *db) AddBackup(body *Backup) (*Backup, error) {
 		_, _, err := tx.Set(body.UUID, string(data), nil)
 		return err
 	})
+
+	backups, err := inst.GetBackups()
+	if err != nil {
+		return nil, err
+	}
+	if backupLimit < 5 {
+		backupLimit = 5
+	}
+
+	backupsLen := len(backups)
+	deleteUpTill := backupsLen - backupLimit
+	for i, backup := range backups {
+		if body.UUID != backup.UUID {
+			if i < deleteUpTill {
+				log.Infof("delete flow backup %s", backup.Timestamp)
+				inst.DeleteBackup(backup.UUID)
+			} else {
+				log.Infof("keep flow backup %s", backup.Timestamp)
+			}
+		}
+	}
 	if err != nil {
 		fmt.Printf("Error: %s", err)
 		return nil, err
@@ -104,6 +128,32 @@ func (inst *db) GetBackup(uuid string) (*Backup, error) {
 	} else {
 		return nil, errors.New("incorrect backup uuid")
 	}
+}
+
+func (inst *db) GetBackups() ([]Backup, error) {
+	var resp []Backup
+	err := inst.DB.View(func(tx *buntdb.Tx) error {
+		err := tx.Ascend("", func(key, value string) bool {
+			var data Backup
+			err := json.Unmarshal([]byte(value), &data)
+			if err != nil {
+				return false
+			}
+			if matchBackupUUID(data.UUID) {
+				resp = append(resp, data) // put into array
+			}
+			return true
+		})
+		return err
+	})
+	if err != nil {
+		fmt.Printf("Error: %s", err)
+		return []Backup{}, err
+	}
+	sort.Slice(resp, func(i, j int) bool {
+		return resp[i].Time.Before(resp[j].Time)
+	})
+	return resp, nil
 }
 
 func (inst *db) GetLatestBackup() (*Backup, error) {
