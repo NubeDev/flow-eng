@@ -39,7 +39,7 @@ import (
 )
 
 const (
-	disableMQTT = false // example now how to disable a node from the user being able to add it, will be moved to the config file
+	disableMQTT = true // example now how to disable a node from the user being able to add it, will be moved to the config file
 )
 
 func All() []*node.Spec { // get all the nodes, will be used for the UI to list all the nodes
@@ -194,10 +194,15 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	getNode, _ := rest.NewGet(nil)
 	writeNode, _ := rest.NewHttpWrite(nil)
 
-	// if disableMQTT {
-	//	mqttSub = nil
-	//	mqttPub = nil
-	// }
+	if disableMQTT {
+		pingNode = nil
+		getNode = nil
+		writeNode = nil
+		funcNode = nil
+		mqttBroker = nil
+		mqttSub = nil
+		mqttPub = nil
+	}
 
 	return node.BuildNodes(
 
