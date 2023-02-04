@@ -195,6 +195,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	writeNode, _ := rest.NewHttpWrite(nil)
 
 	if disableNodes {
+		dataStore = nil
+		jsonFilter = nil
 		pingNode = nil
 		getNode = nil
 		writeNode = nil
