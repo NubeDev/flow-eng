@@ -10,31 +10,30 @@ import (
 	"github.com/NubeIO/lib-schema/schema"
 )
 
-type NumLinkInput struct {
+type BoolLinkInput struct {
 	*node.Spec
 	lastTopic string
 }
 
-func NewNumLinkInput(body *node.Spec, store *Store) (node.Node, error) {
+func NewBoolLinkInput(body *node.Spec, store *Store) (node.Node, error) {
 	if store == nil {
 		store = getStore()
 	}
-	body = node.Defaults(body, linkInputNum, category)
+	body = node.Defaults(body, linkInputBool, category)
 	topic := node.BuildInput(node.Topic, node.TypeString, nil, body.Inputs, nil)
-	value := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, nil)
+	value := node.BuildInput(node.Inp, node.TypeBool, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(topic, value)
 	body = node.BuildNode(body, inputs, nil, body.Settings)
-
-	n := &NumLinkInput{body, ""}
+	n := &BoolLinkInput{body, ""}
 	n.SetSchema(n.buildSchema())
 	return n, nil
 }
 
-func (inst *NumLinkInput) Process() {
-	in1, _ := inst.ReadPinAsFloat(node.Inp)
+func (inst *BoolLinkInput) Process() {
+	in1, _ := inst.ReadPinAsBool(node.Inp)
 	topic := inst.ReadPinOrSettingsString(node.Topic)
 	if topic != inst.lastTopic {
-		topic = fmt.Sprintf("num-%s", topic)
+		topic = fmt.Sprintf("bool-%s", topic)
 		getStore().Add(topic, in1)
 		inst.SetSubTitle(topic)
 		inst.lastTopic = topic
@@ -43,16 +42,16 @@ func (inst *NumLinkInput) Process() {
 
 // Custom Node Settings Schema
 
-type NumLinkInputSettingsSchema struct {
+type BoolLinkInputSettingsSchema struct {
 	Topic schemas.String `json:"topic"`
 }
 
-type NumLinkInputSettings struct {
+type BoolLinkInputSettings struct {
 	Topic string `json:"topic"`
 }
 
-func (inst *NumLinkInput) buildSchema() *schemas.Schema {
-	props := &NumLinkInputSettingsSchema{}
+func (inst *BoolLinkInput) buildSchema() *schemas.Schema {
+	props := &BoolLinkInputSettingsSchema{}
 
 	// topic
 	props.Topic.Title = "Topic"
@@ -73,8 +72,8 @@ func (inst *NumLinkInput) buildSchema() *schemas.Schema {
 	return s
 }
 
-func (inst *NumLinkInput) getSettings(body map[string]interface{}) (*NumLinkInputSettings, error) {
-	settings := &NumLinkInputSettings{}
+func (inst *BoolLinkInput) getSettings(body map[string]interface{}) (*BoolLinkInputSettings, error) {
+	settings := &BoolLinkInputSettings{}
 	marshal, err := json.Marshal(body)
 	if err != nil {
 		return settings, err
@@ -83,22 +82,22 @@ func (inst *NumLinkInput) getSettings(body map[string]interface{}) (*NumLinkInpu
 	return settings, err
 }
 
-type NumLinkOutput struct {
+type BoolLinkOutput struct {
 	*node.Spec
 }
 
-func NewNumLinkOutput(body *node.Spec, store *Store) (node.Node, error) {
+func NewBoolLinkOutput(body *node.Spec, store *Store) (node.Node, error) {
 	if store == nil {
 		store = getStore()
 	}
-	body = node.Defaults(body, linkOutputNum, category)
-	out := node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs)
+	body = node.Defaults(body, linkOutputBool, category)
+	out := node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, nil, outputs, body.Settings)
-	return &NumLinkOutput{body}, nil
+	return &BoolLinkOutput{body}, nil
 }
 
-func (inst *NumLinkOutput) Process() {
+func (inst *BoolLinkOutput) Process() {
 	topic, _ := getSettings(inst.GetSettings())
 	v, found := getStore().Get(topic)
 	if found {
@@ -111,6 +110,6 @@ func (inst *NumLinkOutput) Process() {
 		inst.SetSubTitle(fmt.Sprintf("topic: %s", topic))
 	}
 }
-func (inst *NumLinkOutput) GetSchema() *schemas.Schema {
-	return buildSchema("num")
+func (inst *BoolLinkOutput) GetSchema() *schemas.Schema {
+	return buildSchema("bool")
 }

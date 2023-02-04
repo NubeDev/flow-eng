@@ -123,8 +123,10 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	linkInput, _ := link.NewStringLinkInput(nil, nil)
 	linkInputNum, _ := link.NewNumLinkInput(nil, nil)
+	linkInputBool, _ := link.NewBoolLinkInput(nil, nil)
 	linkOutput, _ := link.NewStringLinkOutput(nil, nil)
 	linkOutputNum, _ := link.NewNumLinkOutput(nil, nil)
+	linkOutputBool, _ := link.NewBoolLinkOutput(nil, nil)
 
 	// math
 	abs, _ := math.NewAbsolute(nil)
@@ -281,7 +283,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(setResetLatch),
 
 		node.ConvertToSpec(linkInputNum),
+		node.ConvertToSpec(linkInputBool),
 		node.ConvertToSpec(linkOutputNum),
+		node.ConvertToSpec(linkOutputBool),
 		node.ConvertToSpec(linkInput),
 		node.ConvertToSpec(linkOutput),
 
@@ -476,8 +480,11 @@ func builderMisc(body *node.Spec) (node.Node, error) {
 		return link.NewNumLinkInput(body, con)
 	case linkOutputNum:
 		return link.NewNumLinkOutput(body, con)
+	case linkInputBool:
+		return link.NewBoolLinkInput(body, con)
+	case linkOutputBool:
+		return link.NewBoolLinkOutput(body, con)
 	}
-
 	return nil, nil
 }
 

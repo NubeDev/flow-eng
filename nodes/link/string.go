@@ -23,10 +23,9 @@ func NewStringLinkInput(body *node.Spec, store *Store) (node.Node, error) {
 	value := node.BuildInput(node.Inp, node.TypeString, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(topic, value)
 	body = node.BuildNode(body, inputs, nil, body.Settings)
-
-	node := &StringLinkInput{body, ""}
-	node.SetSchema(node.buildSchema())
-	return node, nil
+	n := &StringLinkInput{body, ""}
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *StringLinkInput) Process() {

@@ -118,10 +118,12 @@ const (
 	selectNum       = "select-numeric"
 	numOutputSelect = "output-select-numeric"
 
-	linkInput     = "link-input-string"
-	linkOutput    = "link-output-string"
-	linkInputNum  = "link-input-number"
-	linkOutputNum = "link-output-number"
+	linkInput      = "link-input-string"
+	linkOutput     = "link-output-string"
+	linkInputNum   = "link-input-number"
+	linkOutputNum  = "link-output-number"
+	linkInputBool  = "link-input-boolean"
+	linkOutputBool = "link-output-boolean"
 
 	bacnetServer = "bacnet-server"
 	bacnetAI     = "analog-input"

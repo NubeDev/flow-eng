@@ -7,6 +7,8 @@ const (
 	linkOutputString = "link-output-string"
 	linkInputNum     = "link-input-number"
 	linkOutputNum    = "link-output-number"
+	linkInputBool    = "link-input-boolean"
+	linkOutputBool   = "link-output-boolean"
 	category         = "link"
 )
 
