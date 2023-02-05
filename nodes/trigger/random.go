@@ -60,15 +60,15 @@ func (inst *Random) Process() {
 type RandomSettingsSchema struct {
 	Name      schemas.String `json:"name"`
 	Precision schemas.Number `json:"precision"`
-	Max       schemas.Number `json:"max"`
 	Min       schemas.Number `json:"min"`
+	Max       schemas.Number `json:"max"`
 }
 
 type RandomSettings struct {
 	Name      string  `json:"name"`
 	Precision int     `json:"precision"`
-	Max       float64 `json:"max"`
 	Min       float64 `json:"min"`
+	Max       float64 `json:"max"`
 }
 
 func (inst *Random) buildSchema() *schemas.Schema {
@@ -91,7 +91,7 @@ func (inst *Random) buildSchema() *schemas.Schema {
 	schema.Set(props)
 
 	uiSchema := array.Map{
-		"ui:order": array.Slice{"name", "max", "min", "precision"},
+		"ui:order": array.Slice{"name", "min", "max", "precision"},
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{

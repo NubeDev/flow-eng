@@ -206,6 +206,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		mqttBroker = nil
 		mqttSub = nil
 		mqttPub = nil
+		logNode = nil
 	}
 
 	return node.BuildNodes(
