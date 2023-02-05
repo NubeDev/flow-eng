@@ -2,7 +2,6 @@ package hvac
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
@@ -67,7 +66,6 @@ func (inst *AccumulationPeriod) Process() {
 }
 
 func (inst *AccumulationPeriod) calculateAccumulation() {
-	fmt.Println("AccumulationPeriod calculateAccumulation()")
 	input, inNull := inst.ReadPinAsFloat(node.Inp)
 	if !inNull {
 		inst.lastAccumulation = input

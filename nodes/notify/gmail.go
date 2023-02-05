@@ -2,7 +2,6 @@ package notify
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
@@ -38,12 +37,12 @@ func NewGmail(body *node.Spec) (node.Node, error) {
 
 func (inst *Gmail) sendEmail() {
 	to := inst.ReadPinOrSettingsString(node.To)
-	fmt.Println(fmt.Sprintf("sendEmail() to: %+v", to))
+	// fmt.Println(fmt.Sprintf("sendEmail() to: %+v", to))
 	toArray := strings.Split(to, ",")
 	for i, _ := range toArray {
 		toArray[i] = strings.Trim(toArray[i], " ")
 	}
-	fmt.Println(fmt.Sprintf("sendEmail() toArray: %+v", toArray))
+	// fmt.Println(fmt.Sprintf("sendEmail() toArray: %+v", toArray))
 	subject := inst.ReadPinOrSettingsString(node.Subject)
 	message := inst.ReadPinOrSettingsString(node.Message)
 	settingMap := inst.GetSettings()

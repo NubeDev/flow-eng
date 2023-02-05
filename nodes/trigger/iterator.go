@@ -2,12 +2,12 @@ package trigger
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
+	log "github.com/sirupsen/logrus"
 	"math"
 	"strconv"
 	"time"
@@ -138,11 +138,11 @@ func iterate(inst *Iterate, c chan int, duration time.Duration, iterations float
 			case state = <-c:
 				switch state {
 				case Run:
-					fmt.Println("iterating...")
+					log.Info("Iterator iterating...")
 				case Pause:
-					fmt.Println("paused...")
+					log.Info("Iterator paused...")
 				case Terminate:
-					fmt.Println("terminated...")
+					log.Info("Iterator terminated...")
 					return
 				}
 			// check state at the beginning of each loop, break if state is 'Pause'

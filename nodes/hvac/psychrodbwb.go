@@ -2,7 +2,6 @@ package hvac
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/psychrometrics"
 	"github.com/NubeDev/flow-eng/node"
@@ -67,7 +66,6 @@ func (inst *PsychroDBWB) Process() {
 	if err != nil {
 		inst.SetWaringMessage(err.Error())
 		inst.SetWaringIcon(string(emoji.RedCircle))
-		fmt.Println("CalcPsychrometricsFromRelHum(): err: ", err)
 		return
 	} else {
 		inst.SetWaringMessage("")
