@@ -31,9 +31,9 @@ func NewGmail(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
-	node := &Gmail{body, ""}
-	node.SetSchema(node.buildSchema())
-	return node, nil
+	n := &Gmail{body, ""}
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *Gmail) sendEmail() {

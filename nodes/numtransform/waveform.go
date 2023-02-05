@@ -41,9 +41,9 @@ func NewWaveform(body *node.Spec) (node.Node, error) {
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
-	node := &Waveform{body, time.Now(), time.Now(), 5 * time.Second, 1 * time.Second, true, 0, "", true, 0, true}
-	node.SetSchema(node.buildSchema())
-	return node, nil
+	n := &Waveform{body, time.Now(), time.Now(), 5 * time.Second, 1 * time.Second, true, 0, "", true, 0, true}
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *Waveform) Process() {

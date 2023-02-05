@@ -23,9 +23,9 @@ func NewSetResetLatch(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
-	node := &SetResetLatch{body, false}
-	node.SetSchema(node.buildSchema())
-	return node, nil
+	n := &SetResetLatch{body, false}
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *SetResetLatch) Process() {

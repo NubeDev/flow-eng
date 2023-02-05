@@ -42,9 +42,9 @@ func NewPIDNode(body *node.Spec) (node.Node, error) {
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
-	node := &PIDNode{body, nil, 0, 0, false}
-	node.SetSchema(node.buildSchema())
-	return node, nil
+	n := &PIDNode{body, nil, 0, 0, false}
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *PIDNode) Process() {

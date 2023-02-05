@@ -32,9 +32,9 @@ func NewFlatline(body *node.Spec) (node.Node, error) {
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
-	node := &Flatline{body, nil, false, -1, -1}
-	node.SetSchema(node.buildSchema())
-	return node, nil
+	n := &Flatline{body, nil, false, -1, -1}
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *Flatline) Process() {

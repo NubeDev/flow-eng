@@ -34,9 +34,9 @@ func NewPsychroDBWB(body *node.Spec) (node.Node, error) {
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
-	node := &PsychroDBWB{body, "Metric/SI", false}
-	node.SetSchema(node.buildSchema())
-	return node, nil
+	n := &PsychroDBWB{body, "Metric/SI", false}
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *PsychroDBWB) Process() {

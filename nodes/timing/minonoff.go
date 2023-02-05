@@ -40,9 +40,9 @@ func NewMinOnOff(body *node.Spec) (node.Node, error) {
 	minOffActive := node.BuildOutput(node.MinOffActive, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out, minOnActive, minOffActive)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	node := &MinOnOff{body, false, true, false, false, 0, 0, 1 * time.Second, 1 * time.Second, false, false, false}
-	node.SetSchema(node.buildSchema())
-	return node, nil
+	n := &MinOnOff{body, false, true, false, false, 0, 0, 1 * time.Second, 1 * time.Second, false, false, false}
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *MinOnOff) Process() {

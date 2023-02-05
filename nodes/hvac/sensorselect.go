@@ -44,9 +44,9 @@ func NewSensorSelect(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(validOutput, min, max, avg)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetDynamicInputs()
-	node := &SensorSelect{body}
-	node.SetSchema(node.buildSchema())
-	return node, nil
+	n := &SensorSelect{body}
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *SensorSelect) Process() {
