@@ -30,9 +30,9 @@ func NewRandom(body *node.Spec) (node.Node, error) {
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetHelp("When ‘trigger’ transitions from ‘false’ to ‘true’, a random number between ‘min’ and ‘max’ values is produced at ‘output’. The number of decimal places that ‘output’ values have can be set from settings.")
 
-	node := &Random{body, true, 0}
-	node.SetSchema(node.buildSchema())
-	return node, nil
+	n := &Random{body, true, 0}
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *Random) Process() {

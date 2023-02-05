@@ -50,9 +50,9 @@ func NewIterate(body *node.Spec) (node.Node, error) {
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetHelp("This node generates a sequence of 'false' to 'true' transitions on 'output'.  The number of 'false' to 'true' transitions will be equal to 'count' value (or 'Iterations' setting);  these values are sent over the 'interval' duration (unless interrupted by 'stop' input).  For example, if 'interval' is set to 5 (seconds) and 'iterations' is set to 5, a 'false' to 'true' transition will occur on 'output' every 1 second.  If 'stop' input is 'true' then the next 'true' value will not be sent from 'output' until 'stop' is 'false' again. 'interval' units can be configured from settings. Maximum 'interval' setting is 587 hours.")
 
-	node := &Iterate{body, nil, 0, false, false, true, -1, -1, false}
-	node.SetSchema(node.buildSchema())
-	return node, nil
+	n := &Iterate{body, nil, 0, false, false, true, -1, -1, false}
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *Iterate) Process() {
