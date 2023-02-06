@@ -59,8 +59,8 @@ func (inst *PsychroDBRH) Process() {
 		inst.SetWaringIcon(string(emoji.RedCircle))
 		return
 	}
-	dryBulbT := inst.ReadPinOrSettingsFloat(node.DryBulbTemp)
-	relHumPerc := inst.ReadPinOrSettingsFloat(node.RelHumid)
+	dryBulbT, _ := inst.ReadPinAsFloat(node.DryBulbTemp)
+	relHumPerc, _ := inst.ReadPinAsFloat(node.RelHumid)
 	relHumPerc = relHumPerc / 100
 
 	HumRatio, TWetBulb, TDewPoint, VapPres, MoistAirEnthalpy, MoistAirVolume, DegreeOfSaturation, err := psychrometrics.CalcPsychrometricsFromRelHum(dryBulbT, relHumPerc, atmPress, inst.isImperial)

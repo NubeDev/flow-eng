@@ -30,6 +30,7 @@ func NewDutyCycle(body *node.Spec) (node.Node, error) {
 	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, str.New("interval"))
 	dutyCycleInput := node.BuildInput(node.DutyCycle, node.TypeFloat, nil, body.Inputs, str.New("duty_cycle"))
 	inputs := node.BuildInputs(enable, interval, dutyCycleInput)
+
 	out := node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)

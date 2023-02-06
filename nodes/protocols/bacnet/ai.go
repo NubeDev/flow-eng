@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
-	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
@@ -55,11 +54,9 @@ func NewAI(body *node.Spec, opts *Bacnet) (node.Node, error) {
 
 func (inst *AI) Process() {
 	settings, err := inst.getSettings(inst.GetSettings())
-	// transformProps := inst.getTransformProps(settings)
-	transformProps := &ValueTransformProperties{}
 	_, firstLoop := inst.Loop()
 	if firstLoop {
-		settings, err := inst.getSettings(inst.GetSettings())
+		transformProps := inst.getTransformProps(settings)
 		inst.setObjectId(settings)
 		ioType := settings.IoType
 		if ioType == "" {
@@ -81,7 +78,7 @@ func (inst *AI) Process() {
 		s.Set(setUUID(inst.GetParentId(), points.AnalogInput, inst.objectID), point, 0)
 	}
 
-	pv, err := inst.getPV(points.AnalogInput, inst.objectID, transformProps)
+	pv, err := inst.getPV(points.AnalogInput, inst.objectID)
 	if err != nil {
 		return
 	}
@@ -104,12 +101,11 @@ func (inst *AI) setObjectId(settings *AISettings) {
 	}
 }
 
-func (inst *AI) getPV(objType points.ObjectType, id points.ObjectID, transformProps *ValueTransformProperties) (float64, error) {
+func (inst *AI) getPV(objType points.ObjectType, id points.ObjectID) (float64, error) {
 	pnt, ok := inst.getPoint(objType, id)
 	// fmt.Println(fmt.Sprintf("AI getPV() pnt.PresentValue: %v", pnt.PresentValue))
-	if ok && transformProps != nil {
-		transformedValue := conversions.ValueTransformOnRead(pnt.PresentValue, transformProps.ScaleEnable, transformProps.Factor, transformProps.ScaleInMin, transformProps.ScaleInMax, transformProps.ScaleOutMin, transformProps.ScaleOutMax, transformProps.Offset)
-		return transformedValue, nil
+	if ok {
+		return pnt.PresentValue, nil
 	}
 	return 0, nil
 }
@@ -129,36 +125,31 @@ func (inst *AI) getPoint(objType points.ObjectType, id points.ObjectID) (*points
 // Custom Node Settings Schema
 
 type AISettingsSchema struct {
-	DeviceNumber schemas.Integer    `json:"device-number"`
-	InputNumber  schemas.Integer    `json:"input-number"`
-	IoType       schemas.EnumString `json:"io-type"`
-	Decimal      schemas.Number     `json:"decimal"`
-	/*
-		ScaleEnable  schemas.Boolean        `json:"scale-enable"`
-		ScaleInMin   schemas.NumberNoLimits `json:"scale-in-min"`
-		ScaleInMax   schemas.NumberNoLimits `json:"scale-in-max"`
-		ScaleOutMin  schemas.NumberNoLimits `json:"scale-out-min"`
-		ScaleOutMax  schemas.NumberNoLimits `json:"scale-out-max"`
-		Factor       schemas.NumberNoLimits `json:"factor"`
-		Offset       schemas.NumberNoLimits `json:"offset"`
-
-	*/
+	DeviceNumber schemas.Integer        `json:"device-number"`
+	InputNumber  schemas.Integer        `json:"input-number"`
+	IoType       schemas.EnumString     `json:"io-type"`
+	Decimal      schemas.Number         `json:"decimal"`
+	ScaleEnable  schemas.Boolean        `json:"scale-enable"`
+	ScaleInMin   schemas.NumberNoLimits `json:"scale-in-min"`
+	ScaleInMax   schemas.NumberNoLimits `json:"scale-in-max"`
+	ScaleOutMin  schemas.NumberNoLimits `json:"scale-out-min"`
+	ScaleOutMax  schemas.NumberNoLimits `json:"scale-out-max"`
+	Factor       schemas.NumberNoLimits `json:"factor"`
+	Offset       schemas.NumberNoLimits `json:"offset"`
 }
 
 type AISettings struct {
-	DeviceNumber int    `json:"device-number"`
-	InputNumber  int    `json:"input-number"`
-	IoType       string `json:"io-type"`
-	Decimal      int    `json:"decimal"`
-	/*
-		ScaleEnable  bool    `json:"scale-enable"`
-		ScaleInMin   float64 `json:"scale-in-min"`
-		ScaleInMax   float64 `json:"scale-in-max"`
-		ScaleOutMin  float64 `json:"scale-out-min"`
-		ScaleOutMax  float64 `json:"scale-out-max"`
-		Factor       float64 `json:"factor"`
-		Offset       float64 `json:"offset"`
-	*/
+	DeviceNumber int     `json:"device-number"`
+	InputNumber  int     `json:"input-number"`
+	IoType       string  `json:"io-type"`
+	Decimal      int     `json:"decimal"`
+	ScaleEnable  bool    `json:"scale-enable"`
+	ScaleInMin   float64 `json:"scale-in-min"`
+	ScaleInMax   float64 `json:"scale-in-max"`
+	ScaleOutMin  float64 `json:"scale-out-min"`
+	ScaleOutMax  float64 `json:"scale-out-max"`
+	Factor       float64 `json:"factor"`
+	Offset       float64 `json:"offset"`
 }
 
 func (inst *AI) buildSchema() *schemas.Schema {
@@ -184,31 +175,28 @@ func (inst *AI) buildSchema() *schemas.Schema {
 	props.Decimal.Minimum = 0
 	props.Decimal.Maximum = 10
 
-	/*
-		props.ScaleEnable.Title = "Enable Scale/Limit Transformation"
-		props.ScaleEnable.Default = false
+	props.ScaleEnable.Title = "Enable Scale/Limit Transformation"
+	props.ScaleEnable.Default = false
 
-		props.ScaleInMin.Title = "Scale: Input Min (0-10v)"
-		props.ScaleInMin.Default = 0
-		props.ScaleInMin.ReadOnly = true
+	props.ScaleInMin.Title = "Scale: Input Min"
+	props.ScaleInMin.Default = 0
+	props.ScaleInMin.ReadOnly = true
 
-		props.ScaleInMax.Title = "Scale: Input Max (0-10v)"
-		props.ScaleInMax.Default = 10
-		props.ScaleInMax.ReadOnly = true
+	props.ScaleInMax.Title = "Scale: Input Max"
+	props.ScaleInMax.Default = 10
+	props.ScaleInMax.ReadOnly = true
 
-		props.ScaleOutMin.Title = "Scale/Limit: Output Min"
-		props.ScaleOutMin.Default = 0
+	props.ScaleOutMin.Title = "Scale/Limit: Output Min"
+	props.ScaleOutMin.Default = 0
 
-		props.ScaleOutMax.Title = "Scale/Limit: Output Max"
-		props.ScaleOutMax.Default = 100
+	props.ScaleOutMax.Title = "Scale/Limit: Output Max"
+	props.ScaleOutMax.Default = 100
 
-		props.Factor.Title = "Multiplication Factor"
-		props.Factor.Default = 0
+	props.Factor.Title = "Multiplication Factor"
+	props.Factor.Default = 0
 
-		props.Offset.Title = "Offset"
-		props.Offset.Default = 0
-
-	*/
+	props.Offset.Title = "Offset"
+	props.Offset.Default = 0
 
 	schema.Set(props)
 
@@ -238,7 +226,6 @@ func (inst *AI) getSettings(body map[string]interface{}) (*AISettings, error) {
 	return settings, err
 }
 
-/*
 func (inst *AI) getTransformProps(settings *AISettings) *ValueTransformProperties {
 	transProps := ValueTransformProperties{
 		settings.Decimal,
@@ -252,4 +239,3 @@ func (inst *AI) getTransformProps(settings *AISettings) *ValueTransformPropertie
 	}
 	return &transProps
 }
-*/
