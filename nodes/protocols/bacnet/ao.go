@@ -72,6 +72,9 @@ func (inst *AO) setObjectId(settings *AOSettings) {
 }
 
 func (inst *AO) Process() {
+	settings, _ := inst.getSettings(inst.GetSettings())
+	// transformProps := inst.getTransformProps(settings)
+	transformProps := &ValueTransformProperties{}
 	_, firstLoop := inst.Loop()
 	s := inst.GetStore()
 	if s == nil {
@@ -79,14 +82,11 @@ func (inst *AO) Process() {
 	}
 	if firstLoop {
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
-		settings, err := inst.getSettings(inst.GetSettings())
 		inst.setObjectId(settings)
 		ioType := settings.IoType
 		if ioType == "" {
 			ioType = string(points.IoTypeVolts)
 		}
-		inst.toFlowOptions.precision = settings.Decimal
-		transformProps := inst.getTransformProps(settings)
 		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true, inst.application, transformProps)
 		point.Name = inst.GetNodeName()
 		point, err = inst.store.AddPoint(point, false)
@@ -100,13 +100,13 @@ func (inst *AO) Process() {
 	pnt := inst.writePointPri(points.AnalogOutput, inst.objectID, in14, in15)
 	if pnt != nil {
 		value := modbusScaleOutput(pnt.PresentValue, pnt.Offset)
-		inst.WritePinFloat(node.Out, value, 2)
+		inst.WritePinFloat(node.Outp, value, 2)
 		currentPriority := points.GetHighest(pnt.WriteValue)
 		if currentPriority != nil {
 			inst.WritePinFloat(node.CurrentPriority, float64(currentPriority.Number), 0)
 		}
 	} else {
-		inst.WritePinNull(node.Out)
+		inst.WritePinNull(node.Outp)
 	}
 }
 
@@ -185,42 +185,46 @@ func (inst *AO) updatePoint(objType points.ObjectType, id points.ObjectID, point
 // Custom Node Settings Schema
 
 type AOSettingsSchema struct {
-	DeviceNumber schemas.Integer        `json:"device-number"`
-	InputNumber  schemas.Integer        `json:"input-number"`
-	IoType       schemas.EnumString     `json:"io-type"`
-	Decimal      schemas.Number         `json:"decimal"`
-	ScaleEnable  schemas.Boolean        `json:"scale-enable"`
-	ScaleInMin   schemas.NumberNoLimits `json:"scale-in-min"`
-	ScaleInMax   schemas.NumberNoLimits `json:"scale-in-max"`
-	ScaleOutMin  schemas.NumberNoLimits `json:"scale-out-min"`
-	ScaleOutMax  schemas.NumberNoLimits `json:"scale-out-max"`
-	Factor       schemas.NumberNoLimits `json:"factor"`
-	Offset       schemas.NumberNoLimits `json:"offset"`
+	DeviceNumber schemas.Integer    `json:"device-number"`
+	InputNumber  schemas.Integer    `json:"input-number"`
+	IoType       schemas.EnumString `json:"io-type"`
+	/*
+		Decimal      schemas.Number         `json:"decimal"`
+		ScaleEnable  schemas.Boolean        `json:"scale-enable"`
+		ScaleInMin   schemas.NumberNoLimits `json:"scale-in-min"`
+		ScaleInMax   schemas.NumberNoLimits `json:"scale-in-max"`
+		ScaleOutMin  schemas.NumberNoLimits `json:"scale-out-min"`
+		ScaleOutMax  schemas.NumberNoLimits `json:"scale-out-max"`
+		Factor       schemas.NumberNoLimits `json:"factor"`
+		Offset       schemas.NumberNoLimits `json:"offset"`
+	*/
 }
 
 type AOSettings struct {
-	DeviceNumber int     `json:"device-number"`
-	InputNumber  int     `json:"input-number"`
-	IoType       string  `json:"io-type"`
-	Decimal      int     `json:"decimal"`
-	ScaleEnable  bool    `json:"scale-enable"`
-	ScaleInMin   float64 `json:"scale-in-min"`
-	ScaleInMax   float64 `json:"scale-in-max"`
-	ScaleOutMin  float64 `json:"scale-out-min"`
-	ScaleOutMax  float64 `json:"scale-out-max"`
-	Factor       float64 `json:"factor"`
-	Offset       float64 `json:"offset"`
+	DeviceNumber int    `json:"device-number"`
+	InputNumber  int    `json:"input-number"`
+	IoType       string `json:"io-type"`
+	/*
+		Decimal      int     `json:"decimal"`
+		ScaleEnable  bool    `json:"scale-enable"`
+		ScaleInMin   float64 `json:"scale-in-min"`
+		ScaleInMax   float64 `json:"scale-in-max"`
+		ScaleOutMin  float64 `json:"scale-out-min"`
+		ScaleOutMax  float64 `json:"scale-out-max"`
+		Factor       float64 `json:"factor"`
+		Offset       float64 `json:"offset"`
+	*/
 }
 
 func (inst *AO) buildSchema() *schemas.Schema {
 	props := &AOSettingsSchema{}
 
-	props.DeviceNumber.Title = "Select IO Device Number"
+	props.DeviceNumber.Title = "Select IO Device Number (Address)"
 	props.DeviceNumber.Default = 1
 	props.DeviceNumber.Minimum = 1
 	props.DeviceNumber.Maximum = 4
 
-	props.InputNumber.Title = "Select IO UI Number"
+	props.InputNumber.Title = "Select UO Number"
 	props.InputNumber.Default = 1
 	props.InputNumber.Minimum = 1
 	props.InputNumber.Maximum = 8
@@ -230,31 +234,36 @@ func (inst *AO) buildSchema() *schemas.Schema {
 	props.IoType.Options = []string{string(points.IoTypeVolts), string(points.IoTypeDigital)}
 	props.IoType.EnumName = []string{string(points.IoTypeVolts), string(points.IoTypeDigital)}
 
-	props.Decimal.Title = "Rounding To # Decimals"
-	props.Decimal.Default = 2
-	props.Decimal.Minimum = 0
-	props.Decimal.Maximum = 10
+	/*
+		props.Decimal.Title = "Rounding To # Decimals"
+		props.Decimal.Default = 2
+		props.Decimal.Minimum = 0
+		props.Decimal.Maximum = 10
 
-	props.ScaleEnable.Title = "Enable Scale/Limit Transformation"
-	props.ScaleEnable.Default = false
+		props.ScaleEnable.Title = "Enable Scale/Limit Transformation"
+		props.ScaleEnable.Default = false
 
-	props.ScaleInMin.Title = "Scale: Input Min"
-	props.ScaleInMin.Default = 0
+		props.ScaleInMin.Title = "Scale: Input Min (Input 0-10v)"
+		props.ScaleInMin.Default = 0
+		props.ScaleInMin.ReadOnly = true
 
-	props.ScaleInMin.Title = "Scale: Input Max"
-	props.ScaleInMin.Default = 10
+		props.ScaleInMax.Title = "Scale: Input Max (Input 0-10v)"
+		props.ScaleInMax.Default = 10
+		props.ScaleInMax.ReadOnly = true
 
-	props.ScaleOutMin.Title = "Scale/Limit: Output Min"
-	props.ScaleOutMin.Default = 0
+		props.ScaleOutMin.Title = "Scale/Limit: Output Min"
+		props.ScaleOutMin.Default = 0
 
-	props.ScaleOutMax.Title = "Scale/Limit: Output Max"
-	props.ScaleOutMax.Default = 100
+		props.ScaleOutMax.Title = "Scale/Limit: Output Max"
+		props.ScaleOutMax.Default = 10
 
-	props.Factor.Title = "Multiplication Factor"
-	props.Factor.Default = 0
+		props.Factor.Title = "Multiplication Factor"
+		props.Factor.Default = 0
 
-	props.Offset.Title = "Offset"
-	props.Offset.Default = 0
+		props.Offset.Title = "Offset"
+		props.Offset.Default = 0
+
+	*/
 
 	schema.Set(props)
 
@@ -262,7 +271,8 @@ func (inst *AO) buildSchema() *schemas.Schema {
 		"io-type": array.Map{
 			"ui:widget": "select",
 		},
-		"ui:order": array.Slice{"device-number", "input-number", "io-type", "decimal", "scale-enable", "scale-in-min", "scale-in-max", "scale-out-min", "scale-out-max", "factor", "offset"},
+		// "ui:order": array.Slice{"device-number", "input-number", "io-type", "decimal", "scale-enable", "scale-in-min", "scale-in-max", "scale-out-min", "scale-out-max", "factor", "offset"},
+		"ui:order": array.Slice{"device-number", "input-number", "io-type"},
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{
@@ -284,6 +294,7 @@ func (inst *AO) getSettings(body map[string]interface{}) (*AOSettings, error) {
 	return settings, err
 }
 
+/*
 func (inst *AO) getTransformProps(settings *AOSettings) *ValueTransformProperties {
 	transProps := ValueTransformProperties{
 		settings.Decimal,
@@ -297,3 +308,5 @@ func (inst *AO) getTransformProps(settings *AOSettings) *ValueTransformPropertie
 	}
 	return &transProps
 }
+
+*/

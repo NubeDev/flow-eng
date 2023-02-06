@@ -3,6 +3,7 @@ package conversions
 import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/float"
+	"github.com/NubeDev/flow-eng/helpers/nmath"
 	"math"
 	"strconv"
 )
@@ -228,4 +229,76 @@ func ConvertInterfaceToFloatMultiple(values []interface{}) []*float64 {
 		}
 	}
 	return output
+}
+
+func PointScale(presentValue, scaleInMin, scaleInMax, scaleOutMin, scaleOutMax float64) (value float64) {
+	if scaleInMin == 0 && scaleInMax == 0 && scaleOutMin == 0 && scaleOutMax == 0 {
+		return presentValue
+	}
+	out := nmath.Scale(presentValue, scaleInMin, scaleInMax, scaleOutMin, scaleOutMax)
+	return out
+}
+
+func PointRange(presentValue, limitMin, limitMax float64) (value float64) {
+	if limitMin == 0 && limitMax == 0 {
+		return presentValue
+	}
+	out := nmath.LimitToRange(presentValue, limitMin, limitMax)
+	return out
+}
+
+func ValueTransformOnRead(originalValue float64, scaleEnable bool, factor, scaleInMin, scaleInMax, scaleOutMin,
+	scaleOutMax, offset float64) (transformedValue float64) {
+	ov := originalValue
+
+	// perform factor operation
+	factored := ov
+	if factor != 0 {
+		factored = ov * factor
+	}
+
+	// perform scaling and limit operations
+	scaledAndLimited := factored
+	if scaleEnable {
+		if scaleOutMin != 0 || scaleOutMax != 0 {
+			if scaleInMin != 0 || scaleInMax != 0 { // scale with all 4 configs
+				scaledAndLimited = PointScale(factored, scaleInMin, scaleInMax, scaleOutMin,
+					scaleOutMax)
+			} else { // do limit with only scaleOutMin and scaleOutMin
+				scaledAndLimited = PointRange(factored, scaleOutMin, scaleOutMax)
+			}
+		}
+	}
+	// perform offset operation
+	offsetted := scaledAndLimited + offset
+	return offsetted
+}
+
+func ValueTransformOnWrite(originalValue float64, scaleEnable bool, factor, scaleInMin, scaleInMax, scaleOutMin,
+	scaleOutMax, offset float64) (transformedValue float64) {
+	ov := originalValue
+
+	// reverse offset operation
+	unoffsetted := ov - offset
+
+	// reverse scaling and limit operations
+	unscaledAndUnlimited := unoffsetted
+	if scaleEnable {
+		if scaleOutMin != 0 || scaleOutMax != 0 {
+			if scaleInMin != 0 || scaleInMax != 0 { // scale with all 4 configs
+				unscaledAndUnlimited = PointScale(unoffsetted, scaleOutMin, scaleOutMax,
+					scaleInMin, scaleInMax)
+			} else { // do limit with only scaleOutMin and scaleOutMin
+				unscaledAndUnlimited = PointRange(unoffsetted, scaleOutMin, scaleOutMax)
+			}
+		}
+	}
+
+	// reverse factoring operation
+	unfactored := unscaledAndUnlimited
+	if factor != 0 {
+		unfactored = unscaledAndUnlimited / factor
+	}
+
+	return unfactored
 }
