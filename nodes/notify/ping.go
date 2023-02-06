@@ -27,8 +27,8 @@ type Ping struct {
 func NewPing(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, ping, category)
 
-	ip := node.BuildInput(node.Ip, node.TypeString, nil, body.Inputs, nil)
-	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs, nil)
+	ip := node.BuildInput(node.Ip, node.TypeString, nil, body.Inputs, false)
+	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs, false)
 	body.Inputs = node.BuildInputs(ip, trigger)
 	msg := node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs)
 	body.Outputs = node.BuildOutputs(msg)

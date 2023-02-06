@@ -10,7 +10,7 @@ type Not struct {
 
 func NewNot(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, not, category)
-	in := node.BuildInput(node.Inp, node.TypeBool, nil, body.Inputs, nil) // TODO: this input shouldn't have a manual override value
+	in := node.BuildInput(node.Inp, node.TypeBool, nil, body.Inputs, false) // TODO: this input shouldn't have a manual override value
 	inputs := node.BuildInputs(in)
 
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)

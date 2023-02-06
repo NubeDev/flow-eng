@@ -18,8 +18,8 @@ type PsychroDBDP struct {
 
 func NewPsychroDBDP(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, psychroDBDP, category)
-	dryBulbT := node.BuildInput(node.DryBulbTemp, node.TypeFloat, nil, body.Inputs, nil)
-	dewPointT := node.BuildInput(node.DewPointTemp, node.TypeFloat, nil, body.Inputs, nil)
+	dryBulbT := node.BuildInput(node.DryBulbTemp, node.TypeFloat, nil, body.Inputs, false)
+	dewPointT := node.BuildInput(node.DewPointTemp, node.TypeFloat, nil, body.Inputs, false)
 	inputs := node.BuildInputs(dryBulbT, dewPointT)
 
 	humRatio := node.BuildOutput(node.HumRatioO, node.TypeFloat, nil, body.Outputs)

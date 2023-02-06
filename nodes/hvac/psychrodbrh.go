@@ -18,8 +18,8 @@ type PsychroDBRH struct {
 
 func NewPsychroDBRH(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, psychroDBRH, category)
-	dryBulbT := node.BuildInput(node.DryBulbTemp, node.TypeFloat, nil, body.Inputs, nil)
-	relHumPerc := node.BuildInput(node.RelHumid, node.TypeFloat, nil, body.Inputs, nil)
+	dryBulbT := node.BuildInput(node.DryBulbTemp, node.TypeFloat, nil, body.Inputs, false)
+	relHumPerc := node.BuildInput(node.RelHumid, node.TypeFloat, nil, body.Inputs, false)
 	inputs := node.BuildInputs(dryBulbT, relHumPerc)
 
 	humRatio := node.BuildOutput(node.HumRatioO, node.TypeFloat, nil, body.Outputs)

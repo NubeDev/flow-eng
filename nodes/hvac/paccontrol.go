@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/float"
-	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
@@ -36,20 +35,20 @@ type PACControl struct {
 
 func NewPACControl(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, pacControlNode, category)
-	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, str.New("enable"))
-	zoneTemp := node.BuildInput(node.ZoneTemp, node.TypeFloat, nil, body.Inputs, nil)
-	setPoint := node.BuildInput(node.Setpoint, node.TypeFloat, nil, body.Inputs, str.New("setpoint"))
-	clgOffset := node.BuildInput(node.ClgOffset, node.TypeFloat, nil, body.Inputs, str.New("clg_offset"))
-	htgOffset := node.BuildInput(node.HtgOffset, node.TypeFloat, nil, body.Inputs, str.New("htg_offset"))
-	stgUpDelay := node.BuildInput(node.StgUpDelay, node.TypeFloat, nil, body.Inputs, str.New("stage_delay"))
-	modeChangeDelay := node.BuildInput(node.ModeChangeDelay, node.TypeFloat, nil, body.Inputs, str.New("mode_delay"))
-	econoAllow := node.BuildInput(node.EconoAllow, node.TypeBool, nil, body.Inputs, str.New("enable"))
-	oaTemp := node.BuildInput(node.OATemp, node.TypeFloat, nil, body.Inputs, nil)
-	econoHigh := node.BuildInput(node.EconoHigh, node.TypeFloat, nil, body.Inputs, str.New("econo_high_limit"))
-	econoLow := node.BuildInput(node.EconoLow, node.TypeFloat, nil, body.Inputs, str.New("econo_low_limit"))
-	fanStatus := node.BuildInput(node.FanStatus, node.TypeBool, nil, body.Inputs, nil)
-	clgLockout := node.BuildInput(node.ClgLockout, node.TypeBool, nil, body.Inputs, str.New("clg_lockout"))
-	htgLockout := node.BuildInput(node.HtgLockout, node.TypeBool, nil, body.Inputs, str.New("htg_lockout"))
+	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, true)
+	zoneTemp := node.BuildInput(node.ZoneTemp, node.TypeFloat, nil, body.Inputs, false)
+	setPoint := node.BuildInput(node.Setpoint, node.TypeFloat, nil, body.Inputs, true)
+	clgOffset := node.BuildInput(node.ClgOffset, node.TypeFloat, nil, body.Inputs, true)
+	htgOffset := node.BuildInput(node.HtgOffset, node.TypeFloat, nil, body.Inputs, true)
+	stgUpDelay := node.BuildInput(node.StgUpDelay, node.TypeFloat, nil, body.Inputs, true)
+	modeChangeDelay := node.BuildInput(node.ModeChangeDelay, node.TypeFloat, nil, body.Inputs, true)
+	econoAllow := node.BuildInput(node.EconoAllow, node.TypeBool, nil, body.Inputs, true)
+	oaTemp := node.BuildInput(node.OATemp, node.TypeFloat, nil, body.Inputs, false)
+	econoHigh := node.BuildInput(node.EconoHigh, node.TypeFloat, nil, body.Inputs, false)
+	econoLow := node.BuildInput(node.EconoLow, node.TypeFloat, nil, body.Inputs, true)
+	fanStatus := node.BuildInput(node.FanStatus, node.TypeBool, nil, body.Inputs, false)
+	clgLockout := node.BuildInput(node.ClgLockout, node.TypeBool, nil, body.Inputs, true)
+	htgLockout := node.BuildInput(node.HtgLockout, node.TypeBool, nil, body.Inputs, true)
 
 	clgMode := node.BuildOutput(node.ClgMode, node.TypeBool, nil, body.Outputs)
 	htgMode := node.BuildOutput(node.HtgMode, node.TypeBool, nil, body.Outputs)

@@ -45,7 +45,7 @@ type PreventDuplicates struct {
 
 func NewPreventNull(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, preventNull, category)
-	inputs := node.BuildInputs(node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, nil))
+	inputs := node.BuildInputs(node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
 	body.SetHelp(fmt.Sprintln("This node filters ‘input’ values. All ‘input’ values are passed to ‘output’ EXCEPT ‘null’. Output the last known value if the input became null. lastValue is defaulted to be 0."))
@@ -54,7 +54,7 @@ func NewPreventNull(body *node.Spec) (node.Node, error) {
 
 func NewPreventEqualFloat(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, preventEqualFloat, category)
-	inputs := node.BuildInputs(node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, nil), node.BuildInput(node.Match, node.TypeFloat, nil, body.Inputs, nil))
+	inputs := node.BuildInputs(node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false), node.BuildInput(node.Match, node.TypeFloat, nil, body.Inputs, false))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
 	body.SetHelp(fmt.Sprintln("This node filters ‘input’ values. All ‘input’ values are passed to ‘output’ EXCEPT ‘input’ values which are equal to ‘match’. Output the last known input float value if two inputs equal to each other. Out put nil if any of the inputs are nil."))
@@ -63,7 +63,7 @@ func NewPreventEqualFloat(body *node.Spec) (node.Node, error) {
 
 func NewPreventEqualString(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, preventEqualString, category)
-	inputs := node.BuildInputs(node.BuildInput(node.Inp, node.TypeString, nil, body.Inputs, nil), node.BuildInput(node.Match, node.TypeString, nil, body.Inputs, nil))
+	inputs := node.BuildInputs(node.BuildInput(node.Inp, node.TypeString, nil, body.Inputs, false), node.BuildInput(node.Match, node.TypeString, nil, body.Inputs, false))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
 	body.SetHelp(fmt.Sprintln("This node filters ‘input’ values. All ‘input’ values are passed to ‘output’ EXCEPT ‘input’ values which are equal to ‘match’. Output the last known input string value if two inputs equal to each other. Out put nil if any of the inputs are nil."))
@@ -72,7 +72,7 @@ func NewPreventEqualString(body *node.Spec) (node.Node, error) {
 
 func NewOnlyBetween(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, onlyBetween, category)
-	inputs := node.BuildInputs(node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, nil), node.BuildInput(node.MinInput, node.TypeFloat, nil, body.Inputs, nil), node.BuildInput(node.MaxInput, node.TypeFloat, nil, body.Inputs, nil))
+	inputs := node.BuildInputs(node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false), node.BuildInput(node.MinInput, node.TypeFloat, nil, body.Inputs, false), node.BuildInput(node.MaxInput, node.TypeFloat, nil, body.Inputs, false))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
 	body.SetHelp(fmt.Sprintln("This node filters ‘input’ values. Only Numeric ‘input’ values between ‘min’ and ‘max’ are passed to ‘output’. Output the last known input float value if the input is not in range. Out put nil if any of the inputs are nil."))
@@ -81,7 +81,7 @@ func NewOnlyBetween(body *node.Spec) (node.Node, error) {
 
 func NewOnlyGreater(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, onlyGreater, category)
-	inputs := node.BuildInputs(node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, nil), node.BuildInput(node.Threshold, node.TypeFloat, nil, body.Inputs, nil))
+	inputs := node.BuildInputs(node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false), node.BuildInput(node.Threshold, node.TypeFloat, nil, body.Inputs, false))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
 	body.SetHelp(fmt.Sprintln("This node filters ‘input’ values. Only Numeric ‘input’ values greater than ‘OutMax’ are passed to ‘output’. Output the last known input float value if the input is less than 'OutMax'. Out put nil if any of the inputs are nil."))
@@ -90,7 +90,7 @@ func NewOnlyGreater(body *node.Spec) (node.Node, error) {
 
 func NewOnlyLower(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, onlyLower, category)
-	inputs := node.BuildInputs(node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, nil), node.BuildInput(node.Threshold, node.TypeFloat, nil, body.Inputs, nil))
+	inputs := node.BuildInputs(node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false), node.BuildInput(node.Threshold, node.TypeFloat, nil, body.Inputs, false))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
 	body.SetHelp(fmt.Sprintln("This node filters ‘input’ values. Only Numeric ‘input’ values less than 'InMax' are passed to ‘output’. Output the last known input float value if the input is greater than 'OutMin'. Out put nil if any of the inputs are nil."))
@@ -99,7 +99,7 @@ func NewOnlyLower(body *node.Spec) (node.Node, error) {
 
 func NewPreventDuplicates(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, preventDuplicates, category)
-	inputs := node.BuildInputs(node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, nil))
+	inputs := node.BuildInputs(node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
 	body.SetHelp(fmt.Sprintln("This node filters ‘input’ values. All ‘input’ values are passed to ‘output’ EXCEPT ‘input’ values which are equal to the previous ‘input’ value. Output the last known input float value if the subsequent input value is the same. Out put nil if the input is nil."))

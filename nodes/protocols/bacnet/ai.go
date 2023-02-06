@@ -37,7 +37,7 @@ func NewAI(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
 	flowOptions := &toFlowOptions{}
-	node := &AI{
+	n := &AI{
 		body,
 		0,
 		points.AnalogInput,
@@ -47,8 +47,8 @@ func NewAI(body *node.Spec, opts *Bacnet) (node.Node, error) {
 		opts.MqttClient,
 		flowOptions,
 	}
-	node.SetSchema(node.buildSchema())
-	return node, nil
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *AI) Process() {

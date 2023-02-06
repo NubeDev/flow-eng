@@ -25,15 +25,16 @@ func inputHelp(opts ...*InputsOpts) (help InputHelp) {
 	return inputsOptions(opts...).Help
 }
 
-func BuildInput(portName InputName, dataType DataTypes, fallback interface{}, inputs []*Input, settingName *string, opts ...*InputsOpts) *Input {
-	if settingName != nil {
-		portName = InputName(fmt.Sprintf("[%s]", portName))
+func BuildInput(portName InputName, dataType DataTypes, fallback interface{}, inputs []*Input, hasSetting bool, opts ...*InputsOpts) *Input {
+	inputName := portName
+	if hasSetting {
+		inputName = InputName(fmt.Sprintf("[%s]", portName))
 	}
 	port := &Input{
-		Name:        portName,
+		Name:        inputName,
 		DataType:    dataType,
 		Connection:  &InputConnection{},
-		SettingName: settingName,
+		SettingName: portName,
 	}
 	port = newInput(port)
 	var addConnections bool
@@ -51,7 +52,7 @@ func BuildInput(portName InputName, dataType DataTypes, fallback interface{}, in
 			} else {
 				port.Connection = &InputConnection{}
 			}
-			port.SettingName = settingName
+			port.SettingName = hasSetting
 		}
 	}
 	if !addConnections {

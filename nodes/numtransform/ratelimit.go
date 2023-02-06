@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
-	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
@@ -23,11 +22,11 @@ type RateLimit struct {
 
 func NewRateLimit(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, rateLimit, category)
-	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, nil)
-	input := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, nil)
-	step := node.BuildInput(node.StepSize, node.TypeFloat, nil, body.Inputs, str.New("step-size"))
-	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, str.New("interval"))
-	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, nil)
+	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false)
+	input := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false)
+	step := node.BuildInput(node.StepSize, node.TypeFloat, nil, body.Inputs, true)
+	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, true)
+	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, false)
 	inputs := node.BuildInputs(enable, input, step, interval, reset)
 
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)

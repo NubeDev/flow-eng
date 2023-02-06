@@ -23,8 +23,8 @@ type AccumulationPeriod struct {
 
 func NewAccumulationPeriod(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, accumulationPeriod, category)
-	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, nil)
-	input := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, nil)
+	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false)
+	input := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false)
 	inputs := node.BuildInputs(enable, input)
 
 	periodConsumption := node.BuildOutput(node.PeriodConsumption, node.TypeFloat, nil, body.Outputs)

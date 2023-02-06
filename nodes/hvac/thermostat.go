@@ -15,9 +15,9 @@ type Thermostat struct {
 
 func NewThermostat(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, deadBandNode, category)
-	in := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, nil)
-	setPoint := node.BuildInput(node.Setpoint, node.TypeFloat, nil, body.Inputs, nil)
-	deadBand := node.BuildInput(node.DeadBand, node.TypeFloat, nil, body.Inputs, nil)
+	in := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false)
+	setPoint := node.BuildInput(node.Setpoint, node.TypeFloat, nil, body.Inputs, false)
+	deadBand := node.BuildInput(node.DeadBand, node.TypeFloat, nil, body.Inputs, false)
 
 	inputs := node.BuildInputs(in, setPoint, deadBand)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs))

@@ -30,8 +30,8 @@ func NewAO(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	opts = bacnetOpts(opts)
 	body = node.Defaults(body, bacnetAO, category)
 
-	in14 := node.BuildInput(node.In14, node.TypeFloat, nil, body.Inputs, nil)
-	in15 := node.BuildInput(node.In15, node.TypeFloat, nil, body.Inputs, nil)
+	in14 := node.BuildInput(node.In14, node.TypeFloat, nil, body.Inputs, false)
+	in15 := node.BuildInput(node.In15, node.TypeFloat, nil, body.Inputs, false)
 	inputs := node.BuildInputs(in14, in15)
 
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
@@ -41,7 +41,7 @@ func NewAO(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
 	flowOptions := &toFlowOptions{}
-	node := &AO{
+	n := &AO{
 		body,
 		0,
 		points.AnalogOutput,
@@ -51,8 +51,8 @@ func NewAO(body *node.Spec, opts *Bacnet) (node.Node, error) {
 		opts.MqttClient,
 		flowOptions,
 	}
-	node.SetSchema(node.buildSchema())
-	return node, nil
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *AO) setObjectId(settings *AOSettings) {

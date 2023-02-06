@@ -11,9 +11,9 @@ type Limit struct {
 
 func NewLimit(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, limitNode, category)
-	in := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, nil)
-	min := node.BuildInput(node.MinInput, node.TypeFloat, nil, body.Inputs, nil)
-	max := node.BuildInput(node.MaxInput, node.TypeFloat, nil, body.Inputs, nil)
+	in := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false)
+	min := node.BuildInput(node.MinInput, node.TypeFloat, nil, body.Inputs, false)
+	max := node.BuildInput(node.MaxInput, node.TypeFloat, nil, body.Inputs, false)
 	inputs := node.BuildInputs(in, min, max)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)

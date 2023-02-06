@@ -17,10 +17,10 @@ const (
 
 func NewLog(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, logNode, category)
-	comment := node.BuildInput(node.Comment, node.TypeString, nil, body.Inputs, nil)
-	num := node.BuildInput(node.InNumber, node.TypeFloat, nil, body.Inputs, nil)
-	str := node.BuildInput(node.InString, node.TypeString, nil, body.Inputs, nil)
-	b := node.BuildInput(node.InBoolean, node.TypeBool, nil, body.Inputs, nil)
+	comment := node.BuildInput(node.Comment, node.TypeString, nil, body.Inputs, false)
+	num := node.BuildInput(node.InNumber, node.TypeFloat, nil, body.Inputs, false)
+	str := node.BuildInput(node.InString, node.TypeString, nil, body.Inputs, false)
+	b := node.BuildInput(node.InBoolean, node.TypeBool, nil, body.Inputs, false)
 	inputs := node.BuildInputs(comment, num, str, b)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
