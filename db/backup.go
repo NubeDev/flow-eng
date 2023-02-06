@@ -44,8 +44,9 @@ func strip(s string) string {
 	return result.String()
 }
 
-func (inst *db) AddBackup(body *Backup) (*Backup, error) {
-
+// AddBackup
+// if backupLimit count == 0 then only keep the latest backup
+func (inst *db) AddBackup(body *Backup, backupLimit int) (*Backup, error) {
 	body.Time = ttime.New().Now()
 	body.Timestamp = body.Time.Format(time.RFC1123)
 	body.UUID = helpers.UUID("flo")
@@ -62,6 +63,27 @@ func (inst *db) AddBackup(body *Backup) (*Backup, error) {
 		_, _, err := tx.Set(body.UUID, string(data), nil)
 		return err
 	})
+
+	backups, err := inst.GetBackups()
+	if err != nil {
+		return nil, err
+	}
+	if backupLimit < 5 {
+		backupLimit = 5
+	}
+
+	backupsLen := len(backups)
+	deleteUpTill := backupsLen - backupLimit
+	for i, backup := range backups {
+		if body.UUID != backup.UUID {
+			if i < deleteUpTill {
+				log.Infof("delete flow backup %s", backup.Timestamp)
+				inst.DeleteBackup(backup.UUID)
+			} else {
+				log.Infof("keep flow backup %s", backup.Timestamp)
+			}
+		}
+	}
 	if err != nil {
 		fmt.Printf("Error: %s", err)
 		return nil, err
@@ -108,20 +130,6 @@ func (inst *db) GetBackup(uuid string) (*Backup, error) {
 	}
 }
 
-func (inst *db) GetLatestBackup() (*Backup, error) {
-	backups, err := inst.GetBackups()
-	if err != nil {
-		return nil, err
-	}
-	if len(backups) > 0 {
-		data := &backups[0]
-		log.Infof("uuid: %s", data.UUID)
-		log.Infof("downlaoded timestamp: %s", data.Timestamp)
-		return data, nil
-	}
-	return nil, errors.New("no flow backups have been taken yet")
-}
-
 func (inst *db) GetBackups() ([]Backup, error) {
 	var resp []Backup
 	err := inst.DB.View(func(tx *buntdb.Tx) error {
@@ -132,8 +140,7 @@ func (inst *db) GetBackups() ([]Backup, error) {
 				return false
 			}
 			if matchBackupUUID(data.UUID) {
-				resp = append(resp, data)
-				// fmt.Printf("key: %s, value: %s\n", key, value)
+				resp = append(resp, data) // put into array
 			}
 			return true
 		})
@@ -144,7 +151,32 @@ func (inst *db) GetBackups() ([]Backup, error) {
 		return []Backup{}, err
 	}
 	sort.Slice(resp, func(i, j int) bool {
-		return resp[i].Time.After(resp[j].Time)
+		return resp[i].Time.Before(resp[j].Time)
 	})
 	return resp, nil
+}
+
+func (inst *db) GetLatestBackup() (*Backup, error) {
+	latestBackup := Backup{}
+	err := inst.DB.View(func(tx *buntdb.Tx) error {
+		err := tx.Ascend("", func(key, value string) bool {
+			var backup Backup
+			err := json.Unmarshal([]byte(value), &backup)
+			if err != nil {
+				return false
+			}
+			if matchBackupUUID(backup.UUID) {
+				if backup.Time.After(latestBackup.Time) {
+					latestBackup = backup
+				}
+			}
+			return true
+		})
+		return err
+	})
+	if err != nil {
+		fmt.Printf("Error: %s", err)
+		return nil, err
+	}
+	return &latestBackup, nil
 }

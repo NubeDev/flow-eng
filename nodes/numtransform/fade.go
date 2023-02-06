@@ -36,9 +36,9 @@ func NewFade(body *node.Spec) (node.Node, error) {
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
-	node := &Fade{body, false, false, 0, 0, time.Time{}, 1 * time.Second, 1 * time.Second}
-	node.SetSchema(node.buildSchema())
-	return node, nil
+	n := &Fade{body, false, false, 0, 0, time.Time{}, 1 * time.Second, 1 * time.Second}
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *Fade) Process() {

@@ -35,9 +35,9 @@ func NewRateLimit(body *node.Spec) (node.Node, error) {
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
-	node := &RateLimit{body, true, 0, 0, 1 * time.Second}
-	node.SetSchema(node.buildSchema())
-	return node, nil
+	n := &RateLimit{body, true, 0, 0, 1 * time.Second}
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *RateLimit) Process() {

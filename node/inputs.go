@@ -1,6 +1,8 @@
 package node
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type InputsOpts struct {
 	Help InputHelp
@@ -24,6 +26,9 @@ func inputHelp(opts ...*InputsOpts) (help InputHelp) {
 }
 
 func BuildInput(portName InputName, dataType DataTypes, fallback interface{}, inputs []*Input, settingName *string, opts ...*InputsOpts) *Input {
+	if settingName != nil {
+		portName = InputName(fmt.Sprintf("[%s]", portName))
+	}
 	port := &Input{
 		Name:        portName,
 		DataType:    dataType,

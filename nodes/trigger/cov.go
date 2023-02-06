@@ -36,9 +36,9 @@ func NewCOVNode(body *node.Spec) (node.Node, error) {
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetHelp("when ‘input’ changes value, output becomes ‘true’ for ‘interval’ duration, then ‘output’ changes back to ‘false’. For Numeric ‘input’ values, the change of value must be greater than the ‘threshold’ value to trigger the output. Interval value must be equal or larger than 1.")
 
-	node := &COVNode{body, nil, false, 10 * time.Second, -1, false}
-	node.SetSchema(node.buildSchema())
-	return node, nil
+	n := &COVNode{body, nil, false, 10 * time.Second, -1, false}
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *COVNode) Process() {

@@ -40,9 +40,9 @@ func NewNumOutputSelect(body *node.Spec) (node.Node, error) {
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetDynamicInputs()
-	node := &NumOutputSelect{body}
-	node.SetSchema(node.buildSchema())
-	return node, nil
+	n := &NumOutputSelect{body}
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *NumOutputSelect) Process() {

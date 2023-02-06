@@ -33,9 +33,9 @@ func NewDutyCycle(body *node.Spec) (node.Node, error) {
 	out := node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	node := &DutyCycle{body, nil, nil, nil, 10, 50, false, false}
-	node.SetSchema(node.buildSchema())
-	return node, nil
+	n := &DutyCycle{body, nil, nil, nil, 10, 50, false, false}
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *DutyCycle) Process() {

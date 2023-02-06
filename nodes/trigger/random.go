@@ -30,9 +30,9 @@ func NewRandom(body *node.Spec) (node.Node, error) {
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetHelp("When ‘trigger’ transitions from ‘false’ to ‘true’, a random number between ‘min’ and ‘max’ values is produced at ‘output’. The number of decimal places that ‘output’ values have can be set from settings.")
 
-	node := &Random{body, true, 0}
-	node.SetSchema(node.buildSchema())
-	return node, nil
+	n := &Random{body, true, 0}
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *Random) Process() {
@@ -60,15 +60,15 @@ func (inst *Random) Process() {
 type RandomSettingsSchema struct {
 	Name      schemas.String `json:"name"`
 	Precision schemas.Number `json:"precision"`
-	Max       schemas.Number `json:"max"`
 	Min       schemas.Number `json:"min"`
+	Max       schemas.Number `json:"max"`
 }
 
 type RandomSettings struct {
 	Name      string  `json:"name"`
 	Precision int     `json:"precision"`
-	Max       float64 `json:"max"`
 	Min       float64 `json:"min"`
+	Max       float64 `json:"max"`
 }
 
 func (inst *Random) buildSchema() *schemas.Schema {
@@ -91,7 +91,7 @@ func (inst *Random) buildSchema() *schemas.Schema {
 	schema.Set(props)
 
 	uiSchema := array.Map{
-		"ui:order": array.Slice{"name", "max", "min", "precision"},
+		"ui:order": array.Slice{"name", "min", "max", "precision"},
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{

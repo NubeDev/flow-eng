@@ -31,9 +31,9 @@ func NewOneShot(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
-	node := &OneShot{body, nil, false, true, true, 1 * time.Second}
-	node.SetSchema(node.buildSchema())
-	return node, nil
+	n := &OneShot{body, nil, false, true, true, 1 * time.Second}
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *OneShot) Process() {

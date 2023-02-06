@@ -30,9 +30,9 @@ func NewStopwatch(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
-	node := &Stopwatch{body, true, false, "", -1, 0, 0}
-	node.SetSchema(node.buildSchema())
-	return node, nil
+	n := &Stopwatch{body, true, false, "", -1, 0, 0}
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *Stopwatch) Process() {

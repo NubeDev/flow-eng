@@ -29,9 +29,9 @@ func NewCount(body *node.Spec) (node.Node, error) {
 	out := node.BuildOutput(node.CountOut, node.TypeFloat, nil, body.Outputs)
 	body.Outputs = node.BuildOutputs(out)
 
-	node := &Count{body, 0, true, true, true}
-	node.SetSchema(node.buildSchema())
-	return node, nil
+	n := &Count{body, 0, true, true, true}
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *Count) Process() {

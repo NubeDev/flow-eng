@@ -41,9 +41,9 @@ func NewSelectNum(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetDynamicInputs()
-	node := &SelectNum{body}
-	node.SetSchema(node.buildSchema())
-	return node, nil
+	n := &SelectNum{body}
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *SelectNum) Process() {

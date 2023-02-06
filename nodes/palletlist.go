@@ -39,7 +39,7 @@ import (
 )
 
 const (
-	disableMQTT = false // example now how to disable a node from the user being able to add it, will be moved to the config file
+	disableNodes = true
 )
 
 func All() []*node.Spec { // get all the nodes, will be used for the UI to list all the nodes
@@ -123,8 +123,10 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	linkInput, _ := link.NewStringLinkInput(nil, nil)
 	linkInputNum, _ := link.NewNumLinkInput(nil, nil)
+	linkInputBool, _ := link.NewBoolLinkInput(nil, nil)
 	linkOutput, _ := link.NewStringLinkOutput(nil, nil)
 	linkOutputNum, _ := link.NewNumLinkOutput(nil, nil)
+	linkOutputBool, _ := link.NewBoolLinkOutput(nil, nil)
 
 	// math
 	abs, _ := math.NewAbsolute(nil)
@@ -194,10 +196,18 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	getNode, _ := rest.NewGet(nil)
 	writeNode, _ := rest.NewHttpWrite(nil)
 
-	// if disableMQTT {
-	//	mqttSub = nil
-	//	mqttPub = nil
-	// }
+	if disableNodes {
+		dataStore = nil
+		jsonFilter = nil
+		pingNode = nil
+		getNode = nil
+		writeNode = nil
+		funcNode = nil
+		mqttBroker = nil
+		mqttSub = nil
+		mqttPub = nil
+		logNode = nil
+	}
 
 	return node.BuildNodes(
 
@@ -274,7 +284,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(setResetLatch),
 
 		node.ConvertToSpec(linkInputNum),
+		node.ConvertToSpec(linkInputBool),
 		node.ConvertToSpec(linkOutputNum),
+		node.ConvertToSpec(linkOutputBool),
 		node.ConvertToSpec(linkInput),
 		node.ConvertToSpec(linkOutput),
 
@@ -469,8 +481,11 @@ func builderMisc(body *node.Spec) (node.Node, error) {
 		return link.NewNumLinkInput(body, con)
 	case linkOutputNum:
 		return link.NewNumLinkOutput(body, con)
+	case linkInputBool:
+		return link.NewBoolLinkInput(body, con)
+	case linkOutputBool:
+		return link.NewBoolLinkOutput(body, con)
 	}
-
 	return nil, nil
 }
 

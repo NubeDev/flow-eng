@@ -2,12 +2,12 @@ package trigger
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
+	log "github.com/sirupsen/logrus"
 	"math"
 	"strconv"
 	"time"
@@ -50,9 +50,9 @@ func NewIterate(body *node.Spec) (node.Node, error) {
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetHelp("This node generates a sequence of 'false' to 'true' transitions on 'output'.  The number of 'false' to 'true' transitions will be equal to 'count' value (or 'Iterations' setting);  these values are sent over the 'interval' duration (unless interrupted by 'stop' input).  For example, if 'interval' is set to 5 (seconds) and 'iterations' is set to 5, a 'false' to 'true' transition will occur on 'output' every 1 second.  If 'stop' input is 'true' then the next 'true' value will not be sent from 'output' until 'stop' is 'false' again. 'interval' units can be configured from settings. Maximum 'interval' setting is 587 hours.")
 
-	node := &Iterate{body, nil, 0, false, false, true, -1, -1, false}
-	node.SetSchema(node.buildSchema())
-	return node, nil
+	n := &Iterate{body, nil, 0, false, false, true, -1, -1, false}
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *Iterate) Process() {
@@ -138,11 +138,11 @@ func iterate(inst *Iterate, c chan int, duration time.Duration, iterations float
 			case state = <-c:
 				switch state {
 				case Run:
-					fmt.Println("iterating...")
+					log.Info("Iterator iterating...")
 				case Pause:
-					fmt.Println("paused...")
+					log.Info("Iterator paused...")
 				case Terminate:
-					fmt.Println("terminated...")
+					log.Info("Iterator terminated...")
 					return
 				}
 			// check state at the beginning of each loop, break if state is 'Pause'
