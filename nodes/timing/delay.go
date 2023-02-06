@@ -2,7 +2,6 @@ package timing
 
 import (
 	"github.com/NubeDev/flow-eng/helpers/float"
-	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/node"
 	"time"
 )
@@ -22,18 +21,15 @@ type DelayTimer struct {
 
 func NewDelay(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, delay, category)
-	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, nil)
-	in := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, nil)
-	delayInput := node.BuildInput(node.Delay, node.TypeFloat, nil, body.Inputs, str.New("interval"))
+	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false)
+	in := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false)
+	delayInput := node.BuildInput(node.Delay, node.TypeFloat, nil, body.Inputs, true)
 	inputs := node.BuildInputs(enable, in, delayInput)
 
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
-
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-
 	body.SetSchema(buildDefaultSchema())
-
 	delayArray := make([]*DelayTimer, 0)
 	return &Delay{body, delayArray, nil, 1 * time.Second, nil}, nil
 }

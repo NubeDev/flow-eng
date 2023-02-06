@@ -11,7 +11,7 @@ type Absolute struct {
 
 func NewAbsolute(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, absolute, category)
-	in1 := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, nil)
+	in1 := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false)
 	inputs := node.BuildInputs(in1)
 
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)

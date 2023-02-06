@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
-	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
@@ -20,8 +19,8 @@ func NewStringLinkInput(body *node.Spec, store *Store) (node.Node, error) {
 		store = getStore()
 	}
 	body = node.Defaults(body, linkInputString, category)
-	topic := node.BuildInput(node.Topic, node.TypeString, nil, body.Inputs, str.New(string(node.Topic)))
-	value := node.BuildInput(node.Inp, node.TypeString, nil, body.Inputs, nil)
+	topic := node.BuildInput(node.Topic, node.TypeString, nil, body.Inputs, true)
+	value := node.BuildInput(node.Inp, node.TypeString, nil, body.Inputs, false)
 	inputs := node.BuildInputs(topic, value)
 	body = node.BuildNode(body, inputs, nil, body.Settings)
 	n := &StringLinkInput{body, ""}

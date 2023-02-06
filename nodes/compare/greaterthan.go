@@ -10,8 +10,8 @@ type CompareGreaterThan struct {
 
 func NewGreaterThan(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, GreaterThan, category)
-	in1 := node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs, nil)
-	in2 := node.BuildInput(node.In2, node.TypeFloat, nil, body.Inputs, nil)
+	in1 := node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs, false)
+	in2 := node.BuildInput(node.In2, node.TypeFloat, nil, body.Inputs, false)
 	inputs := node.BuildInputs(in1, in2)
 	graterThan := node.BuildOutput(node.GreaterThan, node.TypeBool, nil, body.Outputs)
 	equal := node.BuildOutput(node.GreaterThanEqual, node.TypeBool, nil, body.Outputs)

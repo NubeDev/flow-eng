@@ -20,7 +20,7 @@ type Input struct {
 	HideInput        bool      `json:"hideInput"`
 	Position         int       `json:"position"`
 	OverridePosition bool      `json:"overridePosition"`
-	SettingName      *string   `json:"settingName"`
+	SettingName      string    `json:"settingName"`
 }
 
 func newInput(body *Input) *Input {
@@ -40,7 +40,7 @@ func newInput(body *Input) *Input {
 		false,
 		0,
 		false,
-		nil,
+		"",
 	}
 }
 

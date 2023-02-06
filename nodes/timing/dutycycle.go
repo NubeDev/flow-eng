@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
-	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
@@ -26,9 +25,9 @@ type DutyCycle struct {
 
 func NewDutyCycle(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, dutyCycle, category)
-	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, nil)
-	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, str.New("interval"))
-	dutyCycleInput := node.BuildInput(node.DutyCycle, node.TypeFloat, nil, body.Inputs, str.New("duty_cycle"))
+	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false)
+	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, true)
+	dutyCycleInput := node.BuildInput(node.DutyCycle, node.TypeFloat, nil, body.Inputs, true)
 	inputs := node.BuildInputs(enable, interval, dutyCycleInput)
 
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/float"
-	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
@@ -19,9 +18,9 @@ type Random struct {
 
 func NewRandom(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, RandomFloat, Category)
-	min := node.BuildInput(node.MinInput, node.TypeFloat, nil, body.Inputs, str.New("min"))
-	max := node.BuildInput(node.MaxInput, node.TypeFloat, nil, body.Inputs, str.New("max"))
-	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs, nil)
+	min := node.BuildInput(node.MinInput, node.TypeFloat, nil, body.Inputs, true)
+	max := node.BuildInput(node.MaxInput, node.TypeFloat, nil, body.Inputs, true)
+	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs, false)
 	inputs := node.BuildInputs(min, max, trigger)
 
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)

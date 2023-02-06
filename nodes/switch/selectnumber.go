@@ -31,7 +31,7 @@ func NewSelectNum(body *node.Spec) (node.Node, error) {
 		body.Settings["inputCount"] = 2
 	}
 	inputsCount := int(conversions.GetFloat(body.Settings["inputCount"]))
-	inSelect := node.BuildInput(node.Selection, node.TypeFloat, nil, body.Inputs, nil) // TODO: this input shouldn't have a manual override value
+	inSelect := node.BuildInput(node.Selection, node.TypeFloat, nil, body.Inputs, false) // TODO: this input shouldn't have a manual override value
 	dynamicInputs := node.DynamicInputs(node.TypeFloat, nil, inputsCount, 2, 20, body.Inputs)
 	inputsArray := []*node.Input{inSelect}
 	inputsArray = append(inputsArray, dynamicInputs...)

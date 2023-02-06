@@ -3,7 +3,6 @@ package count
 import (
 	"encoding/json"
 	"github.com/NubeDev/flow-eng/helpers/array"
-	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
@@ -19,11 +18,11 @@ type Count struct {
 
 func NewCount(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, countNode, category)
-	countUp := node.BuildInput(node.CountUp, node.TypeBool, nil, body.Inputs, nil)
-	countDown := node.BuildInput(node.CountDown, node.TypeBool, nil, body.Inputs, nil)
-	stepSize := node.BuildInput(node.StepSize, node.TypeFloat, nil, body.Inputs, str.New("step_size"))
-	setValue := node.BuildInput(node.SetValue, node.TypeFloat, nil, body.Inputs, str.New("set_value"))
-	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, nil)
+	countUp := node.BuildInput(node.CountUp, node.TypeBool, nil, body.Inputs, false)
+	countDown := node.BuildInput(node.CountDown, node.TypeBool, nil, body.Inputs, false)
+	stepSize := node.BuildInput(node.StepSize, node.TypeFloat, nil, body.Inputs, true)
+	setValue := node.BuildInput(node.SetValue, node.TypeFloat, nil, body.Inputs, true)
+	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, false)
 	body.Inputs = node.BuildInputs(countUp, countDown, stepSize, setValue, reset)
 
 	out := node.BuildOutput(node.CountOut, node.TypeFloat, nil, body.Outputs)

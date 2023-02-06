@@ -79,12 +79,12 @@ func nodeDefault(body *node.Spec, nodeName, category string, application names.A
 	var inputs []*node.Input
 	if isWriteable {
 		if body.GetName() == bacnetBV || body.GetName() == bacnetBO {
-			in14 := node.BuildInput(node.In14, node.TypeBool, nil, body.Inputs, nil)
-			in15 := node.BuildInput(node.In15, node.TypeBool, nil, body.Inputs, nil)
+			in14 := node.BuildInput(node.In14, node.TypeBool, nil, body.Inputs, false)
+			in15 := node.BuildInput(node.In15, node.TypeBool, nil, body.Inputs, false)
 			inputs = node.BuildInputs(in14, in15)
 		} else {
-			in14 := node.BuildInput(node.In14, node.TypeFloat, nil, body.Inputs, nil)
-			in15 := node.BuildInput(node.In15, node.TypeFloat, nil, body.Inputs, nil)
+			in14 := node.BuildInput(node.In14, node.TypeFloat, nil, body.Inputs, false)
+			in15 := node.BuildInput(node.In15, node.TypeFloat, nil, body.Inputs, false)
 			inputs = node.BuildInputs(in14, in15)
 		}
 

@@ -11,7 +11,7 @@ type Number struct {
 
 func NewNumber(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, conversionNum, category)
-	inputs := node.BuildInputs(node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, nil))
+	inputs := node.BuildInputs(node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false))
 	asBool := node.BuildOutput(node.Boolean, node.TypeBool, nil, body.Outputs)
 	asString := node.BuildOutput(node.String, node.TypeString, nil, body.Outputs)
 	outputs := node.BuildOutputs(asBool, asString)

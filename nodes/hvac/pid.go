@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/pid"
-	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
@@ -22,19 +21,19 @@ type PIDNode struct {
 
 func NewPIDNode(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, pidNode, category)
-	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, nil)
-	processValue := node.BuildInput(node.ProcessValue, node.TypeFloat, nil, body.Inputs, nil)
-	setPoint := node.BuildInput(node.Setpoint, node.TypeFloat, nil, body.Inputs, str.New("setpoint"))
-	minOut := node.BuildInput(node.MinOut, node.TypeFloat, nil, body.Inputs, str.New("min_out"))
-	maxOut := node.BuildInput(node.MaxOut, node.TypeFloat, nil, body.Inputs, str.New("max_out"))
-	inP := node.BuildInput(node.InP, node.TypeFloat, nil, body.Inputs, str.New("in_p"))
-	inI := node.BuildInput(node.InI, node.TypeFloat, nil, body.Inputs, str.New("in_i"))
-	inD := node.BuildInput(node.InD, node.TypeFloat, nil, body.Inputs, str.New("in_d"))
-	direction := node.BuildInput(node.PIDDirection, node.TypeBool, nil, body.Inputs, str.New("direction"))
-	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, str.New("interval"))
-	bias := node.BuildInput(node.Bias, node.TypeFloat, nil, body.Inputs, str.New("bias"))
-	manual := node.BuildInput(node.Manual, node.TypeFloat, nil, body.Inputs, str.New("manual"))
-	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, nil)
+	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false)
+	processValue := node.BuildInput(node.ProcessValue, node.TypeFloat, nil, body.Inputs, false)
+	setPoint := node.BuildInput(node.Setpoint, node.TypeFloat, nil, body.Inputs, true)
+	minOut := node.BuildInput(node.MinOut, node.TypeFloat, nil, body.Inputs, true)
+	maxOut := node.BuildInput(node.MaxOut, node.TypeFloat, nil, body.Inputs, true)
+	inP := node.BuildInput(node.InP, node.TypeFloat, nil, body.Inputs, true)
+	inI := node.BuildInput(node.InI, node.TypeFloat, nil, body.Inputs, true)
+	inD := node.BuildInput(node.InD, node.TypeFloat, nil, body.Inputs, true)
+	direction := node.BuildInput(node.PIDDirection, node.TypeBool, nil, body.Inputs, true)
+	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, true)
+	bias := node.BuildInput(node.Bias, node.TypeFloat, nil, body.Inputs, true)
+	manual := node.BuildInput(node.Manual, node.TypeFloat, nil, body.Inputs, true)
+	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, false)
 	inputs := node.BuildInputs(enable, processValue, setPoint, minOut, maxOut, inP, inI, inD, direction, interval, bias, manual, reset)
 
 	output := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)

@@ -3,7 +3,6 @@ package numtransform
 import (
 	"encoding/json"
 	"github.com/NubeDev/flow-eng/helpers/array"
-	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
@@ -24,10 +23,10 @@ type Fade struct {
 
 func NewFade(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, fade, category)
-	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, nil)
-	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, str.New("interval"))
-	from := node.BuildInput(node.From, node.TypeFloat, nil, body.Inputs, nil)
-	to := node.BuildInput(node.To, node.TypeFloat, nil, body.Inputs, nil)
+	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false)
+	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, true)
+	from := node.BuildInput(node.From, node.TypeFloat, nil, body.Inputs, false)
+	to := node.BuildInput(node.To, node.TypeFloat, nil, body.Inputs, false)
 	inputs := node.BuildInputs(enable, interval, from, to)
 
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)

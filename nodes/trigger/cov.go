@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
-	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
@@ -25,9 +24,9 @@ type COVNode struct {
 
 func NewCOVNode(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, COV, Category)
-	input := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, nil)
-	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, str.New("interval"))
-	threshold := node.BuildInput(node.Threshold, node.TypeFloat, nil, body.Inputs, str.New("threshold"))
+	input := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false)
+	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, true)
+	threshold := node.BuildInput(node.Threshold, node.TypeFloat, nil, body.Inputs, true)
 	inputs := node.BuildInputs(input, interval, threshold)
 
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)

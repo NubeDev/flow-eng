@@ -28,8 +28,8 @@ func NewBV(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	opts = bacnetOpts(opts)
 	body = node.Defaults(body, bacnetBV, category)
 
-	in14 := node.BuildInput(node.In14, node.TypeBool, nil, body.Inputs, nil)
-	in15 := node.BuildInput(node.In15, node.TypeBool, nil, body.Inputs, nil)
+	in14 := node.BuildInput(node.In14, node.TypeBool, nil, body.Inputs, false)
+	in15 := node.BuildInput(node.In15, node.TypeBool, nil, body.Inputs, false)
 	inputs := node.BuildInputs(in14, in15)
 
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
@@ -39,7 +39,7 @@ func NewBV(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
 	flowOptions := &toFlowOptions{}
-	node := &BV{
+	n := &BV{
 		body,
 		0,
 		points.BinaryVariable,
@@ -49,8 +49,8 @@ func NewBV(body *node.Spec, opts *Bacnet) (node.Node, error) {
 		opts.MqttClient,
 		flowOptions,
 	}
-	node.SetSchema(node.buildSchema())
-	return node, nil
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *BV) setObjectId(settings *BVSettings) {

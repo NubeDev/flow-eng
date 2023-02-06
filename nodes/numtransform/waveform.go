@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
-	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
@@ -29,11 +28,11 @@ type Waveform struct {
 
 func NewWaveform(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, waveform, category)
-	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, nil)
-	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, str.New("interval"))
-	period := node.BuildInput(node.Period, node.TypeFloat, nil, body.Inputs, str.New("period"))
-	amplitude := node.BuildInput(node.Amplitude, node.TypeFloat, nil, body.Inputs, str.New("amplitude"))
-	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, nil)
+	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false)
+	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, true)
+	period := node.BuildInput(node.Period, node.TypeFloat, nil, body.Inputs, true)
+	amplitude := node.BuildInput(node.Amplitude, node.TypeFloat, nil, body.Inputs, true)
+	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, false)
 	inputs := node.BuildInputs(enable, interval, period, amplitude, reset)
 
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)

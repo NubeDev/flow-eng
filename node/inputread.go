@@ -58,6 +58,10 @@ func isNil(i interface{}) bool {
 	return i == nil || reflect.ValueOf(i).IsNil()
 }
 
+func settingName(n string) string {
+	return fmt.Sprintf("[%s]", n)
+}
+
 // InputHasConnectionOrValue true if the node input has a connection, or there is a manual input
 func (n *Spec) InputHasConnectionOrValue(name InputName) bool {
 	if n.InputHasConnection(name) {
@@ -73,14 +77,14 @@ func (n *Spec) InputHasConnectionOrValue(name InputName) bool {
 func (n *Spec) ReadPinOrSettingsFloat(name InputName) float64 {
 	name = InputName(fmt.Sprintf("[%s]", name))
 	input := n.GetInput(name)
-	useSetting := !n.InputHasConnection(name) && n.ReadPin(name) == nil && input.SettingName != nil
+	useSetting := !n.InputHasConnection(name) && n.ReadPin(name) == nil && input.SettingName != ""
 	if useSetting {
 		if n.Settings != nil {
 			val := reflect.ValueOf(n.Settings)
 			if val.Kind() == reflect.Map {
 				for _, e := range val.MapKeys() {
 					v := val.MapIndex(e)
-					if e.String() == *input.SettingName {
+					if settingName(e.String()) == input.SettingName {
 						f, ok := conversions.GetFloatOk(v)
 						if ok {
 							return f
@@ -96,14 +100,14 @@ func (n *Spec) ReadPinOrSettingsFloat(name InputName) float64 {
 func (n *Spec) ReadPinOrSettingsBool(name InputName) bool {
 	name = InputName(fmt.Sprintf("[%s]", name))
 	input := n.GetInput(name)
-	useSetting := !n.InputHasConnection(name) && n.ReadPin(name) == nil && input.SettingName != nil
+	useSetting := !n.InputHasConnection(name) && n.ReadPin(name) == nil && input.SettingName != ""
 	if useSetting {
 		if n.Settings != nil {
 			val := reflect.ValueOf(n.Settings)
 			if val.Kind() == reflect.Map {
 				for _, e := range val.MapKeys() {
 					v := val.MapIndex(e)
-					if e.String() == *input.SettingName {
+					if settingName(e.String()) == input.SettingName {
 						f := boolean.ConvertInterfaceToBool(v)
 						if f != nil && *f {
 							return true
@@ -126,14 +130,14 @@ func (n *Spec) ReadPinOrSettingsBool(name InputName) bool {
 func (n *Spec) ReadPinOrSettingsString(name InputName) string {
 	name = InputName(fmt.Sprintf("[%s]", name))
 	input := n.GetInput(name)
-	useSetting := !n.InputHasConnection(name) && n.ReadPin(name) == nil && input.SettingName != nil
+	useSetting := !n.InputHasConnection(name) && n.ReadPin(name) == nil && input.SettingName != ""
 	if useSetting {
 		if n.Settings != nil {
 			val := reflect.ValueOf(n.Settings)
 			if val.Kind() == reflect.Map {
 				for _, e := range val.MapKeys() {
 					v := val.MapIndex(e)
-					if e.String() == *input.SettingName {
+					if settingName(e.String()) == input.SettingName {
 						s, ok := conversions.GetStringOk(v)
 						if ok {
 							return s
@@ -152,18 +156,20 @@ func (n *Spec) ReadPinAsTimeSettings(name InputName) (time.Duration, error) {
 	var useThisAmount float64
 	var units string
 	name = InputName(fmt.Sprintf("[%s]", name))
+
 	input := n.GetInput(name)
+
 	if n.Settings != nil {
 		val := reflect.ValueOf(n.Settings)
 		if val.Kind() == reflect.Map {
 			for _, e := range val.MapKeys() {
 				v := val.MapIndex(e)
-				if e.String() == *input.SettingName {
+				if settingName(e.String()) == input.SettingName {
 					f, ok := conversions.GetFloatOk(v)
 					if ok {
 						settingsAmount = f
 					}
-				} else if e.String() == fmt.Sprintf("%s%s", *input.SettingName, "_time_units") {
+				} else if e.String() == fmt.Sprintf("%s%s", input.SettingName, "_time_units") {
 					s, ok := conversions.GetStringOk(v)
 					if ok {
 						switch s {
@@ -184,7 +190,7 @@ func (n *Spec) ReadPinAsTimeSettings(name InputName) (time.Duration, error) {
 		}
 	}
 
-	useSetting := !n.InputHasConnection(name) && n.ReadPin(name) == nil && input.SettingName != nil
+	useSetting := !n.InputHasConnection(name) && n.ReadPin(name) == nil && input.SettingName != ""
 	if useSetting {
 		useThisAmount = settingsAmount
 	} else {

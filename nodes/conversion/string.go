@@ -12,7 +12,7 @@ type String struct {
 
 func NewString(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, conversionString, category)
-	inputs := node.BuildInputs(node.BuildInput(node.Inp, node.TypeString, nil, body.Inputs, nil))
+	inputs := node.BuildInputs(node.BuildInput(node.Inp, node.TypeString, nil, body.Inputs, false))
 	asBool := node.BuildOutput(node.Boolean, node.TypeBool, nil, body.Outputs)
 	asString := node.BuildOutput(node.Float, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(asBool, asString)
