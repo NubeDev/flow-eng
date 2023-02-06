@@ -7,6 +7,7 @@ import (
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
+	"strings"
 )
 
 type StringLinkInput struct {
@@ -28,10 +29,27 @@ func NewStringLinkInput(body *node.Spec, store *Store) (node.Node, error) {
 	return n, nil
 }
 
+func (inst *StringLinkInput) getTopic(t string) string {
+	if strings.Contains(t, "{") && strings.Contains(t, "}") {
+		if strings.Contains(t, "parent.name") {
+			parentId := inst.GetParentId()
+			n := inst.GetNode(parentId)
+			cleaned := cleanName(t)
+			name := n.GetNodeName()
+			return fmt.Sprintf("%s %s", name, cleaned)
+		}
+	}
+	return ""
+}
+
 func (inst *StringLinkInput) Process() {
 	in1, _ := inst.ReadPinAsString(node.In)
 	topic := inst.ReadPinOrSettingsString(node.Topic)
 	if topic != inst.lastTopic {
+		parentTopic := inst.getTopic(topic)
+		if parentTopic != "" {
+			topic = parentTopic
+		}
 		topic = fmt.Sprintf("string-%s", topic)
 		getStore().Add(topic, in1)
 		inst.SetSubTitle(topic)
