@@ -21,7 +21,7 @@ func NewDelayOn(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
 	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, nil) // TODO: this input shouldn't have a manual override value
 	inputs := node.BuildInputs(in, delayInput, reset)
 
-	out := node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
@@ -45,7 +45,7 @@ func (inst *DelayOn) Process() {
 
 	in1, _ := inst.ReadPinAsBool(node.Inp)
 	if !in1 { // any time input is false, set output false and cancel any running timers
-		inst.WritePinFalse(node.Outp)
+		inst.WritePinFalse(node.Out)
 		inst.currOutput = false
 		if inst.timer != nil {
 			inst.timer.Stop()
@@ -57,7 +57,7 @@ func (inst *DelayOn) Process() {
 	// input is true
 
 	if inst.currOutput { // input is still active, so output is still active, cancel any running timers (for safety)
-		inst.WritePinTrue(node.Outp)
+		inst.WritePinTrue(node.Out)
 		inst.currOutput = true
 		if inst.timer != nil {
 			inst.timer.Stop()
@@ -69,16 +69,16 @@ func (inst *DelayOn) Process() {
 	// input is active, but output isn't so start a timer if it doesn't exist already
 	if inst.timer == nil {
 		inst.timer = time.AfterFunc(delayDuration, func() {
-			inst.WritePinTrue(node.Outp)
+			inst.WritePinTrue(node.Out)
 			inst.currOutput = true
 			inst.timer = nil
 		})
 	}
-	inst.WritePinBool(node.Outp, inst.currOutput)
+	inst.WritePinBool(node.Out, inst.currOutput)
 }
 
 func (inst *DelayOn) Start() {
-	inst.WritePinFalse(node.Outp)
+	inst.WritePinFalse(node.Out)
 	inst.currOutput = false
 }
 

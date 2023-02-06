@@ -24,7 +24,7 @@ func NewRandom(body *node.Spec) (node.Node, error) {
 	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(min, max, trigger)
 
-	out := node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
@@ -48,11 +48,11 @@ func (inst *Random) Process() {
 		}
 		precision := settings.Precision
 		random := float.RandFloat(min, max)
-		inst.WritePinFloat(node.Outp, random, precision)
+		inst.WritePinFloat(node.Out, random, precision)
 		inst.lastOutput = random
 	}
 	inst.lastInput = input
-	inst.WritePinFloat(node.Outp, inst.lastOutput)
+	inst.WritePinFloat(node.Out, inst.lastOutput)
 }
 
 // Custom Node Settings Schema

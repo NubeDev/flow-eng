@@ -18,7 +18,7 @@ func NewInject(body *node.Spec) (node.Node, error) {
 	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(message, enable, trigger)
 
-	out := node.BuildOutput(node.Outp, node.TypeString, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
@@ -45,9 +45,9 @@ func (inst *Inject) Process() {
 
 	if enable && covBool {
 		if message != nil {
-			inst.WritePin(node.Outp, message)
+			inst.WritePin(node.Out, message)
 		} else {
-			inst.WritePin(node.Outp, inst.s["message"])
+			inst.WritePin(node.Out, inst.s["message"])
 		}
 	}
 }

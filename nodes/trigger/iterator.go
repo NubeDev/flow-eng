@@ -42,7 +42,7 @@ func NewIterate(body *node.Spec) (node.Node, error) {
 	stop := node.BuildInput(node.Stop, node.TypeBool, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(interval, iterations, start, stop)
 
-	out := node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	complete := node.BuildOutput(node.Complete, node.TypeBool, nil, body.Outputs)
 	count := node.BuildOutput(node.CountOut, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(out, complete, count)
@@ -107,9 +107,9 @@ func (inst *Iterate) Process() {
 	inst.WritePinBool(node.Complete, complete)
 	inst.WritePinFloat(node.CountOut, inst.iterationCompleted)
 	if !inst.running {
-		inst.WritePinBool(node.Outp, false)
+		inst.WritePinBool(node.Out, false)
 	} else {
-		inst.WritePinBool(node.Outp, inst.currentOutput)
+		inst.WritePinBool(node.Out, inst.currentOutput)
 	}
 }
 
@@ -119,7 +119,7 @@ func iterate(inst *Iterate, c chan int, duration time.Duration, iterations float
 	if startOnPause {
 		state = Pause
 		inst.WritePinFloat(node.CountOut, 0)
-		inst.WritePinBool(node.Outp, false)
+		inst.WritePinBool(node.Out, false)
 		inst.currentOutput = false
 	}
 	for {
@@ -155,10 +155,10 @@ func iterate(inst *Iterate, c chan int, duration time.Duration, iterations float
 				inst.WritePinFloat(node.CountOut, inst.iterationCompleted)
 				// write out the waveform, 'true' for first half period, and 'false' for the second half
 				// this arrangement allows the program to stop on false when stop become true
-				inst.WritePinBool(node.Outp, true)
+				inst.WritePinBool(node.Out, true)
 				inst.currentOutput = true
 				time.Sleep(duration / 2)
-				inst.WritePinBool(node.Outp, false)
+				inst.WritePinBool(node.Out, false)
 				inst.currentOutput = false
 				time.Sleep(duration / 2)
 			}

@@ -32,7 +32,7 @@ func NewAV(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	in15 := node.BuildInput(node.In15, node.TypeFloat, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(in14, in15)
 
-	out := node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	currentPriority := node.BuildOutput(node.CurrentPriority, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(out, currentPriority)
 
@@ -82,13 +82,13 @@ func (inst *AV) Process() {
 	in14, in15 := fromFlow(inst, inst.objectID)
 	pnt := inst.writePointPri(points.AnalogVariable, inst.objectID, in14, in15)
 	if pnt != nil {
-		inst.WritePinFloat(node.Outp, pnt.PresentValue, 2)
+		inst.WritePinFloat(node.Out, pnt.PresentValue, 2)
 		currentPriority := points.GetHighest(pnt.WriteValue)
 		if currentPriority != nil {
 			inst.WritePinFloat(node.CurrentPriority, float64(currentPriority.Number), 0)
 		}
 	} else {
-		inst.WritePinNull(node.Outp)
+		inst.WritePinNull(node.Out)
 	}
 }
 

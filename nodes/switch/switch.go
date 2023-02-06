@@ -15,7 +15,7 @@ func NewSwitch(body *node.Spec) (node.Node, error) {
 	inFalse := node.BuildInput(node.InFalse, node.TypeFloat, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(inSwitch, inTrue, inFalse)
 
-	out := node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &Switch{body}, nil
@@ -28,15 +28,15 @@ func (inst *Switch) Process() {
 
 	if inSwitch {
 		if inTrueNull {
-			inst.WritePinNull(node.Outp)
+			inst.WritePinNull(node.Out)
 		} else {
-			inst.WritePinFloat(node.Outp, inTrue)
+			inst.WritePinFloat(node.Out, inTrue)
 		}
 	} else {
 		if inFalseNull {
-			inst.WritePinNull(node.Outp)
+			inst.WritePinNull(node.Out)
 		} else {
-			inst.WritePinFloat(node.Outp, inFalse)
+			inst.WritePinFloat(node.Out, inFalse)
 		}
 	}
 }

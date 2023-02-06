@@ -16,7 +16,7 @@ func NewNumLatch(body *node.Spec) (node.Node, error) {
 	latch := node.BuildInput(node.Latch, node.TypeBool, nil, body.Inputs, nil) // TODO: this input shouldn't have a manual override value
 	inputs := node.BuildInputs(input, latch)
 
-	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
 	return &NumLatch{body, 0, false}, nil
@@ -32,5 +32,5 @@ func (inst *NumLatch) Process() {
 	}
 	inst.lastTrigger = latchBool
 
-	inst.WritePinFloat(node.Outp, inst.currentVal)
+	inst.WritePinFloat(node.Out, inst.currentVal)
 }

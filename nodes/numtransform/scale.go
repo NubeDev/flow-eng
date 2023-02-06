@@ -17,7 +17,7 @@ func NewScale(body *node.Spec) (node.Node, error) {
 	minOut := node.BuildInput(node.OutMin, node.TypeFloat, nil, body.Inputs, nil)
 	maxOut := node.BuildInput(node.OutMax, node.TypeFloat, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(in, minIn, maxIn, minOut, maxOut)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &Scale{body}, nil
 }
@@ -28,5 +28,5 @@ func (inst *Scale) Process() {
 	maxIn, _ := inst.ReadPinAsFloat(node.InMax)
 	minOut, _ := inst.ReadPinAsFloat(node.OutMin)
 	maxOut, _ := inst.ReadPinAsFloat(node.OutMax)
-	inst.WritePinFloat(node.Outp, float.Scale(in, minIn, maxIn, minOut, maxOut))
+	inst.WritePinFloat(node.Out, float.Scale(in, minIn, maxIn, minOut, maxOut))
 }

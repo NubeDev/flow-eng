@@ -93,7 +93,7 @@ func NewNumLinkOutput(body *node.Spec, store *Store) (node.Node, error) {
 		store = getStore()
 	}
 	body = node.Defaults(body, linkOutputNum, category)
-	out := node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, nil, outputs, body.Settings)
 	return &NumLinkOutput{body}, nil
@@ -103,9 +103,9 @@ func (inst *NumLinkOutput) Process() {
 	topic, _ := getSettings(inst.GetSettings())
 	v, found := getStore().Get(topic)
 	if found {
-		inst.WritePinFloat(node.Outp, conversions.GetFloat(v))
+		inst.WritePinFloat(node.Out, conversions.GetFloat(v))
 	} else {
-		inst.WritePinNull(node.Outp)
+		inst.WritePinNull(node.Out)
 	}
 	_, firstLoop := inst.Loop()
 	if firstLoop {

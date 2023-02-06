@@ -30,17 +30,17 @@ func (inst *Median) Process() {
 		}
 	}
 	if len(nonNilValues) == 0 {
-		inst.WritePinNull(node.Outp)
+		inst.WritePinNull(node.Out)
 	} else if len(nonNilValues) == 1 {
-		inst.WritePinFloat(node.Outp, nonNilValues[0])
+		inst.WritePinFloat(node.Out, nonNilValues[0])
 	} else {
 		sort.Float64s(nonNilValues)
 		mid := float64(len(nonNilValues)) / 2
 		if math.Mod(mid, 1) > 0 { // Odd number of elements in the input array, take the middle one
-			inst.WritePinFloat(node.Outp, nonNilValues[int(mid-0.5)])
+			inst.WritePinFloat(node.Out, nonNilValues[int(mid-0.5)])
 		} else { // Even number of elements in the input array, take the average of the middle 2 values
 			averageOfMiddles := (nonNilValues[int(mid-float64(1))] + nonNilValues[int(mid)]) / 2
-			inst.WritePinFloat(node.Outp, averageOfMiddles)
+			inst.WritePinFloat(node.Out, averageOfMiddles)
 		}
 	}
 }

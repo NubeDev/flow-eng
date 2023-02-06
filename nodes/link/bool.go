@@ -92,7 +92,7 @@ func NewBoolLinkOutput(body *node.Spec, store *Store) (node.Node, error) {
 		store = getStore()
 	}
 	body = node.Defaults(body, linkOutputBool, category)
-	out := node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, nil, outputs, body.Settings)
 	return &BoolLinkOutput{body}, nil
@@ -102,9 +102,9 @@ func (inst *BoolLinkOutput) Process() {
 	topic, _ := getSettings(inst.GetSettings())
 	v, found := getStore().Get(topic)
 	if found {
-		inst.WritePinFloat(node.Outp, conversions.GetFloat(v))
+		inst.WritePinFloat(node.Out, conversions.GetFloat(v))
 	} else {
-		inst.WritePinNull(node.Outp)
+		inst.WritePinNull(node.Out)
 	}
 	_, firstLoop := inst.Loop()
 	if firstLoop {

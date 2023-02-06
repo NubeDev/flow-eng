@@ -14,7 +14,7 @@ func NewFilter(body *node.Spec) (node.Node, error) {
 	in := node.BuildInput(node.Inp, node.TypeString, nil, body.Inputs, nil)
 	equation := node.BuildInput(node.Filter, node.TypeString, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(in, equation)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeString, nil, body.Outputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &Filter{body}, nil
 }
@@ -23,5 +23,5 @@ func (inst *Filter) Process() {
 	in1, _ := inst.ReadPinAsString(node.Inp)
 	equation, _ := inst.ReadPinAsString(node.Filter)
 	value := gjson.Get(in1, equation)
-	inst.WritePin(node.Outp, value.Value())
+	inst.WritePin(node.Out, value.Value())
 }

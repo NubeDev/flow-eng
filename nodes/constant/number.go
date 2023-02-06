@@ -11,7 +11,7 @@ type Number struct {
 func NewNumber(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, constNum, category)
 	inputs := node.BuildInputs(node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, nil))
-	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetHelp(constHelp)
 	body.SetAllowPayload()
@@ -22,9 +22,9 @@ func NewNumber(body *node.Spec) (node.Node, error) {
 func (inst *Number) Process() {
 	in1, null := inst.ReadPinAsFloat(node.Inp)
 	if null {
-		inst.WritePinNull(node.Outp)
+		inst.WritePinNull(node.Out)
 	} else {
-		inst.WritePinFloat(node.Outp, in1)
+		inst.WritePinFloat(node.Out, in1)
 	}
 	/*
 		v, null := inst.ReadPayloadAsFloat()

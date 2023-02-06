@@ -12,7 +12,7 @@ const (
 func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error) {
 	body = node.Defaults(body, nodeName, category)
 	inputs := node.BuildInputs(node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, nil))
-	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(buildSchema())
 	return body, nil
@@ -28,12 +28,12 @@ func process(body node.Node) {
 	}
 	in, null := body.ReadPinAsFloat(node.Inp)
 	if null {
-		body.WritePinNull(node.Outp)
+		body.WritePinNull(node.Out)
 	}
 	output, err := mathFunc(function, in)
 	if err != nil {
-		body.WritePinFloat(node.Outp, 0)
+		body.WritePinFloat(node.Out, 0)
 	} else {
-		body.WritePinFloat(node.Outp, output)
+		body.WritePinFloat(node.Out, output)
 	}
 }

@@ -30,7 +30,7 @@ func NewFade(body *node.Spec) (node.Node, error) {
 	to := node.BuildInput(node.To, node.TypeFloat, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(enable, interval, from, to)
 
-	out := node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	outEqTo := node.BuildOutput(node.OutEqTo, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(out, outEqTo)
 
@@ -52,7 +52,7 @@ func (inst *Fade) Process() {
 	}
 	if enable && !inst.fading && !inst.outEqTo && !toNull && !fromNull {
 		inst.WritePinBool(node.OutEqTo, false)
-		inst.WritePinFloat(node.Outp, from)
+		inst.WritePinFloat(node.Out, from)
 		inst.fading = true
 		inst.startTime = time.Now()
 		inst.targetTo = to
@@ -60,7 +60,7 @@ func (inst *Fade) Process() {
 		inst.fadeInterval = intervalDuration
 	} else if !enable || toNull {
 		inst.WritePinBool(node.OutEqTo, false)
-		inst.WritePinFloat(node.Outp, 0)
+		inst.WritePinFloat(node.Out, 0)
 		inst.fading = false
 	} else if enable && inst.fading {
 		now := time.Now()
@@ -68,17 +68,17 @@ func (inst *Fade) Process() {
 			inst.fading = false
 			inst.outEqTo = true
 			inst.WritePinBool(node.OutEqTo, true)
-			inst.WritePinFloat(node.Outp, to)
+			inst.WritePinFloat(node.Out, to)
 		} else {
 			inst.WritePinBool(node.OutEqTo, false)
 			percThroughFade := 1 - float64(inst.startTime.Add(inst.fadeInterval).Unix()-now.Unix())/inst.fadeInterval.Seconds()
 			fadingOutput := ((inst.targetTo - inst.originalFrom) * percThroughFade) + inst.originalFrom
 			inst.WritePinBool(node.OutEqTo, false)
-			inst.WritePinFloat(node.Outp, fadingOutput)
+			inst.WritePinFloat(node.Out, fadingOutput)
 		}
 	} else if enable && inst.outEqTo {
 		inst.WritePinBool(node.OutEqTo, true)
-		inst.WritePinFloat(node.Outp, to)
+		inst.WritePinFloat(node.Out, to)
 	}
 }
 

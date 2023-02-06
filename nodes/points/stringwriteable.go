@@ -25,7 +25,7 @@ func NewStringWriteable(body *node.Spec) (node.Node, error) {
 		count = settings.InputCount
 	}
 	inputs := node.BuildInputs(node.DynamicInputs(node.TypeString, nil, count, 2, 20, body.Inputs)...)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeString, nil, body.Outputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(buildStringWriteableSchema())
 	body.SetDynamicInputs()
@@ -37,11 +37,11 @@ func (inst *StringWriteable) Process() {
 	inputs := conversions.ConvertInterfaceToStringMultiple(inst.ReadMultiple(count))
 	for _, val := range inputs {
 		if val != nil {
-			inst.WritePin(node.Outp, *val)
+			inst.WritePin(node.Out, *val)
 			return
 		}
 	}
-	inst.WritePinNull(node.Outp)
+	inst.WritePinNull(node.Out)
 }
 
 // Custom Node Settings Schema

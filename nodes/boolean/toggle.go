@@ -15,7 +15,7 @@ func NewToggle(body *node.Spec) (node.Node, error) {
 	in := node.BuildInput(node.Inp, node.TypeBool, nil, body.Inputs, nil) // TODO: this input shouldn't have a manual override value
 	inputs := node.BuildInputs(in)
 
-	out := node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &Toggle{body, false, true}, nil
@@ -25,7 +25,7 @@ func (inst *Toggle) Process() {
 	resetOnNullOrDisconnect := false
 	in, null := inst.ReadPinAsBool(node.Inp)
 	if null && resetOnNullOrDisconnect {
-		inst.WritePinFalse(node.Outp)
+		inst.WritePinFalse(node.Out)
 		inst.currentOut = false
 		return
 	}
@@ -35,5 +35,5 @@ func (inst *Toggle) Process() {
 		}
 		inst.lastIn = in
 	}
-	inst.WritePinBool(node.Outp, inst.currentOut)
+	inst.WritePinBool(node.Out, inst.currentOut)
 }

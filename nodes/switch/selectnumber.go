@@ -37,7 +37,7 @@ func NewSelectNum(body *node.Spec) (node.Node, error) {
 	inputsArray = append(inputsArray, dynamicInputs...)
 	inputs := node.BuildInputs(inputsArray...)
 
-	out := node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetDynamicInputs()
@@ -49,7 +49,7 @@ func NewSelectNum(body *node.Spec) (node.Node, error) {
 func (inst *SelectNum) Process() {
 	selectInput, selectNull := inst.ReadPinAsFloat(node.Selection)
 	if selectNull {
-		inst.WritePinNull(node.Outp)
+		inst.WritePinNull(node.Out)
 	} else {
 		selectInput = math.Floor(selectInput)
 		settings, _ := inst.getSettings(inst.GetSettings())
@@ -58,12 +58,12 @@ func (inst *SelectNum) Process() {
 			selectedInputName := node.InputName(fmt.Sprintf("in%d", int(selectInput)))
 			input, inNull := inst.ReadPinAsFloat(selectedInputName)
 			if inNull {
-				inst.WritePinNull(node.Outp)
+				inst.WritePinNull(node.Out)
 			} else {
-				inst.WritePinFloat(node.Outp, input)
+				inst.WritePinFloat(node.Out, input)
 			}
 		} else {
-			inst.WritePinNull(node.Outp)
+			inst.WritePinNull(node.Out)
 		}
 	}
 }

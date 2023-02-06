@@ -36,7 +36,7 @@ func NewWaveform(body *node.Spec) (node.Node, error) {
 	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(enable, interval, period, amplitude, reset)
 
-	out := node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
@@ -50,7 +50,7 @@ func (inst *Waveform) Process() {
 	enable, _ := inst.ReadPinAsBool(node.Enable)
 	reset, _ := inst.ReadPinAsBool(node.Reset)
 	if !enable {
-		inst.WritePinFloat(node.Outp, inst.lastOutput)
+		inst.WritePinFloat(node.Out, inst.lastOutput)
 	} else if enable && !inst.lastEnable || reset && !inst.lastReset {
 		inst.startTime = time.Now()
 	}
@@ -105,7 +105,7 @@ func (inst *Waveform) Process() {
 		output = output * float64(invertVal) * amplitude
 		inst.lastTime = time.Now()
 	}
-	inst.WritePinFloat(node.Outp, output)
+	inst.WritePinFloat(node.Out, output)
 	inst.lastOutput = output
 }
 

@@ -35,7 +35,7 @@ func NewMinOnOff(body *node.Spec) (node.Node, error) {
 	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(in, onInterval, offInterval, reset)
 
-	out := node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	minOnActive := node.BuildOutput(node.MinOnActive, node.TypeBool, nil, body.Outputs)
 	minOffActive := node.BuildOutput(node.MinOffActive, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out, minOnActive, minOffActive)
@@ -69,7 +69,7 @@ func (inst *MinOnOff) Process() {
 	inst.lastReset = reset
 
 	if !inst.minOnEnabled && !inst.minOffEnabled {
-		inst.WritePinBool(node.Outp, input)
+		inst.WritePinBool(node.Out, input)
 		inst.currentOutput = input
 		if input && !inst.lastInput {
 			inst.timeOn = time.Now().Unix()
@@ -91,7 +91,7 @@ func (inst *MinOnOff) Process() {
 			inst.WritePinFalse(node.MinOnActive)
 			inst.currentMinOn = false
 			if input {
-				inst.WritePinTrue(node.Outp)
+				inst.WritePinTrue(node.Out)
 				inst.currentOutput = true
 			}
 		}
@@ -103,13 +103,13 @@ func (inst *MinOnOff) Process() {
 			inst.WritePinFalse(node.MinOffActive)
 			inst.currentMinOff = false
 			if !input {
-				inst.WritePinFalse(node.Outp)
+				inst.WritePinFalse(node.Out)
 				inst.currentOutput = false
 			}
 		}
 	}
 	inst.lastInput = input
-	inst.WritePinBool(node.Outp, inst.currentOutput)
+	inst.WritePinBool(node.Out, inst.currentOutput)
 	inst.WritePinBool(node.MinOffActive, inst.currentMinOff)
 	inst.WritePinBool(node.MinOnActive, inst.currentMinOn)
 

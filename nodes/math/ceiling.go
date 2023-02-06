@@ -14,7 +14,7 @@ func NewCeiling(body *node.Spec) (node.Node, error) {
 	in1 := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(in1)
 
-	out := node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
@@ -24,9 +24,9 @@ func NewCeiling(body *node.Spec) (node.Node, error) {
 func (inst *Ceiling) Process() {
 	in, null := inst.ReadPinAsFloat(node.In1)
 	if null {
-		inst.WritePinNull(node.Outp)
+		inst.WritePinNull(node.Out)
 	} else {
 		output := math.Ceil(in)
-		inst.WritePinFloat(node.Outp, output)
+		inst.WritePinFloat(node.Out, output)
 	}
 }
