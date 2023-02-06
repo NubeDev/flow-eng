@@ -1,6 +1,9 @@
 package link
 
-import log "github.com/sirupsen/logrus"
+import (
+	log "github.com/sirupsen/logrus"
+	"strings"
+)
 
 const (
 	linkInputString  = "link-input-string"
@@ -20,4 +23,9 @@ func getStore() *Store {
 		db = &Store{}
 	}
 	return db
+}
+
+func cleanName(s string) string {
+	r := strings.Replace(s, "{parent.name}", "", -1)
+	return r
 }
