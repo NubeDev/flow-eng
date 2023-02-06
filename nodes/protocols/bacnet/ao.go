@@ -30,8 +30,8 @@ func NewAO(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	opts = bacnetOpts(opts)
 	body = node.Defaults(body, bacnetAO, category)
 
-	in14 := node.BuildInput(node.In14, node.TypeBool, nil, body.Inputs, nil)
-	in15 := node.BuildInput(node.In15, node.TypeBool, nil, body.Inputs, nil)
+	in14 := node.BuildInput(node.In14, node.TypeFloat, nil, body.Inputs, nil)
+	in15 := node.BuildInput(node.In15, node.TypeFloat, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(in14, in15)
 
 	out := node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs)
