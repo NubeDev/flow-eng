@@ -24,7 +24,7 @@ type COVNode struct {
 
 func NewCOVNode(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, COV, Category)
-	input := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false)
+	input := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false)
 	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, true)
 	threshold := node.BuildInput(node.Threshold, node.TypeFloat, nil, body.Inputs, true)
 	inputs := node.BuildInputs(input, interval, threshold)
@@ -41,7 +41,7 @@ func NewCOVNode(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *COVNode) Process() {
-	input, inputNull := inst.ReadPinAsFloat(node.Inp)
+	input, inputNull := inst.ReadPinAsFloat(node.In)
 	covThreshold := inst.ReadPinOrSettingsFloat(node.Threshold)
 	intervalDuration, _ := inst.ReadPinAsTimeSettings(node.Interval)
 	if intervalDuration != inst.lastInterval || covThreshold != inst.lastThreshold {

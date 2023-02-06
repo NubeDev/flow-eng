@@ -11,7 +11,7 @@ type Scale struct {
 
 func NewScale(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, scaleNode, category)
-	in := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false)
+	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false)
 	minIn := node.BuildInput(node.InMin, node.TypeFloat, nil, body.Inputs, false)
 	maxIn := node.BuildInput(node.InMax, node.TypeFloat, nil, body.Inputs, false)
 	minOut := node.BuildInput(node.OutMin, node.TypeFloat, nil, body.Inputs, false)
@@ -23,7 +23,7 @@ func NewScale(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Scale) Process() {
-	in, _ := inst.ReadPinAsFloat(node.Inp)
+	in, _ := inst.ReadPinAsFloat(node.In)
 	minIn, _ := inst.ReadPinAsFloat(node.InMin)
 	maxIn, _ := inst.ReadPinAsFloat(node.InMax)
 	minOut, _ := inst.ReadPinAsFloat(node.OutMin)

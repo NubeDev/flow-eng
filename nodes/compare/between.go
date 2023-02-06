@@ -12,7 +12,7 @@ type Between struct {
 func NewBetween(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, betweenNode, category)
 
-	in := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false)
+	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false)
 	from := node.BuildInput(node.From, node.TypeFloat, nil, body.Inputs, false)
 	to := node.BuildInput(node.To, node.TypeFloat, nil, body.Inputs, false)
 	inputs := node.BuildInputs(in, from, to)
@@ -28,7 +28,7 @@ func NewBetween(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Between) Process() {
-	in, inNull := inst.ReadPinAsFloat(node.Inp)
+	in, inNull := inst.ReadPinAsFloat(node.In)
 	from, fromNull := inst.ReadPinAsFloat(node.From)
 	to, toNull := inst.ReadPinAsFloat(node.To)
 

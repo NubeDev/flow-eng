@@ -15,7 +15,7 @@ type DelayOff struct {
 
 func NewDelayOff(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
 	body = node.Defaults(body, delayOff, category)
-	in := node.BuildInput(node.Inp, node.TypeBool, nil, body.Inputs, false) // TODO: this input shouldn't have a manual override value
+	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs, false) // TODO: this input shouldn't have a manual override value
 	delayInput := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, true)
 	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, false) // TODO: this input shouldn't have a manual override value
 	inputs := node.BuildInputs(in, delayInput, reset)
@@ -35,7 +35,7 @@ func (inst *DelayOff) Process() {
 		inst.lastDelay = delayDuration
 	}
 
-	in1, _ := inst.ReadPinAsBool(node.Inp)
+	in1, _ := inst.ReadPinAsBool(node.In)
 	if in1 { // any time input is true, set output true and cancel any running timers
 		inst.WritePinTrue(node.Out)
 		inst.currOutput = true

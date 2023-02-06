@@ -12,7 +12,7 @@ type Toggle struct {
 
 func NewToggle(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, toggle, category)
-	in := node.BuildInput(node.Inp, node.TypeBool, nil, body.Inputs, false) // TODO: this input shouldn't have a manual override value
+	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs, false) // TODO: this input shouldn't have a manual override value
 	inputs := node.BuildInputs(in)
 
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
@@ -23,7 +23,7 @@ func NewToggle(body *node.Spec) (node.Node, error) {
 
 func (inst *Toggle) Process() {
 	resetOnNullOrDisconnect := false
-	in, null := inst.ReadPinAsBool(node.Inp)
+	in, null := inst.ReadPinAsBool(node.In)
 	if null && resetOnNullOrDisconnect {
 		inst.WritePinFalse(node.Out)
 		inst.currentOut = false

@@ -11,7 +11,7 @@ type CountString struct {
 
 func NewCountString(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, countStringNode, category)
-	cov := node.BuildInput(node.Inp, node.TypeString, nil, body.Inputs, false)
+	cov := node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false)
 	body.Inputs = node.BuildInputs(cov)
 	out := node.BuildOutput(node.CountOut, node.TypeFloat, nil, body.Outputs)
 	body.Outputs = node.BuildOutputs(out)
@@ -19,7 +19,7 @@ func NewCountString(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *CountString) Process() {
-	updated, _ := inst.InputUpdated(node.Inp)
+	updated, _ := inst.InputUpdated(node.In)
 	if updated {
 		inst.count++
 	}

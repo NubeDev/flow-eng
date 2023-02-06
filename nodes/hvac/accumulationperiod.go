@@ -24,7 +24,7 @@ type AccumulationPeriod struct {
 func NewAccumulationPeriod(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, accumulationPeriod, category)
 	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false)
-	input := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false)
+	input := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false)
 	inputs := node.BuildInputs(enable, input)
 
 	periodConsumption := node.BuildOutput(node.PeriodConsumption, node.TypeFloat, nil, body.Outputs)
@@ -56,7 +56,7 @@ func (inst *AccumulationPeriod) Process() {
 		inst.WritePinFloat(node.PeriodDuration, float64(period))
 		nextTrigger := cronexpr.MustParse(inst.cronExp).Next(time.Now())
 		inst.WritePin(node.NextTrigger, nextTrigger)
-		input, inNull := inst.ReadPinAsFloat(node.Inp)
+		input, inNull := inst.ReadPinAsFloat(node.In)
 		if !inNull {
 			inst.lastAccumulation = input
 		}
@@ -66,7 +66,7 @@ func (inst *AccumulationPeriod) Process() {
 }
 
 func (inst *AccumulationPeriod) calculateAccumulation() {
-	input, inNull := inst.ReadPinAsFloat(node.Inp)
+	input, inNull := inst.ReadPinAsFloat(node.In)
 	if !inNull {
 		inst.lastAccumulation = input
 	}

@@ -79,7 +79,6 @@ const (
 	MaxSize InputName = "max-size"
 	MinSize InputName = "min-size"
 
-	In   InputName = "in"
 	In1  InputName = "in1"
 	In2  InputName = "in2"
 	In3  InputName = "in3"
@@ -97,7 +96,7 @@ const (
 	InputC InputName = "c"
 	InputD InputName = "d"
 
-	Inp       InputName = "input"
+	In        InputName = "input"
 	Match     InputName = "match"
 	Value     InputName = "value"
 	Threshold InputName = "threshold"
