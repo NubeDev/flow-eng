@@ -11,7 +11,7 @@ const (
 
 func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error) {
 	body = node.Defaults(body, nodeName, category)
-	inputs := node.BuildInputs(node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false))
+	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(buildSchema())
@@ -26,7 +26,7 @@ func process(body node.Node) {
 	if function == "" {
 		function = acos
 	}
-	in, null := body.ReadPinAsFloat(node.Inp)
+	in, null := body.ReadPinAsFloat(node.In)
 	if null {
 		body.WritePinNull(node.Out)
 	}

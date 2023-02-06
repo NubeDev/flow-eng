@@ -22,7 +22,7 @@ type Flatline struct {
 func NewFlatline(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, flatLine, category)
 
-	in := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false) // TODO: this input shouldn't have a manual override value
+	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false) // TODO: this input shouldn't have a manual override value
 	delayInput := node.BuildInput(node.Delay, node.TypeFloat, nil, body.Inputs, true)
 	inputs := node.BuildInputs(in, delayInput)
 
@@ -45,7 +45,7 @@ func (inst *Flatline) Process() {
 
 	newCOV := false
 
-	in, inNull := inst.ReadPinAsFloat(node.Inp)
+	in, inNull := inst.ReadPinAsFloat(node.In)
 	if inNull && inst.lastVal != nil || inNull && inst.lastCOVTime == -1 {
 		newCOV = true
 		inst.lastVal = nil

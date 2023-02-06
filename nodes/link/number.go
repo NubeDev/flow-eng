@@ -21,7 +21,7 @@ func NewNumLinkInput(body *node.Spec, store *Store) (node.Node, error) {
 	}
 	body = node.Defaults(body, linkInputNum, category)
 	topic := node.BuildInput(node.Topic, node.TypeString, nil, body.Inputs, true)
-	value := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false)
+	value := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false)
 	inputs := node.BuildInputs(topic, value)
 	body = node.BuildNode(body, inputs, nil, body.Settings)
 
@@ -31,7 +31,7 @@ func NewNumLinkInput(body *node.Spec, store *Store) (node.Node, error) {
 }
 
 func (inst *NumLinkInput) Process() {
-	in1, _ := inst.ReadPinAsFloat(node.Inp)
+	in1, _ := inst.ReadPinAsFloat(node.In)
 	topic := inst.ReadPinOrSettingsString(node.Topic)
 	if topic != inst.lastTopic {
 		topic = fmt.Sprintf("num-%s", topic)

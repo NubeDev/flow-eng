@@ -23,7 +23,7 @@ type RateLimit struct {
 func NewRateLimit(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, rateLimit, category)
 	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false)
-	input := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false)
+	input := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false)
 	step := node.BuildInput(node.StepSize, node.TypeFloat, nil, body.Inputs, true)
 	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, true)
 	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, false)
@@ -49,7 +49,7 @@ func (inst *RateLimit) Process() {
 	}
 
 	enable, _ := inst.ReadPinAsBool(node.Enable)
-	input, inNull := inst.ReadPinAsFloat(node.Inp)
+	input, inNull := inst.ReadPinAsFloat(node.In)
 	reset, _ := inst.ReadPinAsBool(node.Reset)
 
 	output := float64(0)

@@ -31,7 +31,7 @@ func NewNumOutputSelect(body *node.Spec) (node.Node, error) {
 	}
 
 	inSelect := node.BuildInput(node.Selection, node.TypeFloat, nil, body.Inputs, false) // TODO: this input shouldn't have a manual override value
-	input := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false)          // TODO: this input shouldn't have a manual override value
+	input := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false)           // TODO: this input shouldn't have a manual override value
 	inputs := node.BuildInputs(inSelect, input)
 
 	outputsCount := int(conversions.GetFloat(body.Settings["outputCount"]))
@@ -48,7 +48,7 @@ func NewNumOutputSelect(body *node.Spec) (node.Node, error) {
 func (inst *NumOutputSelect) Process() {
 	selectInput, _ := inst.ReadPinAsFloat(node.Selection)
 	selectInput = math.Floor(selectInput)
-	in, inNull := inst.ReadPinAsFloat(node.Inp)
+	in, inNull := inst.ReadPinAsFloat(node.In)
 	settings, _ := inst.getSettings(inst.GetSettings())
 	count := settings.OutputCount
 	nullNonSelected := settings.NullNonSelected

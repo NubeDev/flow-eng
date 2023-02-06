@@ -11,7 +11,7 @@ type Hysteresis struct {
 
 func NewHysteresis(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, hysteresis, category)
-	in := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false)
+	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false)
 	risingEdge := node.BuildInput(node.RisingEdge, node.TypeFloat, 20, body.Inputs, false)
 	fallingEdge := node.BuildInput(node.FallingEdge, node.TypeFloat, 10, body.Inputs, false)
 	inputs := node.BuildInputs(in, risingEdge, fallingEdge)
@@ -24,7 +24,7 @@ func NewHysteresis(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Hysteresis) Process() {
-	value, inNull := inst.ReadPinAsFloat(node.Inp)
+	value, inNull := inst.ReadPinAsFloat(node.In)
 	risingEdge, riseNull := inst.ReadPinAsFloat(node.RisingEdge)
 	fallingEdge, fallNull := inst.ReadPinAsFloat(node.FallingEdge)
 

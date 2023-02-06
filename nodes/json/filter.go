@@ -11,7 +11,7 @@ type Filter struct {
 
 func NewFilter(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, jsonFilter, category)
-	in := node.BuildInput(node.Inp, node.TypeString, nil, body.Inputs, false)
+	in := node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false)
 	equation := node.BuildInput(node.Filter, node.TypeString, nil, body.Inputs, false)
 	inputs := node.BuildInputs(in, equation)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
@@ -20,7 +20,7 @@ func NewFilter(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Filter) Process() {
-	in1, _ := inst.ReadPinAsString(node.Inp)
+	in1, _ := inst.ReadPinAsString(node.In)
 	equation, _ := inst.ReadPinAsString(node.Filter)
 	value := gjson.Get(in1, equation)
 	inst.WritePin(node.Out, value.Value())

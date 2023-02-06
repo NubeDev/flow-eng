@@ -8,7 +8,7 @@ type InputFloat struct {
 
 func NewSubFlowInputFloat(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, inputFloat, category)
-	in := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false)
+	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false)
 	in.FolderExport = true
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	body = node.BuildNode(body, node.BuildInputs(in), node.BuildOutputs(out), nil)
@@ -16,7 +16,7 @@ func NewSubFlowInputFloat(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *InputFloat) Process() {
-	v, _ := inst.ReadPinAsFloat(node.Inp)
+	v, _ := inst.ReadPinAsFloat(node.In)
 	inst.WritePinFloat(node.Out, v)
 }
 
@@ -26,7 +26,7 @@ type InputBool struct {
 
 func NewSubFlowInputBool(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, inputBool, category)
-	in := node.BuildInput(node.Inp, node.TypeBool, nil, body.Inputs, false)
+	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs, false)
 	in.FolderExport = true
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	body = node.BuildNode(body, node.BuildInputs(in), node.BuildOutputs(out), nil)
@@ -34,7 +34,7 @@ func NewSubFlowInputBool(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *InputBool) Process() {
-	v, _ := inst.ReadPinAsBool(node.Inp)
+	v, _ := inst.ReadPinAsBool(node.In)
 	inst.WritePinBool(node.Out, v)
 }
 
@@ -44,7 +44,7 @@ type InputString struct {
 
 func NewSubFlowInputString(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, inputString, category)
-	in := node.BuildInput(node.Inp, node.TypeString, nil, body.Inputs, false)
+	in := node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false)
 	in.FolderExport = true
 	out := node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs)
 	body = node.BuildNode(body, node.BuildInputs(in), node.BuildOutputs(out), nil)
@@ -52,7 +52,7 @@ func NewSubFlowInputString(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *InputString) Process() {
-	inst.WritePin(node.Out, inst.ReadPin(node.Inp))
+	inst.WritePin(node.Out, inst.ReadPin(node.In))
 }
 
 type OutputFloat struct {
@@ -61,7 +61,7 @@ type OutputFloat struct {
 
 func NewSubFlowOutputFloat(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, outputFloat, category)
-	in := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false)
+	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false)
 	in.FolderExport = true
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	body = node.BuildNode(body, node.BuildInputs(in), node.BuildOutputs(out), nil)
@@ -69,7 +69,7 @@ func NewSubFlowOutputFloat(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *OutputFloat) Process() {
-	v, _ := inst.ReadPinAsFloat(node.Inp)
+	v, _ := inst.ReadPinAsFloat(node.In)
 	inst.WritePinFloat(node.Out, v)
 }
 
@@ -79,7 +79,7 @@ type OutputBool struct {
 
 func NewSubFlowOutputBool(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, outputBool, category)
-	in := node.BuildInput(node.Inp, node.TypeBool, nil, body.Inputs, false)
+	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs, false)
 	in.FolderExport = true
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	body = node.BuildNode(body, node.BuildInputs(in), node.BuildOutputs(out), nil)
@@ -87,7 +87,7 @@ func NewSubFlowOutputBool(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *OutputBool) Process() {
-	v, _ := inst.ReadPinAsBool(node.Inp)
+	v, _ := inst.ReadPinAsBool(node.In)
 	inst.WritePinBool(node.Out, v)
 }
 
@@ -97,7 +97,7 @@ type OutputString struct {
 
 func NewSubFlowOutputString(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, outputString, category)
-	in := node.BuildInput(node.Inp, node.TypeString, nil, body.Inputs, false)
+	in := node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false)
 	in.FolderExport = true
 	out := node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs)
 	body = node.BuildNode(body, node.BuildInputs(in), node.BuildOutputs(out), nil)
@@ -105,5 +105,5 @@ func NewSubFlowOutputString(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *OutputString) Process() {
-	inst.WritePin(node.Out, inst.ReadPin(node.Inp))
+	inst.WritePin(node.Out, inst.ReadPin(node.In))
 }

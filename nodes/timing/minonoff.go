@@ -28,7 +28,7 @@ type MinOnOff struct {
 
 func NewMinOnOff(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, minOnOff, category)
-	in := node.BuildInput(node.Inp, node.TypeBool, nil, body.Inputs, false)
+	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs, false)
 	onInterval := node.BuildInput(node.MinOnTime, node.TypeFloat, 0, body.Inputs, true)
 	offInterval := node.BuildInput(node.MinOffTime, node.TypeFloat, 0, body.Inputs, true)
 	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, false)
@@ -53,7 +53,7 @@ func (inst *MinOnOff) Process() {
 		inst.lastMinOffInterval = minOffIntervalDuration
 	}
 
-	input, _ := inst.ReadPinAsBool(node.Inp)
+	input, _ := inst.ReadPinAsBool(node.In)
 
 	reset, _ := inst.ReadPinAsBool(node.Reset)
 

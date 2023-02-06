@@ -12,7 +12,7 @@ type String struct {
 
 func NewString(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, conversionString, category)
-	inputs := node.BuildInputs(node.BuildInput(node.Inp, node.TypeString, nil, body.Inputs, false))
+	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false))
 	asBool := node.BuildOutput(node.Boolean, node.TypeBool, nil, body.Outputs)
 	asString := node.BuildOutput(node.Float, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(asBool, asString)
@@ -21,7 +21,7 @@ func NewString(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *String) Process() {
-	in1, null := inst.ReadPinAsString(node.Inp)
+	in1, null := inst.ReadPinAsString(node.In)
 	if null {
 		inst.WritePinNull(node.Float)
 		inst.WritePinNull(node.Boolean)
