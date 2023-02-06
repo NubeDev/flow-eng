@@ -38,7 +38,7 @@ func NewFFPointWrite(body *node.Spec) (node.Node, error) {
 	in15 := node.BuildInput(node.In15, node.TypeFloat, nil, body.Inputs, nil)
 	in16 := node.BuildInput(node.In16, node.TypeFloat, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(in1, in10, in15, in16)
-	value := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
+	value := node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs)
 	currentPriority := node.BuildOutput(node.CurrentPriority, node.TypeFloat, nil, body.Outputs)
 	lastUpdated := node.BuildOutput(node.LastUpdated, node.TypeString, nil, body.Outputs)
 	outputs := node.BuildOutputs(value, currentPriority, lastUpdated)
@@ -140,11 +140,11 @@ func (inst *FFPointWrite) Process() {
 	}
 	val := inst.GetPayload()
 	if val == nil {
-		inst.WritePinNull(node.Out)
+		inst.WritePinNull(node.Outp)
 	} else {
 		_, value, currentPri, err := parseCOV(val.Any)
 		if err == nil {
-			inst.WritePinFloat(node.Out, value)
+			inst.WritePinFloat(node.Outp, value)
 			inst.WritePinFloat(node.CurrentPriority, float64(currentPri))
 			inst.lastUpdate = val.LastUpdate
 		}

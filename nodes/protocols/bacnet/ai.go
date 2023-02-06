@@ -1,11 +1,15 @@
 package bacnetio
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
+	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeDev/flow-eng/services/mqttclient"
+	"github.com/NubeIO/lib-schema/schema"
 	log "github.com/sirupsen/logrus"
 	"strings"
 )
@@ -23,11 +27,17 @@ type AI struct {
 
 func NewAI(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	opts = bacnetOpts(opts)
-	var err error
-	body, err = nodeDefault(body, bacnetAI, category, opts.Application)
-	body.SetSchema(buildSchemaUI())
+	body = node.Defaults(body, bacnetAI, category)
+
+	var inputs []*node.Input // no inputs required
+
+	out := node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs)
+	outputs := node.BuildOutputs(out)
+
+	body = node.BuildNode(body, inputs, outputs, body.Settings)
+
 	flowOptions := &toFlowOptions{}
-	return &AI{
+	node := &AI{
 		body,
 		0,
 		points.AnalogInput,
@@ -36,35 +46,23 @@ func NewAI(body *node.Spec, opts *Bacnet) (node.Node, error) {
 		opts.Application,
 		opts.MqttClient,
 		flowOptions,
-	}, err
-}
-
-func (inst *AI) setObjectId(settings *nodeSettings) {
-	id, _ := inst.ReadPinAsInt(node.ObjectId)
-	inst.objectID = points.ObjectID(id)
-	name := bacnetAddress(4, "AI", "UI")
-	if len(name) >= id {
-		if settings != nil {
-			ioType := strings.ReplaceAll(settings.Io, "_", " ")
-			inst.SetSubTitle(strings.ToUpper(fmt.Sprintf("%s %s", name[id-1], ioType)))
-		} else {
-			inst.SetSubTitle(name[id-1])
-		}
 	}
+	node.SetSchema(node.buildSchema())
+	return node, nil
 }
 
 func (inst *AI) Process() {
+	settings, err := inst.getSettings(inst.GetSettings())
 	_, firstLoop := inst.Loop()
 	if firstLoop {
-		settings, err := getSettings(inst.GetSettings())
+		transformProps := inst.getTransformProps(settings)
 		inst.setObjectId(settings)
-		ioType := settings.Io
+		ioType := settings.IoType
 		if ioType == "" {
 			ioType = string(points.IoTypeVolts)
 		}
-		inst.toFlowOptions.precision = settings.Decimal
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
-		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true, inst.application, settings)
+		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true, inst.application, transformProps)
 		point.Name = inst.GetNodeName()
 		if err != nil {
 			log.Errorf("bacnet-server add new point type:%s-%d err:%s", objectType, inst.objectID, err.Error())
@@ -83,12 +81,28 @@ func (inst *AI) Process() {
 	if err != nil {
 		return
 	}
-	inst.WritePinFloat(node.Out, pv, 2)
+	inst.WritePinFloat(node.Outp, pv, settings.Decimal)
+}
 
+func (inst *AI) setObjectId(settings *AISettings) {
+	devNum := settings.DeviceNumber
+	uiNum := settings.InputNumber
+	id := ((devNum - 1) * 8) + uiNum
+	inst.objectID = points.ObjectID(id)
+	name := bacnetAddress(4, "AI", "UI")
+	if len(name) >= id {
+		if settings != nil {
+			ioType := strings.ReplaceAll(settings.IoType, "_", " ")
+			inst.SetSubTitle(strings.ToUpper(fmt.Sprintf("%s %s", name[id-1], ioType)))
+		} else {
+			inst.SetSubTitle(name[id-1])
+		}
+	}
 }
 
 func (inst *AI) getPV(objType points.ObjectType, id points.ObjectID) (float64, error) {
 	pnt, ok := inst.getPoint(objType, id)
+	// fmt.Println(fmt.Sprintf("AI getPV() pnt.PresentValue: %v", pnt.PresentValue))
 	if ok {
 		return pnt.PresentValue, nil
 	}
@@ -105,4 +119,122 @@ func (inst *AI) getPoint(objType points.ObjectType, id points.ObjectID) (*points
 		return d.(*points.Point), true
 	}
 	return nil, false
+}
+
+// Custom Node Settings Schema
+
+type AISettingsSchema struct {
+	DeviceNumber schemas.Integer        `json:"device-number"`
+	InputNumber  schemas.Integer        `json:"input-number"`
+	IoType       schemas.EnumString     `json:"io-type"`
+	Decimal      schemas.Number         `json:"decimal"`
+	ScaleEnable  schemas.Boolean        `json:"scale-enable"`
+	ScaleInMin   schemas.NumberNoLimits `json:"scale-in-min"`
+	ScaleInMax   schemas.NumberNoLimits `json:"scale-in-max"`
+	ScaleOutMin  schemas.NumberNoLimits `json:"scale-out-min"`
+	ScaleOutMax  schemas.NumberNoLimits `json:"scale-out-max"`
+	Factor       schemas.NumberNoLimits `json:"factor"`
+	Offset       schemas.NumberNoLimits `json:"offset"`
+}
+
+type AISettings struct {
+	DeviceNumber int     `json:"device-number"`
+	InputNumber  int     `json:"input-number"`
+	IoType       string  `json:"io-type"`
+	Decimal      int     `json:"decimal"`
+	ScaleEnable  bool    `json:"scale-enable"`
+	ScaleInMin   float64 `json:"scale-in-min"`
+	ScaleInMax   float64 `json:"scale-in-max"`
+	ScaleOutMin  float64 `json:"scale-out-min"`
+	ScaleOutMax  float64 `json:"scale-out-max"`
+	Factor       float64 `json:"factor"`
+	Offset       float64 `json:"offset"`
+}
+
+func (inst *AI) buildSchema() *schemas.Schema {
+	props := &AISettingsSchema{}
+
+	props.DeviceNumber.Title = "Select IO Device Number (Address)"
+	props.DeviceNumber.Default = 1
+	props.DeviceNumber.Minimum = 1
+	props.DeviceNumber.Maximum = 4
+
+	props.InputNumber.Title = "Select UI Number"
+	props.InputNumber.Default = 1
+	props.InputNumber.Minimum = 1
+	props.InputNumber.Maximum = 8
+
+	props.IoType.Title = "Select UI Input Type"
+	props.IoType.Default = string(points.IoTypeVolts)
+	props.IoType.Options = []string{string(points.IoTypeVolts), string(points.IoTypeDigital), string(points.IoTypeTemp), string(points.IoTypeCurrent)}
+	props.IoType.EnumName = []string{string(points.IoTypeVolts), string(points.IoTypeDigital), string(points.IoTypeTemp), string(points.IoTypeCurrent)}
+
+	props.Decimal.Title = "Rounding To # Decimals"
+	props.Decimal.Default = 2
+	props.Decimal.Minimum = 0
+	props.Decimal.Maximum = 10
+
+	props.ScaleEnable.Title = "Enable Scale/Limit Transformation"
+	props.ScaleEnable.Default = false
+
+	props.ScaleInMin.Title = "Scale: Input Min"
+	props.ScaleInMin.Default = 0
+	props.ScaleInMin.ReadOnly = true
+
+	props.ScaleInMax.Title = "Scale: Input Max"
+	props.ScaleInMax.Default = 10
+	props.ScaleInMax.ReadOnly = true
+
+	props.ScaleOutMin.Title = "Scale/Limit: Output Min"
+	props.ScaleOutMin.Default = 0
+
+	props.ScaleOutMax.Title = "Scale/Limit: Output Max"
+	props.ScaleOutMax.Default = 100
+
+	props.Factor.Title = "Multiplication Factor"
+	props.Factor.Default = 0
+
+	props.Offset.Title = "Offset"
+	props.Offset.Default = 0
+
+	schema.Set(props)
+
+	uiSchema := array.Map{
+		"io-type": array.Map{
+			"ui:widget": "select",
+		},
+		"ui:order": array.Slice{"device-number", "input-number", "io-type", "decimal", "scale-enable", "scale-in-min", "scale-in-max", "scale-out-min", "scale-out-max", "factor", "offset"},
+	}
+	s := &schemas.Schema{
+		Schema: schemas.SchemaBody{
+			Title:      "Node Settings",
+			Properties: props,
+		},
+		UiSchema: uiSchema,
+	}
+	return s
+}
+
+func (inst *AI) getSettings(body map[string]interface{}) (*AISettings, error) {
+	settings := &AISettings{}
+	marshal, err := json.Marshal(body)
+	if err != nil {
+		return settings, err
+	}
+	err = json.Unmarshal(marshal, &settings)
+	return settings, err
+}
+
+func (inst *AI) getTransformProps(settings *AISettings) *ValueTransformProperties {
+	transProps := ValueTransformProperties{
+		settings.Decimal,
+		settings.ScaleEnable,
+		settings.ScaleInMin,
+		settings.ScaleInMax,
+		settings.ScaleOutMin,
+		settings.ScaleOutMax,
+		settings.Factor,
+		settings.Offset,
+	}
+	return &transProps
 }

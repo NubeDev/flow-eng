@@ -4,7 +4,6 @@ go 1.18
 
 require (
 	github.com/NubeIO/lib-goja v0.0.4
-	github.com/NubeIO/lib-networking v0.0.6
 	github.com/NubeIO/lib-schema v0.1.6
 	github.com/NubeIO/nubeio-rubix-lib-modbus-go v0.0.4
 	github.com/NubeIO/nubeio-rubix-lib-models-go v1.3.7

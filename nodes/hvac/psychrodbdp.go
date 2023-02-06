@@ -59,8 +59,8 @@ func (inst *PsychroDBDP) Process() {
 		inst.SetWaringIcon(string(emoji.RedCircle))
 		return
 	}
-	dryBulbT := inst.ReadPinOrSettingsFloat(node.DryBulbTemp)
-	dewPointT := inst.ReadPinOrSettingsFloat(node.DewPointTemp)
+	dryBulbT, _ := inst.ReadPinAsFloat(node.DryBulbTemp)
+	dewPointT, _ := inst.ReadPinAsFloat(node.DewPointTemp)
 
 	HumRatio, TWetBulb, RelHum, VapPres, MoistAirEnthalpy, MoistAirVolume, DegreeOfSaturation, err := psychrometrics.CalcPsychrometricsFromTDewPoint(dryBulbT, dewPointT, atmPress, inst.isImperial)
 	if err != nil {

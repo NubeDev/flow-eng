@@ -13,7 +13,7 @@ func NewMqttSub(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, mqttSub, category)
 	top := node.BuildInput(node.Topic, node.TypeString, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(top)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &MqttSub{body, ""}, nil
 }
@@ -54,8 +54,8 @@ func (inst *MqttSub) Process() {
 	}
 	val, null := inst.ReadPayloadAsString()
 	if null {
-		inst.WritePinNull(node.Out)
+		inst.WritePinNull(node.Outp)
 	} else {
-		inst.WritePin(node.Out, val)
+		inst.WritePin(node.Outp, val)
 	}
 }

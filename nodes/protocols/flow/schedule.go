@@ -21,7 +21,7 @@ type FFSchedule struct {
 func NewFFSchedule(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, flowSchedule, category)
 	inputs := node.BuildInputs()
-	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
+	out := node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs)
 	lastUpdated := node.BuildOutput(node.LastUpdated, node.TypeString, nil, body.Outputs)
 	payload := node.BuildOutput(node.OutPayload, node.TypeFloat, nil, body.Outputs)
 	nextStart := node.BuildOutput(node.NextStart, node.TypeString, nil, body.Outputs)
@@ -69,7 +69,7 @@ func (inst *FFSchedule) getResult() {
 				inst.lastValue = value
 				inst.lastUpdate = time.Now()
 			}
-			inst.WritePinBool(node.Out, value)
+			inst.WritePinBool(node.Outp, value)
 			inst.WritePin(node.LastUpdated, ttime.TimeSince(inst.lastUpdate))
 			inst.WritePinFloat(node.OutPayload, schedule.Payload)
 			inst.WritePin(node.NextStart, schedule.NextStartString)

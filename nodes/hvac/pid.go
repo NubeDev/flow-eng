@@ -22,7 +22,7 @@ type PIDNode struct {
 
 func NewPIDNode(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, pidNode, category)
-	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, str.New("enable"))
+	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, nil)
 	processValue := node.BuildInput(node.ProcessValue, node.TypeFloat, nil, body.Inputs, nil)
 	setPoint := node.BuildInput(node.Setpoint, node.TypeFloat, nil, body.Inputs, str.New("setpoint"))
 	minOut := node.BuildInput(node.MinOut, node.TypeFloat, nil, body.Inputs, str.New("min_out"))
@@ -60,7 +60,7 @@ func (inst *PIDNode) Process() {
 
 	input, inputNull := inst.ReadPinAsFloat(node.ProcessValue)
 	setpoint := inst.ReadPinOrSettingsFloat(node.Setpoint)
-	enable := inst.ReadPinOrSettingsBool(node.Enable)
+	enable, _ := inst.ReadPinAsBool(node.Enable)
 
 	if !enable || inputNull {
 		inst.PID.SetMode(pid.MANUAL)
@@ -106,7 +106,6 @@ func (inst *PIDNode) setSubtitle(intervalDuration time.Duration) {
 // Custom Node Settings Schema
 
 type PIDNodeSettingsSchema struct {
-	Enable            schemas.Boolean    `json:"enable"`
 	Setpoint          schemas.Number     `json:"setpoint"`
 	MinOut            schemas.Number     `json:"min_out"`
 	MaxOut            schemas.Number     `json:"max_out"`
@@ -121,7 +120,6 @@ type PIDNodeSettingsSchema struct {
 }
 
 type PIDNodeSettings struct {
-	Enable            bool    `json:"enable"`
 	Setpoint          float64 `json:"setpoint"`
 	MinOut            float64 `json:"min_out"`
 	MaxOut            float64 `json:"max_out"`
@@ -137,10 +135,6 @@ type PIDNodeSettings struct {
 
 func (inst *PIDNode) buildSchema() *schemas.Schema {
 	props := &PIDNodeSettingsSchema{}
-
-	// enable
-	props.Enable.Title = "Enable"
-	props.Enable.Default = false
 
 	// setpoint
 	props.Setpoint.Title = "Setpoint"

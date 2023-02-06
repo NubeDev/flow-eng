@@ -22,6 +22,7 @@ type Point struct {
 	ScaleInMax                  float64
 	ScaleOutMin                 float64
 	ScaleOutMax                 float64
+	Factor                      float64
 	WriteValue                  *PriArray
 	WriteValueFromBACnet        *PriArray
 	PendingWriteValueFromBACnet bool

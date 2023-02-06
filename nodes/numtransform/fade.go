@@ -42,7 +42,7 @@ func NewFade(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Fade) Process() {
-	enable := inst.ReadPinOrSettingsBool(node.Enable)
+	enable, _ := inst.ReadPinAsBool(node.Enable)
 	from, fromNull := inst.ReadPinAsFloat(node.From)
 	to, toNull := inst.ReadPinAsFloat(node.To)
 	intervalDuration, _ := inst.ReadPinAsTimeSettings(node.Interval)

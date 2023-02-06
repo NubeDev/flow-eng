@@ -77,7 +77,7 @@ func (inst *PACControl) Process() {
 	}
 
 	inst.numComps = 2 // TODO: replace with settings value
-	enable := inst.ReadPinOrSettingsBool(node.Enable)
+	enable, _ := inst.ReadPinAsBool(node.Enable)
 	fanStatus := true
 	requireFanStatus := settings.RequireFan
 	if requireFanStatus {
@@ -324,7 +324,6 @@ func (inst *PACControl) DisableEconoMode() {
 // Custom Node Settings Schema
 
 type PACControlSettingsSchema struct {
-	Enable       schemas.Boolean `json:"enable"`
 	Setpoint     schemas.Number  `json:"setpoint"`
 	SetpointMode schemas.Boolean `json:"setpoint_mode"`
 	ClgOffset    schemas.Number  `json:"clg_offset"`
@@ -342,7 +341,6 @@ type PACControlSettingsSchema struct {
 }
 
 type PACControlSettings struct {
-	Enable       bool    `json:"enable"`
 	Setpoint     float64 `json:"setpoint"`
 	SetpointMode bool    `json:"setpoint_mode"`
 	ClgOffset    float64 `json:"clg_offset"`
@@ -361,10 +359,6 @@ type PACControlSettings struct {
 
 func (inst *PACControl) buildSchema() *schemas.Schema {
 	props := &PACControlSettingsSchema{}
-
-	// enable
-	props.Enable.Title = "Enable"
-	props.Enable.Default = false
 
 	// setpoint
 	props.Setpoint.Title = "Setpoint"

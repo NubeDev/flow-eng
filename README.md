@@ -45,15 +45,15 @@ body as an interface
 
 ```go
 func (inst *Not) Process() {
-in, null := inst.ReadPinBoolOk(node.In)
+in, null := inst.ReadPinBoolOk(node.Inp)
 if null { // if input is null then set output to nil
-inst.WritePinNull(node.Out)
+inst.WritePinNull(node.Outp)
 return
 }
 if in {
-inst.WritePinFalse(node.Out)
+inst.WritePinFalse(node.Outp)
 } else {
-inst.WritePinTrue(node.Out)
+inst.WritePinTrue(node.Outp)
 }
 }
 ```
@@ -68,11 +68,11 @@ inst.ReadPinBool(name InputName) (value bool, null bool) // same as above but va
 ### writing outputs
 
 ```go
-inst.WritePinFloat(node.Out, f, inst.precision) // you can add number of decimal places 
+inst.WritePinFloat(node.Outp, f, inst.precision) // you can add number of decimal places 
 inst.WritePinFloat(name OutputName, value float64) // set output to number value (float64)
-inst.WritePinNull(node.Out) // set output to nil
-inst.WritePinTrue(node.Out) // set output to true
-inst.WritePinFalse(node.Out) // set output to false
+inst.WritePinNull(node.Outp) // set output to nil
+inst.WritePinTrue(node.Outp) // set output to true
+inst.WritePinFalse(node.Outp) // set output to false
 ```
 
 [interface](https://github.com/NubeDev/flow-eng/blob/f8778ee7402691a75516acdb9eef355038c8b17a/node/node.go#L7)

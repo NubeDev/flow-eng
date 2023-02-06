@@ -75,31 +75,31 @@ func nodeDefault(body *node.Spec, nodeName, category string, application names.A
 	body = node.Defaults(body, nodeName, category)
 	_, isWriteable, _, err := getBacnetType(nodeName)
 	// pointName := node.BuildInput(node.Name, node.TypeString, nil, body.Inputs)
-	objectIDInput := node.BuildInput(node.ObjectId, node.TypeFloat, 0, body.Inputs, nil)
+	// objectIDInput := node.BuildInput(node.ObjectId, node.TypeFloat, 0, body.Inputs, nil)  // not needed as it is now configured from settings
 	var inputs []*node.Input
 	if isWriteable {
 		if body.GetName() == bacnetBV || body.GetName() == bacnetBO {
 			in14 := node.BuildInput(node.In14, node.TypeBool, nil, body.Inputs, nil)
 			in15 := node.BuildInput(node.In15, node.TypeBool, nil, body.Inputs, nil)
-			inputs = node.BuildInputs(objectIDInput, in14, in15)
+			inputs = node.BuildInputs(in14, in15)
 		} else {
 			in14 := node.BuildInput(node.In14, node.TypeFloat, nil, body.Inputs, nil)
 			in15 := node.BuildInput(node.In15, node.TypeFloat, nil, body.Inputs, nil)
-			inputs = node.BuildInputs(objectIDInput, in14, in15)
+			inputs = node.BuildInputs(in14, in15)
 		}
 
 	} else {
 		// overrideInput := node.BuildInput(node.OverrideInput, node.TypeFloat, nil, body.Inputs)
-		inputs = node.BuildInputs(objectIDInput)
+		// inputs = node.BuildInputs(objectIDInput)
 	}
-	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
+	out := node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs)
 	currentPriority := node.BuildOutput(node.CurrentPriority, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(out, currentPriority)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return body, err
 }
 
-func addPoint(ioType points.IoType, objectType points.ObjectType, id points.ObjectID, isWriteable, isIO, enable bool, application names.ApplicationName, settings *nodeSettings) *points.Point {
+func addPoint(ioType points.IoType, objectType points.ObjectType, id points.ObjectID, isWriteable, isIO, enable bool, application names.ApplicationName, transform *ValueTransformProperties) *points.Point {
 	point := &points.Point{
 		ObjectType:  objectType,
 		Application: application,
@@ -108,15 +108,14 @@ func addPoint(ioType points.IoType, objectType points.ObjectType, id points.Obje
 		IsIO:        isIO,
 		IsWriteable: isWriteable,
 		Enable:      enable,
-		Offset:      settings.Offset,
-		ScaleEnable: settings.ScaleEnable,
-		ScaleInMin:  settings.ScaleInMin,
-		ScaleInMax:  settings.ScaleInMax,
-		ScaleOutMin: settings.ScaleOutMin,
-		ScaleOutMax: settings.ScaleOutMax,
+		Offset:      transform.Offset,
+		ScaleEnable: transform.ScaleEnable,
+		ScaleInMin:  transform.ScaleInMin,
+		ScaleInMax:  transform.ScaleInMax,
+		ScaleOutMin: transform.ScaleOutMin,
+		ScaleOutMax: transform.ScaleOutMax,
 	}
 	return point
-
 }
 
 // topicBuilder bacnet/ObjectType
@@ -131,4 +130,15 @@ func topicBuilder(objectType points.ObjectType, address points.ObjectID) string 
 		log.Error(err)
 	}
 	return fmt.Sprintf("bacnet/%s/%d", obj, address)
+}
+
+type ValueTransformProperties struct {
+	Decimal     int     `json:"decimal"`
+	ScaleEnable bool    `json:"scale-enable"`
+	ScaleInMin  float64 `json:"scale-in-min"`
+	ScaleInMax  float64 `json:"scale-in-max"`
+	ScaleOutMin float64 `json:"scale-out-min"`
+	ScaleOutMax float64 `json:"scale-out-max"`
+	Factor      float64 `json:"factor"`
+	Offset      float64 `json:"offset"`
 }
