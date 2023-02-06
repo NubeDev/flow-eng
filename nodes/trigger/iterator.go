@@ -3,7 +3,6 @@ package trigger
 import (
 	"encoding/json"
 	"github.com/NubeDev/flow-eng/helpers/array"
-	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
@@ -36,10 +35,10 @@ const (
 func NewIterate(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, Iterator, Category)
 
-	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, str.New("interval"))
-	iterations := node.BuildInput(node.Iterations, node.TypeFloat, nil, body.Inputs, str.New("iterations"))
-	start := node.BuildInput(node.Start, node.TypeBool, nil, body.Inputs, nil)
-	stop := node.BuildInput(node.Stop, node.TypeBool, nil, body.Inputs, nil)
+	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, true)
+	iterations := node.BuildInput(node.Iterations, node.TypeFloat, nil, body.Inputs, true)
+	start := node.BuildInput(node.Start, node.TypeBool, nil, body.Inputs, false)
+	stop := node.BuildInput(node.Stop, node.TypeBool, nil, body.Inputs, false)
 	inputs := node.BuildInputs(interval, iterations, start, stop)
 
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)

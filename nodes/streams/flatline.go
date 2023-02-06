@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/float"
-	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
@@ -23,8 +22,8 @@ type Flatline struct {
 func NewFlatline(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, flatLine, category)
 
-	in := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, nil) // TODO: this input shouldn't have a manual override value
-	delayInput := node.BuildInput(node.Delay, node.TypeFloat, nil, body.Inputs, str.New("interval"))
+	in := node.BuildInput(node.Inp, node.TypeFloat, nil, body.Inputs, false) // TODO: this input shouldn't have a manual override value
+	delayInput := node.BuildInput(node.Delay, node.TypeFloat, nil, body.Inputs, true)
 	inputs := node.BuildInputs(in, delayInput)
 
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)

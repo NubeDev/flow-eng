@@ -26,15 +26,16 @@ func inputHelp(opts ...*InputsOpts) (help InputHelp) {
 }
 
 func BuildInput(portName InputName, dataType DataTypes, fallback interface{}, inputs []*Input, hasSetting bool, opts ...*InputsOpts) *Input {
-	inputName := portName
+	var settingName string
 	if hasSetting {
-		inputName = InputName(fmt.Sprintf("[%s]", portName))
+		settingName = string(portName)
+		portName = InputName(fmt.Sprintf("[%s]", portName))
 	}
 	port := &Input{
-		Name:        inputName,
+		Name:        portName,
 		DataType:    dataType,
 		Connection:  &InputConnection{},
-		SettingName: portName,
+		SettingName: settingName,
 	}
 	port = newInput(port)
 	var addConnections bool
@@ -52,7 +53,7 @@ func BuildInput(portName InputName, dataType DataTypes, fallback interface{}, in
 			} else {
 				port.Connection = &InputConnection{}
 			}
-			port.SettingName = hasSetting
+			port.SettingName = string(portName)
 		}
 	}
 	if !addConnections {
@@ -86,7 +87,7 @@ func DynamicInputs(dataType DataTypes, fallback interface{}, count, minAllowed, 
 		for _, names := range overrideNames {
 			for i, name := range names {
 				if i < count {
-					out = append(out, BuildInput(InputName(name), dataType, fallback, inputs, nil))
+					out = append(out, BuildInput(InputName(name), dataType, fallback, inputs, false))
 				}
 
 			}
@@ -95,7 +96,7 @@ func DynamicInputs(dataType DataTypes, fallback interface{}, count, minAllowed, 
 		for i := 1; i <= count; i++ {
 			name := fmt.Sprintf("%s%d", InputNamePrefix, i)
 			if i < maxAllowed {
-				out = append(out, BuildInput(InputName(name), dataType, fallback, inputs, nil))
+				out = append(out, BuildInput(InputName(name), dataType, fallback, inputs, false))
 			}
 		}
 	}

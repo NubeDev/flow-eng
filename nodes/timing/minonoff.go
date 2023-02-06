@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
-	"github.com/NubeDev/flow-eng/helpers/str"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
@@ -29,10 +28,10 @@ type MinOnOff struct {
 
 func NewMinOnOff(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, minOnOff, category)
-	in := node.BuildInput(node.Inp, node.TypeBool, nil, body.Inputs, nil)
-	onInterval := node.BuildInput(node.MinOnTime, node.TypeFloat, 0, body.Inputs, str.New("min_on_interval"))
-	offInterval := node.BuildInput(node.MinOffTime, node.TypeFloat, 0, body.Inputs, str.New("min_off_interval"))
-	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, nil)
+	in := node.BuildInput(node.Inp, node.TypeBool, nil, body.Inputs, false)
+	onInterval := node.BuildInput(node.MinOnTime, node.TypeFloat, 0, body.Inputs, true)
+	offInterval := node.BuildInput(node.MinOffTime, node.TypeFloat, 0, body.Inputs, true)
+	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, false)
 	inputs := node.BuildInputs(in, onInterval, offInterval, reset)
 
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
