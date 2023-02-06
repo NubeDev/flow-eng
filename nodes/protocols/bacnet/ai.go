@@ -32,8 +32,7 @@ func NewAI(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	var inputs []*node.Input // no inputs required
 
 	out := node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs)
-	currentPriority := node.BuildOutput(node.CurrentPriority, node.TypeFloat, nil, body.Outputs)
-	outputs := node.BuildOutputs(out, currentPriority)
+	outputs := node.BuildOutputs(out)
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
