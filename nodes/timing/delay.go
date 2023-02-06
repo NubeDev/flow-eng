@@ -27,7 +27,7 @@ func NewDelay(body *node.Spec) (node.Node, error) {
 	delayInput := node.BuildInput(node.Delay, node.TypeFloat, nil, body.Inputs, str.New("interval"))
 	inputs := node.BuildInputs(enable, in, delayInput)
 
-	out := node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
@@ -42,7 +42,7 @@ func (inst *Delay) Process() {
 	enable, _ := inst.ReadPinAsBool(node.Enable)
 	if !enable {
 		inst.ClearAllDelays()
-		inst.WritePinNull(node.Outp)
+		inst.WritePinNull(node.Out)
 		inst.currentOutput = nil
 		return
 	}
@@ -65,10 +65,10 @@ func (inst *Delay) Process() {
 		newDelay.Timer = time.AfterFunc(delayDuration, func() {
 			delayObj := newDelay
 			if inputFloatPtr == nil {
-				inst.WritePinNull(node.Outp)
+				inst.WritePinNull(node.Out)
 				inst.currentOutput = nil
 			} else {
-				inst.WritePinFloat(node.Outp, *inputFloatPtr)
+				inst.WritePinFloat(node.Out, *inputFloatPtr)
 				inst.currentOutput = float.New(*inputFloatPtr)
 			}
 			delayObj.HasTriggered = true
@@ -77,9 +77,9 @@ func (inst *Delay) Process() {
 	}
 	inst.lastValue = inputFloatPtr
 	if inst.currentOutput == nil {
-		inst.WritePinNull(node.Outp)
+		inst.WritePinNull(node.Out)
 	} else {
-		inst.WritePinFloat(node.Outp, *inst.currentOutput)
+		inst.WritePinFloat(node.Out, *inst.currentOutput)
 	}
 	inst.ClearCompletedDelays()
 }
@@ -107,7 +107,7 @@ func (inst *Delay) ClearAllDelays() {
 }
 
 func (inst *Delay) Start() {
-	inst.WritePinNull(node.Outp)
+	inst.WritePinNull(node.Out)
 }
 
 func (inst *Delay) Stop() {

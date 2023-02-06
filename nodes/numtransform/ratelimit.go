@@ -30,7 +30,7 @@ func NewRateLimit(body *node.Spec) (node.Node, error) {
 	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(enable, input, step, interval, reset)
 
-	out := node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
@@ -55,7 +55,7 @@ func (inst *RateLimit) Process() {
 
 	output := float64(0)
 	if !enable || inNull {
-		inst.WritePinFloat(node.Outp, 0)
+		inst.WritePinFloat(node.Out, 0)
 		inst.lastOutput = 0
 	} else {
 		if reset && !inst.lastReset {
@@ -71,7 +71,7 @@ func (inst *RateLimit) Process() {
 		} else {
 			output = inst.lastOutput + step
 		}
-		inst.WritePinFloat(node.Outp, output)
+		inst.WritePinFloat(node.Out, output)
 		inst.lastOutput = output
 	}
 }

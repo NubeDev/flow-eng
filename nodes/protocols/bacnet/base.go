@@ -92,7 +92,7 @@ func nodeDefault(body *node.Spec, nodeName, category string, application names.A
 		// overrideInput := node.BuildInput(node.OverrideInput, node.TypeFloat, nil, body.Inputs)
 		// inputs = node.BuildInputs(objectIDInput)
 	}
-	out := node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	currentPriority := node.BuildOutput(node.CurrentPriority, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(out, currentPriority)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)

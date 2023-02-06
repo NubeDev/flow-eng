@@ -27,7 +27,7 @@ func NewFlatline(body *node.Spec) (node.Node, error) {
 	delayInput := node.BuildInput(node.Delay, node.TypeFloat, nil, body.Inputs, str.New("interval"))
 	inputs := node.BuildInputs(in, delayInput)
 
-	out := node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
@@ -67,7 +67,7 @@ func (inst *Flatline) Process() {
 			inst.alertStatus = true
 		}
 	}
-	inst.WritePinBool(node.Outp, inst.alertStatus)
+	inst.WritePinBool(node.Out, inst.alertStatus)
 }
 
 func (inst *Flatline) setSubtitle(intervalDuration time.Duration) {

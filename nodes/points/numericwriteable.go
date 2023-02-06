@@ -25,7 +25,7 @@ func NewNumericWriteable(body *node.Spec) (node.Node, error) {
 		count = settings.InputCount
 	}
 	inputs := node.BuildInputs(node.DynamicInputs(node.TypeFloat, nil, count, 2, 20, body.Inputs)...)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(buildNumericWriteableSchema())
 	body.SetDynamicInputs()
@@ -39,14 +39,14 @@ func (inst *NumericWriteable) Process() {
 	for _, val := range inputs {
 		if val != nil {
 			// fmt.Println("NumericWriteable() i: ", i, "  val:", *val)
-			inst.WritePinFloat(node.Outp, *val)
+			inst.WritePinFloat(node.Out, *val)
 			return
 		} else {
 			// fmt.Println("NumericWriteable() i: ", i, "  val: null")
 		}
 
 	}
-	inst.WritePinNull(node.Outp)
+	inst.WritePinNull(node.Out)
 }
 
 // Custom Node Settings Schema

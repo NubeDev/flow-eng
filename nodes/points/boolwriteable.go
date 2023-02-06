@@ -25,7 +25,7 @@ func NewBooleanWriteable(body *node.Spec) (node.Node, error) {
 		count = settings.InputCount
 	}
 	inputs := node.BuildInputs(node.DynamicInputs(node.TypeBool, nil, count, 2, 20, body.Inputs)...)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(buildBooleanWriteableSchema())
 	body.SetDynamicInputs()
@@ -37,11 +37,11 @@ func (inst *BooleanWriteable) Process() {
 	inputs := boolean.ConvertInterfaceToBoolMultiple(inst.ReadMultiple(count))
 	for _, val := range inputs {
 		if val != nil {
-			inst.WritePinBool(node.Outp, *val)
+			inst.WritePinBool(node.Out, *val)
 			return
 		}
 	}
-	inst.WritePinNull(node.Outp)
+	inst.WritePinNull(node.Out)
 }
 
 // Custom Node Settings Schema

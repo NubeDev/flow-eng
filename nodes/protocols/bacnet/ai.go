@@ -31,7 +31,7 @@ func NewAI(body *node.Spec, opts *Bacnet) (node.Node, error) {
 
 	var inputs []*node.Input // no inputs required
 
-	out := node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
@@ -81,7 +81,7 @@ func (inst *AI) Process() {
 	if err != nil {
 		return
 	}
-	inst.WritePinFloat(node.Outp, pv, settings.Decimal)
+	inst.WritePinFloat(node.Out, pv, settings.Decimal)
 }
 
 func (inst *AI) setObjectId(settings *AISettings) {

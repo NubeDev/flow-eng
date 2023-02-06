@@ -20,7 +20,7 @@ type FFPoint struct {
 func NewFFPoint(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, flowPoint, category)
 	inputs := node.BuildInputs()
-	out := node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	currentPriority := node.BuildOutput(node.CurrentPriority, node.TypeFloat, nil, body.Outputs)
 	lastUpdated := node.BuildOutput(node.LastUpdated, node.TypeString, nil, body.Outputs)
 	outputs := node.BuildOutputs(out, currentPriority, lastUpdated)
@@ -119,13 +119,13 @@ func (inst *FFPoint) Process() {
 	val, null := inst.GetPayloadNull()
 	var wroteValue bool
 	if null {
-		inst.WritePinNull(node.Outp)
+		inst.WritePinNull(node.Out)
 	} else {
 		p, value, currentPri, err := parseCOV(val)
 		if err == nil && p != nil {
 			inst.lastPayload = p
 			wroteValue = true
-			inst.WritePinFloat(node.Outp, value, 2)
+			inst.WritePinFloat(node.Out, value, 2)
 			inst.WritePinFloat(node.CurrentPriority, float64(currentPri))
 			if inst.lastValue != value {
 				inst.lastValue = value
@@ -136,7 +136,7 @@ func (inst *FFPoint) Process() {
 		}
 	}
 	if !wroteValue {
-		inst.WritePinNull(node.Outp)
+		inst.WritePinNull(node.Out)
 	}
 }
 

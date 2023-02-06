@@ -27,7 +27,7 @@ func NewGmail(body *node.Spec) (node.Node, error) {
 	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(to, subject, message, trigger)
 
-	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeString, nil, body.Outputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
 	n := &Gmail{body, ""}
@@ -76,7 +76,7 @@ func (inst *Gmail) Process() {
 	if cov {
 		inst.sendEmail()
 	}
-	inst.WritePin(node.Outp, "")
+	inst.WritePin(node.Out, "")
 }
 
 // Custom Node Settings Schema

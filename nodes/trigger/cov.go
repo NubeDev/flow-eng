@@ -30,7 +30,7 @@ func NewCOVNode(body *node.Spec) (node.Node, error) {
 	threshold := node.BuildInput(node.Threshold, node.TypeFloat, nil, body.Inputs, str.New("threshold"))
 	inputs := node.BuildInputs(input, interval, threshold)
 
-	out := node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
@@ -54,7 +54,7 @@ func (inst *COVNode) Process() {
 
 	// outputs false if the input is nil or there is no lastValue
 	if inputNull || inst.lastValue == nil {
-		inst.WritePinBool(node.Outp, false)
+		inst.WritePinBool(node.Out, false)
 		inst.currentOutput = false
 	} else {
 		// call 'writeOutput' when the absolute diff between last two inputs are larger than 'covThreshold' and there are no previous routine running
@@ -65,16 +65,16 @@ func (inst *COVNode) Process() {
 		}
 	}
 	inst.lastValue = &input
-	inst.WritePinBool(node.Outp, inst.currentOutput)
+	inst.WritePinBool(node.Out, inst.currentOutput)
 }
 
 func writeOutput(inst *COVNode, duration time.Duration) {
 	// set the output pin to true for 'duration' period before setting it to false
 	// set inst.running to false after routine is finished
-	inst.WritePinBool(node.Outp, true)
+	inst.WritePinBool(node.Out, true)
 	inst.currentOutput = true
 	time.Sleep(duration)
-	inst.WritePinBool(node.Outp, false)
+	inst.WritePinBool(node.Out, false)
 	inst.currentOutput = false
 	inst.running = false
 }

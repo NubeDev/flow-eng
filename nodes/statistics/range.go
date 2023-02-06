@@ -29,11 +29,11 @@ func (inst *Range) Process() {
 		}
 	}
 	if len(nonNilValues) == 0 {
-		inst.WritePinNull(node.Outp)
+		inst.WritePinNull(node.Out)
 	} else {
 		minValue := array.MinFloat64(nonNilValues)
 		maxValue := array.MaxFloat64(nonNilValues)
 		rangeValue := maxValue - minValue
-		inst.WritePinFloat(node.Outp, rangeValue)
+		inst.WritePinFloat(node.Out, rangeValue)
 	}
 }

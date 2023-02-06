@@ -32,7 +32,7 @@ func getSettings(body map[string]interface{}) (string, error) {
 func NewFunc(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, funcNode, category)
 	inputs := node.BuildInputs(node.DynamicInputs(node.TypeString, nil, 2, 3, 3, body.Inputs)...)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeString, nil, body.Outputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(buildSchema())
 	return &Func{body, ""}, nil
@@ -50,7 +50,7 @@ func (inst *Func) Process() {
 		fmt.Println(err)
 	}
 
-	inst.WritePin(node.Outp, f)
+	inst.WritePin(node.Out, f)
 }
 
 func runFunc(val1, val2 interface{}, code string) (interface{}, error) {

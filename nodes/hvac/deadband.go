@@ -16,7 +16,7 @@ func NewDeadBand(body *node.Spec) (node.Node, error) {
 	deadBand := node.BuildInput(node.DeadBand, node.TypeFloat, nil, body.Inputs, nil)
 
 	inputs := node.BuildInputs(in, setPoint, deadBand)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &DeadBand{body, false}, nil
 }
@@ -24,7 +24,7 @@ func NewDeadBand(body *node.Spec) (node.Node, error) {
 func (inst *DeadBand) Process() {
 	input, null := inst.ReadPinAsFloat(node.Inp)
 	if null {
-		inst.WritePinNull(node.Outp)
+		inst.WritePinNull(node.Out)
 		return
 	}
 	setPoint, _ := inst.ReadPinAsFloat(node.Setpoint)
@@ -47,5 +47,5 @@ func (inst *DeadBand) Process() {
 			inst.out = true
 		}
 	}
-	inst.WritePinBool(node.Outp, inst.out)
+	inst.WritePinBool(node.Out, inst.out)
 }

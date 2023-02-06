@@ -16,7 +16,7 @@ func NewStringLatch(body *node.Spec) (node.Node, error) {
 	latch := node.BuildInput(node.Latch, node.TypeBool, nil, body.Inputs, nil) // TODO: this input shouldn't have a manual override value
 
 	inputs := node.BuildInputs(input, latch)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Outp, node.TypeString, "", body.Outputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, "", body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &StringLatch{body, "", false}, nil
 }
@@ -31,5 +31,5 @@ func (inst *StringLatch) Process() {
 	}
 	inst.lastTrigger = latchBool
 
-	inst.WritePin(node.Outp, inst.currentVal)
+	inst.WritePin(node.Out, inst.currentVal)
 }

@@ -91,7 +91,7 @@ func NewStringLinkOutput(body *node.Spec, store *Store) (node.Node, error) {
 		store = getStore()
 	}
 	body = node.Defaults(body, linkOutputString, category)
-	out := node.BuildOutput(node.Outp, node.TypeString, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, nil, outputs, body.Settings)
 	return &StringLinkOutput{body}, nil
@@ -101,9 +101,9 @@ func (inst *StringLinkOutput) Process() {
 	topic, _ := getSettings(inst.GetSettings())
 	v, found := getStore().Get(topic)
 	if found {
-		inst.WritePin(node.Outp, v)
+		inst.WritePin(node.Out, v)
 	} else {
-		inst.WritePinNull(node.Outp)
+		inst.WritePinNull(node.Out)
 	}
 	_, firstLoop := inst.Loop()
 	if firstLoop {

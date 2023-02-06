@@ -13,7 +13,7 @@ func NewNot(body *node.Spec) (node.Node, error) {
 	in := node.BuildInput(node.Inp, node.TypeBool, nil, body.Inputs, nil) // TODO: this input shouldn't have a manual override value
 	inputs := node.BuildInputs(in)
 
-	out := node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &Not{body}, nil
@@ -22,8 +22,8 @@ func NewNot(body *node.Spec) (node.Node, error) {
 func (inst *Not) Process() {
 	in, null := inst.ReadPinAsBool(node.Inp)
 	if null {
-		inst.WritePinNull(node.Outp)
+		inst.WritePinNull(node.Out)
 	} else {
-		inst.WritePinBool(node.Outp, !in)
+		inst.WritePinBool(node.Out, !in)
 	}
 }

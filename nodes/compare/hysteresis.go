@@ -16,7 +16,7 @@ func NewHysteresis(body *node.Spec) (node.Node, error) {
 	fallingEdge := node.BuildInput(node.FallingEdge, node.TypeFloat, 10, body.Inputs, nil)
 	inputs := node.BuildInputs(in, risingEdge, fallingEdge)
 
-	output := node.BuildOutput(node.Outp, node.TypeBool, nil, body.Outputs)
+	output := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	outNot := node.BuildOutput(node.OutNot, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(output, outNot)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
@@ -29,8 +29,8 @@ func (inst *Hysteresis) Process() {
 	fallingEdge, fallNull := inst.ReadPinAsFloat(node.FallingEdge)
 
 	if riseNull || fallNull || inNull {
-		inst.WritePinFalse(node.Outp)
-		inst.WritePinTrue(node.Outp)
+		inst.WritePinFalse(node.Out)
+		inst.WritePinTrue(node.Out)
 		inst.currentVal = false
 		return
 	}
@@ -53,6 +53,6 @@ func (inst *Hysteresis) Process() {
 		inst.currentVal = value > risingEdge
 	}
 
-	inst.WritePinBool(node.Outp, inst.currentVal)
+	inst.WritePinBool(node.Out, inst.currentVal)
 	inst.WritePinBool(node.OutNot, !inst.currentVal)
 }

@@ -196,10 +196,8 @@ const (
 	NextStop   OutputName = "next stop"
 
 	OutTopic OutputName = "topic"
-	Out      OutputName = "out"
-	Outp     OutputName = "output"
-
-	Elapsed OutputName = "elapsed"
+	Out      OutputName = "output"
+	Elapsed  OutputName = "elapsed"
 
 	MinOutput OutputName = "min"
 	MaxOutput OutputName = "max"

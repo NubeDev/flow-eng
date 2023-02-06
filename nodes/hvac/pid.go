@@ -37,7 +37,7 @@ func NewPIDNode(body *node.Spec) (node.Node, error) {
 	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, nil)
 	inputs := node.BuildInputs(enable, processValue, setPoint, minOut, maxOut, inP, inI, inD, direction, interval, bias, manual, reset)
 
-	output := node.BuildOutput(node.Outp, node.TypeFloat, nil, body.Outputs)
+	output := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(output)
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
@@ -65,7 +65,7 @@ func (inst *PIDNode) Process() {
 	if !enable || inputNull {
 		inst.PID.SetMode(pid.MANUAL)
 		manual := inst.ReadPinOrSettingsFloat(node.Manual)
-		inst.WritePinFloat(node.Outp, manual)
+		inst.WritePinFloat(node.Out, manual)
 		return
 	}
 
@@ -95,7 +95,7 @@ func (inst *PIDNode) Process() {
 	inst.PID.SetBias(bias)
 
 	inst.PID.Compute()
-	inst.WritePinFloat(node.Outp, inst.PID.GetOutput())
+	inst.WritePinFloat(node.Out, inst.PID.GetOutput())
 }
 
 func (inst *PIDNode) setSubtitle(intervalDuration time.Duration) {
