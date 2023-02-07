@@ -88,14 +88,12 @@ func (inst *COVNode) setSubtitle(intervalDuration time.Duration, threshold float
 // Custom Node Settings Schema
 
 type COVNodeSettingsSchema struct {
-	Name              schemas.String     `json:"name"`
 	Interval          schemas.Number     `json:"interval"`
 	IntervalTimeUnits schemas.EnumString `json:"interval_time_units"`
 	COVThreshold      schemas.Number     `json:"threshold"`
 }
 
 type COVNodeSettings struct {
-	Name              string  `json:"name"`
 	Interval          float64 `json:"interval"`
 	IntervalTimeUnits string  `json:"interval_time_units"`
 	COVThreshold      float64 `json:"threshold"`
@@ -103,10 +101,6 @@ type COVNodeSettings struct {
 
 func (inst *COVNode) buildSchema() *schemas.Schema {
 	props := &COVNodeSettingsSchema{}
-
-	// name
-	props.Name.Title = "Name"
-	props.Name.Default = "Change-Of-Value"
 
 	// time selection
 	props.Interval.Title = "Interval"
@@ -129,7 +123,7 @@ func (inst *COVNode) buildSchema() *schemas.Schema {
 				"inline": true,
 			},
 		},
-		"ui:order": array.Slice{"name", "interval", "interval_time_units", "threshold"},
+		"ui:order": array.Slice{"interval", "interval_time_units", "threshold"},
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{
