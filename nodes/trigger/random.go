@@ -57,14 +57,12 @@ func (inst *Random) Process() {
 // Custom Node Settings Schema
 
 type RandomSettingsSchema struct {
-	Name      schemas.String `json:"name"`
 	Precision schemas.Number `json:"precision"`
 	Min       schemas.Number `json:"min"`
 	Max       schemas.Number `json:"max"`
 }
 
 type RandomSettings struct {
-	Name      string  `json:"name"`
 	Precision int     `json:"precision"`
 	Min       float64 `json:"min"`
 	Max       float64 `json:"max"`
@@ -72,10 +70,6 @@ type RandomSettings struct {
 
 func (inst *Random) buildSchema() *schemas.Schema {
 	props := &RandomSettingsSchema{}
-
-	// name
-	props.Name.Title = "Name"
-	props.Name.Default = "Random"
 
 	// decimals
 	props.Precision.Title = "Precision / Decimal Places"
@@ -90,7 +84,7 @@ func (inst *Random) buildSchema() *schemas.Schema {
 	schema.Set(props)
 
 	uiSchema := array.Map{
-		"ui:order": array.Slice{"name", "min", "max", "precision"},
+		"ui:order": array.Slice{"min", "max", "precision"},
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{

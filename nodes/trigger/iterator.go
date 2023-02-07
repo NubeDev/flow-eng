@@ -175,14 +175,12 @@ func (inst *Iterate) setSubtitle(intervalDuration time.Duration, iterations int)
 // Custom Node Settings Schema
 
 type IterateSettingsSchema struct {
-	Name              schemas.String     `json:"name"`
 	Interval          schemas.Number     `json:"interval"`
 	IntervalTimeUnits schemas.EnumString `json:"interval_time_units"`
 	Iterations        schemas.Integer    `json:"iterations"`
 }
 
 type IterateSettings struct {
-	Name              string  `json:"name"`
 	Interval          float64 `json:"interval"`
 	IntervalTimeUnits string  `json:"interval_time_units"`
 	Iterations        int     `json:"iterations"`
@@ -190,10 +188,6 @@ type IterateSettings struct {
 
 func (inst *Iterate) buildSchema() *schemas.Schema {
 	props := &IterateSettingsSchema{}
-
-	// name
-	props.Name.Title = "Name"
-	props.Name.Default = "Iterate"
 
 	// time selection
 	props.Interval.Title = "Interval"
@@ -216,7 +210,7 @@ func (inst *Iterate) buildSchema() *schemas.Schema {
 				"inline": true,
 			},
 		},
-		"ui:order": array.Slice{"name", "interval", "interval_time_units", "iterations"},
+		"ui:order": array.Slice{"interval", "interval_time_units", "iterations"},
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{
