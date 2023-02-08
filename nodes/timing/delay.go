@@ -23,7 +23,7 @@ func NewDelay(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, delay, category)
 	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false)
 	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false)
-	delayInput := node.BuildInput(node.Delay, node.TypeFloat, nil, body.Inputs, true)
+	delayInput := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, true)
 	inputs := node.BuildInputs(enable, in, delayInput)
 
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
@@ -51,7 +51,7 @@ func (inst *Delay) Process() {
 
 	// if (inputFloatPtr == nil && inst.lastValue != nil) || (inputFloatPtr != nil && inst.lastValue == nil) || *inputFloatPtr != *inst.lastValue {
 	if !float.ComparePtrValues(inst.lastValue, inputFloatPtr) {
-		delayDuration, _ := inst.ReadPinAsTimeSettings(node.Delay)
+		delayDuration, _ := inst.ReadPinAsTimeSettings(node.Interval)
 		if delayDuration != inst.lastDelay {
 			inst.setSubtitle(delayDuration)
 			inst.lastDelay = delayDuration

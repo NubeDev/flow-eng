@@ -106,11 +106,11 @@ func (inst *PIDNode) setSubtitle(intervalDuration time.Duration) {
 
 type PIDNodeSettingsSchema struct {
 	Setpoint          schemas.Number     `json:"setpoint"`
-	MinOut            schemas.Number     `json:"min_out"`
-	MaxOut            schemas.Number     `json:"max_out"`
-	InP               schemas.Number     `json:"in_p"`
-	InI               schemas.Number     `json:"in_i"`
-	InD               schemas.Number     `json:"in_d"`
+	MinOut            schemas.Number     `json:"min-out"`
+	MaxOut            schemas.Number     `json:"max-out"`
+	InP               schemas.Number     `json:"in-p"`
+	InI               schemas.Number     `json:"in-i"`
+	InD               schemas.Number     `json:"in-d"`
 	Direction         schemas.Boolean    `json:"direction"`
 	Interval          schemas.Number     `json:"interval"`
 	IntervalTimeUnits schemas.EnumString `json:"interval_time_units"`
@@ -186,7 +186,7 @@ func (inst *PIDNode) buildSchema() *schemas.Schema {
 		"direction": array.Map{
 			"ui:widget": "select",
 		},
-		"ui:order": array.Slice{"enable", "setpoint", "min_out", "max_out", "in_p", "in_i", "in_d", "direction", "interval", "interval_time_units", "bias", "manual"},
+		"ui:order": array.Slice{"enable", "setpoint", "min-out", "max-out", "in-p", "in-i", "in-d", "direction", "interval", "interval_time_units", "bias", "manual"},
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{

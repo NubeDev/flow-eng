@@ -22,7 +22,7 @@ func NewAbsolute(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Absolute) Process() {
-	in, null := inst.ReadPinAsFloat(node.In1)
+	in, null := inst.ReadPinAsFloat(node.In)
 	if null {
 		inst.WritePinNull(node.Out)
 	} else {
