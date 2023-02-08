@@ -35,20 +35,20 @@ type PACControl struct {
 
 func NewPACControl(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, pacControlNode, category)
-	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, true)
+	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false)
 	zoneTemp := node.BuildInput(node.ZoneTemp, node.TypeFloat, nil, body.Inputs, false)
 	setPoint := node.BuildInput(node.Setpoint, node.TypeFloat, nil, body.Inputs, true)
 	clgOffset := node.BuildInput(node.ClgOffset, node.TypeFloat, nil, body.Inputs, true)
 	htgOffset := node.BuildInput(node.HtgOffset, node.TypeFloat, nil, body.Inputs, true)
 	stgUpDelay := node.BuildInput(node.StgUpDelay, node.TypeFloat, nil, body.Inputs, true)
 	modeChangeDelay := node.BuildInput(node.ModeChangeDelay, node.TypeFloat, nil, body.Inputs, true)
-	econoAllow := node.BuildInput(node.EconoAllow, node.TypeBool, nil, body.Inputs, true)
+	econoAllow := node.BuildInput(node.EconoAllow, node.TypeBool, nil, body.Inputs, false)
 	oaTemp := node.BuildInput(node.OATemp, node.TypeFloat, nil, body.Inputs, false)
-	econoHigh := node.BuildInput(node.EconoHigh, node.TypeFloat, nil, body.Inputs, false)
+	econoHigh := node.BuildInput(node.EconoHigh, node.TypeFloat, nil, body.Inputs, true)
 	econoLow := node.BuildInput(node.EconoLow, node.TypeFloat, nil, body.Inputs, true)
 	fanStatus := node.BuildInput(node.FanStatus, node.TypeBool, nil, body.Inputs, false)
-	clgLockout := node.BuildInput(node.ClgLockout, node.TypeBool, nil, body.Inputs, true)
-	htgLockout := node.BuildInput(node.HtgLockout, node.TypeBool, nil, body.Inputs, true)
+	clgLockout := node.BuildInput(node.ClgLockout, node.TypeBool, nil, body.Inputs, false)
+	htgLockout := node.BuildInput(node.HtgLockout, node.TypeBool, nil, body.Inputs, false)
 
 	clgMode := node.BuildOutput(node.ClgMode, node.TypeBool, nil, body.Outputs)
 	htgMode := node.BuildOutput(node.HtgMode, node.TypeBool, nil, body.Outputs)
@@ -325,35 +325,35 @@ func (inst *PACControl) DisableEconoMode() {
 type PACControlSettingsSchema struct {
 	Setpoint     schemas.Number  `json:"setpoint"`
 	SetpointMode schemas.Boolean `json:"setpoint_mode"`
-	ClgOffset    schemas.Number  `json:"clg_offset"`
-	HtgOffset    schemas.Number  `json:"htg_offset"`
-	StageDelay   schemas.Number  `json:"stage_delay"`
-	ModeDelay    schemas.Number  `json:"mode_delay"`
+	ClgOffset    schemas.Number  `json:"clg-offset"`
+	HtgOffset    schemas.Number  `json:"htg-offset"`
+	StageDelay   schemas.Number  `json:"stage-up-delay"`
+	ModeDelay    schemas.Number  `json:"mode-change-delay"`
 	// TODO: add variable number of compressors
 	EconoDeadband     schemas.Number  `json:"econo_deadband"`
-	EconoHighLimit    schemas.Number  `json:"econo_high_limit"`
-	EconoLowLimit     schemas.Number  `json:"econo_low_limit"`
+	EconoHighLimit    schemas.Number  `json:"econo-high"`
+	EconoLowLimit     schemas.Number  `json:"econo-low"`
 	RequireFan        schemas.Boolean `json:"require_fan"`
 	FanStatusOffDelay schemas.Number  `json:"fan_status_off_delay"`
-	ClgLockout        schemas.Boolean `json:"clg_lockout"`
-	HtgLockout        schemas.Boolean `json:"htg_lockout"`
+	ClgLockout        schemas.Boolean `json:"clg-lockout"`
+	HtgLockout        schemas.Boolean `json:"htg-lockout"`
 }
 
 type PACControlSettings struct {
 	Setpoint     float64 `json:"setpoint"`
 	SetpointMode bool    `json:"setpoint_mode"`
-	ClgOffset    float64 `json:"clg_offset"`
-	HtgOffset    float64 `json:"htg_offset"`
-	StageDelay   float64 `json:"stage_delay"`
-	ModeDelay    float64 `json:"mode_delay"`
+	ClgOffset    float64 `json:"clg-offset"`
+	HtgOffset    float64 `json:"htg-offset"`
+	StageDelay   float64 `json:"stage-up-delay"`
+	ModeDelay    float64 `json:"mode-change-delay"`
 	// TODO: add variable number of compressors
 	EconoDeadband     float64 `json:"econo_deadband"`
-	EconoHighLimit    float64 `json:"econo_high_limit"`
-	EconoLowLimit     float64 `json:"econo_low_limit"`
+	EconoHighLimit    float64 `json:"econo-high"`
+	EconoLowLimit     float64 `json:"econo-low"`
 	RequireFan        bool    `json:"require_fan"`
 	FanStatusOffDelay float64 `json:"fan_status_off_delay"`
-	ClgLockout        bool    `json:"clg_lockout"`
-	HtgLockout        bool    `json:"htg_lockout"`
+	ClgLockout        bool    `json:"clg-lockout"`
+	HtgLockout        bool    `json:"htg-lockout"`
 }
 
 func (inst *PACControl) buildSchema() *schemas.Schema {
@@ -406,7 +406,7 @@ func (inst *PACControl) buildSchema() *schemas.Schema {
 		"setpoint_mode": array.Map{
 			"ui:widget": "select",
 		},
-		"ui:order": array.Slice{"enable", "setpoint", "setpoint_mode", "clg_offset", "htg_offset", "stage_delay", "mode_delay", "econo_deadband", "econo_high_limit", "econo_low_limit", "require_fan", "fan_status_off_delay", "clg_lockout", "htg_lockout"},
+		"ui:order": array.Slice{"setpoint", "setpoint_mode", "clg-offset", "htg-offset", "stage-up-delay", "mode-change-delay", "econo_deadband", "econo-high", "econo-low", "require_fan", "fan_status_off_delay", "clg-lockout", "htg-lockout"},
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{

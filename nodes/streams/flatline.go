@@ -77,26 +77,26 @@ func (inst *Flatline) setSubtitle(intervalDuration time.Duration) {
 // Custom Node Settings Schema
 
 type FlatlineSettingsSchema struct {
-	Interval          schemas.Number     `json:"interval"`
-	IntervalTimeUnits schemas.EnumString `json:"interval_time_units"`
+	Delay          schemas.Number     `json:"delay"`
+	DelayTimeUnits schemas.EnumString `json:"delay_time_units"`
 }
 
 type FlatlineSettings struct {
-	Interval          float64 `json:"interval"`
-	IntervalTimeUnits string  `json:"interval_time_units"`
+	Delay          float64 `json:"delay"`
+	DelayTimeUnits string  `json:"delay_time_units"`
 }
 
 func (inst *Flatline) buildSchema() *schemas.Schema {
 	props := &FlatlineSettingsSchema{}
 	// time selection
-	props.Interval.Title = "Interval"
-	props.Interval.Default = 30
+	props.Delay.Title = "Delay"
+	props.Delay.Default = 30
 
 	// time selection
-	props.IntervalTimeUnits.Title = "Interval Units"
-	props.IntervalTimeUnits.Default = ttime.Min
-	props.IntervalTimeUnits.Options = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
-	props.IntervalTimeUnits.EnumName = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
+	props.DelayTimeUnits.Title = "Delay Units"
+	props.DelayTimeUnits.Default = ttime.Min
+	props.DelayTimeUnits.Options = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
+	props.DelayTimeUnits.EnumName = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
 
 	schema.Set(props)
 
@@ -107,7 +107,7 @@ func (inst *Flatline) buildSchema() *schemas.Schema {
 				"inline": true,
 			},
 		},
-		"ui:order": array.Slice{"interval", "interval_time_units"},
+		"ui:order": array.Slice{"delay", "delay_time_units"},
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{

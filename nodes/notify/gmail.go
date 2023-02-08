@@ -84,17 +84,17 @@ func (inst *Gmail) Process() {
 type GmailSettingsSchema struct {
 	SenderAddress    schemas.String `json:"sender-address"`
 	Password         schemas.String `json:"password"`
-	RecipientAddress schemas.String `json:"recipient-address"`
+	RecipientAddress schemas.String `json:"to"`
 	Subject          schemas.String `json:"subject"`
-	Body             schemas.String `json:"body"`
+	Body             schemas.String `json:"message"`
 }
 
 type GmailSettings struct {
 	SenderAddress    string `json:"sender-address"`
 	Password         string `json:"password"`
-	RecipientAddress string `json:"recipient-address"`
+	RecipientAddress string `json:"to"`
 	Subject          string `json:"subject"`
-	Body             string `json:"body"`
+	Body             string `json:"message"`
 }
 
 func (inst *Gmail) buildSchema() *schemas.Schema {
@@ -123,14 +123,14 @@ func (inst *Gmail) buildSchema() *schemas.Schema {
 	schema.Set(props)
 
 	uiSchema := array.Map{
-		"ui:order": array.Slice{"sender-address", "password", "recipient-address", "subject", "body"},
+		"ui:order": array.Slice{"sender-address", "password", "to", "subject", "message"},
 		"password": array.Map{
 			"ui:widget": "password",
 		},
 		"sender-address": array.Map{
 			"ui:widget": "email",
 		},
-		"recipient-address": array.Map{
+		"to": array.Map{
 			"ui:widget": "email",
 		},
 	}

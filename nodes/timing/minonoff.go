@@ -127,17 +127,17 @@ func (inst *MinOnOff) setSubtitle(minOnIntervalDuration, minOffIntervalDuration 
 // Custom Node Settings Schema
 
 type MinOnOffSettingsSchema struct {
-	MinOnInterval   schemas.Number     `json:"min_on_interval"`
-	MinOnTimeUnits  schemas.EnumString `json:"min_on_interval_time_units"`
-	MinOffInterval  schemas.Number     `json:"min_off_interval"`
-	MinOffTimeUnits schemas.EnumString `json:"min_off_interval_time_units"`
+	MinOnInterval   schemas.Number     `json:"min-on-time"`
+	MinOnTimeUnits  schemas.EnumString `json:"min-on-time_time_units"`
+	MinOffInterval  schemas.Number     `json:"min-off-time"`
+	MinOffTimeUnits schemas.EnumString `json:"min-off-time_time_units"`
 }
 
 type MinOnOffSettings struct {
-	MinOnInterval   float64 `json:"min_on_interval"`
-	MinOnTimeUnits  string  `json:"min_on_interval_time_units"`
-	MinOffInterval  float64 `json:"min_off_interval"`
-	MinOffTimeUnits string  `json:"min_off_interval_time_units"`
+	MinOnInterval   float64 `json:"min-on-time"`
+	MinOnTimeUnits  string  `json:"min-on-time_time_units"`
+	MinOffInterval  float64 `json:"min-off-time"`
+	MinOffTimeUnits string  `json:"min-off-time_time_units"`
 }
 
 func (inst *MinOnOff) buildSchema() *schemas.Schema {
@@ -175,7 +175,7 @@ func (inst *MinOnOff) buildSchema() *schemas.Schema {
 				"inline": true,
 			},
 		},
-		"ui:order": array.Slice{"min_on_interval", "min_on_interval_time_units", "min_off_interval", "min_off_interval_time_units"},
+		"ui:order": array.Slice{"min-on-time", "min-on-time_time_units", "min-off-time", "min-off-time_time_units"},
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{

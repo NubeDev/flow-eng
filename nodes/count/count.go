@@ -64,13 +64,13 @@ func (inst *Count) Process() {
 // Custom Node Settings Schema
 
 type CountSettingsSchema struct {
-	StepSize schemas.Number `json:"step_size"`
-	SetValue schemas.Number `json:"set_value"`
+	StepSize schemas.Number `json:"step-size"`
+	SetValue schemas.Number `json:"set-value"`
 }
 
 type CountSettings struct {
-	StepSize float64 `json:"step_size"`
-	SetValue float64 `json:"set_value"`
+	StepSize float64 `json:"step-size"`
+	SetValue float64 `json:"set-value"`
 }
 
 func (inst *Count) buildSchema() *schemas.Schema {
@@ -87,7 +87,7 @@ func (inst *Count) buildSchema() *schemas.Schema {
 	schema.Set(props)
 
 	uiSchema := array.Map{
-		"ui:order": array.Slice{"step_size", "set_value"},
+		"ui:order": array.Slice{"step-size", "set-value"},
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{
