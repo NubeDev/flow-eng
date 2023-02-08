@@ -99,7 +99,7 @@ func nodeDefault(body *node.Spec, nodeName, category string, application names.A
 	return body, err
 }
 
-func addPoint(ioType points.IoType, objectType points.ObjectType, id points.ObjectID, isWriteable, isIO, enable bool, application names.ApplicationName, transform *ValueTransformProperties) *points.Point {
+func addPoint(ioType points.IoType, objectType points.ObjectType, id points.ObjectID, isWriteable, isIO, enable bool, application names.ApplicationName, transform *valueTransformProperties) *points.Point {
 	point := &points.Point{
 		ObjectType:  objectType,
 		Application: application,
@@ -132,7 +132,7 @@ func topicBuilder(objectType points.ObjectType, address points.ObjectID) string 
 	return fmt.Sprintf("bacnet/%s/%d", obj, address)
 }
 
-type ValueTransformProperties struct {
+type valueTransformProperties struct {
 	Decimal     int     `json:"decimal"`
 	ScaleEnable bool    `json:"scale-enable"`
 	ScaleInMin  float64 `json:"scale-in-min"`

@@ -87,3 +87,21 @@ func UUID(prefix ...string) string {
 	}
 	return uuid
 }
+
+func CleanParentName(topic, parentNodeName string) string {
+	if parentNodeName == "" {
+		return ""
+	}
+	if strings.Contains(topic, "{") && strings.Contains(topic, "}") {
+		if strings.Contains(topic, "parent.name") {
+			cleaned := CleanName(topic)
+			return fmt.Sprintf("%s %s", parentNodeName, cleaned)
+		}
+	}
+	return ""
+}
+
+func CleanName(s string) string {
+	r := strings.Replace(s, "{parent.name}", "", -1)
+	return r
+}

@@ -3,6 +3,7 @@ package bacnetio
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/NubeDev/flow-eng/helpers"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/node"
@@ -28,12 +29,9 @@ type AI struct {
 func NewAI(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	opts = bacnetOpts(opts)
 	body = node.Defaults(body, bacnetAI, category)
-
 	var inputs []*node.Input // no inputs required
-
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
-
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
 	flowOptions := &toFlowOptions{}
@@ -63,7 +61,12 @@ func (inst *AI) Process() {
 		}
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
 		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true, inst.application, transformProps)
-		point.Name = inst.GetNodeName()
+		name := inst.GetNodeName()
+		parentTopic := helpers.CleanParentName(name, inst.GetParentName())
+		if parentTopic != "" {
+			name = parentTopic
+		}
+		point.Name = name
 		if err != nil {
 			log.Errorf("bacnet-server add new point type:%s-%d err:%s", objectType, inst.objectID, err.Error())
 			return
@@ -225,8 +228,8 @@ func (inst *AI) getSettings(body map[string]interface{}) (*AISettings, error) {
 	return settings, err
 }
 
-func (inst *AI) getTransformProps(settings *AISettings) *ValueTransformProperties {
-	transProps := ValueTransformProperties{
+func (inst *AI) getTransformProps(settings *AISettings) *valueTransformProperties {
+	transProps := valueTransformProperties{
 		settings.Decimal,
 		settings.ScaleEnable,
 		settings.ScaleInMin,

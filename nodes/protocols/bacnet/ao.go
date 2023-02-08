@@ -3,6 +3,7 @@ package bacnetio
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/NubeDev/flow-eng/helpers"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/names"
@@ -74,7 +75,7 @@ func (inst *AO) setObjectId(settings *AOSettings) {
 func (inst *AO) Process() {
 	settings, _ := inst.getSettings(inst.GetSettings())
 	// transformProps := inst.getTransformProps(settings)
-	transformProps := &ValueTransformProperties{}
+	transformProps := &valueTransformProperties{}
 	_, firstLoop := inst.Loop()
 	s := inst.GetStore()
 	if s == nil {
@@ -88,7 +89,12 @@ func (inst *AO) Process() {
 			ioType = string(points.IoTypeVolts)
 		}
 		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true, inst.application, transformProps)
-		point.Name = inst.GetNodeName()
+		name := inst.GetNodeName()
+		parentTopic := helpers.CleanParentName(name, inst.GetParentName())
+		if parentTopic != "" {
+			name = parentTopic
+		}
+		point.Name = name
 		point, err = inst.store.AddPoint(point, false)
 		if err != nil {
 			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
@@ -295,8 +301,8 @@ func (inst *AO) getSettings(body map[string]interface{}) (*AOSettings, error) {
 }
 
 /*
-func (inst *AO) getTransformProps(settings *AOSettings) *ValueTransformProperties {
-	transProps := ValueTransformProperties{
+func (inst *AO) getTransformProps(settings *AOSettings) *valueTransformProperties {
+	transProps := valueTransformProperties{
 		settings.Decimal,
 		settings.ScaleEnable,
 		settings.ScaleInMin,

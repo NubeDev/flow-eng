@@ -3,6 +3,7 @@ package bacnetio
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/NubeDev/flow-eng/helpers"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/node"
@@ -71,7 +72,12 @@ func (inst *AV) Process() {
 		inst.setObjectId(settings)
 		transformProps := inst.getTransformProps(settings)
 		point := addPoint(points.IoTypeNumber, objectType, inst.objectID, isWriteable, isIO, true, inst.application, transformProps)
-		point.Name = inst.GetNodeName()
+		name := inst.GetNodeName()
+		parentTopic := helpers.CleanParentName(name, inst.GetParentName())
+		if parentTopic != "" {
+			name = parentTopic
+		}
+		point.Name = name
 		point, err = inst.store.AddPoint(point, false)
 		if err != nil {
 			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
@@ -200,8 +206,8 @@ func (inst *AV) getSettings(body map[string]interface{}) (*AVSettings, error) {
 	return settings, err
 }
 
-func (inst *AV) getTransformProps(settings *AVSettings) *ValueTransformProperties {
-	transProps := ValueTransformProperties{
+func (inst *AV) getTransformProps(settings *AVSettings) *valueTransformProperties {
+	transProps := valueTransformProperties{
 		10,
 		false,
 		0,

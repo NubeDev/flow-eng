@@ -13,6 +13,7 @@ type Schema struct {
 	IsParent bool                     `json:"isParent"`
 	ParentId string                   `json:"parentId,omitempty"`
 	Payload  *Payload                 `json:"payload,omitempty"`
+	Children []*Schema                `json:"children,omitempty"`
 }
 
 type SchemaOutputs struct {
