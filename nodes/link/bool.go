@@ -3,12 +3,12 @@ package link
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/NubeDev/flow-eng/helpers"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
-	"strings"
 )
 
 type BoolLinkInput struct {
@@ -30,24 +30,11 @@ func NewBoolLinkInput(body *node.Spec, store *Store) (node.Node, error) {
 	return n, nil
 }
 
-func (inst *BoolLinkInput) getTopic(t string) string {
-	if strings.Contains(t, "{") && strings.Contains(t, "}") {
-		if strings.Contains(t, "parent.name") {
-			parentId := inst.GetParentId()
-			n := inst.GetNode(parentId)
-			cleaned := cleanName(t)
-			name := n.GetNodeName()
-			return fmt.Sprintf("%s %s", name, cleaned)
-		}
-	}
-	return ""
-}
-
 func (inst *BoolLinkInput) Process() {
 	in1, _ := inst.ReadPinAsBool(node.In)
 	topic := inst.ReadPinOrSettingsString(node.Topic)
 	if topic != inst.lastTopic {
-		parentTopic := inst.getTopic(topic)
+		parentTopic := helpers.CleanParentName(topic, inst.GetParentName())
 		if parentTopic != "" {
 			topic = parentTopic
 		}

@@ -19,14 +19,11 @@ type Node interface {
 	Start()
 	Process()
 	Stop()
-
 	GetCurrentState() CurrentState
 	SetCurrentState(currentState CurrentState)
-
 	ResetProcessed()
 	SetProcessed()
 	GetProcessed() bool
-
 	Loop() (count uint64, firstLoop bool)
 	AddDB(d db.DB)
 	GetDB() db.DB
@@ -71,6 +68,7 @@ type Node interface {
 	OverrideInputValue(name InputName, value interface{}) error
 	GetMetadata() *Metadata
 	GetIsParent() bool
+	GetParentName() string
 	GetParentId() string
 	SetMetadata(m *Metadata)
 	GetAllowSettings() bool
@@ -350,6 +348,14 @@ func (n *Spec) InputsLen() int {
 
 func (n *Spec) OutputsLen() int {
 	return len(n.Outputs)
+}
+
+func (n *Spec) GetParentName() string {
+	p := n.GetNode(n.ParentId)
+	if p != nil {
+		return p.GetNodeName()
+	}
+	return ""
 }
 
 func (n *Spec) GetParentId() string {
