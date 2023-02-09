@@ -1,6 +1,8 @@
 package node
 
 import (
+	"errors"
+	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/conversions"
 	log "github.com/sirupsen/logrus"
 )
@@ -82,4 +84,20 @@ func (n *Spec) WritePinBool(name OutputName, value bool) {
 	if name == out.Name {
 		out.Write(value)
 	}
+}
+
+func (n *Spec) OverrideOutputValue(name OutputName, value interface{}) error {
+	output := n.GetOutput(name)
+	if output == nil {
+		return errors.New(fmt.Sprintf("override-output-value: failed to find port %s", name))
+	}
+	for _, val := range output.Connections {
+		if val != nil && val.OverrideValue != nil {
+			val.OverrideValue = value
+		} else {
+			return errors.New(fmt.Sprintf("override-output-value: this node has no outputs"))
+		}
+	}
+
+	return nil
 }

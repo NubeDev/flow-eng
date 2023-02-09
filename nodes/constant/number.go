@@ -15,21 +15,21 @@ func NewNumber(body *node.Spec) (node.Node, error) {
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetHelp(constHelp)
 	body.SetAllowPayload()
-	body.SetPayloadType(node.TypeNumber)
+	body.SetPayloadType(node.TypeFloat)
 	return &Number{body}, nil
 }
 
 func (inst *Number) Process() {
+	// context menu payload overrides
+	v, null := inst.ReadPayloadAsFloat()
+	if !null {
+		inst.OverrideInputValue(node.In, v)
+	}
+
 	in1, null := inst.ReadPinAsFloat(node.In)
 	if null {
 		inst.WritePinNull(node.Out)
 	} else {
 		inst.WritePinFloat(node.Out, in1)
 	}
-	/*
-		v, null := inst.ReadPayloadAsFloat()
-		if !null {
-			inst.OverrideInputValue(node.In, v)
-		}
-	*/
 }
