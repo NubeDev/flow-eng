@@ -2,6 +2,7 @@ package node
 
 import (
 	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/boolean"
 	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"time"
 )
@@ -24,6 +25,23 @@ func (n *Spec) GetPayloadNull() (value any, null bool) {
 		return nil, true
 	}
 	return n.Payload.Any, false
+}
+
+func (n *Spec) ReadPayloadAsBool() (value, null bool) {
+	r := n.GetPayload()
+	if r == nil {
+		return false, true
+	}
+	if r.Any == nil {
+		return false, true
+	}
+	m, ok := r.Any.(map[string]interface{})
+	if ok {
+		for _, v := range m {
+			return boolean.NonNil(boolean.ConvertInterfaceToBool(v)), false
+		}
+	}
+	return false, true
 }
 
 func (n *Spec) ReadPayloadAsFloat() (value float64, null bool) {
@@ -52,4 +70,24 @@ func (n *Spec) ReadPayloadAsString() (value string, null bool) {
 		return "", true
 	}
 	return fmt.Sprint(r.Any), false
+}
+
+func (n *Spec) ReadPayloadAsString2() (value string, null bool) {
+	r := n.GetPayload()
+	if r == nil {
+		return "", true
+	}
+	if r.Any == nil {
+		return "", true
+	}
+	m, ok := r.Any.(map[string]interface{})
+	if ok {
+		for _, v := range m {
+			val, k := conversions.GetStringOk(v)
+			if k {
+				return val, false
+			}
+		}
+	}
+	return "", true
 }

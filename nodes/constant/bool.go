@@ -14,14 +14,22 @@ func NewBoolean(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetHelp(constHelp)
+	body.SetAllowPayload()
+	body.SetPayloadType(node.TypeBool)
 	return &Boolean{body}, nil
 }
 
 func (inst *Boolean) Process() {
-	v, null := inst.ReadPinAsBool(node.In)
+	// context menu payload overrides
+	v, null := inst.ReadPayloadAsBool()
+	if !null {
+		inst.OverrideInputValue(node.In, v)
+	}
+
+	in, null := inst.ReadPinAsBool(node.In)
 	if null {
 		inst.WritePinNull(node.Out)
 	} else {
-		inst.WritePinBool(node.Out, v)
+		inst.WritePinBool(node.Out, in)
 	}
 }
