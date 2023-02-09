@@ -1,8 +1,13 @@
 package timing
 
 import (
+	"encoding/json"
+	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/float"
+	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
+	"github.com/NubeDev/flow-eng/schemas"
+	"github.com/NubeIO/lib-schema/schema"
 	"time"
 )
 
@@ -23,15 +28,17 @@ func NewDelay(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, delay, category)
 	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false)
 	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false)
-	delayInput := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, true)
+	delayInput := node.BuildInput(node.Delay, node.TypeFloat, nil, body.Inputs, true)
 	inputs := node.BuildInputs(enable, in, delayInput)
 
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	body.SetSchema(buildDefaultSchema())
 	delayArray := make([]*DelayTimer, 0)
-	return &Delay{body, delayArray, nil, 1 * time.Second, nil}, nil
+
+	n := &Delay{body, delayArray, nil, 5 * time.Second, nil}
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
 func (inst *Delay) Process() {
@@ -49,13 +56,14 @@ func (inst *Delay) Process() {
 		inputFloatPtr = nil
 	}
 
+	delayDuration, _ := inst.ReadPinAsTimeSettings(node.Delay)
+	if delayDuration != inst.lastDelay {
+		inst.setSubtitle(delayDuration)
+		inst.lastDelay = delayDuration
+	}
+
 	// if (inputFloatPtr == nil && inst.lastValue != nil) || (inputFloatPtr != nil && inst.lastValue == nil) || *inputFloatPtr != *inst.lastValue {
 	if !float.ComparePtrValues(inst.lastValue, inputFloatPtr) {
-		delayDuration, _ := inst.ReadPinAsTimeSettings(node.Interval)
-		if delayDuration != inst.lastDelay {
-			inst.setSubtitle(delayDuration)
-			inst.lastDelay = delayDuration
-		}
 
 		newDelay := &DelayTimer{false, nil}
 		newDelay.Timer = time.AfterFunc(delayDuration, func() {
@@ -113,4 +121,59 @@ func (inst *Delay) Stop() {
 func (inst *Delay) setSubtitle(intervalDuration time.Duration) {
 	subtitleText := intervalDuration.String()
 	inst.SetSubTitle(subtitleText)
+}
+
+// Custom Node Settings Schema
+
+type DelaySettingsSchema struct {
+	Delay          schemas.Number     `json:"delay"`
+	DelayTimeUnits schemas.EnumString `json:"delay_time_units"`
+}
+
+type DelaySettings struct {
+	Delay          float64 `json:"delay"`
+	DelayTimeUnits string  `json:"delay_time_units"`
+}
+
+func (inst *Delay) buildSchema() *schemas.Schema {
+	props := &DelaySettingsSchema{}
+	// time selection
+	props.Delay.Title = "Delay"
+	props.Delay.Default = 1
+
+	// time selection
+	props.DelayTimeUnits.Title = "Delay Units"
+	props.DelayTimeUnits.Default = ttime.Sec
+	props.DelayTimeUnits.Options = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
+	props.DelayTimeUnits.EnumName = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
+
+	schema.Set(props)
+
+	uiSchema := array.Map{
+		"interval_time_units": array.Map{
+			"ui:widget": "radio",
+			"ui:options": array.Map{
+				"inline": true,
+			},
+		},
+		"ui:order": array.Slice{"delay", "delay_time_units"},
+	}
+	s := &schemas.Schema{
+		Schema: schemas.SchemaBody{
+			Title:      "Node Settings",
+			Properties: props,
+		},
+		UiSchema: uiSchema,
+	}
+	return s
+}
+
+func (inst *Delay) getSettings(body map[string]interface{}) (*DelaySettings, error) {
+	settings := &DelaySettings{}
+	marshal, err := json.Marshal(body)
+	if err != nil {
+		return settings, err
+	}
+	err = json.Unmarshal(marshal, &settings)
+	return settings, err
 }

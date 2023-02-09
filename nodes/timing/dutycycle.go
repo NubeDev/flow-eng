@@ -53,13 +53,16 @@ func (inst *DutyCycle) Process() {
 	if intervalDuration <= 0 {
 		intervalDuration = 10 * time.Second
 	}
-	if intervalDuration != inst.lastInterval {
-		inst.setSubtitle(intervalDuration)
-	}
 
 	dutyCyclePerc := inst.ReadPinOrSettingsFloat(node.DutyCycle)
 	if dutyCyclePerc < 0 || dutyCyclePerc > 100 {
 		dutyCyclePerc = 50
+	}
+
+	if intervalDuration != inst.lastInterval || dutyCyclePerc != inst.lastDuty {
+		inst.setSubtitle(intervalDuration, dutyCyclePerc)
+		inst.lastInterval = intervalDuration
+		inst.lastDuty = dutyCyclePerc
 	}
 
 	// Check if there are settings that require a restart
@@ -131,8 +134,8 @@ func (inst *DutyCycle) Stop() {
 	inst.disableDutyCycle()
 }
 
-func (inst *DutyCycle) setSubtitle(intervalDuration time.Duration) {
-	subtitleText := intervalDuration.String()
+func (inst *DutyCycle) setSubtitle(intervalDuration time.Duration, dutyCycle float64) {
+	subtitleText := fmt.Sprintf("interval %v  duty-cycle: %v%%", intervalDuration.String(), dutyCycle)
 	inst.SetSubTitle(subtitleText)
 }
 
@@ -141,20 +144,20 @@ func (inst *DutyCycle) setSubtitle(intervalDuration time.Duration) {
 type DutyCycleSettingsSchema struct {
 	Interval  schemas.Number     `json:"interval"`
 	TimeUnits schemas.EnumString `json:"interval_time_units"`
-	DutyCycle schemas.Number     `json:"duty_cycle"`
+	DutyCycle schemas.Number     `json:"duty-cycle"`
 }
 
 type DutyCycleSettings struct {
 	Interval  float64 `json:"interval"`
 	TimeUnits string  `json:"interval_time_units"`
-	DutyCycle float64 `json:"duty_cycle"`
+	DutyCycle float64 `json:"duty-cycle"`
 }
 
 func (inst *DutyCycle) buildSchema() *schemas.Schema {
 	props := &DutyCycleSettingsSchema{}
 	// time selection
 	props.Interval.Title = "Period"
-	props.Interval.Default = 1
+	props.Interval.Default = 10
 
 	// time selection
 	props.TimeUnits.Title = "Period Units"
