@@ -1,7 +1,7 @@
 package timing
 
 import (
-	"github.com/NubeDev/flow-eng/helpers/timer"
+	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 	"time"
 )
@@ -13,7 +13,7 @@ type DelayOn struct {
 	lastDelay  time.Duration
 }
 
-func NewDelayOn(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
+func NewDelayOn(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, delayOn, category)
 	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs, false) // TODO: this input shouldn't have a manual override value
 	delayInput := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, true)
@@ -24,8 +24,11 @@ func NewDelayOn(body *node.Spec, timer timer.TimedDelay) (node.Node, error) {
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(buildDefaultSchema())
+	for _, input := range body.Inputs {
+		fmt.Println(fmt.Sprintf("NewDelayOn() INPUTS: %+v", input))
+	}
 
-	return &DelayOn{body, nil, false, 1 * time.Second}, nil
+	return &DelayOn{body, nil, false, 0}, nil
 }
 
 /*
