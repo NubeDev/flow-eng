@@ -58,7 +58,7 @@ func isNil(i interface{}) bool {
 	return i == nil || reflect.ValueOf(i).IsNil()
 }
 
-func settingName(n string) string {
+func inputWithSettingName(n string) string {
 	return fmt.Sprintf("[%s]", n)
 }
 
@@ -84,7 +84,7 @@ func (n *Spec) ReadPinOrSettingsFloat(name InputName) float64 {
 			if val.Kind() == reflect.Map {
 				for _, e := range val.MapKeys() {
 					v := val.MapIndex(e)
-					if settingName(e.String()) == input.SettingName {
+					if e.String() == input.SettingName {
 						f, ok := conversions.GetFloatOk(v)
 						if ok {
 							return f
@@ -107,7 +107,7 @@ func (n *Spec) ReadPinOrSettingsBool(name InputName) bool {
 			if val.Kind() == reflect.Map {
 				for _, e := range val.MapKeys() {
 					v := val.MapIndex(e)
-					if settingName(e.String()) == input.SettingName {
+					if e.String() == input.SettingName {
 						f := boolean.ConvertInterfaceToBool(v)
 						if f != nil && *f {
 							return true
@@ -137,7 +137,7 @@ func (n *Spec) ReadPinOrSettingsString(name InputName) string {
 			if val.Kind() == reflect.Map {
 				for _, e := range val.MapKeys() {
 					v := val.MapIndex(e)
-					if settingName(e.String()) == input.SettingName {
+					if e.String() == input.SettingName {
 						s, ok := conversions.GetStringOk(v)
 						if ok {
 							return s
@@ -158,13 +158,12 @@ func (n *Spec) ReadPinAsTimeSettings(name InputName) (time.Duration, error) {
 	name = InputName(fmt.Sprintf("[%s]", name))
 
 	input := n.GetInput(name)
-
 	if n.Settings != nil {
 		val := reflect.ValueOf(n.Settings)
 		if val.Kind() == reflect.Map {
 			for _, e := range val.MapKeys() {
 				v := val.MapIndex(e)
-				if settingName(e.String()) == input.SettingName {
+				if e.String() == input.SettingName {
 					f, ok := conversions.GetFloatOk(v)
 					if ok {
 						settingsAmount = f
@@ -201,7 +200,6 @@ func (n *Spec) ReadPinAsTimeSettings(name InputName) (time.Duration, error) {
 		}
 		useThisAmount = inputAmount
 	}
-
 	durationResult := ttime.Duration(useThisAmount, units)
 	return durationResult, nil
 }

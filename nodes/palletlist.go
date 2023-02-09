@@ -8,7 +8,6 @@ import (
 
 	"github.com/NubeDev/flow-eng/db"
 	"github.com/NubeDev/flow-eng/helpers/store"
-	"github.com/NubeDev/flow-eng/helpers/timer"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/boolean"
 	"github.com/NubeDev/flow-eng/nodes/compare"
@@ -152,8 +151,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	// time
 	delay, _ := timing.NewDelay(nil)
-	delayOn, _ := timing.NewDelayOn(nil, nil)
-	delayOff, _ := timing.NewDelayOff(nil, nil)
+	delayOn, _ := timing.NewDelayOn(nil)
+	delayOff, _ := timing.NewDelayOff(nil)
 	dutyCycle, _ := timing.NewDutyCycle(nil)
 	minOnOff, _ := timing.NewMinOnOff(nil)
 	oneShot, _ := timing.NewOneShot(nil)
@@ -780,9 +779,9 @@ func builderTiming(body *node.Spec) (node.Node, error) {
 	case delay:
 		return timing.NewDelay(body)
 	case delayOn:
-		return timing.NewDelayOn(body, timer.NewTimer())
+		return timing.NewDelayOn(body)
 	case delayOff:
-		return timing.NewDelayOff(body, timer.NewTimer())
+		return timing.NewDelayOff(body)
 	case dutyCycle:
 		return timing.NewDutyCycle(body)
 	case minOnOff:

@@ -40,7 +40,7 @@ func newInput(body *Input) *Input {
 		false,
 		0,
 		false,
-		"",
+		body.SettingName,
 	}
 }
 
