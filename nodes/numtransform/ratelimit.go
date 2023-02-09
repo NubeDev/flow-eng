@@ -18,6 +18,7 @@ type RateLimit struct {
 	lastStep     float64
 	lastOutput   float64
 	lastInterval time.Duration
+	lastUpdate   int64
 }
 
 func NewRateLimit(body *node.Spec) (node.Node, error) {
@@ -34,7 +35,7 @@ func NewRateLimit(body *node.Spec) (node.Node, error) {
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
-	n := &RateLimit{body, true, 0, 0, 1 * time.Second}
+	n := &RateLimit{body, true, 0, 0, 1 * time.Second, 0}
 	n.SetSchema(n.buildSchema())
 	return n, nil
 }
@@ -56,27 +57,36 @@ func (inst *RateLimit) Process() {
 	if !enable || inNull {
 		inst.WritePinFloat(node.Out, 0)
 		inst.lastOutput = 0
+		return
 	} else {
 		if reset && !inst.lastReset {
 			inst.lastOutput = input
+			inst.WritePinFloat(node.Out, input)
+			inst.lastUpdate = time.Now().Unix()
+			return
 		}
-		change := input - inst.lastOutput
-		if math.Abs(change) >= step {
-			if change < 0 {
-				output = inst.lastOutput - step
+		if time.Unix(inst.lastUpdate, 0).Add(inst.lastInterval).Before(time.Now()) {
+			fmt.Println("RECALCULATE")
+			fmt.Println("lastOutput: ", inst.lastOutput)
+			inst.lastUpdate = time.Now().Unix()
+			change := input - inst.lastOutput
+			if math.Abs(change) >= step {
+				if change < 0 {
+					output = inst.lastOutput - step
+				} else {
+					output = inst.lastOutput + step
+				}
 			} else {
-				output = inst.lastOutput + step
+				output = inst.lastOutput + change
 			}
-		} else {
-			output = inst.lastOutput + step
+			inst.lastOutput = output
 		}
-		inst.WritePinFloat(node.Out, output)
-		inst.lastOutput = output
+		inst.WritePinFloat(node.Out, inst.lastOutput)
 	}
 }
 
 func (inst *RateLimit) setSubtitle(intervalDuration time.Duration, stepSize float64) {
-	subtitleText := fmt.Sprintf("%f every %s", stepSize, intervalDuration.String())
+	subtitleText := fmt.Sprintf("%v every %s", stepSize, intervalDuration.String())
 	inst.SetSubTitle(subtitleText)
 }
 

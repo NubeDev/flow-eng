@@ -2,6 +2,7 @@ package count
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
@@ -14,6 +15,8 @@ type Count struct {
 	lastReset     bool
 	lastCountUp   bool
 	lastCountDown bool
+	lastStepSize  float64
+	lastSetVal    float64
 }
 
 func NewCount(body *node.Spec) (node.Node, error) {
@@ -28,15 +31,15 @@ func NewCount(body *node.Spec) (node.Node, error) {
 	out := node.BuildOutput(node.CountOut, node.TypeFloat, nil, body.Outputs)
 	body.Outputs = node.BuildOutputs(out)
 
-	n := &Count{body, 0, true, true, true}
+	n := &Count{body, 0, true, true, true, 0, 0}
 	n.SetSchema(n.buildSchema())
 	return n, nil
 }
 
 func (inst *Count) Process() {
 	reset, _ := inst.ReadPinAsBool(node.Reset)
+	setVal := inst.ReadPinOrSettingsFloat(node.SetValue)
 	if reset && !inst.lastReset {
-		setVal := inst.ReadPinOrSettingsFloat(node.SetValue)
 		inst.count = setVal
 	}
 	inst.lastReset = reset
@@ -44,6 +47,12 @@ func (inst *Count) Process() {
 	stepSize := inst.ReadPinOrSettingsFloat(node.StepSize)
 	if stepSize < 0 {
 		stepSize = 1
+	}
+
+	if stepSize != inst.lastStepSize || setVal != inst.lastSetVal {
+		inst.setSubtitle(stepSize, setVal)
+		inst.lastStepSize = stepSize
+		inst.lastSetVal = setVal
 	}
 
 	countUp, _ := inst.ReadPinAsBool(node.CountUp)
@@ -59,6 +68,11 @@ func (inst *Count) Process() {
 	inst.lastCountDown = countDown
 
 	inst.WritePinFloat(node.CountOut, inst.count)
+}
+
+func (inst *Count) setSubtitle(step, set float64) {
+	subtitleText := fmt.Sprintf("step-size %v   set-value: %v", step, set)
+	inst.SetSubTitle(subtitleText)
 }
 
 // Custom Node Settings Schema

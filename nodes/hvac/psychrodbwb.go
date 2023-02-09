@@ -2,6 +2,7 @@ package hvac
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/psychrometrics"
 	"github.com/NubeDev/flow-eng/node"
@@ -12,8 +13,9 @@ import (
 
 type PsychroDBWB struct {
 	*node.Spec
-	unitSystem string
-	isImperial bool
+	unitSystem   string
+	isImperial   bool
+	lastAltitude float64
 }
 
 func NewPsychroDBWB(body *node.Spec) (node.Node, error) {
@@ -33,7 +35,7 @@ func NewPsychroDBWB(body *node.Spec) (node.Node, error) {
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
-	n := &PsychroDBWB{body, "Metric/SI", false}
+	n := &PsychroDBWB{body, "Metric/SI", false, 1}
 	n.SetSchema(n.buildSchema())
 	return n, nil
 }
@@ -43,11 +45,12 @@ func (inst *PsychroDBWB) Process() {
 	units := settings.UnitSystem
 	altitude := settings.Altitude
 
-	if units != inst.unitSystem {
-		inst.setSubtitle()
+	if units != inst.unitSystem || altitude != inst.lastAltitude {
+		inst.setSubtitle(units, altitude)
 		inst.unitSystem = units
-
+		inst.lastAltitude = altitude
 	}
+
 	if units == "Metric/SI" {
 		inst.isImperial = false
 	} else {
@@ -82,8 +85,13 @@ func (inst *PsychroDBWB) Process() {
 
 }
 
-func (inst *PsychroDBWB) setSubtitle() {
-	subtitleText := inst.unitSystem
+func (inst *PsychroDBWB) setSubtitle(units string, altitude float64) {
+	subtitleText := ""
+	if units == "Metric/SI" {
+		subtitleText = fmt.Sprintf("units %v   altitude: %vm", units, altitude)
+	} else {
+		subtitleText = fmt.Sprintf("units %v   altitude: %vf", units, altitude)
+	}
 	inst.SetSubTitle(subtitleText)
 }
 

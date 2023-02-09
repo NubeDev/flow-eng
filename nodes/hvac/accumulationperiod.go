@@ -2,6 +2,7 @@ package hvac
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
@@ -19,6 +20,7 @@ type AccumulationPeriod struct {
 	lastPeriodConsumption     float64
 	cron                      *cron.Cron
 	cronExp                   string
+	lastPeriodSetting         int
 }
 
 func NewAccumulationPeriod(body *node.Spec) (node.Node, error) {
@@ -34,7 +36,7 @@ func NewAccumulationPeriod(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(periodConsumption, lastAccum, periodDuration, nextTrigger)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
-	n := &AccumulationPeriod{body, 0, 0, 0, nil, ""}
+	n := &AccumulationPeriod{body, 0, 0, 0, nil, "", 0}
 	n.SetSchema(n.buildSchema())
 	return n, nil
 }
@@ -43,6 +45,12 @@ func (inst *AccumulationPeriod) Process() {
 	if inst.cron == nil {
 		settings, _ := inst.getSettings(inst.GetSettings())
 		period := settings.AccumulationPeriod
+
+		if period != inst.lastPeriodSetting {
+			inst.setSubtitle(float64(period))
+			inst.lastPeriodSetting = period
+		}
+
 		cronExp := ""
 		if period <= 60 {
 			cronExp = "*/" + strconv.Itoa(period) + " * * * *"
@@ -81,6 +89,11 @@ func (inst *AccumulationPeriod) calculateAccumulation() {
 
 func (inst *AccumulationPeriod) Stop() {
 	inst.cron.Stop()
+}
+
+func (inst *AccumulationPeriod) setSubtitle(period float64) {
+	subtitleText := fmt.Sprintf("period %v minutes", period)
+	inst.SetSubTitle(subtitleText)
 }
 
 // Custom Node Settings Schema
