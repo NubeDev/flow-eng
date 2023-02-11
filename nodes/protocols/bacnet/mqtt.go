@@ -73,9 +73,24 @@ func (inst *Server) mqttPublishPV(point *points.Point) error {
 		log.Error(err)
 		return err
 	}
-	topic := fmt.Sprintf("bacnet/%s/%d/write/pv", obj, objectId) // bacnet/ao/1/write/pv
-	// topic := fmt.Sprintf("bacnet/%s/%d/write/pri/15", obj, objectId) // bacnet/ao/1/write/pv
 	payload := buildPayload("", point.PresentValue)
+	topic := fmt.Sprintf("bacnet/%s/%d/write/pv", obj, objectId) // bacnet/ao/1/write/pv
+	if point.IsWriteable {
+		// highest := points.GetHighest(point.WriteValue)
+		in14, in15 := points.GetWriteArrayValues(point.WriteValue)
+
+		if in14 != nil { // if values are null we need to set bacnet server back to null
+			topic = fmt.Sprintf("bacnet/%s/%d/write/pri/14", obj, objectId) // bacnet/ao/1/write/pv
+
+		}
+		if in15 != nil {
+			topic = fmt.Sprintf("bacnet/%s/%d/write/pri/15", obj, objectId) // bacnet/ao/1/write/pv
+		}
+
+	}
+
+	//
+
 	log.Infof("mqtt-bacnet publish topic: %s -> value: %s", topic, payload)
 	if payload != "" {
 		err = inst.clients.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload)
