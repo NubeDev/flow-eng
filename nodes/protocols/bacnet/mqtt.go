@@ -89,8 +89,6 @@ func (inst *Server) mqttPublishPV(point *points.Point) error {
 
 	}
 
-	//
-
 	log.Infof("mqtt-bacnet publish topic: %s -> value: %s", topic, payload)
 	if payload != "" {
 		err = inst.clients.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload)
