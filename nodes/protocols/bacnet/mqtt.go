@@ -80,11 +80,11 @@ func (inst *Server) mqttPublishPV(point *points.Point) error {
 		in14, in15 := points.GetWriteArrayValues(point.WriteValue)
 
 		if in14 != nil { // if values are null we need to set bacnet server back to null
-			topic = fmt.Sprintf("bacnet/%s/%d/write/pri/14", obj, objectId) // bacnet/ao/1/write/pv
+			// topic = fmt.Sprintf("bacnet/%s/%d/write/pri/14", obj, objectId) // bacnet/ao/1/write/pv
 
 		}
 		if in15 != nil {
-			topic = fmt.Sprintf("bacnet/%s/%d/write/pri/15", obj, objectId) // bacnet/ao/1/write/pv
+			// topic = fmt.Sprintf("bacnet/%s/%d/write/pri/15", obj, objectId) // bacnet/ao/1/write/pv
 		}
 
 	}
