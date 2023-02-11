@@ -20,7 +20,9 @@ func selectIO16() string {
 	return "0"
 }
 
-var ioOptions = []string{"Select an IO-16", "1x IO-16", "2x IO-16s", "3x IO-16s", "4x IO-16s"}
+const noDevices = "Select an IO-16"
+
+var ioOptions = []string{noDevices, "1x IO-16", "2x IO-16s", "3x IO-16s", "4x IO-16s"}
 var serialPorts = []string{"/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyAMA0"}
 
 func BuildSchemaServer() *schemas.Schema {

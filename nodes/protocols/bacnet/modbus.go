@@ -1,6 +1,7 @@
 package bacnetio
 
 import (
+	"errors"
 	"fmt"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/services/modbuscli"
@@ -10,16 +11,18 @@ import (
 	"time"
 )
 
-// modbus will come from polling
-// this is to only work for the IO-16
-func (inst *Server) modbusRunner(settings map[string]interface{}) {
-	log.Info("start modbus-runner")
+const errNoDevices = "no IO16 where selected so dont inti modbus"
+
+func (inst *Server) initModbus(settings map[string]interface{}) (*modbuscli.Modbus, error) {
 	schema, err := GetBacnetSchema(settings)
 	if err != nil {
 		log.Error(err)
 		inst.SetStatusError("failed to set node settings")
 		inst.SetErrorIcon(string(emoji.RedCircle))
-		return
+		return nil, err
+	}
+	if schema.DeviceCount == noDevices {
+		return nil, errors.New(errNoDevices)
 	}
 	port := "/dev/ttyAMA0"
 	if schema.Serial != "" {
@@ -36,16 +39,35 @@ func (inst *Server) modbusRunner(settings map[string]interface{}) {
 		inst.SetStatusError(fmt.Sprintf("failed to set serial port: %s", port))
 		inst.SetErrorIcon(string(emoji.RedCircle))
 		log.Error(err)
-		return
+		return nil, err
+	}
+	return init, nil
+}
+
+// modbus will come from polling
+// this is to only work for the IO-16
+func (inst *Server) modbusRunner(settings map[string]interface{}) {
+	log.Info("start modbus-runner")
+
+	mb, err := inst.initModbus(settings)
+	var dontPollModbus bool
+	if err != nil {
+		if err.Error() == errNoDevices {
+			dontPollModbus = true
+		} else {
+			return
+		}
 	}
 	var count int64
 	for {
 		log.Infof("modbus polling loop count: %d application-type: %s", count, inst.application)
 		inst.pollingCount = count
 		pointsListRead, _ := inst.getPointsReadOnly()
-		inst.modbusInputsRunner(init, pointsListRead) // process the inputs
-		time.Sleep(modbusDelay * time.Millisecond)
-		inst.modbusOutputsDispatch(init)
+		if !dontPollModbus {
+			inst.modbusInputsRunner(mb, pointsListRead) // process the inputs
+			time.Sleep(modbusDelay * time.Millisecond)
+			inst.modbusOutputsDispatch(mb)
+		}
 		go inst.writeRunner() // publish all mqtt values
 		time.Sleep(500 * time.Millisecond)
 		inst.SetNotifyMessage(pollStats(inst.pollingCount))
