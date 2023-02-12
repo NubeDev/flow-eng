@@ -3,19 +3,23 @@ package modbuscli
 import (
 	"errors"
 	"github.com/NubeIO/nubeio-rubix-lib-modbus-go/modbus"
+	"time"
 )
 
 type Modbus struct {
-	IsSerial    bool
-	Address     string
-	Port, Slave int
-	Serial      *modbus.Serial
-	client      *modbus.Client
+	IsSerial             bool
+	Address              string
+	Port, Slave, Timeout int
+	Serial               *modbus.Serial
+	client               *modbus.Client
 }
 
 func (inst *Modbus) Init(opts *Modbus) (*Modbus, error) {
 	if opts.Port == 0 {
 		opts.Port = 502
+	}
+	if opts.Timeout <= 100 {
+		opts.Timeout = 100
 	}
 	mbClient := &modbus.Client{
 		HostIP:   opts.Address,
@@ -23,10 +27,12 @@ func (inst *Modbus) Init(opts *Modbus) (*Modbus, error) {
 		IsSerial: opts.IsSerial,
 		Serial:   opts.Serial,
 	}
+
 	mbClient, err := mbClient.New()
 	if err != nil {
 		return nil, err
 	}
+	mbClient.RTUClientHandler.Timeout = time.Duration(opts.Timeout) * time.Millisecond
 	m := &Modbus{
 		IsSerial: opts.IsSerial,
 		Address:  opts.Address,

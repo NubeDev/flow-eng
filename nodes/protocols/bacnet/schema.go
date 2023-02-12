@@ -3,21 +3,14 @@ package bacnetio
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
 )
 
 type serverSchema struct {
-	DeviceCount schemas.EnumString `json:"deviceCount"`
-	Serial      schemas.EnumString `json:"serial"`
-}
-
-func selectIO16() string {
-	for i, _ := range ioOptions {
-		return fmt.Sprintf("%d", i)
-	}
-	return "0"
+	DeviceCount schemas.EnumString   `json:"deviceCount"`
+	Serial      schemas.EnumString   `json:"serial"`
+	Timeout     schemas.NumberLimits `json:"timeout"`
 }
 
 const noDevices = "Select an IO-16"
@@ -35,6 +28,10 @@ func BuildSchemaServer() *schemas.Schema {
 	props.Serial.Default = serialPorts[2]
 	props.Serial.EnumName = serialPorts
 	props.Serial.Options = serialPorts
+	props.Timeout.Title = "timeout (ms)"
+	props.Timeout.Default = 100
+	props.Timeout.Min = 100
+	props.Timeout.Max = 20000
 	schema.Set(props)
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{
@@ -49,102 +46,11 @@ func BuildSchemaServer() *schemas.Schema {
 type BacnetSchema struct {
 	DeviceCount string `json:"deviceCount"`
 	Serial      string `json:"serial"`
+	Timeout     int    `json:"timeout"`
 }
 
 func GetBacnetSchema(body map[string]interface{}) (*BacnetSchema, error) {
 	settings := &BacnetSchema{}
-	marshal, err := json.Marshal(body)
-	if err != nil {
-		return settings, err
-	}
-	err = json.Unmarshal(marshal, &settings)
-	return settings, err
-}
-
-type nodeUISchema struct {
-	Io          schemas.EnumString     `json:"ioType"`
-	Decimal     schemas.Number         `json:"decimal"`
-	Offset      schemas.NumberNoLimits `json:"offset"`
-	ScaleEnable schemas.Boolean        `json:"scaleEnable"`
-	ScaleInMin  schemas.NumberNoLimits `json:"scaleInMin"`
-	ScaleInMax  schemas.NumberNoLimits `json:"scaleInMax"`
-	ScaleOutMin schemas.NumberNoLimits `json:"scaleOutMin"`
-	ScaleOutMax schemas.NumberNoLimits `json:"scaleOutMax"`
-}
-
-type nodeSchema struct {
-	Io      schemas.EnumString     `json:"ioType"`
-	Decimal schemas.Number         `json:"decimal"`
-	Offset  schemas.NumberNoLimits `json:"offset"`
-}
-
-func buildSchemaUI() *schemas.Schema {
-	props := &nodeUISchema{}
-	props.Io.Title = "io-type"
-	props.Io.Default = string(points.IoTypeVolts)
-	props.Io.Options = []string{string(points.IoTypeVolts), string(points.IoTypeDigital), string(points.IoTypeTemp), string(points.IoTypeCurrent)}
-	props.Io.EnumName = []string{string(points.IoTypeVolts), string(points.IoTypeDigital), string(points.IoTypeTemp), string(points.IoTypeCurrent)}
-
-	props.Decimal.Title = "decimal places"
-	props.Decimal.Default = 2
-
-	props.Offset.Title = "offset"
-	props.Offset.Default = 0
-
-	props.ScaleEnable.Title = "enable scale"
-	props.ScaleInMin.Title = "scale in min"
-	props.ScaleInMax.Title = "scale in max"
-	props.ScaleOutMin.Title = "scale out min"
-	props.ScaleOutMax.Title = "scale out max"
-
-	schema.Set(props)
-	s := &schemas.Schema{
-		Schema: schemas.SchemaBody{
-			Title:      "point-settings",
-			Properties: props,
-		},
-		UiSchema: nil,
-	}
-	return s
-}
-
-func buildSchemaUO() *schemas.Schema {
-	props := &nodeSchema{}
-	props.Io.Title = "io-type"
-	props.Io.Default = string(points.IoTypeVolts)
-	props.Io.Options = []string{string(points.IoTypeVolts), string(points.IoTypeDigital)}
-	props.Io.EnumName = []string{string(points.IoTypeVolts), string(points.IoTypeDigital)}
-
-	props.Decimal.Title = "decimal places"
-	props.Decimal.Default = 2
-
-	props.Offset.Title = "offset"
-	props.Offset.Default = 0
-
-	schema.Set(props)
-	s := &schemas.Schema{
-		Schema: schemas.SchemaBody{
-			Title:      "point-settings",
-			Properties: props,
-		},
-		UiSchema: nil,
-	}
-	return s
-}
-
-type nodeSettings struct {
-	Io          string  `json:"ioType"`
-	Decimal     int     `json:"decimal"`
-	Offset      float64 `json:"offset"`
-	ScaleEnable bool    `json:"scaleEnable"`
-	ScaleInMin  float64 `json:"scaleInMin"`
-	ScaleInMax  float64 `json:"scaleInMax"`
-	ScaleOutMin float64 `json:"scaleOutMin"`
-	ScaleOutMax float64 `json:"scaleOutMax"`
-}
-
-func getSettings(body map[string]interface{}) (*nodeSettings, error) {
-	settings := &nodeSettings{}
 	marshal, err := json.Marshal(body)
 	if err != nil {
 		return settings, err
