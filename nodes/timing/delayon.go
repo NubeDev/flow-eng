@@ -1,7 +1,6 @@
 package timing
 
 import (
-	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 	"time"
 )
@@ -24,10 +23,6 @@ func NewDelayOn(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(buildDefaultSchema())
-	for _, input := range body.Inputs {
-		fmt.Println(fmt.Sprintf("NewDelayOn() INPUTS: %+v", input))
-	}
-
 	return &DelayOn{body, nil, false, 0}, nil
 }
 
