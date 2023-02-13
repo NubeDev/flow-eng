@@ -52,6 +52,7 @@ func convertInputs(node *node.Spec) []*PalletInputs {
 		one.ValueType = string(input.DataType)
 		one.FolderExport = input.FolderExport
 		one.HideInput = input.HideInput
+		one.DefaultValue = input.Connection.DefaultValue
 		all = append(all, one)
 	}
 	return all

@@ -387,9 +387,10 @@ type InputConnection struct {
 	NodePort      OutputName  `json:"nodePort,omitempty"`
 	OverrideValue interface{} `json:"overrideValue,omitempty"` // used for when the user has no node link and writes the value direct (or can be used to override a value)
 	CurrentValue  interface{} `json:"currentValue,omitempty"`
-	FallbackValue interface{} `json:"fallbackValue,omitempty"`
-	Hide          bool        `json:"hide"`
-	Disable       bool        `json:"disable,omitempty"`
+	// FallbackValue interface{} `json:"fallbackValue,omitempty"`
+	DefaultValue interface{} `json:"defaultValue,omitempty"`
+	Hide         bool        `json:"hide"`
+	Disable      bool        `json:"disable,omitempty"`
 }
 
 type OutputConnection struct {
