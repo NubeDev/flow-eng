@@ -64,9 +64,6 @@ func (p *Input) GetValue() interface{} {
 		if p.Connection.OverrideValue != nil {
 			return p.Connection.OverrideValue
 		}
-		if p.Connection.FallbackValue != nil {
-			return p.Connection.FallbackValue
-		}
 	}
 	return p.value
 }

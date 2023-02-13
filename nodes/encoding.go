@@ -41,6 +41,7 @@ func Encode(graph *flowctrl.Flow) (*NodesList, error) {
 				inputsLinks := node.SchemaInputs{}
 				inputsLinks.Position = input.Position
 				inputsLinks.OverridePosition = input.OverridePosition
+				inputsLinks.DefaultValue = input.Connection.DefaultValue
 				// check the input has links
 				destOutputName := input.Connection.NodePort
 				if destOutputName != "" {
