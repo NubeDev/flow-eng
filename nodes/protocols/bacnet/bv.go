@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers"
 	"github.com/NubeDev/flow-eng/helpers/array"
+	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
@@ -12,6 +13,7 @@ import (
 	"github.com/NubeDev/flow-eng/services/mqttclient"
 	"github.com/NubeIO/lib-schema/schema"
 	log "github.com/sirupsen/logrus"
+	"math"
 )
 
 type BV struct {
@@ -61,7 +63,7 @@ func (inst *BV) setObjectId(settings *BVSettings) {
 }
 
 func (inst *BV) Process() {
-	_, firstLoop := inst.Loop()
+	loop, firstLoop := inst.Loop()
 	s := inst.GetStore()
 	if s == nil {
 		return
@@ -86,7 +88,7 @@ func (inst *BV) Process() {
 	}
 
 	in14, in15 := fromFlow(inst, inst.objectID)
-	pnt := inst.writePointPri(points.BinaryVariable, inst.objectID, in14, in15)
+	pnt := inst.writePointPri(points.BinaryVariable, inst.objectID, in14, in15, loop)
 	if pnt != nil {
 		inst.WritePinFloat(node.Out, pnt.PresentValue, 2)
 		currentPriority := points.GetHighest(pnt.WriteValue)
@@ -118,36 +120,73 @@ func (inst *BV) getPoint(objType points.ObjectType, id points.ObjectID) *points.
 	return nil
 }
 
-func (inst *BV) writePointPri(objType points.ObjectType, id points.ObjectID, in14, in15 *float64) *points.Point {
+func (inst *BV) writePointPri(objType points.ObjectType, id points.ObjectID, in14, in15 *float64, loop uint64) *points.Point {
 	p := inst.getPoint(objType, id)
 	if p == nil {
 		return nil
 	}
+
+	rewrite := math.Mod(float64(loop), rewriteValuesToBACnetEveryNumLoops+float64(p.ObjectID)) == 0 // this is a periodic rewrite with a loop offset based on ObjectID so that all the MQTT updates don't fire at the same time.
+	updatePoint := false
 	if p.WriteValueFromBACnet != nil {
-		p.WriteValueFromBACnet.P14 = in14
-		p.WriteValueFromBACnet.P15 = in15
-		p.WriteValue = p.WriteValueFromBACnet
-		currentPriority := points.GetHighest(p.WriteValue)
-		if currentPriority != nil {
-			p.PresentValue = currentPriority.Value
+
+		if p.WriteValue == nil {
+			p.PendingMQTTPublish = true
+			updatePoint = true
+			p.WriteValue = points.NewPriArray(in14, in15)
 		}
-		inst.updatePoint(objType, id, p)
-		return p
+
+		bacnetPriority := points.GetHighest(p.WriteValueFromBACnet)
+		currentPriority := points.GetHighest(p.WriteValue)
+
+		// this prevents re-updating the point with a null priority array on every loop.  It doesn't set any values
+		if bacnetPriority == nil && currentPriority == nil {
+			bacnetPriority = &points.PriAndValue{Number: 16, Value: 0}
+			currentPriority = &points.PriAndValue{Number: 16, Value: 0}
+		}
+
+		if rewrite || bacnetPriority == nil || currentPriority == nil || bacnetPriority.Number != currentPriority.Number || bacnetPriority.Value != currentPriority.Value || !float.ComparePtrValues(p.WriteValue.P14, in14) || !float.ComparePtrValues(p.WriteValue.P15, in15) {
+			fmt.Println(fmt.Sprintf("[BV] BEFORE ON REWRITE current priority WriteValue: %+v", p.WriteValue))
+			fmt.Println(fmt.Sprintf("[BV] BEFORE ON REWRITE current priority WriteValueFromBACnet: %+v", p.WriteValueFromBACnet))
+
+			p.PendingMQTTPublish = true
+			p.WriteValue = p.WriteValueFromBACnet
+			p.WriteValue.P14 = in14
+			p.WriteValue.P15 = in15
+			fmt.Println(fmt.Sprintf("[BV] ON REWRITE current priority WriteValue: %+v", p.WriteValue))
+			fmt.Println(fmt.Sprintf("[BV] ON REWRITE current priority WriteValueFromBACnet: %+v", p.WriteValueFromBACnet))
+
+			highestPriority := points.GetHighest(p.WriteValue)
+			if highestPriority != nil {
+				p.PresentValue = highestPriority.Value
+			} else {
+				p.PresentValue = 0 // TODO: replace this once PresentValue is type *float64
+			}
+			inst.updatePoint(objType, id, p)
+		}
+
 	} else {
 		if p.WriteValue == nil {
+			p.PendingMQTTPublish = true
+			updatePoint = true
 			p.WriteValue = points.NewPriArray(in14, in15)
-		} else {
+		} else if rewrite || !float.ComparePtrValues(p.WriteValue.P14, in14) || !float.ComparePtrValues(p.WriteValue.P15, in15) {
+			p.PendingMQTTPublish = true
+			updatePoint = true
 			p.WriteValue.P14 = in14
 			p.WriteValue.P15 = in15
 		}
-		currentPriority := points.GetHighest(p.WriteValue)
-		if currentPriority != nil {
-			p.PresentValue = currentPriority.Value
+		if updatePoint {
+			currentPriority := points.GetHighest(p.WriteValue)
+			if currentPriority != nil {
+				p.PresentValue = currentPriority.Value
+			} else {
+				p.PresentValue = 0 // TODO: replace this once PresentValue is type *float64
+			}
+			inst.updatePoint(objType, id, p)
 		}
-		inst.updatePoint(objType, id, p)
-		return p
 	}
-
+	return p
 }
 
 func (inst *BV) updatePoint(objType points.ObjectType, id points.ObjectID, point *points.Point) error {

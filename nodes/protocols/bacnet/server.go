@@ -134,16 +134,14 @@ func (inst *Server) getPV(objType points.ObjectType, id points.ObjectID) (float6
 func (inst *Server) writePV(objType points.ObjectType, id points.ObjectID, value float64) error {
 	pnt, ok := inst.getPoint(objType, id)
 	if ok {
-		pnt.PresentValue = conversions.ValueTransformOnRead(value, pnt.ScaleEnable, pnt.Factor, pnt.ScaleInMin, pnt.ScaleInMax, pnt.ScaleOutMin, pnt.ScaleOutMax, pnt.Offset)
-		/*
-			if pnt.ScaleEnable {
-				value = float.Scale(value, pnt.ScaleInMin, pnt.ScaleInMax, pnt.ScaleOutMin, pnt.ScaleOutMax)
+		newPV := conversions.ValueTransformOnRead(value, pnt.ScaleEnable, pnt.Factor, pnt.ScaleInMin, pnt.ScaleInMax, pnt.ScaleOutMin, pnt.ScaleOutMax, pnt.Offset)
+		if newPV != pnt.PresentValue {
+			pnt.PendingMQTTPublish = true
+			pnt.PresentValue = newPV
+			err := inst.updatePoint(objType, id, pnt)
+			if err != nil {
+				return err
 			}
-			pnt.PresentValue = value * pnt.Offset
-		*/
-		err := inst.updatePoint(objType, id, pnt)
-		if err != nil {
-			return err
 		}
 	}
 	return nil

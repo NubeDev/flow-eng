@@ -8,11 +8,10 @@ import (
 )
 
 func buildPayload(value string, valueFloat float64) string {
-	var v string = value
-	if v == "" {
-		v = fmt.Sprintf("%f", valueFloat)
+	if value == "" {
+		value = fmt.Sprintf("%f", valueFloat)
 	}
-	payload := &points.BacnetPayload{Value: v, UUID: helpers.ShortUUID("pay")}
+	payload := &points.BacnetPayload{Value: value, UUID: helpers.ShortUUID("pay")}
 	p, err := json.Marshal(payload)
 	if err != nil {
 		return ""
@@ -22,6 +21,18 @@ func buildPayload(value string, valueFloat float64) string {
 
 func buildPayloadName(value string) string {
 	payload := &points.BacnetPayload{Value: value, UUID: helpers.ShortUUID("pay")}
+	p, err := json.Marshal(payload)
+	if err != nil {
+		return ""
+	}
+	return string(p)
+}
+
+func buildPayloadWithoutUUID(value string, valueFloat float64) string {
+	if value == "" {
+		value = fmt.Sprintf("%f", valueFloat)
+	}
+	payload := &points.BacnetPayload{Value: value, UUID: ""}
 	p, err := json.Marshal(payload)
 	if err != nil {
 		return ""
