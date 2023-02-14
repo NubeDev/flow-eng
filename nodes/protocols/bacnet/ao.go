@@ -106,7 +106,7 @@ func (inst *AO) Process() {
 	in14, in15 := fromFlow(inst, inst.objectID)
 	pnt := inst.writePointPri(points.AnalogOutput, inst.objectID, in14, in15, loop)
 	if pnt != nil {
-		value := modbusScaleOutput(pnt.PresentValue, pnt.Offset)
+		value := modbusScaleOutput(*pnt.PresentValue, pnt.Offset)
 		inst.WritePinFloat(node.Out, value, 2)
 		currentPriority := points.GetHighest(pnt.WriteValue)
 		if currentPriority != nil {
@@ -128,12 +128,12 @@ func scaleAO(value float64, isBO bool) float64 {
 	return float.Scale(value, 0, 100, 0, 10)
 }
 
-func (inst *AO) getPV(objType points.ObjectType, id points.ObjectID) (float64, error) {
+func (inst *AO) getPV(objType points.ObjectType, id points.ObjectID) (*float64, error) {
 	pnt := inst.getPoint(objType, id)
 	if pnt != nil {
 		return pnt.PresentValue, nil
 	}
-	return 0, nil
+	return float.New(0), nil
 }
 
 func (inst *AO) getPoint(objType points.ObjectType, id points.ObjectID) *points.Point {
@@ -179,7 +179,7 @@ func (inst *AO) writePointPri(objType points.ObjectType, id points.ObjectID, in1
 
 			highestPriority := points.GetHighest(p.WriteValue)
 			if highestPriority != nil {
-				p.PresentValue = highestPriority.Value
+				p.PresentValue = float.New(highestPriority.Value)
 			}
 			inst.updatePoint(objType, id, p)
 		}
@@ -200,7 +200,7 @@ func (inst *AO) writePointPri(objType points.ObjectType, id points.ObjectID, in1
 				p.WriteValue.P15 = float.New(0) // sets the output to OFF as default
 				currentPriority = &points.PriAndValue{Number: 15, Value: 0}
 			}
-			p.PresentValue = currentPriority.Value
+			p.PresentValue = float.New(currentPriority.Value)
 			inst.updatePoint(objType, id, p)
 		}
 	}

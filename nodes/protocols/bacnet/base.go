@@ -51,7 +51,7 @@ const (
 	typeBV = "bv"
 )
 
-const rewriteValuesToBACnetEveryNumLoops = float64(10)
+const rewriteValuesToBACnetEveryNumLoops = float64(100)
 
 func getBacnetType(nodeName string) (obj points.ObjectType, isWriteable, isIO bool, err error) {
 	switch nodeName {

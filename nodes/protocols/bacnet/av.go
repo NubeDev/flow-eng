@@ -64,7 +64,6 @@ func (inst *AV) setObjectId(settings *AVSettings) {
 
 func (inst *AV) Process() {
 	loop, firstLoop := inst.Loop()
-	fmt.Println("LOOP:", loop) // TESTING
 	s := inst.GetStore()
 	if s == nil {
 		return
@@ -91,22 +90,28 @@ func (inst *AV) Process() {
 	in14, in15 := fromFlow(inst, inst.objectID)
 	pnt := inst.writePointPri(points.AnalogVariable, inst.objectID, in14, in15, loop)
 	if pnt != nil {
-		inst.WritePinFloat(node.Out, pnt.PresentValue, 2)
+		if pnt.PresentValue == nil {
+			inst.WritePinNull(node.Out)
+		} else {
+			inst.WritePinFloat(node.Out, *pnt.PresentValue, 2)
+		}
 		currentPriority := points.GetHighest(pnt.WriteValue)
 		if currentPriority != nil {
 			inst.WritePinFloat(node.CurrentPriority, float64(currentPriority.Number), 0)
+		} else {
+			inst.WritePinNull(node.CurrentPriority)
 		}
 	} else {
 		inst.WritePinNull(node.Out)
 	}
 }
 
-func (inst *AV) getPV(objType points.ObjectType, id points.ObjectID) (float64, error) {
+func (inst *AV) getPV(objType points.ObjectType, id points.ObjectID) (*float64, error) {
 	pnt := inst.getPoint(objType, id)
 	if pnt != nil {
 		return pnt.PresentValue, nil
 	}
-	return 0, nil
+	return float.New(0), nil
 }
 
 func (inst *AV) getPoint(objType points.ObjectType, id points.ObjectID) *points.Point {
@@ -150,20 +155,13 @@ func (inst *AV) writePointPri(objType points.ObjectType, id points.ObjectID, in1
 			fmt.Println(fmt.Sprintf("[AV] BEFORE ON REWRITE current priority WriteValue: %+v", p.WriteValue))
 			fmt.Println(fmt.Sprintf("[AV] BEFORE ON REWRITE current priority WriteValueFromBACnet: %+v", p.WriteValueFromBACnet))
 
+			updatePoint = true
 			p.PendingMQTTPublish = true
 			p.WriteValue = p.WriteValueFromBACnet
 			p.WriteValue.P14 = in14
 			p.WriteValue.P15 = in15
 			fmt.Println(fmt.Sprintf("[AV] ON REWRITE current priority WriteValue: %+v", p.WriteValue))
 			fmt.Println(fmt.Sprintf("[AV] ON REWRITE current priority WriteValueFromBACnet: %+v", p.WriteValueFromBACnet))
-
-			highestPriority := points.GetHighest(p.WriteValue)
-			if highestPriority != nil {
-				p.PresentValue = highestPriority.Value
-			} else {
-				p.PresentValue = 0 // TODO: replace this once PresentValue is type *float64
-			}
-			inst.updatePoint(objType, id, p)
 		}
 
 	} else {
@@ -177,15 +175,15 @@ func (inst *AV) writePointPri(objType points.ObjectType, id points.ObjectID, in1
 			p.WriteValue.P14 = in14
 			p.WriteValue.P15 = in15
 		}
-		if updatePoint {
-			currentPriority := points.GetHighest(p.WriteValue)
-			if currentPriority != nil {
-				p.PresentValue = currentPriority.Value
-			} else {
-				p.PresentValue = 0 // TODO: replace this once PresentValue is type *float64
-			}
-			inst.updatePoint(objType, id, p)
+	}
+	if updatePoint {
+		highestPriority := points.GetHighest(p.WriteValue)
+		if highestPriority != nil {
+			p.PresentValue = float.New(highestPriority.Value)
+		} else {
+			p.PresentValue = nil
 		}
+		inst.updatePoint(objType, id, p)
 	}
 	return p
 }

@@ -81,20 +81,22 @@ func (inst *Server) mqttPublishPV(point *points.Point) error {
 			payload := ""
 			topic := ""
 
-			if false { // THIS WOULD BE USED FOR OUTPUT POINTS THAT DON'T USE THE PRIOIRTY ARRAY (ONLY PRESENT VALUE)
-				payload = buildPayload("", point.PresentValue)
-				topic = fmt.Sprintf("bacnet/%s/%d/write/pv", obj, objectId) // bacnet/ai/1/write/pv
-				log.Infof("mqtt-bacnet publish (bacnet output) topic: %s -> value: %s", topic, payload)
-				if payload != "" {
-					err = inst.clients.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload)
-					if err != nil {
-						log.Errorf("bacnet-server: mqtt publish (bacnet output) err: %s", err.Error())
-						return err
-					} else {
-						point.PendingMQTTPublish = false
-						updatePoint = true
+			if false { // THIS WOULD BE USED FOR OUTPUT POINTS THAT DON'T USE THE PRIORITY ARRAY (ONLY PRESENT VALUE)
+				/*
+					payload = buildPayload("", point.PresentValue)
+					topic = fmt.Sprintf("bacnet/%s/%d/write/pv", obj, objectId) // bacnet/ai/1/write/pv
+					log.Infof("mqtt-bacnet publish (bacnet output) topic: %s -> value: %s", topic, payload)
+					if payload != "" {
+						err = inst.clients.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload)
+						if err != nil {
+							log.Errorf("bacnet-server: mqtt publish (bacnet output) err: %s", err.Error())
+							return err
+						} else {
+							point.PendingMQTTPublish = false
+							updatePoint = true
+						}
 					}
-				}
+				*/
 			} else {
 				// highest := points.GetHighest(point.WriteValue)
 				in14, in15 := points.GetWriteArrayValues(point.WriteValue)
@@ -138,31 +140,14 @@ func (inst *Server) mqttPublishPV(point *points.Point) error {
 						updatePoint = true
 					}
 				}
-
-				/* // TESTING:
-				topic = fmt.Sprintf("bacnet/%s/%d/write/pri/9", obj, objectId)
-				payload = buildPayloadWithoutUUID("", 1)
-
-				log.Infof("mqtt-bacnet publish (TEST) topic: %s -> value: %s", topic, payload)
-				if payload != "" {
-					err = inst.clients.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload)
-					if err != nil {
-						log.Errorf("bacnet-server: mqtt publish (TEST) err: %s", err.Error())
-						return err
-					} else {
-						point.PendingMQTTPublish = false
-						updatePoint = true
-					}
-				}
-				//
-
-				*/
-
 			}
 		}
 	} else {
 		if point.PendingMQTTPublish {
-			payload := buildPayload("", point.PresentValue)
+			payload := buildPayload("null", 0)
+			if point.PresentValue != nil {
+				payload = buildPayload("", *point.PresentValue)
+			}
 			topic := fmt.Sprintf("bacnet/%s/%d/write/pv", obj, objectId) // bacnet/ai/1/write/pv
 			log.Infof("mqtt-bacnet publish (bacnet input) topic: %s -> value: %s", topic, payload)
 			if payload != "" {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers"
 	"github.com/NubeDev/flow-eng/helpers/array"
+	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
@@ -84,7 +85,11 @@ func (inst *AI) Process() {
 	if err != nil {
 		return
 	}
-	inst.WritePinFloat(node.Out, pv, settings.Decimal)
+	if pv == nil {
+		inst.WritePinNull(node.Out)
+	} else {
+		inst.WritePinFloat(node.Out, *pv, settings.Decimal)
+	}
 }
 
 func (inst *AI) setObjectId(settings *AISettings) {
@@ -103,13 +108,13 @@ func (inst *AI) setObjectId(settings *AISettings) {
 	}
 }
 
-func (inst *AI) getPV(objType points.ObjectType, id points.ObjectID) (float64, error) {
+func (inst *AI) getPV(objType points.ObjectType, id points.ObjectID) (*float64, error) {
 	pnt, ok := inst.getPoint(objType, id)
 	// fmt.Println(fmt.Sprintf("AI getPV() pnt.PresentValue: %v", pnt.PresentValue))
 	if ok {
 		return pnt.PresentValue, nil
 	}
-	return 0, nil
+	return float.New(0), nil
 }
 
 func (inst *AI) getPoint(objType points.ObjectType, id points.ObjectID) (*points.Point, bool) {
@@ -182,11 +187,9 @@ func (inst *AI) buildSchema() *schemas.Schema {
 
 	props.ScaleInMin.Title = "Scale: Input Min"
 	props.ScaleInMin.Default = 0
-	props.ScaleInMin.ReadOnly = true
 
 	props.ScaleInMax.Title = "Scale: Input Max"
 	props.ScaleInMax.Default = 10
-	props.ScaleInMax.ReadOnly = true
 
 	props.ScaleOutMin.Title = "Scale/Limit: Output Min"
 	props.ScaleOutMin.Default = 0
