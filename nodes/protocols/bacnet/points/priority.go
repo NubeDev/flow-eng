@@ -179,7 +179,7 @@ func GetWriteArrayValues(payload *PriArray) (in14, in15 *float64) {
 		payload = &PriArray{}
 	}
 	if payload.P14 != nil {
-		in14 = payload.P4
+		in14 = payload.P14
 	}
 	if payload.P15 != nil {
 		in15 = payload.P15
@@ -273,7 +273,7 @@ func (inst *Payload) cleanArray(payload string) *PriArray {
 	return arr
 }
 
-//object bacnet/ao/1/pv
+// object bacnet/ao/1/pv
 func object(topic string) ObjectType {
 	parts := strings.Split(topic, "/")
 	if len(parts) >= 2 {
@@ -302,7 +302,7 @@ func object(topic string) ObjectType {
 	return ""
 }
 
-//object bacnet/ao/1/pv
+// object bacnet/ao/1/pv
 func objectId(topic string) (int, error) {
 	parts := strings.Split(topic, "/")
 	if len(parts) >= 2 {

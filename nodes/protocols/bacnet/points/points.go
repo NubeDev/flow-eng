@@ -15,7 +15,7 @@ type Point struct {
 	IsWriteable                 bool
 	Enable                      bool
 	ValueFromRead               float64
-	PresentValue                float64
+	PresentValue                *float64
 	Offset                      float64
 	ScaleEnable                 bool
 	ScaleInMin                  float64

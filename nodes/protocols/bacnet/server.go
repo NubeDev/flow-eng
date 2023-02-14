@@ -3,6 +3,7 @@ package bacnetio
 import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/conversions"
+	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
@@ -122,28 +123,26 @@ func setUUID(parentID string, objType points.ObjectType, id points.ObjectID) str
 	return fmt.Sprintf("%s:%s:%d", parentID, objType, id)
 }
 
-func (inst *Server) getPV(objType points.ObjectType, id points.ObjectID) (float64, error) {
+func (inst *Server) getPV(objType points.ObjectType, id points.ObjectID) (*float64, error) {
 	pnt, ok := inst.getPoint(objType, id)
 	if ok {
 		return pnt.PresentValue, nil
 
 	}
-	return 0, nil
+	return float.New(0), nil
 }
 
 func (inst *Server) writePV(objType points.ObjectType, id points.ObjectID, value float64) error {
 	pnt, ok := inst.getPoint(objType, id)
 	if ok {
-		pnt.PresentValue = conversions.ValueTransformOnRead(value, pnt.ScaleEnable, pnt.Factor, pnt.ScaleInMin, pnt.ScaleInMax, pnt.ScaleOutMin, pnt.ScaleOutMax, pnt.Offset)
-		/*
-			if pnt.ScaleEnable {
-				value = float.Scale(value, pnt.ScaleInMin, pnt.ScaleInMax, pnt.ScaleOutMin, pnt.ScaleOutMax)
+		newPV := conversions.ValueTransformOnRead(value, pnt.ScaleEnable, pnt.Factor, pnt.ScaleInMin, pnt.ScaleInMax, pnt.ScaleOutMin, pnt.ScaleOutMax, pnt.Offset)
+		if pnt.PresentValue == nil || newPV != *pnt.PresentValue {
+			pnt.PendingMQTTPublish = true
+			pnt.PresentValue = float.New(newPV)
+			err := inst.updatePoint(objType, id, pnt)
+			if err != nil {
+				return err
 			}
-			pnt.PresentValue = value * pnt.Offset
-		*/
-		err := inst.updatePoint(objType, id, pnt)
-		if err != nil {
-			return err
 		}
 	}
 	return nil
