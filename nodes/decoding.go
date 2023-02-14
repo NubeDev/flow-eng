@@ -5,6 +5,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Decode the flow from react-flow to the flow-eng in correct format
 func Decode(encodedNodes *NodesList) ([]*node.Spec, error) {
 	var decodedNodes []*node.Spec
 	for _, encodedNode := range encodedNodes.Nodes {

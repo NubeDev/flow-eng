@@ -25,7 +25,7 @@ func inputHelp(opts ...*InputsOpts) (help InputHelp) {
 	return inputsOptions(opts...).Help
 }
 
-func BuildInput(portName InputName, dataType DataTypes, fallback interface{}, inputs []*Input, hasSetting bool, opts ...*InputsOpts) *Input {
+func BuildInput(portName InputName, dataType DataTypes, defaultValue interface{}, inputs []*Input, hasSetting bool, opts ...*InputsOpts) *Input {
 	var settingName string
 	if hasSetting {
 		settingName = string(portName)
@@ -44,8 +44,8 @@ func BuildInput(portName InputName, dataType DataTypes, fallback interface{}, in
 	}
 	for _, input := range inputs {
 		if input.Name == portName {
-			if input.Connection.FallbackValue == nil {
-				port.Connection.FallbackValue = fallback
+			if input.Connection.DefaultValue == nil {
+				port.Connection.DefaultValue = defaultValue
 			}
 			addConnections = true
 			if input.Connection != nil { // this would be when the flow comes from json
@@ -53,7 +53,6 @@ func BuildInput(portName InputName, dataType DataTypes, fallback interface{}, in
 			} else {
 				port.Connection = &InputConnection{}
 			}
-			// port.SettingName = string(portName)
 		}
 	}
 	if !addConnections {

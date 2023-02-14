@@ -23,6 +23,7 @@ type SchemaOutputs struct {
 
 type SchemaInputs struct {
 	Value            interface{}   `json:"value,omitempty"`
+	DefaultValue     interface{}   `json:"defaultValue,omitempty"`
 	Links            []SchemaLinks `json:"links,omitempty"`
 	Position         int           `json:"position"`
 	OverridePosition bool          `json:"overridePosition"`
