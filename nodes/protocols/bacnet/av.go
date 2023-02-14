@@ -152,16 +152,16 @@ func (inst *AV) writePointPri(objType points.ObjectType, id points.ObjectID, in1
 		}
 
 		if rewrite || bacnetPriority == nil || currentPriority == nil || bacnetPriority.Number != currentPriority.Number || bacnetPriority.Value != currentPriority.Value || !float.ComparePtrValues(p.WriteValue.P14, in14) || !float.ComparePtrValues(p.WriteValue.P15, in15) {
-			fmt.Println(fmt.Sprintf("[AV] BEFORE ON REWRITE current priority WriteValue: %+v", p.WriteValue))
-			fmt.Println(fmt.Sprintf("[AV] BEFORE ON REWRITE current priority WriteValueFromBACnet: %+v", p.WriteValueFromBACnet))
+			// fmt.Println(fmt.Sprintf("[AV] BEFORE ON REWRITE current priority WriteValue: %+v", p.WriteValue))
+			// fmt.Println(fmt.Sprintf("[AV] BEFORE ON REWRITE current priority WriteValueFromBACnet: %+v", p.WriteValueFromBACnet))
 
 			updatePoint = true
 			p.PendingMQTTPublish = true
 			p.WriteValue = p.WriteValueFromBACnet
 			p.WriteValue.P14 = in14
 			p.WriteValue.P15 = in15
-			fmt.Println(fmt.Sprintf("[AV] ON REWRITE current priority WriteValue: %+v", p.WriteValue))
-			fmt.Println(fmt.Sprintf("[AV] ON REWRITE current priority WriteValueFromBACnet: %+v", p.WriteValueFromBACnet))
+			// fmt.Println(fmt.Sprintf("[AV] ON REWRITE current priority WriteValue: %+v", p.WriteValue))
+			// fmt.Println(fmt.Sprintf("[AV] ON REWRITE current priority WriteValueFromBACnet: %+v", p.WriteValueFromBACnet))
 		}
 
 	} else {
