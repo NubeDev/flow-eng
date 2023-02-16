@@ -16,8 +16,12 @@ func NewSubFlowInputFloat(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *InputFloat) Process() {
-	v, _ := inst.ReadPinAsFloat(node.In)
-	inst.WritePinFloat(node.Out, v)
+	v, null := inst.ReadPinAsFloat(node.In)
+	if null {
+		inst.WritePinNull(node.Out)
+	} else {
+		inst.WritePinFloat(node.Out, v)
+	}
 }
 
 type InputBool struct {
@@ -34,8 +38,12 @@ func NewSubFlowInputBool(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *InputBool) Process() {
-	v, _ := inst.ReadPinAsBool(node.In)
-	inst.WritePinBool(node.Out, v)
+	v, null := inst.ReadPinAsBool(node.In)
+	if null {
+		inst.WritePinNull(node.Out)
+	} else {
+		inst.WritePinBool(node.Out, v)
+	}
 }
 
 type InputString struct {
@@ -69,8 +77,12 @@ func NewSubFlowOutputFloat(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *OutputFloat) Process() {
-	v, _ := inst.ReadPinAsFloat(node.In)
-	inst.WritePinFloat(node.Out, v)
+	v, null := inst.ReadPinAsFloat(node.In)
+	if null {
+		inst.WritePinNull(node.Out)
+	} else {
+		inst.WritePinFloat(node.Out, v)
+	}
 }
 
 type OutputBool struct {
@@ -87,8 +99,12 @@ func NewSubFlowOutputBool(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *OutputBool) Process() {
-	v, _ := inst.ReadPinAsBool(node.In)
-	inst.WritePinBool(node.Out, v)
+	v, null := inst.ReadPinAsBool(node.In)
+	if null {
+		inst.WritePinNull(node.Out)
+	} else {
+		inst.WritePinBool(node.Out, v)
+	}
 }
 
 type OutputString struct {
