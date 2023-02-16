@@ -25,7 +25,7 @@ func (inst *CompareEqual) Process() {
 	a, aNull := inst.ReadPinAsFloat(node.In1)
 	b, bNull := inst.ReadPinAsFloat(node.In2)
 
-	if (aNull && bNull) || a == b {
+	if (aNull && bNull) || (!aNull && !bNull && a == b) {
 		inst.WritePinBool(node.Equal, true)
 		inst.WritePinBool(node.NotEqual, false)
 		return
