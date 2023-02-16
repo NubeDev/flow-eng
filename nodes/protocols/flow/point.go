@@ -113,18 +113,17 @@ func (inst *FFPoint) Process() {
 	if firstLoop {
 		inst.setTopic()
 	}
-	if loopCount%50 == 0 {
+	if loopCount%retryCount == 0 {
 		inst.checkStillExists()
 	}
 	val, null := inst.GetPayloadNull()
-	var wroteValue bool
+	var writeNull bool
 	if null {
-		inst.WritePinNull(node.Out)
+		writeNull = true
 	} else {
 		p, value, currentPri, err := parseCOV(val)
 		if err == nil && p != nil {
 			inst.lastPayload = p
-			wroteValue = true
 			inst.WritePinFloat(node.Out, value, 2)
 			inst.WritePinFloat(node.CurrentPriority, float64(currentPri))
 			if inst.lastValue != value {
@@ -133,10 +132,14 @@ func (inst *FFPoint) Process() {
 			} else {
 				inst.WritePin(node.LastUpdated, ttime.TimeSince(inst.lastUpdate))
 			}
+		} else {
+			writeNull = true
 		}
 	}
-	if !wroteValue {
+	if writeNull { // make sure we return some values
 		inst.WritePinNull(node.Out)
+		inst.WritePinNull(node.CurrentPriority)
+		inst.WritePinNull(node.LastUpdated)
 	}
 }
 

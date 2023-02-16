@@ -213,7 +213,7 @@ func (n *Spec) GetStore() *store.Store {
 
 // Loop will give you the loop count and a flag if it's the first loop
 func (n *Spec) Loop() (loopCount uint64, firstLoop bool) {
-	if n.loopCount == 0 {
+	if n.loopCount == 1 {
 		firstLoop = true
 	} else {
 		firstLoop = false

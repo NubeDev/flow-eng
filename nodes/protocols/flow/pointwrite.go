@@ -134,20 +134,27 @@ func (inst *FFPointWrite) Process() {
 	if firstLoop {
 		inst.setTopic()
 	}
-	if loopCount%50 == 0 {
+	if loopCount%retryCount == 0 {
 		inst.setTopic()
 		inst.checkStillExists()
 	}
 	val := inst.GetPayload()
+	var writeNull bool
 	if val == nil {
-		inst.WritePinNull(node.Out)
+		writeNull = true
 	} else {
 		_, value, currentPri, err := parseCOV(val.Any)
 		if err == nil {
 			inst.WritePinFloat(node.Out, value)
 			inst.WritePinFloat(node.CurrentPriority, float64(currentPri))
 			inst.lastUpdate = val.LastUpdate
+		} else {
+			writeNull = true
 		}
+	}
+	if writeNull {
+		inst.WritePinNull(node.Out)
+		inst.WritePinNull(node.CurrentPriority)
 	}
 	inst.WritePin(node.LastUpdated, ttime.TimeSince(inst.lastUpdate))
 

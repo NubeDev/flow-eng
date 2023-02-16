@@ -13,6 +13,8 @@ func setError(body *node.Spec, message string) *node.Spec {
 	return body
 }
 
+var retryCount uint64 = 200
+
 const (
 	category       = "flow"
 	flowNetwork    = "flow-network"

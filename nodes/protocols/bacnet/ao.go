@@ -114,6 +114,7 @@ func (inst *AO) Process() {
 		}
 	} else {
 		inst.WritePinNull(node.Out)
+		inst.WritePinNull(node.CurrentPriority)
 	}
 }
 

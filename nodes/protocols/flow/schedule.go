@@ -6,6 +6,7 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
+	"github.com/enescakir/emoji"
 	log "github.com/sirupsen/logrus"
 	"time"
 )
@@ -16,6 +17,7 @@ type FFSchedule struct {
 	lastPayload *covPayload
 	lastValue   bool
 	lastUpdate  time.Time
+	hasWritten  bool
 }
 
 func NewFFSchedule(body *node.Spec) (node.Node, error) {
@@ -30,7 +32,7 @@ func NewFFSchedule(body *node.Spec) (node.Node, error) {
 	body.SetAllowSettings()
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body = node.SetNoParent(body)
-	pnt := &FFSchedule{body, "", nil, false, time.Now()}
+	pnt := &FFSchedule{body, "", nil, false, time.Now(), false}
 	return pnt, nil
 }
 
@@ -69,12 +71,14 @@ func (inst *FFSchedule) getResult() {
 				inst.lastValue = value
 				inst.lastUpdate = time.Now()
 			}
+			inst.hasWritten = true
 			inst.WritePinBool(node.Out, value)
 			inst.WritePin(node.LastUpdated, ttime.TimeSince(inst.lastUpdate))
 			inst.WritePinFloat(node.OutPayload, schedule.Payload)
 			inst.WritePin(node.NextStart, schedule.NextStartString)
 			inst.WritePin(node.NextStop, schedule.NextStopString)
 			inst.SetSubTitle(schedule.Name)
+			inst.SetWaringIcon(string(emoji.GreenCircle))
 		}
 	}
 
@@ -82,12 +86,20 @@ func (inst *FFSchedule) getResult() {
 
 func (inst *FFSchedule) Process() {
 	loopCount, _ := inst.Loop()
-	if loopCount == 3 {
+	if loopCount == 20 {
+		inst.getResult()
+	} else if loopCount%50 == 0 {
 		inst.getResult()
 	}
-	if loopCount%50 == 0 {
-		inst.getResult()
+	if !inst.hasWritten {
+		inst.WritePinNull(node.Out)
+		inst.WritePinNull(node.LastUpdated)
+		inst.WritePinNull(node.OutPayload)
+		inst.WritePinNull(node.NextStart)
+		inst.WritePinNull(node.NextStop)
+		inst.SetWaringIcon(string(emoji.OrangeCircle))
 	}
+
 }
 
 func (inst *FFSchedule) GetSchema() *schemas.Schema {

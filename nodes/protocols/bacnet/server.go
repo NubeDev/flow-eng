@@ -103,7 +103,7 @@ func (inst *Server) Process() {
 		}
 	}
 	inst.loopCount = loopCount
-	if loopCount%100 == 0 {
+	if loopCount%200 == 0 {
 		go inst.mqttReconnect()
 		p, ok := inst.getPoints()
 		if ok {

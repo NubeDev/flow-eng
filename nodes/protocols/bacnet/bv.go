@@ -103,6 +103,7 @@ func (inst *BV) Process() {
 		}
 	} else {
 		inst.WritePinNull(node.Out)
+		inst.WritePinNull(node.CurrentPriority)
 	}
 }
 

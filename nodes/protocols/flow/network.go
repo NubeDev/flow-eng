@@ -110,17 +110,29 @@ func (inst *Network) Process() {
 		go inst.schedulesList()
 		go inst.publish(loopCount)
 	}
-	if loopCount%100 == 0 {
+	var retry bool
+	if loopCount == 10 {
+		retry = true
+	}
+	if loopCount%retryCount == 0 {
+		retry = true
+	}
+
+	if retry {
 		if !inst.mqttConnected {
+			log.Errorf("flow-network: reset mqtt connection as first time failed loop-count: %d", loopCount)
 			go inst.setConnection()
 		}
 		if inst.subscribeFailedPoints || !inst.mqttConnected {
+			log.Errorf("flow-network: reset subscribe to each point as first time failed: %d", loopCount)
 			go inst.subscribeToEachPoint()
 		}
 		if inst.subscribeFailedPointsList || !inst.mqttConnected {
+			log.Errorf("flow-network: reset fetch points list as first time failed: %d", loopCount)
 			go inst.pointsList()
 		}
 		if inst.subscribeFailedSchedulesList || !inst.mqttConnected {
+			log.Errorf("flow-network: reset fetch schedule list as first time failed: %d", loopCount)
 			go inst.schedulesList()
 		}
 	}
@@ -133,12 +145,13 @@ func (inst *Network) Process() {
 	if loopCount > 2 {
 		go inst.publish(loopCount)
 	}
-	if loopCount%50 == 0 { // get the points every 50 loops
+	if retry { // get the points every 200 loops
 		inst.fetchPointsList()
-		inst.fetchSchedulesList()
 		inst.connectionError()
-	} else if loopCount%110 == 0 { // refresh point COV
-		inst.fetchAllPointValues()
+		inst.fetchAllPointValues() // refresh point COV
+	}
+	if loopCount%100 == 0 {
+		inst.fetchSchedulesList()
 	}
 }
 

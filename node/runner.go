@@ -56,18 +56,21 @@ func (runner *Runner) Start() {
 	}
 }
 
+var previousNodeType string
+var previousNodeName string
+
 func (runner *Runner) Process() {
 	defer func() {
 		if recovered := recover(); recovered != nil {
-			log.Errorf("flow process error: %v", recovered)
-			log.Errorf("error on node: %s, node_id: %s", runner.node.GetName(), runner.NodeId())
+			// log.Errorf("flow process error: %v", recovered)
+			// log.Errorf("error on node: %s, node_id: %s", runner.node.GetName(), runner.NodeId())
 		}
 	}()
 
 	// trigger all connectors to input ports
 	err := runner.processConnectors()
 	if err != nil {
-		log.Errorf("RUNNER node: %s err: %s", runner.node.GetName(), err.Error())
+		log.Errorf("RUNNER NAME: %s PREVIOUS-TYPE: %s PREVIOUS-NAME: %s ERR: %s ", runner.node.GetName(), previousNodeType, previousNodeName, err.Error())
 		return
 	}
 
@@ -77,6 +80,8 @@ func (runner *Runner) Process() {
 		runner.node.Process()
 		runner.node.SetProcessed()
 	}
+	previousNodeType = runner.node.GetName()
+	previousNodeName = runner.node.GetNodeName()
 }
 
 func (runner *Runner) Stop(wg *sync.WaitGroup) {
@@ -130,7 +135,7 @@ func (runner *Runner) processConnectors() error {
 		}
 		err := conn.Trigger(debug)
 		if err != nil {
-			log.Errorf("error from runner: %s node: %s from: %s to: %s", err.Error(), runner.Name(), conn.from.Name, conn.to.Name)
+			// log.Errorf("error from runner: %s node: %s from: %s to: %s", err.Error(), runner.Name(), conn.from.Name, conn.to.Name)
 			return err
 		}
 	}
