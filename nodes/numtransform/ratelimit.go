@@ -15,6 +15,7 @@ import (
 type RateLimit struct {
 	*node.Spec
 	lastReset    bool
+	lastEnable   bool
 	lastStep     float64
 	lastOutput   float64
 	lastInterval time.Duration
@@ -35,7 +36,7 @@ func NewRateLimit(body *node.Spec) (node.Node, error) {
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
-	n := &RateLimit{body, true, 0, 0, 1 * time.Second, 0}
+	n := &RateLimit{body, true, false, 0, 0, 1 * time.Second, 0}
 	n.SetSchema(n.buildSchema())
 	return n, nil
 }
@@ -57,17 +58,18 @@ func (inst *RateLimit) Process() {
 	if !enable || inNull {
 		inst.WritePinFloat(node.Out, 0)
 		inst.lastOutput = 0
+		inst.lastEnable = enable
 		return
 	} else {
-		if reset && !inst.lastReset {
+		if (reset && !inst.lastReset) || (enable && !inst.lastEnable) {
 			inst.lastOutput = input
 			inst.WritePinFloat(node.Out, input)
 			inst.lastUpdate = time.Now().Unix()
-			return
 		}
+		inst.lastEnable = enable
+		inst.lastReset = reset
+
 		if time.Unix(inst.lastUpdate, 0).Add(inst.lastInterval).Before(time.Now()) {
-			fmt.Println("RECALCULATE")
-			fmt.Println("lastOutput: ", inst.lastOutput)
 			inst.lastUpdate = time.Now().Unix()
 			change := input - inst.lastOutput
 			if math.Abs(change) >= step {
