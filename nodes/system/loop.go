@@ -25,6 +25,9 @@ func (inst *Loop) Process() {
 	if null {
 		toggleOnCount = 10
 	}
+	if toggleOnCount < 10 {
+		toggleOnCount = 10
+	}
 	inst.WritePinFloat(node.Out, float64(counter))
 	if toggleOnCount <= 0 {
 		toggleOnCount = 1
