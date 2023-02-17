@@ -38,6 +38,7 @@ const (
 	limitNode = "limit"
 	fade      = "fade"
 	rateLimit = "rate-limit"
+	round     = "round"
 	waveform  = "waveform"
 
 	dataStore  = "data-store"
