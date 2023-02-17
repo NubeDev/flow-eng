@@ -158,7 +158,7 @@ func (inst *Network) Process() {
 func (inst *Network) setError(msg string, reset, setMQTTConnected bool) {
 	if reset {
 		inst.SetStatusError("error cleared")
-		inst.SetErrorIcon(string(emoji.YellowCircle))
+		inst.SetErrorIcon(string(emoji.GreenCircle))
 	} else {
 		inst.SetStatusError(msg)
 		inst.SetErrorIcon(string(emoji.RedCircle))

@@ -162,6 +162,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	fade, _ := numtransform.NewFade(nil)
 	limitNode, _ := numtransform.NewLimit(nil)
 	rateLimit, _ := numtransform.NewRateLimit(nil)
+	round, _ := numtransform.NewRound(nil)
 	scaleNode, _ := numtransform.NewScale(nil)
 	waveform, _ := numtransform.NewWaveform(nil)
 
@@ -302,6 +303,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(fade),
 		node.ConvertToSpec(limitNode),
 		node.ConvertToSpec(rateLimit),
+		node.ConvertToSpec(round),
 		node.ConvertToSpec(scaleNode),
 		node.ConvertToSpec(waveform),
 
@@ -550,6 +552,8 @@ func builderTransformations(body *node.Spec) (node.Node, error) {
 		return numtransform.NewFade(body)
 	case rateLimit:
 		return numtransform.NewRateLimit(body)
+	case round:
+		return numtransform.NewRound(body)
 	case waveform:
 		return numtransform.NewWaveform(body)
 	}

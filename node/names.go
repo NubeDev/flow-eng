@@ -75,9 +75,10 @@ const (
 
 	Delete InputName = "delete"
 
-	Size    InputName = "size"
-	MaxSize InputName = "max-size"
-	MinSize InputName = "min-size"
+	Size     InputName = "size"
+	MaxSize  InputName = "max-size"
+	MinSize  InputName = "min-size"
+	Decimals InputName = "decimals"
 
 	In1  InputName = "in1"
 	In2  InputName = "in2"

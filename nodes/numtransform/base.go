@@ -7,4 +7,5 @@ const (
 	fade      = "fade"
 	rateLimit = "rate-limit"
 	waveform  = "waveform"
+	round     = "round"
 )
