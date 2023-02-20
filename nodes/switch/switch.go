@@ -10,7 +10,7 @@ type Switch struct {
 
 func NewSwitch(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, switchNode, category)
-	inSwitch := node.BuildInput(node.Switch, node.TypeBool, nil, body.Inputs, false, true) // TODO: this input shouldn't have a manual override value
+	inSwitch := node.BuildInput(node.Switch, node.TypeBool, nil, body.Inputs, false, true)
 	inTrue := node.BuildInput(node.InTrue, node.TypeFloat, nil, body.Inputs, false, false)
 	inFalse := node.BuildInput(node.InFalse, node.TypeFloat, nil, body.Inputs, false, false)
 	inputs := node.BuildInputs(inSwitch, inTrue, inFalse)

@@ -14,9 +14,9 @@ type DelayOff struct {
 
 func NewDelayOff(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, delayOff, category)
-	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs, false, false) // TODO: this input shouldn't have a manual override value
+	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs, false, true)
 	delayInput := node.BuildInput(node.Interval, node.TypeFloat, 1, body.Inputs, true, false)
-	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, false, false) // TODO: this input shouldn't have a manual override value
+	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, false, true)
 	inputs := node.BuildInputs(in, delayInput, reset)
 
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)

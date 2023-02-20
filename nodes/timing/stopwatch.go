@@ -22,8 +22,8 @@ type Stopwatch struct {
 
 func NewStopwatch(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, stopwatch, category)
-	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false, false) // TODO: this input shouldn't have a manual override value
-	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, false, false)   // TODO: this input shouldn't have a manual override value
+	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false, true)
+	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, false, true)
 	inputs := node.BuildInputs(enable, reset)
 
 	out := node.BuildOutput(node.Elapsed, node.TypeFloat, nil, body.Outputs)
