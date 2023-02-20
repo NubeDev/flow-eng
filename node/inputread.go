@@ -55,11 +55,38 @@ func (n *Spec) InputHasConnection(name InputName) bool {
 }
 
 func isNil(i interface{}) bool {
-	return i == nil || reflect.ValueOf(i).IsNil()
+	return i == nil
 }
 
 func inputWithSettingName(n string) string {
 	return fmt.Sprintf("[%s]", n)
+}
+
+// InputHasNonNullConnection true if the node input has a connection with a non null value
+func (n *Spec) InputHasNonNullConnection(name InputName) bool {
+	input := n.GetInput(name)
+	if input == nil {
+		return false
+	}
+	if input.Connection.NodeID == "" {
+		return false
+	}
+	if input.Connection.NodeID != "" && input.GetValue() == nil {
+		return false
+	}
+	return true
+}
+
+// InputHasNullConnection true if the node input has a connection with a null value
+func (n *Spec) InputHasNullConnection(name InputName) bool {
+	input := n.GetInput(name)
+	if input == nil {
+		return true
+	}
+	if input.Connection.NodeID != "" && input.GetValue() == nil {
+		return true
+	}
+	return false
 }
 
 // InputHasConnectionOrValue true if the node input has a connection, or there is a manual input
@@ -155,7 +182,7 @@ func (n *Spec) ReadPinAsTimeSettings(name InputName) (time.Duration, error) {
 	var settingsAmount float64
 	var useThisAmount float64
 	var units string
-	name = InputName(fmt.Sprintf("[%s]", name))
+	// name = InputName(fmt.Sprintf("[%s]", name))
 
 	input := n.GetInput(name)
 	if n.Settings != nil {
@@ -188,14 +215,12 @@ func (n *Spec) ReadPinAsTimeSettings(name InputName) (time.Duration, error) {
 			}
 		}
 	}
-
-	useSetting := !n.InputHasConnection(name) && n.ReadPin(name) == nil && input.SettingName != ""
+	useSetting := input.SettingName != "" && (n.InputHasNullConnection(name) || input.GetValue() == nil)
 	if useSetting {
 		useThisAmount = settingsAmount
 	} else {
 		inputAmount, aNull := n.ReadPinAsFloat(name)
 		if aNull {
-			fmt.Println("ReadPinAsTimeSettings() err: something went wrong here, should have taken settings value if input link was null")
 			return 0, errors.New("ReadPinAsTimeSettings() err: something went wrong here, should have taken settings value if input link was null")
 		}
 		useThisAmount = inputAmount

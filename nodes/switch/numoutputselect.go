@@ -30,8 +30,8 @@ func NewNumOutputSelect(body *node.Spec) (node.Node, error) {
 		body.Settings["outputCount"] = 2
 	}
 
-	inSelect := node.BuildInput(node.Selection, node.TypeFloat, nil, body.Inputs, false) // TODO: this input shouldn't have a manual override value
-	input := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false)           // TODO: this input shouldn't have a manual override value
+	inSelect := node.BuildInput(node.Selection, node.TypeFloat, nil, body.Inputs, false, true)
+	input := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, true)
 	inputs := node.BuildInputs(inSelect, input)
 
 	outputsCount := int(conversions.GetFloat(body.Settings["outputCount"]))

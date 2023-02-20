@@ -28,10 +28,10 @@ type MinOnOff struct {
 
 func NewMinOnOff(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, minOnOff, category)
-	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs, false)
-	onInterval := node.BuildInput(node.MinOnTime, node.TypeFloat, 0, body.Inputs, true)
-	offInterval := node.BuildInput(node.MinOffTime, node.TypeFloat, 0, body.Inputs, true)
-	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, false)
+	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs, false, false)
+	onInterval := node.BuildInput(node.MinOnTime, node.TypeFloat, 50, body.Inputs, true, false)
+	offInterval := node.BuildInput(node.MinOffTime, node.TypeFloat, 50, body.Inputs, true, false)
+	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, false, false)
 	inputs := node.BuildInputs(in, onInterval, offInterval, reset)
 
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
@@ -54,7 +54,6 @@ func (inst *MinOnOff) Process() {
 	}
 
 	input, _ := inst.ReadPinAsBool(node.In)
-
 	reset, _ := inst.ReadPinAsBool(node.Reset)
 
 	if reset && !inst.lastReset {
@@ -163,13 +162,13 @@ func (inst *MinOnOff) buildSchema() *schemas.Schema {
 	schema.Set(props)
 
 	uiSchema := array.Map{
-		"min_on_interval_time_units": array.Map{
+		"min-on-time_time_units": array.Map{
 			"ui:widget": "radio",
 			"ui:options": array.Map{
 				"inline": true,
 			},
 		},
-		"min_off_interval_time_units": array.Map{
+		"min-off-time_time_units": array.Map{
 			"ui:widget": "radio",
 			"ui:options": array.Map{
 				"inline": true,

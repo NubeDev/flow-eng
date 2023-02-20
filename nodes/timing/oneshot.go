@@ -21,9 +21,9 @@ type OneShot struct {
 
 func NewOneShot(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, oneShot, category)
-	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs, false) // TODO: this input shouldn't have a manual override value
-	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, false)          // TODO: this input shouldn't have a manual override value
-	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, true)
+	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs, false, true)
+	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, false, true)
+	interval := node.BuildInput(node.Interval, node.TypeFloat, 1, body.Inputs, true, false)
 	inputs := node.BuildInputs(trigger, reset, interval)
 
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)

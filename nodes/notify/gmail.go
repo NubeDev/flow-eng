@@ -21,10 +21,10 @@ type Gmail struct {
 func NewGmail(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, gmail, category)
 
-	to := node.BuildInput(node.To, node.TypeString, nil, body.Inputs, true)
-	subject := node.BuildInput(node.Subject, node.TypeString, nil, body.Inputs, true)
-	message := node.BuildInput(node.Message, node.TypeString, nil, body.Inputs, true)
-	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs, false)
+	to := node.BuildInput(node.To, node.TypeString, nil, body.Inputs, true, false)
+	subject := node.BuildInput(node.Subject, node.TypeString, nil, body.Inputs, true, false)
+	message := node.BuildInput(node.Message, node.TypeString, nil, body.Inputs, true, false)
+	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs, false, true)
 	inputs := node.BuildInputs(to, subject, message, trigger)
 
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))

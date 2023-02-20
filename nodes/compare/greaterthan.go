@@ -1,6 +1,7 @@
 package compare
 
 import (
+	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 )
 
@@ -10,8 +11,8 @@ type CompareGreaterThan struct {
 
 func NewGreaterThan(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, GreaterThan, category)
-	in1 := node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs, false)
-	in2 := node.BuildInput(node.In2, node.TypeFloat, nil, body.Inputs, false)
+	in1 := node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs, false, false)
+	in2 := node.BuildInput(node.In2, node.TypeFloat, nil, body.Inputs, false, false)
 	inputs := node.BuildInputs(in1, in2)
 	graterThan := node.BuildOutput(node.GreaterThan, node.TypeBool, nil, body.Outputs)
 	equal := node.BuildOutput(node.GreaterThanEqual, node.TypeBool, nil, body.Outputs)
@@ -23,6 +24,7 @@ func NewGreaterThan(body *node.Spec) (node.Node, error) {
 func (inst *CompareGreaterThan) Process() {
 	a, aNull := inst.ReadPinAsFloat(node.In1)
 	b, bNull := inst.ReadPinAsFloat(node.In2)
+	fmt.Println("in2:", b)
 
 	if aNull || bNull {
 		inst.WritePinBool(node.GreaterThan, false)

@@ -13,10 +13,10 @@ type Get struct {
 
 func build(body *node.Spec) *node.Spec {
 	// ins
-	url := node.BuildInput(node.URL, node.TypeString, nil, body.Inputs, false)
-	filter := node.BuildInput(node.Filter, node.TypeString, nil, body.Inputs, false)
-	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs, false)
-	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false)
+	url := node.BuildInput(node.URL, node.TypeString, nil, body.Inputs, false, false)
+	filter := node.BuildInput(node.Filter, node.TypeString, nil, body.Inputs, false, false)
+	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs, false, false)
+	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false, false)
 	inputs := node.BuildInputs(url, filter, trigger, enable)
 	// outs
 	out := node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs)

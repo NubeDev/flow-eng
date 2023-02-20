@@ -12,9 +12,9 @@ type Between struct {
 func NewBetween(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, betweenNode, category)
 
-	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false)
-	from := node.BuildInput(node.From, node.TypeFloat, nil, body.Inputs, false)
-	to := node.BuildInput(node.To, node.TypeFloat, nil, body.Inputs, false)
+	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false)
+	from := node.BuildInput(node.From, node.TypeFloat, 100, body.Inputs, false, false)
+	to := node.BuildInput(node.To, node.TypeFloat, 0, body.Inputs, false, false)
 	inputs := node.BuildInputs(in, from, to)
 
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)

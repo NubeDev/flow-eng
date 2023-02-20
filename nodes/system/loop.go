@@ -10,7 +10,7 @@ type Loop struct {
 
 func NewLoopCount(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, flowLoopCount, category)
-	toggleOnCount := node.BuildInput(node.TriggerOnCount, node.TypeFloat, 100, body.Inputs, false) // will trigger every 10 loops
+	toggleOnCount := node.BuildInput(node.TriggerOnCount, node.TypeFloat, 100, body.Inputs, false, false) // will trigger every 10 loops
 	inputs := node.BuildInputs(toggleOnCount)
 	outNum := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	outToggle := node.BuildOutput(node.Toggle, node.TypeBool, nil, body.Outputs)
@@ -39,5 +39,4 @@ func (inst *Loop) Process() {
 	} else {
 		inst.WritePinFalse(node.Toggle)
 	}
-
 }

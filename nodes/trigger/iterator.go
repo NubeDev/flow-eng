@@ -35,10 +35,10 @@ const (
 func NewIterate(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, Iterator, Category)
 
-	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, true)
-	iterations := node.BuildInput(node.Iterations, node.TypeFloat, nil, body.Inputs, true)
-	start := node.BuildInput(node.Start, node.TypeBool, nil, body.Inputs, false)
-	stop := node.BuildInput(node.Stop, node.TypeBool, nil, body.Inputs, false)
+	interval := node.BuildInput(node.Interval, node.TypeFloat, 10, body.Inputs, true, false)
+	iterations := node.BuildInput(node.Iterations, node.TypeFloat, 5, body.Inputs, true, false)
+	start := node.BuildInput(node.Start, node.TypeBool, nil, body.Inputs, false, false)
+	stop := node.BuildInput(node.Stop, node.TypeBool, nil, body.Inputs, false, false)
 	inputs := node.BuildInputs(interval, iterations, start, stop)
 
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
@@ -192,6 +192,7 @@ func (inst *Iterate) buildSchema() *schemas.Schema {
 	// time selection
 	props.Interval.Title = "Interval"
 	props.Interval.Default = 10
+
 	props.IntervalTimeUnits.Title = "Interval Units"
 	props.IntervalTimeUnits.Default = ttime.Sec
 	props.IntervalTimeUnits.Options = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
