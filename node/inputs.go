@@ -25,7 +25,7 @@ func inputHelp(opts ...*InputsOpts) (help InputHelp) {
 	return inputsOptions(opts...).Help
 }
 
-func BuildInput(portName InputName, dataType DataTypes, defaultValue interface{}, inputs []*Input, hasSetting bool, opts ...*InputsOpts) *Input {
+func BuildInput(portName InputName, dataType DataTypes, defaultValue interface{}, inputs []*Input, hasSetting bool, preventOverride bool, opts ...*InputsOpts) *Input {
 	var settingName string
 	if hasSetting {
 		settingName = string(portName)
@@ -72,7 +72,7 @@ func BuildInputs(body ...*Input) []*Input {
 
 // DynamicInputs build n number of inputs -- in1, in2, in3, ..., inN
 //	-p overrideNames[]string -> for example, we can pass in [a,b,c,d] or [temp, humidity]
-func DynamicInputs(dataType DataTypes, defaultVal interface{}, count, minAllowed, maxAllowed int, inputs []*Input, overrideNames ...[]string) []*Input {
+func DynamicInputs(dataType DataTypes, defaultVal interface{}, count, minAllowed, maxAllowed int, inputs []*Input, preventOverrides bool, overrideNames ...[]string) []*Input {
 	if len(overrideNames) > 0 {
 		if len(overrideNames[0]) < count {
 			panic("build dynamic-inputs name length must match the count length of the required inputs")
@@ -86,7 +86,7 @@ func DynamicInputs(dataType DataTypes, defaultVal interface{}, count, minAllowed
 		for _, names := range overrideNames {
 			for i, name := range names {
 				if i < count {
-					out = append(out, BuildInput(InputName(name), dataType, defaultVal, inputs, false))
+					out = append(out, BuildInput(InputName(name), dataType, defaultVal, inputs, false, preventOverrides))
 				}
 
 			}
@@ -95,7 +95,7 @@ func DynamicInputs(dataType DataTypes, defaultVal interface{}, count, minAllowed
 		for i := 1; i <= count; i++ {
 			name := fmt.Sprintf("%s%d", InputNamePrefix, i)
 			if i < maxAllowed {
-				out = append(out, BuildInput(InputName(name), dataType, defaultVal, inputs, false))
+				out = append(out, BuildInput(InputName(name), dataType, defaultVal, inputs, false, preventOverrides))
 			}
 		}
 	}

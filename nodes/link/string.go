@@ -20,8 +20,8 @@ func NewStringLinkInput(body *node.Spec, store *Store) (node.Node, error) {
 		store = getStore()
 	}
 	body = node.Defaults(body, linkInputString, category)
-	topic := node.BuildInput(node.Topic, node.TypeString, nil, body.Inputs, true)
-	value := node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false)
+	topic := node.BuildInput(node.Topic, node.TypeString, nil, body.Inputs, true, false)
+	value := node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false, false)
 	inputs := node.BuildInputs(topic, value)
 	body = node.BuildNode(body, inputs, nil, body.Settings)
 	n := &StringLinkInput{body, ""}

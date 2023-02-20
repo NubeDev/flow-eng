@@ -20,8 +20,8 @@ type PsychroDBWB struct {
 
 func NewPsychroDBWB(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, psychroDBWB, category)
-	dryBulbT := node.BuildInput(node.DryBulbTemp, node.TypeFloat, nil, body.Inputs, false)
-	wetBulbT := node.BuildInput(node.WetBulbTemp, node.TypeFloat, nil, body.Inputs, false)
+	dryBulbT := node.BuildInput(node.DryBulbTemp, node.TypeFloat, nil, body.Inputs, false, false)
+	wetBulbT := node.BuildInput(node.WetBulbTemp, node.TypeFloat, nil, body.Inputs, false, false)
 	inputs := node.BuildInputs(dryBulbT, wetBulbT)
 
 	humRatio := node.BuildOutput(node.HumRatioO, node.TypeFloat, nil, body.Outputs)

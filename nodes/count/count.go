@@ -21,11 +21,11 @@ type Count struct {
 
 func NewCount(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, countNode, category)
-	countUp := node.BuildInput(node.CountUp, node.TypeBool, nil, body.Inputs, false)
-	countDown := node.BuildInput(node.CountDown, node.TypeBool, nil, body.Inputs, false)
-	stepSize := node.BuildInput(node.StepSize, node.TypeFloat, 1, body.Inputs, true)
-	setValue := node.BuildInput(node.SetValue, node.TypeFloat, 0, body.Inputs, true)
-	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, false)
+	countUp := node.BuildInput(node.CountUp, node.TypeBool, nil, body.Inputs, false, true)
+	countDown := node.BuildInput(node.CountDown, node.TypeBool, nil, body.Inputs, false, true)
+	stepSize := node.BuildInput(node.StepSize, node.TypeFloat, 1, body.Inputs, true, false)
+	setValue := node.BuildInput(node.SetValue, node.TypeFloat, 0, body.Inputs, true, false)
+	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, false, true)
 	body.Inputs = node.BuildInputs(countUp, countDown, stepSize, setValue, reset)
 
 	out := node.BuildOutput(node.CountOut, node.TypeFloat, nil, body.Outputs)

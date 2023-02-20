@@ -31,7 +31,7 @@ func getSettings(body map[string]interface{}) (string, error) {
 
 func NewFunc(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, funcNode, category)
-	inputs := node.BuildInputs(node.DynamicInputs(node.TypeString, nil, 2, 3, 3, body.Inputs)...)
+	inputs := node.BuildInputs(node.DynamicInputs(node.TypeString, nil, 2, 3, 3, body.Inputs, false)...)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(buildSchema())

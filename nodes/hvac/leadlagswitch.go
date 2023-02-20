@@ -12,9 +12,9 @@ type LeadLagSwitch struct {
 
 func NewLeadLagSwitch(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, leadLagSwitch, category)
-	in := node.BuildInput(node.RotateLead, node.TypeBool, nil, body.Inputs, false)
-	stage1 := node.BuildInput(node.Stage1, node.TypeBool, nil, body.Inputs, false)
-	stage2 := node.BuildInput(node.Stage2, node.TypeBool, nil, body.Inputs, false)
+	in := node.BuildInput(node.RotateLead, node.TypeBool, nil, body.Inputs, false, false)
+	stage1 := node.BuildInput(node.Stage1, node.TypeBool, nil, body.Inputs, false, false)
+	stage2 := node.BuildInput(node.Stage2, node.TypeBool, nil, body.Inputs, false, false)
 	inputs := node.BuildInputs(in, stage1, stage2)
 
 	leadUnit := node.BuildOutput(node.LeadUnit, node.TypeString, nil, body.Outputs)

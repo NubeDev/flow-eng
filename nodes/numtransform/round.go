@@ -11,8 +11,8 @@ type Round struct {
 
 func NewRound(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, round, category)
-	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false)
-	decimals := node.BuildInput(node.Decimals, node.TypeFloat, 2, body.Inputs, false)
+	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false)
+	decimals := node.BuildInput(node.Decimals, node.TypeFloat, 2, body.Inputs, false, false)
 	inputs := node.BuildInputs(in, decimals)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)

@@ -24,7 +24,7 @@ func NewNumericWriteable(body *node.Spec) (node.Node, error) {
 	if settings != nil {
 		count = settings.InputCount
 	}
-	inputs := node.BuildInputs(node.DynamicInputs(node.TypeFloat, nil, count, 2, 20, body.Inputs)...)
+	inputs := node.BuildInputs(node.DynamicInputs(node.TypeFloat, nil, count, 2, 20, body.Inputs, false)...)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(buildNumericWriteableSchema())

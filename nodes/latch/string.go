@@ -12,8 +12,8 @@ type StringLatch struct {
 
 func NewStringLatch(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, stringLatch, category)
-	input := node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false)
-	latch := node.BuildInput(node.Latch, node.TypeBool, nil, body.Inputs, false) // TODO: this input shouldn't have a manual override value
+	input := node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false, false)
+	latch := node.BuildInput(node.Latch, node.TypeBool, nil, body.Inputs, false, true) // TODO: this input shouldn't have a manual override value
 
 	inputs := node.BuildInputs(input, latch)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, "", body.Outputs))

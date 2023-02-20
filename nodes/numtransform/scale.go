@@ -11,11 +11,11 @@ type Scale struct {
 
 func NewScale(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, scaleNode, category)
-	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false)
-	minIn := node.BuildInput(node.InMin, node.TypeFloat, 0, body.Inputs, false)
-	maxIn := node.BuildInput(node.InMax, node.TypeFloat, 10, body.Inputs, false)
-	minOut := node.BuildInput(node.OutMin, node.TypeFloat, 0, body.Inputs, false)
-	maxOut := node.BuildInput(node.OutMax, node.TypeFloat, 100, body.Inputs, false)
+	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false)
+	minIn := node.BuildInput(node.InMin, node.TypeFloat, 0, body.Inputs, false, false)
+	maxIn := node.BuildInput(node.InMax, node.TypeFloat, 10, body.Inputs, false, false)
+	minOut := node.BuildInput(node.OutMin, node.TypeFloat, 0, body.Inputs, false, false)
+	maxOut := node.BuildInput(node.OutMax, node.TypeFloat, 100, body.Inputs, false, false)
 	inputs := node.BuildInputs(in, minIn, maxIn, minOut, maxOut)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)

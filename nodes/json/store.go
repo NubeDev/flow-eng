@@ -18,9 +18,9 @@ type Store struct {
 
 func NewStore(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, dataStore, category)
-	add := node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false)
-	maxSize := node.BuildInput(node.MaxSize, node.TypeFloat, nil, body.Inputs, false)
-	clear := node.BuildInput(node.Delete, node.TypeBool, nil, body.Inputs, false)
+	add := node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false, false)
+	maxSize := node.BuildInput(node.MaxSize, node.TypeFloat, nil, body.Inputs, false, false)
+	clear := node.BuildInput(node.Delete, node.TypeBool, nil, body.Inputs, false, false)
 	inputs := node.BuildInputs(add, maxSize, clear)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)

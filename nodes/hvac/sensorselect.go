@@ -31,7 +31,7 @@ func NewSensorSelect(body *node.Spec) (node.Node, error) {
 	}
 	inputsCount := int(conversions.GetFloat(body.Settings["inputCount"]))
 
-	fallback := node.BuildInput(node.Fallback, node.TypeFloat, nil, body.Inputs, false)
+	fallback := node.BuildInput(node.Fallback, node.TypeFloat, nil, body.Inputs, false, false)
 	dynamicInputs := dynamicInputs(inputsCount, 2, 20, body.Inputs)
 	inputsArray := []*node.Input{fallback}
 	inputsArray = append(inputsArray, dynamicInputs...)
@@ -112,9 +112,9 @@ func dynamicInputs(count, minAllowed, maxAllowed int, inputs []*node.Input) []*n
 			break
 		}
 		sensorInputName := fmt.Sprintf("sensor%d", i)
-		out = append(out, node.BuildInput(node.InputName(sensorInputName), node.TypeFloat, nil, inputs, false))
+		out = append(out, node.BuildInput(node.InputName(sensorInputName), node.TypeFloat, nil, inputs, false, false))
 		excludeInputName := fmt.Sprintf("exclude%d", i)
-		out = append(out, node.BuildInput(node.InputName(excludeInputName), node.TypeBool, nil, inputs, false))
+		out = append(out, node.BuildInput(node.InputName(excludeInputName), node.TypeBool, nil, inputs, false, false))
 	}
 	return out
 }
