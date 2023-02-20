@@ -12,7 +12,7 @@ type Modulo struct {
 func NewModulo(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, modulo, category)
 	in1 := node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs, false)
-	in2 := node.BuildInput(node.In2, node.TypeFloat, nil, body.Inputs, false)
+	in2 := node.BuildInput(node.In2, node.TypeFloat, 2, body.Inputs, false)
 	inputs := node.BuildInputs(in1, in2)
 
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)

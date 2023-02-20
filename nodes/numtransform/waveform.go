@@ -29,9 +29,9 @@ type Waveform struct {
 func NewWaveform(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, waveform, category)
 	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false)
-	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, true)
-	period := node.BuildInput(node.Period, node.TypeFloat, nil, body.Inputs, true)
-	amplitude := node.BuildInput(node.Amplitude, node.TypeFloat, nil, body.Inputs, true)
+	interval := node.BuildInput(node.Interval, node.TypeFloat, 1, body.Inputs, true)
+	period := node.BuildInput(node.Period, node.TypeFloat, 60, body.Inputs, true)
+	amplitude := node.BuildInput(node.Amplitude, node.TypeFloat, 100, body.Inputs, true)
 	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, false)
 	inputs := node.BuildInputs(enable, interval, period, amplitude, reset)
 

@@ -23,7 +23,7 @@ func NewFlatline(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, flatLine, category)
 
 	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false) // TODO: this input shouldn't have a manual override value
-	delayInput := node.BuildInput(node.Delay, node.TypeFloat, nil, body.Inputs, true)
+	delayInput := node.BuildInput(node.Delay, node.TypeFloat, 30, body.Inputs, true)
 	inputs := node.BuildInputs(in, delayInput)
 
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)

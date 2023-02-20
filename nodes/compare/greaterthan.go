@@ -1,6 +1,7 @@
 package compare
 
 import (
+	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 )
 
@@ -23,6 +24,7 @@ func NewGreaterThan(body *node.Spec) (node.Node, error) {
 func (inst *CompareGreaterThan) Process() {
 	a, aNull := inst.ReadPinAsFloat(node.In1)
 	b, bNull := inst.ReadPinAsFloat(node.In2)
+	fmt.Println("in2:", b)
 
 	if aNull || bNull {
 		inst.WritePinBool(node.GreaterThan, false)

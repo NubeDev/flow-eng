@@ -24,9 +24,9 @@ type Fade struct {
 func NewFade(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, fade, category)
 	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false)
-	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, true)
-	from := node.BuildInput(node.From, node.TypeFloat, nil, body.Inputs, false)
-	to := node.BuildInput(node.To, node.TypeFloat, nil, body.Inputs, false)
+	interval := node.BuildInput(node.Interval, node.TypeFloat, 60, body.Inputs, true)
+	from := node.BuildInput(node.From, node.TypeFloat, 0, body.Inputs, false)
+	to := node.BuildInput(node.To, node.TypeFloat, 100, body.Inputs, false)
 	inputs := node.BuildInputs(enable, interval, from, to)
 
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)

@@ -21,6 +21,7 @@ type Input struct {
 	Position         int       `json:"position"`
 	OverridePosition bool      `json:"overridePosition"`
 	SettingName      string    `json:"settingName"`
+	PreventOverride  bool      `json:"preventOverride"`
 }
 
 func newInput(body *Input) *Input {
@@ -41,6 +42,7 @@ func newInput(body *Input) *Input {
 		0,
 		false,
 		body.SettingName,
+		false,
 	}
 }
 
@@ -61,8 +63,13 @@ func (p *Input) Connectors() []*Connector {
 
 func (p *Input) GetValue() interface{} {
 	if p.value == nil {
-		if p.Connection.OverrideValue != nil {
-			return p.Connection.OverrideValue
+		if p.Connection.NodeID == "" { // don't use default or override values if there is a link connected
+			if p.Connection.OverrideValue != nil {
+				return p.Connection.OverrideValue
+			}
+			if p.Connection.DefaultValue != nil {
+				return p.Connection.DefaultValue
+			}
 		}
 	}
 	return p.value

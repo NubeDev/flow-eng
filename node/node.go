@@ -2,6 +2,7 @@ package node
 
 import (
 	"github.com/NubeDev/flow-eng/db"
+	"github.com/NubeDev/flow-eng/helpers/settings"
 	"github.com/NubeDev/flow-eng/helpers/store"
 	"github.com/NubeDev/flow-eng/schemas"
 	"time"
@@ -322,7 +323,7 @@ func (n *Spec) GetNodeValues() []*PortValues {
 
 func (n *Spec) GetInput(name InputName) *Input {
 	for _, input := range n.GetInputs() {
-		if input.Name == name {
+		if settings.MatchPortNameWithSettings(string(name), string(input.Name)) {
 			return input
 		}
 	}

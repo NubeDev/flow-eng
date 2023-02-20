@@ -26,9 +26,9 @@ type DelayTimer struct {
 
 func NewDelay(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, delay, category)
-	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false)
+	enable := node.BuildInput(node.Enable, node.TypeBool, true, body.Inputs, false)
 	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false)
-	delayInput := node.BuildInput(node.Delay, node.TypeFloat, nil, body.Inputs, true)
+	delayInput := node.BuildInput(node.Delay, node.TypeFloat, 1, body.Inputs, true)
 	inputs := node.BuildInputs(enable, in, delayInput)
 
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)

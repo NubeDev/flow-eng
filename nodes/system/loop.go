@@ -39,5 +39,4 @@ func (inst *Loop) Process() {
 	} else {
 		inst.WritePinFalse(node.Toggle)
 	}
-
 }

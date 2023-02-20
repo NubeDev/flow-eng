@@ -26,8 +26,8 @@ func NewRateLimit(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, rateLimit, category)
 	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false)
 	input := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false)
-	step := node.BuildInput(node.StepSize, node.TypeFloat, nil, body.Inputs, true)
-	interval := node.BuildInput(node.Interval, node.TypeFloat, nil, body.Inputs, true)
+	step := node.BuildInput(node.StepSize, node.TypeFloat, 1, body.Inputs, true)
+	interval := node.BuildInput(node.Interval, node.TypeFloat, 10, body.Inputs, true)
 	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, false)
 	inputs := node.BuildInputs(enable, input, step, interval, reset)
 
