@@ -18,8 +18,8 @@ func (inst *Network) subscribeToEachPoint() {
 		payloads := getPayloads(children, ok)
 		for _, payload := range payloads {
 			fixedTopic, pntUUID := fixTopic(message.Topic())
-			payload.pointUUID = pntUUID
 			if payload.topic == fixedTopic {
+				payload.pointUUID = pntUUID
 				n := inst.GetNode(payload.nodeUUID)
 				if n != nil {
 					n.SetPayload(&node.Payload{

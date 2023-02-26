@@ -13,7 +13,7 @@ func setError(body *node.Spec, message string) *node.Spec {
 	return body
 }
 
-var retryCount uint64 = 200
+var retryCount uint64 = 100
 
 const (
 	category       = "flow"
