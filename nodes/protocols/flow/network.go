@@ -104,14 +104,14 @@ func (inst *Network) Process() {
 	if firstLoop {
 		go inst.setConnection()
 	}
-	if loopCount == 2 {
+	if loopCount == 3 {
 		go inst.subscribeToEachPoint()
 		go inst.pointsList()
 		go inst.schedulesList()
 		go inst.publish(loopCount)
 	}
 	var retry bool
-	if loopCount == 10 {
+	if loopCount == 4 {
 		retry = true
 	}
 	if loopCount%retryCount == 0 {
@@ -145,7 +145,7 @@ func (inst *Network) Process() {
 	if loopCount > 2 {
 		go inst.publish(loopCount)
 	}
-	if retry { // get the points every 200 loops
+	if retry { // get the points every 100 loops
 		inst.fetchPointsList()
 		inst.connectionError()
 		inst.fetchAllPointValues() // refresh point COV
