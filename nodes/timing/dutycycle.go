@@ -25,7 +25,7 @@ type DutyCycle struct {
 
 func NewDutyCycle(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, dutyCycle, category)
-	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false, false)
+	enable := node.BuildInput(node.Enable, node.TypeBool, true, body.Inputs, false, false)
 	interval := node.BuildInput(node.Interval, node.TypeFloat, 10, body.Inputs, true, false)
 	dutyCycleInput := node.BuildInput(node.DutyCycle, node.TypeFloat, 50, body.Inputs, true, false)
 	inputs := node.BuildInputs(enable, interval, dutyCycleInput)
