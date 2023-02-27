@@ -5,11 +5,12 @@ import (
 )
 
 type PalletInputs struct {
-	Name         string      `json:"name"`
-	ValueType    string      `json:"valueType"`
-	DefaultValue interface{} `json:"defaultValue,omitempty"`
-	FolderExport bool        `json:"folderExport"`
-	HideInput    bool        `json:"hideInput"`
+	Name            string      `json:"name"`
+	ValueType       string      `json:"valueType"`
+	DefaultValue    interface{} `json:"defaultValue,omitempty"`
+	FolderExport    bool        `json:"folderExport"`
+	HideInput       bool        `json:"hideInput"`
+	PreventOverride bool        `json:"preventOverride"`
 }
 
 type PalletOutputs struct {
@@ -53,6 +54,7 @@ func convertInputs(node *node.Spec) []*PalletInputs {
 		one.FolderExport = input.FolderExport
 		one.HideInput = input.HideInput
 		one.DefaultValue = input.Connection.DefaultValue
+		one.PreventOverride = input.PreventOverride
 		all = append(all, one)
 	}
 	return all
