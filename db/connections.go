@@ -109,7 +109,7 @@ func (inst *db) GetConnectionByName(name string) (*Connection, error) {
 			return &conn, nil
 		}
 	}
-	return nil, nil
+	return nil, errors.New(fmt.Sprintf("GetConnectionByName() couldn't find connection with name: %v", name))
 }
 
 func (inst *db) GetConnectionsByType(t names.ApplicationName) ([]Connection, error) {
