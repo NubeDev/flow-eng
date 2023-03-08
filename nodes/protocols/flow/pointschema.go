@@ -10,6 +10,9 @@ import (
 
 func fixTopic(topic string) (fixedTopic, pointUUID string) {
 	parts := strings.Split(topic, "/")
+	for i, val := range parts {
+		parts[i] = strings.TrimSpace(val)
+	}
 	if len(parts) == 12 {
 		pointUUID = parts[10]
 		parts[6] = "+"

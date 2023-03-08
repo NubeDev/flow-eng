@@ -33,12 +33,17 @@ func NewFFPoint(body *node.Spec) (node.Node, error) {
 
 // set add this point to the store
 func (inst *FFPoint) set() {
+	// log.Infof("FLOW POINT: set() topic: %+v", inst.topic)
+	// log.Infof("FLOW POINT: set() STORE: %+v", inst.GetStore().All())
+	// log.Infof("FLOW POINT: set() STORE Object: %+v", inst.GetStore().All()[inst.GetParentId()].Object)
 	s := inst.GetStore()
 	if s == nil {
 		return
 	}
 	parentId := inst.GetParentId()
+	// log.Infof("FLOW POINT: set() inst.GetParentId(): %+v", inst.GetParentId())
 	nodeUUID := inst.GetID()
+	// log.Infof("FLOW POINT: set() nodeUUID: %+v", nodeUUID)
 	d, ok := s.Get(parentId)
 	var mqttData *pointStore
 	if !ok {
@@ -49,14 +54,34 @@ func (inst *FFPoint) set() {
 				topic:    inst.topic,
 			}},
 		}, 0)
+		// log.Infof("FLOW POINT: set()")
 	} else {
 		mqttData = d.(*pointStore)
+		/*
+			log.Infof("FLOW POINT: set() mqttData: %+v", *mqttData)
+			for i, v := range mqttData.payloads {
+				if v == nil {
+					log.Infof("FLOW POINT: set() mqttData.payloads %v IS NIL", i)
+				} else {
+					log.Infof("FLOW POINT: set() mqttData.payloads %v: %+v", i, *v)
+				}
+			}
+		*/
 		payload := &pointDetails{
 			nodeUUID: nodeUUID,
 			topic:    inst.topic,
 		}
 		mqttData, _ = addUpdatePayload(nodeUUID, mqttData, payload)
 		s.Set(parentId, mqttData, 0)
+		/*
+			for i, v := range mqttData.payloads {
+				if v == nil {
+					log.Infof("FLOW POINT: set() mqttData.payloads %v IS NIL", i)
+				} else {
+					log.Infof("FLOW POINT: set() mqttData.payloads %v: %+v", i, *v)
+				}
+			}
+		*/
 	}
 }
 

@@ -52,21 +52,19 @@ func (inst *Network) setConnection() {
 	var connection *db.Connection
 	var connectionName = "flow framework integration over MQTT (dont not edit/delete)" // this name is set in rubix-edge-wires
 
-	connection, err = inst.GetDB().GetConnectionByName(connectionName)
+	connection, err = inst.GetDB().GetConnection(settings.Conn)
 	if err != nil {
-		errMes := fmt.Sprintf("flow-network error in getting connection err:%s", err.Error())
+		errMes := fmt.Sprintf("flow-network error in getting connection: %+v. err:%s", settings.Conn, err.Error())
 		log.Errorf(errMes)
 		inst.setError(errMes, false, false)
-		return
 	}
 
 	if connection == nil {
-		connection, err = inst.GetDB().GetConnection(settings.Conn)
+		connection, err = inst.GetDB().GetConnectionByName(connectionName)
 		if err != nil {
-			errMes := fmt.Sprintf("flow-network error in getting connection err:%s", err.Error())
+			errMes := fmt.Sprintf("flow-network error in getting connection name: %+v. err:%s", connectionName, err.Error())
 			log.Errorf(errMes)
 			inst.setError(errMes, false, false)
-			return
 		}
 	}
 
@@ -101,7 +99,10 @@ func (inst *Network) GetSchema() *schemas.Schema {
 
 func (inst *Network) Process() {
 	loopCount, firstLoop := inst.Loop()
+	// log.Info("FLOW NETWORK: loopCount:", loopCount)
+	// log.Info("FLOW NETWORK: firstLoop:", firstLoop)
 	if firstLoop {
+		// log.Infof("FLOW NETWORK: LOOP 2 STORE: %+v", inst.GetStore().All())
 		go inst.setConnection()
 	}
 	if loopCount == 3 {
@@ -112,6 +113,8 @@ func (inst *Network) Process() {
 	}
 	var retry bool
 	if loopCount == 4 {
+		// log.Infof("FLOW NETWORK: LOOP 4 STORE: %+v", inst.GetStore().All())
+		// log.Infof("FLOW NETWORK: LOOP 4 STORE Object: %+v", inst.GetStore().All()[inst.GetID()].Object)
 		retry = true
 	}
 	if loopCount%retryCount == 0 {
@@ -145,10 +148,12 @@ func (inst *Network) Process() {
 	if loopCount > 2 {
 		go inst.publish(loopCount)
 	}
-	if retry { // get the points every 100 loops
+	if retry { // get the points every 50 loops
 		inst.fetchPointsList()
 		inst.connectionError()
 		inst.fetchAllPointValues() // refresh point COV
+		// log.Infof("FLOW NETWORK: RETRY STORE: %+v", inst.GetStore().All())
+		// log.Infof("FLOW NETWORK: RETRY STORE Object: %+v", inst.GetStore().All()[inst.GetID()].Object)
 	}
 	if loopCount%100 == 0 {
 		inst.fetchSchedulesList()
