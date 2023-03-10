@@ -59,7 +59,7 @@ func NewAO(body *node.Spec, opts *Bacnet) (node.Node, error) {
 
 func (inst *AO) setObjectId(settings *AOSettings) {
 	devNum := settings.DeviceNumber
-	uoNum := settings.InputNumber
+	uoNum := settings.OutputNumber
 	id := ((devNum - 1) * 8) + uoNum
 	inst.objectID = points.ObjectID(id)
 	name := bacnetAddress(4, "AO", "UO")
@@ -221,7 +221,7 @@ func (inst *AO) updatePoint(objType points.ObjectType, id points.ObjectID, point
 
 type AOSettingsSchema struct {
 	DeviceNumber schemas.Integer    `json:"device-number"`
-	InputNumber  schemas.Integer    `json:"input-number"`
+	OutputNumber schemas.Integer    `json:"output-number"`
 	IoType       schemas.EnumString `json:"io-type"`
 	/*
 		Decimal      schemas.Number         `json:"decimal"`
@@ -237,7 +237,7 @@ type AOSettingsSchema struct {
 
 type AOSettings struct {
 	DeviceNumber int    `json:"device-number"`
-	InputNumber  int    `json:"input-number"`
+	OutputNumber int    `json:"output-number"`
 	IoType       string `json:"io-type"`
 	/*
 		Decimal      int     `json:"decimal"`
@@ -259,12 +259,12 @@ func (inst *AO) buildSchema() *schemas.Schema {
 	props.DeviceNumber.Minimum = 1
 	props.DeviceNumber.Maximum = 4
 
-	props.InputNumber.Title = "Select UO Number"
-	props.InputNumber.Default = 1
-	props.InputNumber.Minimum = 1
-	props.InputNumber.Maximum = 8
+	props.OutputNumber.Title = "Select UO Number"
+	props.OutputNumber.Default = 1
+	props.OutputNumber.Minimum = 1
+	props.OutputNumber.Maximum = 8
 
-	props.IoType.Title = "Select UI Input Type"
+	props.IoType.Title = "Select UI Output Type"
 	props.IoType.Default = string(points.IoTypeVolts)
 	props.IoType.Options = []string{string(points.IoTypeVolts), string(points.IoTypeDigital)}
 	props.IoType.EnumName = []string{string(points.IoTypeVolts), string(points.IoTypeDigital)}
@@ -278,11 +278,11 @@ func (inst *AO) buildSchema() *schemas.Schema {
 		props.ScaleEnable.Title = "Enable Scale/Limit Transformation"
 		props.ScaleEnable.Default = false
 
-		props.ScaleInMin.Title = "Scale: Input Min (Input 0-10v)"
+		props.ScaleInMin.Title = "Scale: Output Min (Output 0-10v)"
 		props.ScaleInMin.Default = 0
 		props.ScaleInMin.ReadOnly = true
 
-		props.ScaleInMax.Title = "Scale: Input Max (Input 0-10v)"
+		props.ScaleInMax.Title = "Scale: Output Max (Output 0-10v)"
 		props.ScaleInMax.Default = 10
 		props.ScaleInMax.ReadOnly = true
 
@@ -306,8 +306,8 @@ func (inst *AO) buildSchema() *schemas.Schema {
 		"io-type": array.Map{
 			"ui:widget": "select",
 		},
-		// "ui:order": array.Slice{"device-number", "input-number", "io-type", "decimal", "scale-enable", "scale-in-min", "scale-in-max", "scale-out-min", "scale-out-max", "factor", "offset"},
-		"ui:order": array.Slice{"device-number", "input-number", "io-type"},
+		// "ui:order": array.Slice{"device-number", "output-number", "io-type", "decimal", "scale-enable", "scale-in-min", "scale-in-max", "scale-out-min", "scale-out-max", "factor", "offset"},
+		"ui:order": array.Slice{"device-number", "output-number", "io-type"},
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{

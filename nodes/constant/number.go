@@ -21,9 +21,12 @@ func NewNumber(body *node.Spec) (node.Node, error) {
 
 func (inst *Number) Process() {
 	// context menu payload overrides
-	v, null := inst.ReadPayloadAsFloat()
-	if !null {
+	v, noPayload, nullPayload := inst.ReadPayloadAsFloat()
+	if !noPayload && !nullPayload {
 		inst.OverrideInputValue(node.In, v)
+	} else if nullPayload {
+		inst.WritePinNull(node.Out)
+		return
 	}
 
 	in1, null := inst.ReadPinAsFloat(node.In)

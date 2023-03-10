@@ -11,8 +11,8 @@ import (
 
 func (inst *Network) subscribeToEachPoint() {
 	callback := func(client mqtt.Client, message mqtt.Message) {
-		// log.Infof("Flow Network subscribe(): %+v", string(message.Payload()))
-		// log.Infof("Flow Network subscribe(): %+v", string(message.Topic()))
+		// log.Infof("FLOW NETWORK: subscribeToEachPoint(): %+v", string(message.Payload()))
+		// log.Infof("FLOW NETWORK: subscribeToEachPoint(): %+v", string(message.Topic()))
 		s := inst.GetStore()
 		children, ok := s.Get(inst.GetID())
 		payloads := getPayloads(children, ok)
@@ -163,34 +163,56 @@ func (inst *Network) schedulesList() {
 const fetchSelectedPointsCOVTopic = "rubix/platform/points/cov/selected"
 
 func (inst *Network) fetchAllPointValues() {
-	// log.Infof("Flow Network fetchAllPointValues()")
+	// log.Infof("FLOW NETWORK: fetchAllPointValues()")
 	s := inst.GetStore()
+	// log.Infof("FLOW NETWORK: fetchAllPointValues() inst.GetID(): %+v", inst.GetID())
 	children, ok := s.Get(inst.GetID())
 	payloads := getPayloads(children, ok)
+
 	var pointUUIDList []*MqttPoint
 	for _, payload := range payloads {
+		/*
+			if payload == nil {
+				log.Info("FLOW NETWORK: fetchAllPointValues() payload IS NIL")
+			} else {
+				log.Infof("FLOW NETWORK: fetchAllPointValues() payload: %+v", *payload)
+			}
+		*/
+
 		if payload.pointUUID != "" {
 			pnt := MqttPoint{
 				PointUUID: payload.pointUUID,
 			}
 			exists := false
 			for _, val := range pointUUIDList {
+				// log.Infof("FLOW NETWORK: fetchAllPointValues() pointUUIDList val %+v", val)
 				if val != nil && val.PointUUID == pnt.PointUUID {
 					exists = true
 					break
 				}
 			}
 			if !exists {
+				// log.Info("FLOW NETWORK: fetchAllPointValues() ADD TO LIST")
 				pointUUIDList = append(pointUUIDList, &pnt)
 			}
 		}
 	}
+	/*
+		for i, v := range pointUUIDList {
+			if v == nil {
+				log.Infof("FLOW NETWORK: fetchAllPointValues() pointUUIDList %v IS NIL", i)
+			} else {
+				log.Infof("FLOW NETWORK: fetchAllPointValues() pointUUIDList %v: %+v", i, *v)
+			}
+		}
+	*/
 	data, err := json.Marshal(pointUUIDList)
 	if err != nil {
 		log.Errorf("Flow Network fetchAllPointValues() json marshal err: %s", err.Error())
 		return
 	}
 	if inst.mqttClient != nil {
+		// log.Infof("FLOW NETWORK: inst.mqttClient.Publish(fetchSelectedPointsCOVTopic, mqttQOS, mqttRetain, data)")
 		err := inst.mqttClient.Publish(fetchSelectedPointsCOVTopic, mqttQOS, mqttRetain, data)
 		if err != nil {
 			log.Errorf("Flow Network fetchAllPointValues() mqtt publish err: %s", err.Error())

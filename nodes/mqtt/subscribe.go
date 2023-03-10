@@ -52,7 +52,7 @@ func (inst *MqttSub) Process() {
 			inst.set()
 		}
 	}
-	val, null := inst.ReadPayloadAsString()
+	val, null := inst.ReadMQTTPayloadAsString()
 	if null {
 		inst.WritePinNull(node.Out)
 	} else {

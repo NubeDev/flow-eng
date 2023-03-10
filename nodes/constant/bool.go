@@ -21,9 +21,19 @@ func NewBoolean(body *node.Spec) (node.Node, error) {
 
 func (inst *Boolean) Process() {
 	// context menu payload overrides
-	v, null := inst.ReadPayloadAsBool()
-	if !null {
+	v, noPayload, nullPayload := inst.ReadPayloadAsBool()
+	if !noPayload && !nullPayload {
 		inst.OverrideInputValue(node.In, v)
+	} else if nullPayload {
+		inst.WritePinNull(node.Out)
+		return
+	}
+
+	if !noPayload && !nullPayload {
+		inst.OverrideInputValue(node.In, v)
+	} else if nullPayload {
+		inst.WritePinNull(node.Out)
+		return
 	}
 
 	in, null := inst.ReadPinAsBool(node.In)
