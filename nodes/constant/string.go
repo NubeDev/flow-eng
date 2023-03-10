@@ -21,11 +21,18 @@ func NewString(body *node.Spec) (node.Node, error) {
 
 func (inst *ConstString) Process() {
 	// context menu payload overrides
-	v, null := inst.ReadPayloadAsString2()
-	if !null {
+	v, noPayload, nullPayload := inst.ReadPayloadAsString()
+	if !noPayload && !nullPayload {
 		inst.OverrideInputValue(node.In, v)
+	} else if nullPayload {
+		inst.WritePinNull(node.Out)
+		return
 	}
 
 	in1 := inst.ReadPin(node.In)
-	inst.WritePin(node.Out, in1)
+	if in1 == nil || in1 == "null" || in1 == "" {
+		inst.WritePinNull(node.Out)
+	} else {
+		inst.WritePin(node.Out, in1)
+	}
 }

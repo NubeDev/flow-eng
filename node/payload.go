@@ -27,41 +27,49 @@ func (n *Spec) GetPayloadNull() (value any, null bool) {
 	return n.Payload.Any, false
 }
 
-func (n *Spec) ReadPayloadAsBool() (value, null bool) {
+func (n *Spec) ReadPayloadAsBool() (value, noPayload, nullPayload bool) {
 	r := n.GetPayload()
 	if r == nil {
-		return false, true
+		return false, true, false
 	}
 	if r.Any == nil {
-		return false, true
+		return false, true, false
 	}
 	m, ok := r.Any.(map[string]interface{})
 	if ok {
 		for _, v := range m {
-			return boolean.NonNil(boolean.ConvertInterfaceToBool(v)), false
+			if v == nil {
+				return false, false, true
+			} else {
+				return boolean.NonNil(boolean.ConvertInterfaceToBool(v)), false, false
+			}
 		}
 	}
-	return false, true
+	return false, true, false
 }
 
-func (n *Spec) ReadPayloadAsFloat() (value float64, null bool) {
+func (n *Spec) ReadPayloadAsFloat() (value float64, noPayload, nullPayload bool) {
 	r := n.GetPayload()
 	if r == nil {
-		return 0, true
+		return 0, true, false
 	}
 	if r.Any == nil {
-		return 0, true
+		return 0, true, false
 	}
 	m, ok := r.Any.(map[string]interface{})
 	if ok {
 		for _, v := range m {
-			return conversions.GetFloat(v), false
+			if v == nil {
+				return 0, false, true
+			} else {
+				return conversions.GetFloat(v), false, false
+			}
 		}
 	}
-	return 0, true
+	return 0, true, false
 }
 
-func (n *Spec) ReadPayloadAsString() (value string, null bool) {
+func (n *Spec) ReadMQTTPayloadAsString() (value string, null bool) {
 	r := n.GetPayload()
 	if r == nil {
 		return "", true
@@ -72,22 +80,26 @@ func (n *Spec) ReadPayloadAsString() (value string, null bool) {
 	return fmt.Sprint(r.Any), false
 }
 
-func (n *Spec) ReadPayloadAsString2() (value string, null bool) {
+func (n *Spec) ReadPayloadAsString() (value string, noPayload, nullPayload bool) {
 	r := n.GetPayload()
 	if r == nil {
-		return "", true
+		return "", true, false
 	}
 	if r.Any == nil {
-		return "", true
+		return "", true, false
 	}
 	m, ok := r.Any.(map[string]interface{})
 	if ok {
 		for _, v := range m {
-			val, k := conversions.GetStringOk(v)
-			if k {
-				return val, false
+			if v == nil || v == "" || v == "null" {
+				return "", false, true
+			} else {
+				val, k := conversions.GetStringOk(v)
+				if k {
+					return val, false, false
+				}
 			}
 		}
 	}
-	return "", true
+	return "", true, false
 }

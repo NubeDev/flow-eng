@@ -88,7 +88,9 @@ type Node interface {
 	SetWaringIcon(icon string)
 	GetPayload() *Payload
 	SetPayload(payload *Payload)
-	ReadPayloadAsFloat() (value float64, null bool)
+	ReadPayloadAsFloat() (value float64, noPayload, nullPayload bool)
+	ReadPayloadAsBool() (value bool, noPayload, nullPayload bool)
+	ReadPayloadAsString() (value string, noPayload, nullPayload bool)
 	GetPayloadNull() (value any, null bool)
 	GetNode(uuid string) Node
 	GetNodes() []Node
