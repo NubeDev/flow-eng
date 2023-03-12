@@ -15,6 +15,7 @@ import (
 
 type Backup struct {
 	UUID        string      `json:"uuid"`
+	HostUUID    string      `json:"hostUUID"`
 	UserComment string      `json:"user_comment"`
 	Time        time.Time   `json:"time"`
 	Timestamp   string      `json:"timestamp"`
