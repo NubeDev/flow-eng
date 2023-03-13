@@ -113,6 +113,7 @@ func (inst *Network) Process() {
 	}
 	var retry bool
 	if loopCount == 4 {
+		go inst.fetchAllPointValues()
 		// log.Infof("FLOW NETWORK: LOOP 4 STORE: %+v", inst.GetStore().All())
 		// log.Infof("FLOW NETWORK: LOOP 4 STORE Object: %+v", inst.GetStore().All()[inst.GetID()].Object)
 		retry = true
@@ -151,7 +152,7 @@ func (inst *Network) Process() {
 	if retry { // get the points every 50 loops
 		inst.fetchPointsList()
 		inst.connectionError()
-		inst.fetchAllPointValues() // refresh point COV
+		inst.fetchExistingPointValues() // refresh point COV
 		// log.Infof("FLOW NETWORK: RETRY STORE: %+v", inst.GetStore().All())
 		// log.Infof("FLOW NETWORK: RETRY STORE Object: %+v", inst.GetStore().All()[inst.GetID()].Object)
 	}

@@ -145,9 +145,20 @@ func (inst *FFPointWrite) Process() {
 	} else {
 		_, value, currentPri, err := parseCOV(val.Any)
 		if err == nil {
-			inst.WritePinFloat(node.Out, value)
-			inst.WritePinFloat(node.CurrentPriority, float64(currentPri))
-			inst.lastUpdate = val.LastUpdate
+			inst.lastUpdate = time.Now()
+			if value == nil {
+				inst.WritePinNull(node.Out)
+			} else {
+				inst.WritePinFloat(node.Out, *value, 2)
+			}
+
+			if currentPri == nil {
+				inst.WritePinNull(node.CurrentPriority)
+			} else {
+				inst.WritePinFloat(node.CurrentPriority, float64(*currentPri))
+			}
+
+			inst.WritePin(node.LastUpdated, ttime.TimeSince(inst.lastUpdate))
 		} else {
 			writeNull = true
 		}

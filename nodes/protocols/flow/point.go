@@ -2,6 +2,7 @@ package flow
 
 import (
 	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
@@ -13,7 +14,7 @@ type FFPoint struct {
 	*node.Spec
 	topic       string
 	lastPayload *covPayload
-	lastValue   float64
+	lastValue   *float64
 	lastUpdate  time.Time
 }
 
@@ -27,7 +28,7 @@ func NewFFPoint(body *node.Spec) (node.Node, error) {
 	body.SetAllowSettings()
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body = node.SetNoParent(body)
-	pnt := &FFPoint{body, "", nil, 0, time.Now()}
+	pnt := &FFPoint{body, "", nil, nil, time.Now()}
 	return pnt, nil
 }
 
@@ -142,6 +143,7 @@ func (inst *FFPoint) Process() {
 		inst.checkStillExists()
 	}
 	val, null := inst.GetPayloadNull()
+	// fmt.Println(fmt.Sprintf("FLOW POINT Process() payload: val: %+v,  null: %v", val, null))
 	var writeNull bool
 	if null {
 		writeNull = true
@@ -149,14 +151,26 @@ func (inst *FFPoint) Process() {
 		p, value, currentPri, err := parseCOV(val)
 		if err == nil && p != nil {
 			inst.lastPayload = p
-			inst.WritePinFloat(node.Out, value, 2)
-			inst.WritePinFloat(node.CurrentPriority, float64(currentPri))
-			if inst.lastValue != value {
-				inst.lastValue = value
-				inst.lastUpdate = time.Now()
+			if value == nil {
+				inst.WritePinNull(node.Out)
+				if inst.lastValue != nil {
+					inst.lastValue = nil
+				}
 			} else {
-				inst.WritePin(node.LastUpdated, ttime.TimeSince(inst.lastUpdate))
+				inst.WritePinFloat(node.Out, *value, 2)
+				if inst.lastValue == nil || *inst.lastValue != *value {
+					inst.lastValue = float.New(*value)
+					inst.lastUpdate = time.Now()
+				}
 			}
+
+			if currentPri == nil {
+				inst.WritePinNull(node.CurrentPriority)
+			} else {
+				inst.WritePinFloat(node.CurrentPriority, float64(*currentPri))
+			}
+
+			inst.WritePin(node.LastUpdated, ttime.TimeSince(inst.lastUpdate))
 		} else {
 			writeNull = true
 		}
