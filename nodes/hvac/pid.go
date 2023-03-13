@@ -61,19 +61,23 @@ func (inst *PIDNode) Process() {
 	setpoint := inst.ReadPinOrSettingsFloat(node.Setpoint)
 	enable, _ := inst.ReadPinAsBool(node.Enable)
 
+	minOut := inst.ReadPinOrSettingsFloat(node.MinOut)
+	maxOut := inst.ReadPinOrSettingsFloat(node.MaxOut)
+
 	if !enable || inputNull {
 		inst.PID.SetMode(pid.MANUAL)
 		manual := inst.ReadPinOrSettingsFloat(node.Manual)
 		inst.WritePinFloat(node.Out, manual)
+		return
+	} else if minOut == maxOut {
+		inst.PID.SetMode(pid.MANUAL)
+		inst.WritePinFloat(node.Out, minOut)
 		return
 	}
 
 	inst.PID.SetMode(pid.AUTO)
 	inst.PID.SetSetpoint(setpoint)
 	inst.PID.SetInput(input)
-
-	minOut := inst.ReadPinOrSettingsFloat(node.MinOut)
-	maxOut := inst.ReadPinOrSettingsFloat(node.MaxOut)
 	inst.PID.SetOutputLimits(minOut, maxOut)
 
 	inP := inst.ReadPinOrSettingsFloat(node.InP)
