@@ -28,10 +28,10 @@ const (
 )
 
 type covPayload struct {
-	Value    float64 `json:"value"`
-	ValueRaw float64 `json:"value_raw"`
-	Ts       string  `json:"ts"`
-	Priority int     `json:"priority"`
+	Value    *float64 `json:"value"`
+	ValueRaw *float64 `json:"value_raw"`
+	Ts       string   `json:"ts"`
+	Priority *int     `json:"priority"`
 }
 
 type PointWriter struct {
@@ -77,16 +77,19 @@ type pointDetails struct {
 	isWriteable    bool
 }
 
-func parseCOV(body any) (payload *covPayload, value float64, priority int, err error) {
+func parseCOV(body any) (payload *covPayload, value *float64, priority *int, err error) {
+	// fmt.Println(fmt.Sprintf("FLOW POINT parseCOV() body: %+v", body))
 	msg, ok := body.(mqtt.Message)
 	if !ok {
-		return nil, 0, 0, errors.New("failed to parse mqtt cov payload")
+		return nil, nil, nil, errors.New("failed to parse mqtt cov payload")
 	}
 	payload = &covPayload{}
+	// fmt.Println(fmt.Sprintf("FLOW POINT parseCOV() msg.Payload(): %+v", string(msg.Payload())))
 	err = json.Unmarshal(msg.Payload(), &payload)
 	if err != nil {
-		return nil, 0, 0, err
+		return nil, nil, nil, err
 	}
+	// fmt.Println(fmt.Sprintf("FLOW POINT parseCOV() payload: %+v", payload))
 	return payload, payload.Value, payload.Priority, nil
 }
 
