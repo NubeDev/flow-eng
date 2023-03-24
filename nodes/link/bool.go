@@ -31,7 +31,7 @@ func NewBoolLinkInput(body *node.Spec, store *Store) (node.Node, error) {
 }
 
 func (inst *BoolLinkInput) Process() {
-	in1, _ := inst.ReadPinAsBool(node.In)
+	in1, null := inst.ReadPinAsBool(node.In)
 	topic := inst.ReadPinOrSettingsString(node.Topic)
 	if topic != inst.lastTopic {
 		parentTopic := helpers.CleanParentName(topic, inst.GetParentName())
@@ -39,7 +39,11 @@ func (inst *BoolLinkInput) Process() {
 			topic = parentTopic
 		}
 		topic = fmt.Sprintf("bool-%s", topic)
-		getStore().Add(topic, in1)
+		if null {
+			getStore().Add(topic, nil)
+		} else {
+			getStore().Add(topic, in1)
+		}
 		inst.SetSubTitle(topic)
 		inst.lastTopic = topic
 	}
@@ -106,7 +110,15 @@ func (inst *BoolLinkOutput) Process() {
 	topic, _ := getSettings(inst.GetSettings())
 	v, found := getStore().Get(topic)
 	if found {
-		inst.WritePinFloat(node.Out, conversions.GetFloat(v))
+		if v == nil {
+			inst.WritePinNull(node.Out)
+		} else {
+			if conversions.GetFloat(v) == 1 {
+				inst.WritePinTrue(node.Out)
+			} else {
+				inst.WritePinFalse(node.Out)
+			}
+		}
 	} else {
 		inst.WritePinNull(node.Out)
 	}

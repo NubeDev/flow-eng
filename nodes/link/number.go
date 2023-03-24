@@ -32,7 +32,7 @@ func NewNumLinkInput(body *node.Spec, store *Store) (node.Node, error) {
 }
 
 func (inst *NumLinkInput) Process() {
-	in1, _ := inst.ReadPinAsFloat(node.In)
+	in1, null := inst.ReadPinAsFloat(node.In)
 	topic := inst.ReadPinOrSettingsString(node.Topic)
 	if topic != inst.lastTopic {
 		parentTopic := helpers.CleanParentName(topic, inst.GetParentName())
@@ -40,7 +40,12 @@ func (inst *NumLinkInput) Process() {
 			topic = parentTopic
 		}
 		topic = fmt.Sprintf("num-%s", topic)
-		getStore().Add(topic, in1)
+		if null {
+			getStore().Add(topic, nil)
+		} else {
+			getStore().Add(topic, in1)
+		}
+
 		inst.SetSubTitle(topic)
 		inst.lastTopic = topic
 	}
@@ -107,7 +112,11 @@ func (inst *NumLinkOutput) Process() {
 	topic, _ := getSettings(inst.GetSettings())
 	v, found := getStore().Get(topic)
 	if found {
-		inst.WritePinFloat(node.Out, conversions.GetFloat(v))
+		if v == nil {
+			inst.WritePinNull(node.Out)
+		} else {
+			inst.WritePinFloat(node.Out, conversions.GetFloat(v))
+		}
 	} else {
 		inst.WritePinNull(node.Out)
 	}

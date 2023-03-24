@@ -21,15 +21,20 @@ func NewNumber(body *node.Spec) (node.Node, error) {
 
 func (inst *Number) Process() {
 	in1, null := inst.ReadPinAsFloat(node.In)
-	if !null {
+	if null {
+		inst.WritePinNull(node.Boolean)
+		inst.WritePinNull(node.String)
+	} else {
 		if in1 == 1 {
 			inst.WritePinBool(node.Boolean, true)
 		} else {
 			inst.WritePinBool(node.Boolean, false)
 		}
-		inst.WritePin(node.String, conversions.FloatToString(in1))
-	} else {
-		inst.WritePinNull(node.Boolean)
-		inst.WritePinNull(node.String)
+		v := conversions.FloatToString(in1)
+		if v == "" {
+			inst.WritePin(node.String, conversions.FloatToString(in1))
+		} else {
+			inst.WritePinNull(node.String)
+		}
 	}
 }
