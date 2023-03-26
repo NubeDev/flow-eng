@@ -80,6 +80,8 @@ func (inst *AO) Process() {
 	loop, firstLoop := inst.Loop()
 	s := inst.GetStore()
 	if s == nil {
+		inst.WritePinNull(node.Out)
+		inst.WritePinNull(node.CurrentPriority)
 		return
 	}
 	if firstLoop {
