@@ -70,11 +70,13 @@ func (inst *AI) Process() {
 		point.Name = name
 		if err != nil {
 			log.Errorf("bacnet-server add new point type:%s-%d err:%s", objectType, inst.objectID, err.Error())
+			inst.WritePinNull(node.Out)
 			return
 		}
 		s := inst.GetStore()
 		if s == nil {
 			log.Errorf("bacnet-server add new point failed to get store type:%s-%d err:%s", objectType, inst.objectID, err.Error())
+			inst.WritePinNull(node.Out)
 			return
 		}
 		point, err = inst.store.AddPoint(point, true)
@@ -83,6 +85,7 @@ func (inst *AI) Process() {
 
 	pv, err := inst.getPV(points.AnalogInput, inst.objectID)
 	if err != nil {
+		inst.WritePinNull(node.Out)
 		return
 	}
 	if pv == nil {

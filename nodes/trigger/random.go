@@ -43,6 +43,7 @@ func (inst *Random) Process() {
 		settings, err := inst.getSettings(inst.GetSettings())
 		if err != nil {
 			log.Errorf("Random Node err: failed to get settings err:%s", err.Error())
+			inst.WritePinNull(node.Out)
 			return
 		}
 		precision := settings.Precision
