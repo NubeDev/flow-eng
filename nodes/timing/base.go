@@ -10,6 +10,8 @@ import (
 
 const (
 	category  = "time"
+	clock     = "clock"
+	date      = "date"
 	delay     = "delay"
 	delayOn   = "delay-on"
 	delayOff  = "delay-off"

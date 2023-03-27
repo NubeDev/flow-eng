@@ -50,7 +50,8 @@ func (inst *NumOutputSelect) Process() {
 	selectInput = math.Floor(selectInput)
 	in, inNull := inst.ReadPinAsFloat(node.In)
 	settings, _ := inst.getSettings(inst.GetSettings())
-	count := settings.OutputCount
+	// count := settings.OutputCount
+	count := inst.OutputsLen()
 	nullNonSelected := settings.NullNonSelected
 	for i := 1; i <= count; i++ {
 		selectedOutputName := node.OutputName(fmt.Sprintf("out%d", i))
@@ -59,6 +60,15 @@ func (inst *NumOutputSelect) Process() {
 		} else {
 			if selectInput == float64(i) {
 				inst.WritePinFloat(selectedOutputName, in)
+			} else {
+				out := inst.GetOutput(selectedOutputName)
+				outValue := out.GetValue()
+				if outValue == nil {
+					inst.WritePinNull(selectedOutputName)
+				} else {
+					inst.WritePinFloat(selectedOutputName, conversions.GetFloat(outValue))
+				}
+
 			}
 		}
 	}

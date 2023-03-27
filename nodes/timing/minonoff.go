@@ -59,9 +59,7 @@ func (inst *MinOnOff) Process() {
 	if reset && !inst.lastReset {
 		inst.minOnEnabled = false
 		inst.minOffEnabled = false
-		inst.WritePinFalse(node.MinOnActive)
 		inst.currentMinOn = false
-		inst.WritePinFalse(node.MinOffActive)
 		inst.currentMinOff = false
 	}
 	inst.lastReset = reset
@@ -72,9 +70,16 @@ func (inst *MinOnOff) Process() {
 		if input && !inst.lastInput {
 			inst.timeOn = time.Now().Unix()
 			inst.minOnEnabled = true
+			inst.WritePinTrue(node.MinOnActive)
+			inst.WritePinFalse(node.MinOffActive)
 		} else if !input && inst.lastInput {
 			inst.timeOff = time.Now().Unix()
 			inst.minOffEnabled = true
+			inst.WritePinTrue(node.MinOffActive)
+			inst.WritePinFalse(node.MinOnActive)
+		} else {
+			inst.WritePinFalse(node.MinOnActive)
+			inst.WritePinFalse(node.MinOffActive)
 		}
 		inst.lastInput = input
 		return
@@ -86,10 +91,7 @@ func (inst *MinOnOff) Process() {
 		minOnIntervalSecs := minOnIntervalDuration.Seconds()
 		if elapsed >= int64(minOnIntervalSecs) {
 			inst.minOnEnabled = false
-			inst.WritePinFalse(node.MinOnActive)
-			inst.currentMinOn = false
 			if input {
-				inst.WritePinTrue(node.Out)
 				inst.currentOutput = true
 			}
 		}
@@ -98,18 +100,15 @@ func (inst *MinOnOff) Process() {
 		minOffIntervalSecs := minOffIntervalDuration.Seconds()
 		if elapsed >= int64(minOffIntervalSecs) {
 			inst.minOffEnabled = false
-			inst.WritePinFalse(node.MinOffActive)
-			inst.currentMinOff = false
 			if !input {
-				inst.WritePinFalse(node.Out)
 				inst.currentOutput = false
 			}
 		}
 	}
 	inst.lastInput = input
 	inst.WritePinBool(node.Out, inst.currentOutput)
-	inst.WritePinBool(node.MinOffActive, inst.currentMinOff)
-	inst.WritePinBool(node.MinOnActive, inst.currentMinOn)
+	inst.WritePinBool(node.MinOffActive, inst.minOffEnabled)
+	inst.WritePinBool(node.MinOnActive, inst.minOnEnabled)
 
 }
 

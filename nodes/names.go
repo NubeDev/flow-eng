@@ -34,12 +34,13 @@ const (
 
 	rampNode = "ramp"
 
-	scaleNode = "scale"
-	limitNode = "limit"
-	fade      = "fade"
-	rateLimit = "rate-limit"
-	round     = "round"
-	waveform  = "waveform"
+	scaleNode  = "scale"
+	limitNode  = "limit"
+	polynomial = "polynomial"
+	fade       = "fade"
+	rateLimit  = "rate-limit"
+	round      = "round"
+	waveform   = "waveform"
 
 	dataStore  = "data-store"
 	jsonFilter = "json-filter"
@@ -106,6 +107,8 @@ const (
 	injectNode = "inject"
 	iterate    = "iterate"
 
+	clock     = "clock"
+	date      = "date"
 	delay     = "delay"
 	delayOn   = "delay-on"
 	delayOff  = "delay-off"
