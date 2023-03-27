@@ -69,7 +69,7 @@ func (runner *Runner) Process() {
 
 	// trigger all connectors to input ports
 	err := runner.processConnectors()
-	if err != nil {
+	if err != ErrNoInputData && err != nil {
 		log.Errorf("RUNNER NAME: %s PREVIOUS-TYPE: %s PREVIOUS-NAME: %s ERR: %s ", runner.node.GetName(), previousNodeType, previousNodeName, err.Error())
 		return
 	}
