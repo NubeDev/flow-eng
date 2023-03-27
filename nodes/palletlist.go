@@ -150,6 +150,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	iterate, _ := trigger.NewIterate(nil)
 
 	// time
+	clock, _ := timing.NewClock(nil)
+	date, _ := timing.NewDate(nil)
 	delay, _ := timing.NewDelay(nil)
 	delayOn, _ := timing.NewDelayOn(nil)
 	delayOff, _ := timing.NewDelayOff(nil)
@@ -161,6 +163,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	// numtransform
 	fade, _ := numtransform.NewFade(nil)
 	limitNode, _ := numtransform.NewLimit(nil)
+	polynomial, _ := numtransform.NewPolynomial(nil)
 	rateLimit, _ := numtransform.NewRateLimit(nil)
 	round, _ := numtransform.NewRound(nil)
 	scaleNode, _ := numtransform.NewScale(nil)
@@ -302,6 +305,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(fade),
 		node.ConvertToSpec(limitNode),
+		node.ConvertToSpec(polynomial),
 		node.ConvertToSpec(rateLimit),
 		node.ConvertToSpec(round),
 		node.ConvertToSpec(scaleNode),
@@ -337,6 +341,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(switchNode),
 		node.ConvertToSpec(selectNode),
 
+		node.ConvertToSpec(clock),
+		node.ConvertToSpec(date),
 		node.ConvertToSpec(delay),
 		node.ConvertToSpec(delayOn),
 		node.ConvertToSpec(delayOff),
@@ -556,6 +562,8 @@ func builderTransformations(body *node.Spec) (node.Node, error) {
 		return numtransform.NewRound(body)
 	case waveform:
 		return numtransform.NewWaveform(body)
+	case polynomial:
+		return numtransform.NewPolynomial(body)
 	}
 	return nil, nil
 }
@@ -780,6 +788,10 @@ func builderTrigger(body *node.Spec) (node.Node, error) {
 
 func builderTiming(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
+	case clock:
+		return timing.NewClock(body)
+	case date:
+		return timing.NewDate(body)
 	case delay:
 		return timing.NewDelay(body)
 	case delayOn:
