@@ -12,6 +12,8 @@ type DB interface {
 	DeleteSettings() error
 	GetGitToken(uuid string, previewToken bool) (string, error)
 	GetSetting(uuid string) (*Settings, error)
+	GetSettings() ([]Settings, error)
+	GetFirstSettings() (*Settings, error)
 	AddConnection(body *Connection) (*Connection, error)
 	UpdateConnection(uuid string, body *Connection) (*Connection, error)
 	GetConnections() ([]Connection, error)

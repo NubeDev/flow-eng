@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/NubeDev/flow-eng/helpers"
 	"github.com/tidwall/buntdb"
 )
 
@@ -15,7 +16,6 @@ type AutoRefresh struct {
 
 type Settings struct {
 	UUID              string `json:"uuid"`
-	Theme             string `json:"theme"` // light, dark
 	GitToken          string `json:"git_token"`
 	AutoRefreshEnable bool   `json:"auto_refresh_enable"`
 	AutoRefreshRate   int    `json:"auto_refresh_rate"`
@@ -27,12 +27,19 @@ func (inst *db) AddSettings(body *Settings) (*Settings, error) {
 		return nil, err
 	}
 	if len(settings) > 0 {
+		if settings != nil {
+			return nil, errors.New(fmt.Sprintf("settings can only be added once uuid: %s", settings[0].UUID))
+		}
 		return nil, errors.New("settings can only be added once")
 	}
-	body.UUID = "set_123456789ABC"
+	body.UUID = helpers.UUID("set")
 	if body.GitToken != "" {
 		body.GitToken = encodeToken(body.GitToken)
 	}
+	if body.AutoRefreshRate == 0 {
+		body.AutoRefreshRate = 200
+	}
+
 	data, err := json.Marshal(body)
 	if err != nil {
 		fmt.Printf("Error: %s", err)
@@ -50,21 +57,11 @@ func (inst *db) AddSettings(body *Settings) (*Settings, error) {
 }
 
 func (inst *db) UpdateSettings(uuid string, body *Settings) (*Settings, error) {
-	settings, err := inst.GetSettings()
-	if err != nil {
-		return nil, err
-	}
-	if len(settings) == 0 { // add settings if not existing
-		addSettings, err := inst.AddSettings(body)
-		if err != nil {
-			return nil, err
-		}
-		return addSettings, err
-	}
 	uuid_ := uuid
 	if body.GitToken != "" {
 		body.GitToken = encodeToken(body.GitToken)
 	}
+	body.UUID = uuid
 	j, err := json.Marshal(body)
 	if err != nil {
 		fmt.Printf("Error: %s", err)
@@ -78,7 +75,7 @@ func (inst *db) UpdateSettings(uuid string, body *Settings) (*Settings, error) {
 		fmt.Printf("Error: %s", err)
 		return nil, err
 	}
-	return body, nil
+	return inst.GetSetting(uuid)
 }
 
 func (inst *db) DeleteSettings() error {
@@ -86,19 +83,25 @@ func (inst *db) DeleteSettings() error {
 	if err != nil {
 		return err
 	}
-	if len(settings) == 0 {
-		return errors.New("no settings have been added")
-	}
-	uuid_ := settings[0].UUID
-	err = inst.DB.Update(func(tx *buntdb.Tx) error {
-		_, err := tx.Delete(uuid_)
-		return err
-	})
-	if err != nil {
-		fmt.Printf("Error delete: %s", err)
-		return err
+	for _, setting := range settings {
+		inst.DeleteSetting(setting.UUID)
 	}
 	return nil
+}
+
+func (inst *db) DeleteSetting(uuid string) error {
+	if matchSettingsUUID(uuid) {
+		err := inst.DB.Update(func(tx *buntdb.Tx) error {
+			_, err := tx.Delete(uuid)
+			return err
+		})
+		if err != nil {
+			fmt.Printf("Error delete: %s", err)
+			return err
+		}
+		return nil
+	}
+	return errors.New("incorrect setting uuid")
 }
 
 func (inst *db) GetGitToken(uuid string, previewToken bool) (string, error) {
@@ -154,6 +157,17 @@ func (inst *db) GetSettings() ([]Settings, error) {
 		return []Settings{}, err
 	}
 	return resp, nil
+}
+
+func (inst *db) GetFirstSettings() (*Settings, error) {
+	s, err := inst.GetSettings()
+	if err != nil {
+		return nil, err
+	}
+	if len(s) > 0 {
+		return &s[0], nil
+	}
+	return nil, nil
 }
 
 func (inst *db) GetSetting(uuid string) (*Settings, error) {
