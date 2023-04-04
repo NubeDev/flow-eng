@@ -41,7 +41,7 @@ func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error)
 	if settings != nil {
 		count = settings.InputCount
 	}
-	inputs := node.BuildInputs(node.DynamicInputs(node.TypeBool, false, count, 2, 20, body.Inputs, false)...)
+	inputs := node.BuildInputs(node.DynamicInputs(node.TypeBool, nil, count, 2, 20, body.Inputs, false)...)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(buildBoolDefaultSchema())
