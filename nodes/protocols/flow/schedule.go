@@ -86,7 +86,7 @@ func (inst *FFSchedule) getResult() {
 
 func (inst *FFSchedule) Process() {
 	loopCount, _ := inst.Loop()
-	if loopCount == 20 {
+	if loopCount == 10 {
 		inst.getResult()
 	} else if loopCount%50 == 0 {
 		inst.getResult()

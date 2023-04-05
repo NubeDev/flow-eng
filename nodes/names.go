@@ -85,7 +85,8 @@ const (
 	rank      = "rank"
 	median    = "median"
 
-	flatLine = "flatline"
+	flatLine       = "flatline"
+	rollingAverage = "rolling-average"
 
 	// filters
 	preventNull        = "prevent-null"
