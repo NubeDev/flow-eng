@@ -5,5 +5,7 @@ const (
 )
 
 const (
-	flatLine = "flatline"
+	flatLine       = "flatline"
+	streamAverage  = "stream-average"
+	rollingAverage = "rolling-average"
 )

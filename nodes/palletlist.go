@@ -72,6 +72,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	// streams
 	flatLine, _ := streams.NewFlatline(nil)
+	rollingAverage, _ := streams.NewRollingAverage(nil)
 
 	flowNetwork, _ := flow.NewNetwork(nil)
 	flowPoint, _ := flow.NewFFPoint(nil)
@@ -327,6 +328,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(median),
 
 		node.ConvertToSpec(flatLine),
+		node.ConvertToSpec(rollingAverage),
 
 		node.ConvertToSpec(flowLoopCount),
 		node.ConvertToSpec(subFlowFolder),
@@ -632,6 +634,8 @@ func builderStreams(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case flatLine:
 		return streams.NewFlatline(body)
+	case rollingAverage:
+		return streams.NewRollingAverage(body)
 	}
 	return nil, nil
 }
