@@ -67,15 +67,12 @@ func (inst *RollingAverage) Process() {
 	sampleDelay := intervalDuration.Milliseconds() / int64(inst.numSamples)
 	takeSample := resetDone || (now-inst.lastSampleTimeMilli) > sampleDelay
 
-	fmt.Println(fmt.Sprintf("intervalDuration: %v, numSamples: %v, sampleDelay: %v, now-inst.lastSampleTimeMilli: %v, takeSample: %v", intervalDuration.String(), inst.numSamples, sampleDelay, now-inst.lastSampleTimeMilli, takeSample))
-
 	if !inNull && takeSample {
 		// Take a sample and add it to the array
 		inst.sampleArray = append(inst.sampleArray, inputVal)
 		for len(inst.sampleArray) >= inst.numSamples {
 			inst.sampleArray = inst.sampleArray[1:]
 		}
-		fmt.Println(fmt.Sprintf("sampleArray: %+v", inst.sampleArray))
 		total := 0.0
 		for _, value := range inst.sampleArray {
 			total += value
@@ -89,47 +86,6 @@ func (inst *RollingAverage) Process() {
 		inst.WritePinFloat(node.Out, *inst.lastOutput)
 	}
 
-	/*
-		in, inNull := inst.ReadPinAsFloat(node.In)
-		if !inNull {
-			if inst.lastAvg == nil || inst.numSamples == 0 {
-				inst.lastAvg = float.New(in)
-				inst.numSamples = 1
-			} else {
-				total := *inst.lastAvg * inst.numSamples
-				total += in
-				// inst.numSamples++
-				// inst.lastAvg = total / inst.numSamples
-			}
-
-		}
-
-		newCOV := false
-
-		in, inNull := inst.ReadPinAsFloat(node.In)
-		if inNull && inst.lastVal != nil || inNull && inst.lastCOVTime == -1 {
-			newCOV = true
-			inst.lastVal = nil
-		} else if !inNull && inst.lastVal == nil {
-			newCOV = true
-			inst.lastVal = float.New(in)
-		} else if !inNull && (in != *inst.lastVal) {
-			newCOV = true
-			inst.lastVal = float.New(in)
-		}
-
-		if newCOV {
-			inst.lastCOVTime = time.Now().Unix()
-			inst.alertStatus = false
-		} else {
-			now := time.Now().Unix()
-			if float64(now-inst.lastCOVTime) >= intervalDuration.Seconds() {
-				inst.alertStatus = true
-			}
-		}
-		inst.WritePinBool(node.Out, inst.alertStatus)
-
-	*/
 }
 
 func (inst *RollingAverage) setSubtitle(numSamples int, intervalDuration time.Duration) {
