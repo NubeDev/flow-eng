@@ -18,7 +18,7 @@ func NewLeadLagSwitch(body *node.Spec) (node.Node, error) {
 	inputs := node.BuildInputs(in, stage1, stage2)
 
 	leadUnit := node.BuildOutput(node.LeadUnit, node.TypeString, nil, body.Outputs)
-	leadUnitBool := node.BuildOutput(node.LeadUnitBool, node.TypeString, nil, body.Outputs)
+	leadUnitBool := node.BuildOutput(node.LeadUnitBool, node.TypeBool, nil, body.Outputs)
 	enableA := node.BuildOutput(node.EnableA, node.TypeBool, nil, body.Outputs)
 	enableB := node.BuildOutput(node.EnableB, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(leadUnit, leadUnitBool, enableA, enableB)
@@ -38,12 +38,12 @@ func (inst *LeadLagSwitch) Process() {
 	stage2, _ := inst.ReadPinAsBool(node.Stage2)
 	if !inst.swapLead {
 		inst.WritePin(node.LeadUnit, "A")
-		inst.WritePinBool(node.LeadUnitBool, false)
+		inst.WritePinFalse(node.LeadUnitBool)
 		inst.WritePinBool(node.EnableA, stage1)
 		inst.WritePinBool(node.EnableB, stage2)
 	} else {
 		inst.WritePin(node.LeadUnit, "B")
-		inst.WritePinBool(node.LeadUnitBool, true)
+		inst.WritePinTrue(node.LeadUnitBool)
 		inst.WritePinBool(node.EnableA, stage2)
 		inst.WritePinBool(node.EnableB, stage1)
 	}

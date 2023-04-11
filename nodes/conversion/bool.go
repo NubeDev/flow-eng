@@ -19,12 +19,16 @@ func NewBoolean(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *Boolean) Process() {
-	in1, _ := inst.ReadPinAsBool(node.In)
+	in1, null := inst.ReadPinAsBool(node.In)
+	if null {
+		inst.WritePinNull(node.Float)
+		inst.WritePinNull(node.String)
+	}
 	if in1 {
 		inst.WritePinFloat(node.Float, 1)
-		inst.WritePin(node.String, "1")
+		inst.WritePin(node.String, "true")
 	} else {
 		inst.WritePinFloat(node.Float, 0)
-		inst.WritePin(node.String, "0")
+		inst.WritePin(node.String, "false")
 	}
 }

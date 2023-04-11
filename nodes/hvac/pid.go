@@ -153,7 +153,7 @@ func (inst *PIDNode) buildSchema() *schemas.Schema {
 	props.InP.Title = "Proportional Factor (error multiplier)"
 	props.InP.Default = 1
 	props.InI.Title = "Integral Factor (repeats per second)"
-	props.InI.Default = 0
+	props.InI.Default = 0.01
 	props.InD.Title = "Derivative Factor"
 	props.InD.Default = 0
 
