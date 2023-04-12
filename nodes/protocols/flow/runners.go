@@ -11,14 +11,14 @@ import (
 
 func (inst *Network) subscribeToEachPoint() {
 	callback := func(client mqtt.Client, message mqtt.Message) {
-		/*
-			if message.Payload() == nil {
-				log.Info("FLOW NETWORK: subscribeToEachPoint() response payload: NIL")
-			} else {
-				log.Infof("FLOW NETWORK: subscribeToEachPoint() response payload: %+v", string(message.Payload()))
-			}
-			log.Infof("FLOW NETWORK: subscribeToEachPoint() response topic: %+v", string(message.Topic()))
-		*/
+
+		if message.Payload() == nil {
+			log.Info("FLOW NETWORK: subscribeToEachPoint() response payload: NIL")
+		} else {
+			log.Infof("FLOW NETWORK: subscribeToEachPoint() response payload: %+v", string(message.Payload()))
+		}
+		log.Infof("FLOW NETWORK: subscribeToEachPoint() response topic: %+v", string(message.Topic()))
+
 		s := inst.GetStore()
 		children, ok := s.Get(inst.GetID())
 		payloads := getPayloads(children, ok)
@@ -40,15 +40,15 @@ func (inst *Network) subscribeToEachPoint() {
 	payloads := getPayloads(children, ok)
 	inst.subscribeFailedPoints = true
 	for _, payload := range payloads {
-		// log.Infof("Flow Network subscribeToEachPoint() payload: %+v", payload)
+		log.Infof("Flow Network subscribeToEachPoint() payload: %+v", payload)
 		if payload.topic != "" {
 			if inst.mqttClient != nil {
-				// log.Info("Flow Network subscribeToEachPoint()")
+				log.Info("Flow Network subscribeToEachPoint()")
 				err := inst.mqttClient.Subscribe(payload.topic, mqttQOS, callback)
 				if err != nil {
-					// log.Errorf("Flow Network subscribeToEachPoint() subscribe topic: %s err: %s", payload.topic, err.Error())
+					log.Errorf("Flow Network subscribeToEachPoint() subscribe topic: %s err: %s", payload.topic, err.Error())
 				} else {
-					// log.Infof("Flow Network subscribeToEachPoint() subscribe topic: %s", payload.topic)
+					log.Infof("Flow Network subscribeToEachPoint() subscribe topic: %s", payload.topic)
 					inst.subscribeFailedPoints = false
 				}
 			}
@@ -172,7 +172,7 @@ func (inst *Network) schedulesList() {
 const fetchSelectedPointsCOVTopic = "rubix/platform/points/cov/selected"
 
 func (inst *Network) fetchExistingPointValues() {
-	// log.Infof("FLOW NETWORK: fetchExistingPointValues()")
+	log.Infof("FLOW NETWORK: fetchExistingPointValues()")
 	s := inst.GetStore()
 	// log.Infof("FLOW NETWORK: fetchExistingPointValues() inst.GetID(): %+v", inst.GetID())
 	children, ok := s.Get(inst.GetID())
@@ -206,42 +206,42 @@ func (inst *Network) fetchExistingPointValues() {
 			}
 		}
 	}
-	/*
-		for i, v := range pointUUIDList {
-			if v == nil {
-				log.Infof("FLOW NETWORK: fetchExistingPointValues() pointUUIDList %v IS NIL", i)
-			} else {
-				log.Infof("FLOW NETWORK: fetchExistingPointValues() pointUUIDList %v: %+v", i, *v)
-			}
+
+	for i, v := range pointUUIDList {
+		if v == nil {
+			log.Infof("FLOW NETWORK: fetchExistingPointValues() pointUUIDList %v IS NIL", i)
+		} else {
+			log.Infof("FLOW NETWORK: fetchExistingPointValues() pointUUIDList %v: %+v", i, *v)
 		}
-	*/
+	}
+
 	data, err := json.Marshal(pointUUIDList)
 	if err != nil {
 		// log.Errorf("Flow Network fetchExistingPointValues() json marshal err: %s", err.Error())
 		return
 	}
 	if inst.mqttClient != nil {
-		// log.Infof("FLOW NETWORK: inst.mqttClient.Publish(fetchSelectedPointsCOVTopic, mqttQOS, mqttRetain, data)")
+		log.Infof("FLOW NETWORK: inst.mqttClient.Publish(fetchSelectedPointsCOVTopic, mqttQOS, mqttRetain, data)")
 		err := inst.mqttClient.Publish(fetchSelectedPointsCOVTopic, mqttQOS, mqttRetain, data)
 		if err != nil {
-			// log.Errorf("Flow Network fetchExistingPointValues() mqtt publish err: %s", err.Error())
+			log.Errorf("Flow Network fetchExistingPointValues() mqtt publish err: %s", err.Error())
 		}
 	} else {
-		// log.Errorf("Flow Network fetchExistingPointValues() mqttClient not available")
+		log.Errorf("Flow Network fetchExistingPointValues() mqttClient not available")
 	}
 }
 
 const fetchAllPointsCOVTopic = "rubix/platform/points/cov/all"
 
 func (inst *Network) fetchAllPointValues() {
-	// log.Info("FLOW NETWORK: fetchAllPointValues()")
+	log.Info("FLOW NETWORK: fetchAllPointValues()")
 	if inst.mqttClient != nil {
 		err := inst.mqttClient.Publish(fetchAllPointsCOVTopic, mqttQOS, mqttRetain, "")
 		if err != nil {
-			// log.Errorf("Flow Network fetchAllPointValues() mqtt publish err: %s", err.Error())
+			log.Errorf("Flow Network fetchAllPointValues() mqtt publish err: %s", err.Error())
 		}
 	} else {
-		// log.Errorf("Flow Network fetchAllPointValues() mqttClient not available")
+		log.Errorf("Flow Network fetchAllPointValues() mqttClient not available")
 	}
 }
 
