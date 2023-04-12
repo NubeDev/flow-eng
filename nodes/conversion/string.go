@@ -14,8 +14,8 @@ func NewString(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, conversionString, category)
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false, false))
 	asBool := node.BuildOutput(node.Boolean, node.TypeBool, nil, body.Outputs)
-	asString := node.BuildOutput(node.Float, node.TypeFloat, nil, body.Outputs)
-	outputs := node.BuildOutputs(asBool, asString)
+	asFloat := node.BuildOutput(node.Float, node.TypeFloat, nil, body.Outputs)
+	outputs := node.BuildOutputs(asBool, asFloat)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &String{body}, nil
 }
@@ -33,11 +33,6 @@ func (inst *String) Process() {
 	} else {
 		inst.WritePinNull(node.Float)
 	}
-	result, err := strconv.ParseBool(in1) // to boolean
-	if err != nil {
-		inst.WritePinNull(node.Boolean)
-	} else {
-		inst.WritePinBool(node.Boolean, result)
-	}
-
+	result, _ := strconv.ParseBool(in1) // to boolean
+	inst.WritePinBool(node.Boolean, result)
 }

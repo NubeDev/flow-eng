@@ -26,9 +26,11 @@ func NewFFSchedule(body *node.Spec) (node.Node, error) {
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	lastUpdated := node.BuildOutput(node.LastUpdated, node.TypeString, nil, body.Outputs)
 	payload := node.BuildOutput(node.OutPayload, node.TypeFloat, nil, body.Outputs)
-	nextStart := node.BuildOutput(node.NextStart, node.TypeString, nil, body.Outputs)
-	nextStop := node.BuildOutput(node.NextStop, node.TypeString, nil, body.Outputs)
-	outputs := node.BuildOutputs(out, lastUpdated, payload, nextStart, nextStop)
+	periodStart := node.BuildOutput(node.PeriodStart, node.TypeString, nil, body.Outputs)
+	periodStop := node.BuildOutput(node.PeriodStop, node.TypeString, nil, body.Outputs)
+	periodStartUnix := node.BuildOutput(node.PeriodStartUnix, node.TypeFloat, nil, body.Outputs)
+	periodStopUnix := node.BuildOutput(node.PeriodStopUnix, node.TypeFloat, nil, body.Outputs)
+	outputs := node.BuildOutputs(out, lastUpdated, payload, periodStart, periodStop, periodStartUnix, periodStopUnix)
 	body.SetAllowSettings()
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body = node.SetNoParent(body)
@@ -75,13 +77,14 @@ func (inst *FFSchedule) getResult() {
 			inst.WritePinBool(node.Out, value)
 			inst.WritePin(node.LastUpdated, ttime.TimeSince(inst.lastUpdate))
 			inst.WritePinFloat(node.OutPayload, schedule.Payload)
-			inst.WritePin(node.NextStart, schedule.NextStartString)
-			inst.WritePin(node.NextStop, schedule.NextStopString)
+			inst.WritePin(node.PeriodStart, schedule.PeriodStartString)
+			inst.WritePin(node.PeriodStop, schedule.PeriodStopString)
+			inst.WritePinFloat(node.PeriodStartUnix, float64(schedule.PeriodStart))
+			inst.WritePinFloat(node.PeriodStopUnix, float64(schedule.PeriodStop))
 			inst.SetSubTitle(schedule.Name)
 			inst.SetWaringIcon(string(emoji.GreenCircle))
 		}
 	}
-
 }
 
 func (inst *FFSchedule) Process() {

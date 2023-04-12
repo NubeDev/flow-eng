@@ -122,13 +122,17 @@ type Schedule struct {
 	Enable            bool      `json:"enable"`
 	ThingClass        string    `json:"thing_class"`
 	ThingType         string    `json:"thing_type"`
-	IsActive          bool      `json:"is_active"`
-	IsGlobal          bool      `json:"is_global"`
 	TimeZone          string    `json:"timezone"`
+	IsActive          bool      `json:"is_active"`
 	ActiveWeekly      bool      `json:"active_weekly"`
 	ActiveException   bool      `json:"active_exception"`
 	ActiveEvent       bool      `json:"active_event"`
 	Payload           float64   `json:"payload"`
+	DefaultPayload    float64   `json:"default_payload"`
+	PeriodStart       int64     `json:"period_start"`        // unix (seconds) timestamp
+	PeriodStop        int64     `json:"period_stop"`         // unix (seconds) timestamp
+	NextStart         int64     `json:"next_start"`          // unix (seconds) timestamp
+	NextStop          int64     `json:"next_stop"`           // unix (seconds) timestamp
 	PeriodStartString string    `json:"period_start_string"` // human readable timestamp
 	PeriodStopString  string    `json:"period_stop_string"`  // human readable timestamp
 	NextStartString   string    `json:"next_start_string"`   // human readable timestamp

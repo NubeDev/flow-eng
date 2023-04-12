@@ -31,7 +31,7 @@ func (inst *Number) Process() {
 			inst.WritePinBool(node.Boolean, false)
 		}
 		v := conversions.FloatToString(in1)
-		if v == "" {
+		if v != "" {
 			inst.WritePin(node.String, conversions.FloatToString(in1))
 		} else {
 			inst.WritePinNull(node.String)

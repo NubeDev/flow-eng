@@ -172,6 +172,9 @@ func (inst *FFPoint) Process() {
 
 			inst.WritePin(node.LastUpdated, ttime.TimeSince(inst.lastUpdate))
 		} else {
+			if err != nil {
+				fmt.Println(fmt.Sprintf("FLOW POINT Process() parseCOV() err: %v", err))
+			}
 			writeNull = true
 		}
 	}

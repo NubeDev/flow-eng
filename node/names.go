@@ -204,9 +204,15 @@ const (
 
 	OutNot OutputName = "out not"
 
-	OutPayload OutputName = "payload"
-	NextStart  OutputName = "next start"
-	NextStop   OutputName = "next stop"
+	OutPayload      OutputName = "payload"
+	PeriodStart     OutputName = "period-start"
+	PeriodStop      OutputName = "period-stop"
+	NextStart       OutputName = "next-start"
+	NextStop        OutputName = "next-stop"
+	PeriodStartUnix OutputName = "period-start-unix"
+	PeriodStopUnix  OutputName = "period-stop-unix"
+	NextStartUnix   OutputName = "next-start-unix"
+	NextStopUnix    OutputName = "next-stop-unix"
 
 	TimeString OutputName = "time-string"
 	Hour       OutputName = "hour"
