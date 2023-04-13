@@ -84,9 +84,10 @@ func (inst *BV) Process() {
 		point.Name = name
 		point, err = inst.store.AddPoint(point, false)
 		if err != nil {
-			log.Errorf("bacnet-server add new point type:%s-%d", objectType, inst.objectID)
+			log.Errorf("bacnet-server add new point type: %s-%d", objectType, inst.objectID)
+		} else {
+			s.Set(setUUID(inst.GetParentId(), points.BinaryVariable, inst.objectID), point, 0)
 		}
-		s.Set(setUUID(inst.GetParentId(), points.BinaryVariable, inst.objectID), point, 0)
 	}
 
 	in14, in15 := fromFlow(inst, inst.objectID)

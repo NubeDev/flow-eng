@@ -80,7 +80,11 @@ func (inst *AI) Process() {
 			return
 		}
 		point, err = inst.store.AddPoint(point, true)
-		s.Set(setUUID(inst.GetParentId(), points.AnalogInput, inst.objectID), point, 0)
+		if err != nil {
+			log.Errorf("bacnet-server add new point type: %s-%d", objectType, inst.objectID)
+		} else {
+			s.Set(setUUID(inst.GetParentId(), points.AnalogInput, inst.objectID), point, 0)
+		}
 	}
 
 	pv, err := inst.getPV(points.AnalogInput, inst.objectID)

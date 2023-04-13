@@ -197,7 +197,7 @@ func (inst *Server) getPoints() ([]*points.Point, bool) {
 		if len(parts) > 0 {
 			if parts[0] == inst.GetID() {
 				point, ok := item.Object.(*points.Point)
-				if ok {
+				if ok && point != nil {
 					pointsList = append(pointsList, point)
 				}
 			}
