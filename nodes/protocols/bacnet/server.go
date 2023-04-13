@@ -89,16 +89,9 @@ func (inst *Server) Process() {
 			}
 		}
 	}
-
-	if inst.pingFailed { // on failed resubscribe
-		// log.Error("bacnet node failed")
-	}
-	if !inst.pingLock {
-
-	}
 	if !runnersLock {
-		go inst.protocolRunner()
-		if loopCount == 1 {
+		if loopCount == 10 {
+			go inst.protocolRunner()
 			runnersLock = true
 		}
 	}
