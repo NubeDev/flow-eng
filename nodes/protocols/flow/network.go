@@ -111,32 +111,32 @@ func (inst *Network) Process() {
 		go inst.schedulesList()
 		go inst.publish(loopCount)
 	}
-	var retry bool
+	retry := false
 	if loopCount == 4 {
 		go inst.fetchAllPointValues()
 		// log.Infof("FLOW NETWORK: LOOP 4 STORE: %+v", inst.GetStore().All())
 		// log.Infof("FLOW NETWORK: LOOP 4 STORE Object: %+v", inst.GetStore().All()[inst.GetID()].Object)
 		retry = true
 	}
-	if loopCount%retryCount == 0 {
+	if loopCount > 5 && loopCount%retryCount == 0 {
 		retry = true
 	}
 
 	if retry {
 		if !inst.mqttConnected {
-			log.Errorf("flow-network: reset mqtt connection as first time failed loop-count: %d", loopCount)
+			log.Errorf("flow-network: reset mqtt connection as first time failed loop-count: %d, inst.mqttConnected: %v", loopCount, inst.mqttConnected)
 			go inst.setConnection()
 		}
 		if inst.subscribeFailedPoints || !inst.mqttConnected {
-			log.Errorf("flow-network: reset subscribe to each point as first time failed: %d", loopCount)
+			log.Errorf("flow-network: reset subscribe to each point as first time failed: %d, inst.subscribeFailedPoints: %v, inst.mqttConnected: %v", loopCount, inst.subscribeFailedPoints, inst.mqttConnected)
 			go inst.subscribeToEachPoint()
 		}
 		if inst.subscribeFailedPointsList || !inst.mqttConnected {
-			log.Errorf("flow-network: reset fetch points list as first time failed: %d", loopCount)
+			log.Errorf("flow-network: reset fetch points list as first time failed: %d, inst.subscribeFailedPointsList: %v, inst.mqttConnected: %v", loopCount, inst.subscribeFailedPointsList, inst.mqttConnected)
 			go inst.pointsList()
 		}
 		if inst.subscribeFailedSchedulesList || !inst.mqttConnected {
-			log.Errorf("flow-network: reset fetch schedule list as first time failed: %d", loopCount)
+			log.Errorf("flow-network: reset fetch schedule list as first time failed: %d, inst.subscribeFailedSchedulesList: %v, inst.mqttConnected: %v", loopCount, inst.subscribeFailedSchedulesList, inst.mqttConnected)
 			go inst.schedulesList()
 		}
 	}

@@ -108,6 +108,7 @@ func addUpdatePayload(nodeUUID string, p *pointStore, newPayload *pointDetails) 
 		if payload.nodeUUID == nodeUUID {
 			p.payloads[i] = newPayload
 			found = true
+			break
 		}
 	}
 	if !found {
