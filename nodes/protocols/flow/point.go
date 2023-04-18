@@ -104,6 +104,7 @@ func (inst *FFPoint) checkStillExists() {
 				inst.SetSubTitle(existingPoint.Name)
 				inst.SetWaringMessage("")
 				inst.SetWaringIcon(string(emoji.GreenCircle))
+				break
 			}
 		}
 		if !pointExists {
@@ -158,11 +159,16 @@ func (inst *FFPoint) Process() {
 				}
 			} else {
 				inst.WritePinFloat(node.Out, *value, 2)
+				/* THIS IS USED TO SHOW LAST UPDATE AS LAST VALUE CHANGE
 				if inst.lastValue == nil || *inst.lastValue != *value {
 					inst.lastValue = float.New(*value)
 					inst.lastUpdate = time.Now()
 				}
+				*/
 			}
+			// THIS IS USED TO SHOW THE LAST UPDATED AS THE LAST VALUE FETCH
+			inst.lastValue = float.New(*value)
+			inst.lastUpdate = time.Now()
 
 			if currentPri == nil {
 				inst.WritePinNull(node.CurrentPriority)

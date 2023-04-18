@@ -11,17 +11,19 @@ import (
 
 func (inst *Network) subscribeToEachPoint() {
 	callback := func(client mqtt.Client, message mqtt.Message) {
-
+		log.Infof("FLOW NETWORK: subscribeToEachPoint() response topic: %+v", string(message.Topic()))
 		if message.Payload() == nil {
 			log.Info("FLOW NETWORK: subscribeToEachPoint() response payload: NIL")
 		} else {
 			log.Infof("FLOW NETWORK: subscribeToEachPoint() response payload: %+v", string(message.Payload()))
 		}
-		log.Infof("FLOW NETWORK: subscribeToEachPoint() response topic: %+v", string(message.Topic()))
 
 		s := inst.GetStore()
 		children, ok := s.Get(inst.GetID())
 		payloads := getPayloads(children, ok)
+		if len(payloads) == 0 {
+			log.Error("FLOW NETWORK: subscribeToEachPoint() NO PAYLOADS FOUND ON NETWORK STORE")
+		}
 		for _, payload := range payloads {
 			fixedTopic, pntUUID := fixTopic(message.Topic())
 			if payload.topic == fixedTopic {
@@ -31,6 +33,8 @@ func (inst *Network) subscribeToEachPoint() {
 					n.SetPayload(&node.Payload{
 						Any: message,
 					})
+				} else {
+					log.Errorf("FLOW NETWORK: subscribeToEachPoint() node not found: %v", pntUUID)
 				}
 			}
 		}
@@ -38,12 +42,13 @@ func (inst *Network) subscribeToEachPoint() {
 	s := inst.GetStore()
 	children, ok := s.Get(inst.GetID())
 	payloads := getPayloads(children, ok)
+	settings, _ := getSettings(inst.GetSettings())
+	log.Infof("Flow Network subscribeToEachPoint() connection: %v, payloads length: %v", settings.Conn, len(payloads))
 	inst.subscribeFailedPoints = true
 	for _, payload := range payloads {
 		log.Infof("Flow Network subscribeToEachPoint() payload: %+v", payload)
 		if payload.topic != "" {
 			if inst.mqttClient != nil {
-				log.Info("Flow Network subscribeToEachPoint()")
 				err := inst.mqttClient.Subscribe(payload.topic, mqttQOS, callback)
 				if err != nil {
 					log.Errorf("Flow Network subscribeToEachPoint() subscribe topic: %s err: %s", payload.topic, err.Error())
@@ -54,6 +59,7 @@ func (inst *Network) subscribeToEachPoint() {
 			}
 		}
 	}
+	log.Infof("Flow Network subscribeToEachPoint() connection: %v, DONE SUBSCRIBING", settings.Conn)
 }
 
 func (inst *Network) fetchPointsList() {
@@ -172,7 +178,8 @@ func (inst *Network) schedulesList() {
 const fetchSelectedPointsCOVTopic = "rubix/platform/points/cov/selected"
 
 func (inst *Network) fetchExistingPointValues() {
-	log.Infof("FLOW NETWORK: fetchExistingPointValues()")
+	settings, err := getSettings(inst.GetSettings())
+	log.Infof("FLOW NETWORK: fetchExistingPointValues() %v", settings.Conn)
 	s := inst.GetStore()
 	// log.Infof("FLOW NETWORK: fetchExistingPointValues() inst.GetID(): %+v", inst.GetID())
 	children, ok := s.Get(inst.GetID())
