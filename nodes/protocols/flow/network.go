@@ -25,6 +25,7 @@ type Network struct {
 	subscribeFailedPoints        bool
 	subscribeFailedPointsList    bool
 	subscribeFailedSchedulesList bool
+	subscribeFailedMissingPoints bool
 }
 
 var mqttQOS = mqttclient.AtMostOnce
@@ -37,7 +38,7 @@ func NewNetwork(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(node.BuildOutput(node.Connected, node.TypeBool, nil, body.Outputs))
 	body.IsParent = true
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	network := &Network{body, false, 0, nil, nil, false, nil, 0, "", false, 0, false, false, false}
+	network := &Network{body, false, 0, nil, nil, false, nil, 0, "", false, 0, false, false, false, false}
 	return network, nil
 }
 
@@ -107,8 +108,9 @@ func (inst *Network) Process() {
 	}
 	if loopCount == 3 {
 		go inst.subscribeToEachPoint()
-		go inst.pointsList()
-		go inst.schedulesList()
+		go inst.subscribeToMissingPoints()
+		// go inst.pointsList()
+		// go inst.schedulesList()
 		go inst.publish(loopCount)
 	}
 	retry := false
@@ -131,6 +133,7 @@ func (inst *Network) Process() {
 			log.Errorf("flow-network: reset subscribe to each point as first time failed: %d, inst.subscribeFailedPoints: %v, inst.mqttConnected: %v", loopCount, inst.subscribeFailedPoints, inst.mqttConnected)
 			go inst.subscribeToEachPoint()
 		}
+		/*  Points list and Schedules list are now done in UI
 		if inst.subscribeFailedPointsList || !inst.mqttConnected {
 			log.Errorf("flow-network: reset fetch points list as first time failed: %d, inst.subscribeFailedPointsList: %v, inst.mqttConnected: %v", loopCount, inst.subscribeFailedPointsList, inst.mqttConnected)
 			go inst.pointsList()
@@ -139,6 +142,7 @@ func (inst *Network) Process() {
 			log.Errorf("flow-network: reset fetch schedule list as first time failed: %d, inst.subscribeFailedSchedulesList: %v, inst.mqttConnected: %v", loopCount, inst.subscribeFailedSchedulesList, inst.mqttConnected)
 			go inst.schedulesList()
 		}
+		*/
 	}
 
 	if inst.mqttConnected && !inst.error {
@@ -150,15 +154,17 @@ func (inst *Network) Process() {
 		go inst.publish(loopCount)
 	}
 	if retry { // get the points every 50 loops
-		inst.fetchPointsList()
+		// inst.fetchPointsList()
 		inst.connectionError()
 		inst.fetchExistingPointValues() // refresh point COV
 		// log.Infof("FLOW NETWORK: RETRY STORE: %+v", inst.GetStore().All())
 		// log.Infof("FLOW NETWORK: RETRY STORE Object: %+v", inst.GetStore().All()[inst.GetID()].Object)
 	}
-	if loopCount%100 == 0 {
-		inst.fetchSchedulesList()
-	}
+	/*
+		if loopCount%100 == 0 {
+			inst.fetchSchedulesList()
+		}
+	*/
 }
 
 func (inst *Network) setError(msg string, reset, setMQTTConnected bool) {

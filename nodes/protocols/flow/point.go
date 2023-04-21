@@ -136,13 +136,15 @@ func (inst *FFPoint) setTopic() {
 }
 
 func (inst *FFPoint) Process() {
-	loopCount, firstLoop := inst.Loop()
+	_, firstLoop := inst.Loop()
 	if firstLoop {
 		inst.setTopic()
 	}
+	/* // removed, missing points are now sent from FF via MQTT after a fetchExistingPoints call.
 	if loopCount%retryCount == 0 {
 		inst.checkStillExists()
 	}
+	*/
 	val, null := inst.GetPayloadNull()
 	// fmt.Println(fmt.Sprintf("FLOW POINT Process() payload: val: %+v,  null: %v", val, null))
 	var writeNull bool
