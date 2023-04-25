@@ -133,6 +133,10 @@ func (inst *Network) Process() {
 			log.Errorf("flow-network: reset subscribe to each point as first time failed: %d, inst.subscribeFailedPoints: %v, inst.mqttConnected: %v", loopCount, inst.subscribeFailedPoints, inst.mqttConnected)
 			go inst.subscribeToEachPoint()
 		}
+		if inst.subscribeFailedMissingPoints || !inst.mqttConnected {
+			log.Errorf("flow-network: reset subscribe to missing points as first time failed: %d, inst.subscribeFailedMissingPoints: %v, inst.mqttConnected: %v", loopCount, inst.subscribeFailedMissingPoints, inst.mqttConnected)
+			go inst.subscribeToMissingPoints()
+		}
 		/*  Points list and Schedules list are now done in UI
 		if inst.subscribeFailedPointsList || !inst.mqttConnected {
 			log.Errorf("flow-network: reset fetch points list as first time failed: %d, inst.subscribeFailedPointsList: %v, inst.mqttConnected: %v", loopCount, inst.subscribeFailedPointsList, inst.mqttConnected)

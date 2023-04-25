@@ -86,32 +86,12 @@ func (inst *FFPoint) set() {
 	}
 }
 
-func (inst *FFPoint) checkStillExists() {
-	s := inst.GetStore()
-	if s == nil {
-		return
-	}
-	parentId := inst.GetParentId()
-	topic := fmt.Sprintf("pointsList_%s", parentId)
-	children, ok := s.Get(topic)
-	if ok {
-		existingPoints := children.([]*point)
-		var pointExists bool
-		for _, existingPoint := range existingPoints {
-			t := makePointTopic(existingPoint.Name)
-			if t == inst.topic {
-				pointExists = true
-				inst.SetSubTitle(existingPoint.Name)
-				inst.SetWaringMessage("")
-				inst.SetWaringIcon(string(emoji.GreenCircle))
-				break
-			}
-		}
-		if !pointExists {
-			inst.SetWaringMessage(pointError)
-			inst.SetWaringIcon(string(emoji.OrangeCircle))
-			inst.SetSubTitle("")
-		}
+func (inst *FFPoint) checkStillExists() bool {
+	nodeStatus := inst.GetStatus()
+	if nodeStatus.WaringMessage == pointError { // This is set by the subscribeToMissingPoints() runner
+		return false
+	} else {
+		return true
 	}
 }
 
@@ -136,61 +116,67 @@ func (inst *FFPoint) setTopic() {
 }
 
 func (inst *FFPoint) Process() {
-	_, firstLoop := inst.Loop()
+	loopCount, firstLoop := inst.Loop()
 	if firstLoop {
 		inst.setTopic()
 	}
-	/* // removed, missing points are now sent from FF via MQTT after a fetchExistingPoints call.
 	if loopCount%retryCount == 0 {
-		inst.checkStillExists()
+		inst.setTopic()
 	}
-	*/
-	val, null := inst.GetPayloadNull()
-	// fmt.Println(fmt.Sprintf("FLOW POINT Process() payload: val: %+v,  null: %v", val, null))
-	var writeNull bool
-	if null {
-		writeNull = true
-	} else {
-		p, value, currentPri, err := parseCOV(val)
-		if err == nil && p != nil {
-			inst.lastPayload = p
-			if value == nil {
-				inst.WritePinNull(node.Out)
-				if inst.lastValue != nil {
-					inst.lastValue = nil
-				}
-			} else {
-				inst.WritePinFloat(node.Out, *value, 2)
-				/* THIS IS USED TO SHOW LAST UPDATE AS LAST VALUE CHANGE
-				if inst.lastValue == nil || *inst.lastValue != *value {
-					inst.lastValue = float.New(*value)
-					inst.lastUpdate = time.Now()
-				}
-				*/
-			}
-			// THIS IS USED TO SHOW THE LAST UPDATED AS THE LAST VALUE FETCH
-			inst.lastValue = float.New(*value)
-			inst.lastUpdate = time.Now()
 
-			if currentPri == nil {
-				inst.WritePinNull(node.CurrentPriority)
-			} else {
-				inst.WritePinFloat(node.CurrentPriority, float64(*currentPri))
-			}
-
-			inst.WritePin(node.LastUpdated, ttime.TimeSince(inst.lastUpdate))
-		} else {
-			if err != nil {
-				fmt.Println(fmt.Sprintf("FLOW POINT Process() parseCOV() err: %v", err))
-			}
+	if inst.checkStillExists() {
+		val, null := inst.GetPayloadNull()
+		// fmt.Println(fmt.Sprintf("FLOW POINT Process() payload: val: %+v,  null: %v", val, null))
+		var writeNull bool
+		if null {
 			writeNull = true
+		} else {
+			p, value, currentPri, err := parseCOV(val)
+			if err == nil && p != nil {
+				inst.lastPayload = p
+				if value == nil {
+					inst.WritePinNull(node.Out)
+					if inst.lastValue != nil {
+						inst.lastValue = nil
+					}
+				} else {
+					inst.WritePinFloat(node.Out, *value, 2)
+					/* THIS IS USED TO SHOW LAST UPDATE AS LAST VALUE CHANGE
+					if inst.lastValue == nil || *inst.lastValue != *value {
+						inst.lastValue = float.New(*value)
+						inst.lastUpdate = time.Now()
+					}
+					*/
+				}
+				// THIS IS USED TO SHOW THE LAST UPDATED AS THE LAST VALUE FETCH
+				inst.lastValue = float.New(*value)
+				inst.lastUpdate = time.Now()
+
+				if currentPri == nil {
+					inst.WritePinNull(node.CurrentPriority)
+				} else {
+					inst.WritePinFloat(node.CurrentPriority, float64(*currentPri))
+				}
+
+				inst.WritePin(node.LastUpdated, ttime.TimeSince(inst.lastUpdate))
+			} else {
+				if err != nil {
+					fmt.Println(fmt.Sprintf("FLOW POINT Process() parseCOV() err: %v", err))
+				}
+				writeNull = true
+			}
 		}
-	}
-	if writeNull { // make sure we return some values
+		if writeNull { // make sure we return some values
+			inst.WritePinNull(node.Out)
+			inst.WritePinNull(node.CurrentPriority)
+			inst.WritePinNull(node.LastUpdated)
+		}
+	} else {
 		inst.WritePinNull(node.Out)
 		inst.WritePinNull(node.CurrentPriority)
 		inst.WritePinNull(node.LastUpdated)
 	}
+
 }
 
 func (inst *FFPoint) GetSchema() *schemas.Schema {

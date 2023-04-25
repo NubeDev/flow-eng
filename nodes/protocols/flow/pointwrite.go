@@ -80,31 +80,12 @@ func (inst *FFPointWrite) set() {
 	}
 }
 
-func (inst *FFPointWrite) checkStillExists() {
-	s := inst.GetStore()
-	if s == nil {
-		return
-	}
-	parentId := inst.GetParentId()
-	topic := fmt.Sprintf("pointsList_%s", parentId)
-	children, ok := s.Get(topic)
-	if ok {
-		existingPoints := children.([]*point)
-		var pointExists bool
-		for _, existingPoint := range existingPoints {
-			t := makePointTopic(existingPoint.Name)
-			if t == inst.topic {
-				pointExists = true
-				inst.SetSubTitle(existingPoint.Name)
-				inst.SetWaringMessage("")
-				inst.SetWaringIcon(string(emoji.GreenCircle))
-			}
-		}
-		if !pointExists {
-			inst.SetWaringMessage(pointError)
-			inst.SetWaringIcon(string(emoji.OrangeCircle))
-			inst.SetSubTitle("")
-		}
+func (inst *FFPointWrite) checkStillExists() bool {
+	nodeStatus := inst.GetStatus()
+	if nodeStatus.WaringMessage == pointError { // This is set by the subscribeToMissingPoints() runner
+		return false
+	} else {
+		return true
 	}
 }
 
@@ -138,37 +119,42 @@ func (inst *FFPointWrite) Process() {
 		inst.setTopic()
 		inst.checkStillExists()
 	}
-	val := inst.GetPayload()
-	var writeNull bool
-	if val == nil {
-		writeNull = true
-	} else {
-		_, value, currentPri, err := parseCOV(val.Any)
-		if err == nil {
-			inst.lastUpdate = time.Now()
-			if value == nil {
-				inst.WritePinNull(node.Out)
-			} else {
-				inst.WritePinFloat(node.Out, *value, 2)
-			}
 
-			if currentPri == nil {
-				inst.WritePinNull(node.CurrentPriority)
-			} else {
-				inst.WritePinFloat(node.CurrentPriority, float64(*currentPri))
-			}
-
-			inst.WritePin(node.LastUpdated, ttime.TimeSince(inst.lastUpdate))
-		} else {
+	if inst.checkStillExists() {
+		val := inst.GetPayload()
+		var writeNull bool
+		if val == nil {
 			writeNull = true
+		} else {
+			_, value, currentPri, err := parseCOV(val.Any)
+			if err == nil {
+				inst.lastUpdate = time.Now()
+				if value == nil {
+					inst.WritePinNull(node.Out)
+				} else {
+					inst.WritePinFloat(node.Out, *value, 2)
+				}
+
+				if currentPri == nil {
+					inst.WritePinNull(node.CurrentPriority)
+				} else {
+					inst.WritePinFloat(node.CurrentPriority, float64(*currentPri))
+				}
+				inst.WritePin(node.LastUpdated, ttime.TimeSince(inst.lastUpdate))
+			} else {
+				writeNull = true
+			}
 		}
-	}
-	if writeNull {
+		if writeNull {
+			inst.WritePinNull(node.Out)
+			inst.WritePinNull(node.CurrentPriority)
+			inst.WritePinNull(node.LastUpdated)
+		}
+	} else {
 		inst.WritePinNull(node.Out)
 		inst.WritePinNull(node.CurrentPriority)
+		inst.WritePinNull(node.LastUpdated)
 	}
-	inst.WritePin(node.LastUpdated, ttime.TimeSince(inst.lastUpdate))
-
 }
 
 func (inst *FFPointWrite) GetLastPriorityWrite() (priorityArrayWrite map[string]*float64) {
