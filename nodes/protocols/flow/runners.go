@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/enescakir/emoji"
 	log "github.com/sirupsen/logrus"
 	"strings"
 )
@@ -33,6 +34,8 @@ func (inst *Network) subscribeToEachPoint() {
 					n.SetPayload(&node.Payload{
 						Any: message,
 					})
+					n.SetWaringMessage("")
+					n.SetWaringIcon(string(emoji.GreenCircle))
 				} else {
 					log.Errorf("FLOW NETWORK: subscribeToEachPoint() node not found: %v", pntUUID)
 				}
@@ -60,6 +63,59 @@ func (inst *Network) subscribeToEachPoint() {
 		}
 	}
 	log.Infof("Flow Network subscribeToEachPoint() connection: %v, DONE SUBSCRIBING", settings.Conn)
+}
+
+func (inst *Network) subscribeToMissingPoints() {
+	callback := func(client mqtt.Client, message mqtt.Message) {
+		log.Infof("FLOW NETWORK: subscribeToMissingPoints() response topic: %+v", string(message.Topic()))
+		if message.Payload() == nil {
+			log.Info("FLOW NETWORK: subscribeToMissingPoints() response payload: NIL")
+		} else {
+			log.Infof("FLOW NETWORK: subscribeToMissingPoints() response payload: %+v", string(message.Payload()))
+		}
+
+		var missingPoints []MqttPoint
+		err := json.Unmarshal(message.Payload(), &missingPoints)
+		if err != nil {
+			log.Errorf("failed to unmarshal flow-framework missing points list err: %s", err.Error())
+			return
+		}
+		log.Infof("Flow Network subscribeToMissingPoints() missing points count: %d", len(missingPoints))
+
+		s := inst.GetStore()
+		children, ok := s.Get(inst.GetID())
+		payloads := getPayloads(children, ok)
+		if len(payloads) == 0 {
+			log.Error("FLOW NETWORK: subscribeToMissingPoints() NO PAYLOADS FOUND ON NETWORK STORE")
+		}
+
+		for _, payload := range payloads {
+			for _, missingPoint := range missingPoints {
+				if payload.pointUUID == missingPoint.PointUUID {
+					n := inst.GetNode(payload.nodeUUID)
+					if n != nil {
+						n.SetWaringMessage(pointError)
+						n.SetWaringIcon(string(emoji.RedCircle))
+					} else {
+						log.Errorf("FLOW NETWORK: subscribeToMissingPoints() node not found: %v", payload.pointUUID)
+					}
+				}
+			}
+
+		}
+	}
+	log.Infof("Flow Network subscribeToMissingPoints()")
+	var topic = "rubix/platform/points/missing/publish"
+	inst.subscribeFailedMissingPoints = true
+	if inst.mqttClient != nil {
+		err := inst.mqttClient.Subscribe(topic, mqttQOS, callback)
+		if err != nil {
+			log.Errorf("Flow Network subscribeToMissingPoints() :%s Subscribe() err: %s", topic, err.Error())
+		} else {
+			log.Infof("Flow Network subscribeToMissingPoints() Subscribe() : %s", topic)
+			inst.subscribeFailedMissingPoints = false
+		}
+	}
 }
 
 func (inst *Network) fetchPointsList() {
