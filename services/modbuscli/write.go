@@ -44,6 +44,20 @@ func (inst *Modbus) WriteRegister(slave, register int, value float64) (err error
 
 }
 
+func (inst *Modbus) WriteRegisterInt16(slave, register int, value uint16) (err error) {
+	err = inst.SetSlave(slave)
+	if err != nil {
+		return err
+	}
+	// fmt.Println(slave, register, encodeUO(value))
+	_, _, err = inst.client.WriteSingleRegister(uint16(register), value)
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
 func encodeUO(in float64) uint16 {
 	in = in * 100
 	return uint16(in)

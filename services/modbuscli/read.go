@@ -15,6 +15,11 @@ func voltRegs() (start int, count int) {
 	return start, 8
 }
 
+func pulseRegs() (start int, count int) {
+	start = 400
+	return start, 8
+}
+
 func currentRegs() (start int, count int) {
 	start = 300
 	return start, 8
@@ -51,7 +56,7 @@ func decodeDIs(in []bool) [8]float64 {
 
 func (inst *Modbus) ReadTemps(slave int) (raw [8]float64, err error) {
 	start, count := tempRegs()
-	registers, err := inst.readRegisters(slave, start, count, false)
+	registers, _, err := inst.readRegisters(slave, start, count, false, false)
 	if err != nil {
 		return raw, err
 	}
@@ -73,9 +78,21 @@ func (inst *Modbus) ReadDIs(slave int) (raw [8]float64, err error) {
 	return decodeDIs(registers), err
 }
 
+func (inst *Modbus) ReadPulse(slave int) (raw [8]float64, err error) {
+	start, count := pulseRegs()
+	_, registers, err := inst.readRegisters(slave, start, count, false, true)
+	if err != nil {
+		return raw, err
+	}
+	if len(registers) < 8 {
+		return raw, errors.New("read length must be 8")
+	}
+	return convertUint32(registers), err
+}
+
 func (inst *Modbus) ReadVolts(slave int) (raw [8]float64, err error) {
 	start, count := voltRegs()
-	registers, err := inst.readRegisters(slave, start, count, false)
+	registers, _, err := inst.readRegisters(slave, start, count, false, false)
 	if err != nil {
 		return raw, err
 	}
@@ -87,7 +104,7 @@ func (inst *Modbus) ReadVolts(slave int) (raw [8]float64, err error) {
 
 func (inst *Modbus) ReadCurrent(slave int) (raw [8]float64, err error) {
 	start, count := currentRegs()
-	registers, err := inst.readRegisters(slave, start, count, false)
+	registers, _, err := inst.readRegisters(slave, start, count, false, false)
 	if err != nil {
 		return raw, err
 	}
@@ -107,6 +124,15 @@ func convert(raw []byte) [8]float64 {
 	return out
 }
 
+func convertUint32(raw []uint32) [8]float64 {
+	out := [8]float64{}
+	for i, u := range raw {
+		out[i] = float64(u)
+	}
+	// log.Print(out)
+	return out
+}
+
 func (inst *Modbus) readDiscreteInputs(slave, start, count int) (raw []bool, err error) {
 	err = inst.SetSlave(slave)
 	if err != nil {
@@ -117,19 +143,26 @@ func (inst *Modbus) readDiscreteInputs(slave, start, count int) (raw []bool, err
 	return registers, err
 }
 
-func (inst *Modbus) readRegisters(slave, start, count int, holding bool) (raw []byte, err error) {
+func (inst *Modbus) readRegisters(slave, start, count int, holding, uint32 bool) (raw []byte, uint32Res []uint32, err error) {
 	err = inst.SetSlave(slave)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
+	if uint32 {
+		inst.client.SetEncoding(modbus.BigEndian, modbus.LowWordFirst)
+		registers, err := inst.client.ReadUint32s(uint16(start), uint16(count), modbus.InputRegister)
+		// log.Print(registers)
+		return nil, registers, err
+	}
+
 	if holding {
 		registers, _, err := inst.client.ReadHoldingRegisters(uint16(start), uint16(count))
 		// log.Print(registers)
-		return registers, err
+		return registers, nil, err
 	} else {
 		// fmt.Println("READ INPUTS", slave, uint16(start), uint16(count))
 		registers, _, err := inst.client.ReadInputRegisters(uint16(start), uint16(count))
 		// log.Print(registers)
-		return registers, err
+		return registers, nil, err
 	}
 }

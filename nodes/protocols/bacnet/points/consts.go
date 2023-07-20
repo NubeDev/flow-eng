@@ -17,6 +17,8 @@ const BinaryOutput ObjectType = "binaryOutput"
 const BinaryVariable ObjectType = "binaryVariable"
 
 const IoTypeTemp IoType = "thermistor_10k_type_2"
+const IoTypePulseOnRise IoType = "pulse on rise"
+const IoTypePulseOnFall IoType = "pulse on fall"
 const IoTypeCurrent IoType = "current"
 const IoTypeVolts IoType = "voltage_dc"
 const IoTypeDigital IoType = "digital"

@@ -181,8 +181,8 @@ func (inst *AI) buildSchema() *schemas.Schema {
 
 	props.IoType.Title = "Select UI Input Type"
 	props.IoType.Default = string(points.IoTypeVolts)
-	props.IoType.Options = []string{string(points.IoTypeVolts), string(points.IoTypeDigital), string(points.IoTypeTemp), string(points.IoTypeCurrent)}
-	props.IoType.EnumName = []string{string(points.IoTypeVolts), string(points.IoTypeDigital), string(points.IoTypeTemp), string(points.IoTypeCurrent)}
+	props.IoType.Options = []string{string(points.IoTypeVolts), string(points.IoTypeDigital), string(points.IoTypeTemp), string(points.IoTypeCurrent), string(points.IoTypePulseOnRise), string(points.IoTypePulseOnFall)}
+	props.IoType.EnumName = []string{string(points.IoTypeVolts), string(points.IoTypeDigital), string(points.IoTypeTemp), string(points.IoTypeCurrent), string(points.IoTypePulseOnRise), string(points.IoTypePulseOnFall)}
 
 	props.Decimal.Title = "Rounding To # Decimals"
 	props.Decimal.Default = 2

@@ -1,11 +1,13 @@
 module github.com/NubeDev/flow-eng
 
+//replace github.com/NubeIO/nubeio-rubix-lib-modbus-go => /home/aidan/code/go/nubeio-rubix-lib-modbus-go
+
 go 1.18
 
 require (
 	github.com/NubeIO/lib-goja v0.0.4
 	github.com/NubeIO/lib-schema v0.1.6
-	github.com/NubeIO/nubeio-rubix-lib-modbus-go v0.0.4
+	github.com/NubeIO/nubeio-rubix-lib-modbus-go v0.0.5
 	github.com/NubeIO/nubeio-rubix-lib-models-go v1.4.24
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f
 	github.com/dustin/go-humanize v1.0.0

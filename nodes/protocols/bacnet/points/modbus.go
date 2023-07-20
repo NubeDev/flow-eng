@@ -37,6 +37,12 @@ func typeSelect(objectType IoType, write bool) model.ObjectType {
 	if objectType == IoTypeTemp {
 		return model.ObjTypeReadRegister
 	}
+	if objectType == IoTypePulseOnFall {
+		return model.ObjTypeReadRegister
+	}
+	if objectType == IoTypePulseOnRise {
+		return model.ObjTypeReadRegister
+	}
 	return ""
 
 }
@@ -70,7 +76,7 @@ func InputAddress(deviceCount int, filterByBacnet int) ([]ModbusInputAddr, Modbu
 			address.Temp = i + temp
 			address.Volt = i + volt
 			address.Current = i + current
-			//fmt.Println("device-addr", count, "bacnet address", innerCount, "io-number", i+ioNumber, "point-tmp", i+temp, "point-volt", i+volt)
+			// fmt.Println("device-addr", count, "bacnet address", innerCount, "io-number", i+ioNumber, "point-tmp", i+temp, "point-volt", i+volt)
 			addresses = append(addresses, address)
 		}
 	}

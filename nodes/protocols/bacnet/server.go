@@ -82,6 +82,8 @@ func (inst *Server) Process() {
 		go inst.setMessage()
 		go inst.subscribe()
 		go inst.mqttReconnect()
+	}
+	if loopCount == 3 { // publish all the point names
 		p, ok := inst.getPoints()
 		if ok {
 			for _, point := range p {

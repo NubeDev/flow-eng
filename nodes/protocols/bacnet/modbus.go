@@ -150,6 +150,8 @@ func (inst *Server) modbusOutputsDispatch(cli *modbuscli.Modbus) {
 	}
 }
 
+var firstLoop = true
+
 func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*points.Point) {
 	var err error
 	var tempList [8]float64
@@ -161,6 +163,7 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 	var completedCurrent bool
 	var completedDis bool
 	var returnedValue float64
+
 	for _, point := range pointsList { // do modbus read
 		if !point.IsWriteable {
 			addr, _ := points.ModbusBuildInput(point.IoType, point.ObjectID)
@@ -170,6 +173,11 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 				log.Errorf("modbus slave addrress cant not be less to 1")
 				continue
 			}
+
+			if firstLoop { // setup all the pulse inputs
+				inst.modbusPointSetup(cli, point, slaveId, addr.IoPin)
+			}
+
 			if !completedTemp && (point.IoType == points.IoTypeTemp) {
 				tempList, err = cli.ReadTemps(slaveId) // DO MODBUS READ FOR TEMPS OR DIs
 				if err != nil {
@@ -224,7 +232,88 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 				}
 				time.Sleep(modbusDelay * time.Millisecond)
 			}
+
+			if !completedDis && (point.IoType == points.IoTypePulseOnRise || point.IoType == points.IoTypePulseOnFall) { // update anypoint that is type temp
+				diList, err = cli.ReadPulse(slaveId) // DO MODBUS READ FOR PULSE
+				if err != nil {
+					log.Errorf("modbus read pulse %s slave: %d", err.Error(), slaveId)
+				} else {
+					returnedValue = diList[io16Pin]
+					err := inst.writePV(point.ObjectType, point.ObjectID, returnedValue)
+					if err != nil {
+						log.Errorf("modbus modbusInputsRunner() writePv %s slave: %d", err.Error(), slaveId)
+					}
+				}
+				time.Sleep(modbusDelay * time.Millisecond)
+			}
 		}
 
+	}
+	firstLoop = false
+}
+
+func (inst *Server) modbusPointSetup(cli *modbuscli.Modbus, point *points.Point, slaveId, ioPin int) {
+	if ioPin == 1 { // UI1
+		var value uint16
+		if point.IoType == points.IoTypePulseOnRise { // 8: Pulse RISE
+			value = 8
+			err := cli.WriteRegisterInt16(slaveId, 5200, value)
+			if err != nil {
+				log.Errorf("modbus WriteRegister for pulse err: %s slave: %d io16Pin: %d value: %d", err.Error(), slaveId, ioPin, value)
+			}
+		} else if point.IoType == points.IoTypePulseOnFall { // 9: Pulse FALL
+			value = 9
+			err := cli.WriteRegisterInt16(slaveId, 5200, value)
+			if err != nil {
+				log.Errorf("modbus WriteRegister for pulse err: %s slave: %d io16Pin: %d value: %d", err.Error(), slaveId, ioPin, value)
+			}
+		} else {
+			err := cli.WriteRegisterInt16(slaveId, 5200, 0)
+			if err != nil {
+				log.Errorf("modbus WriteRegister for pulse err: %s slave: %d io16Pin: %d value: %d", err.Error(), slaveId, ioPin, value)
+			}
+		}
+	}
+	if ioPin == 2 { // UI2
+		var value uint16
+		if point.IoType == points.IoTypePulseOnRise { // 8: Pulse RISE
+			value = 8
+			err := cli.WriteRegisterInt16(slaveId, 5201, value)
+			if err != nil {
+				log.Errorf("modbus WriteRegister for pulse err: %s slave: %d io16Pin: %d value: %d", err.Error(), slaveId, ioPin, value)
+			}
+		} else if point.IoType == points.IoTypePulseOnFall { // 9: Pulse FALL
+			value = 9
+			err := cli.WriteRegisterInt16(slaveId, 5201, value)
+			if err != nil {
+				log.Errorf("modbus WriteRegister for pulse err: %s slave: %d io16Pin: %d value: %d", err.Error(), slaveId, ioPin, value)
+			}
+		} else {
+			err := cli.WriteRegisterInt16(slaveId, 5201, 0)
+			if err != nil {
+				log.Errorf("modbus WriteRegister for pulse err: %s slave: %d io16Pin: %d value: %d", err.Error(), slaveId, ioPin, value)
+			}
+		}
+	}
+	if ioPin == 3 { // UI2
+		var value uint16
+		if point.IoType == points.IoTypePulseOnRise { // 8: Pulse RISE
+			value = 8
+			err := cli.WriteRegisterInt16(slaveId, 5202, value)
+			if err != nil {
+				log.Errorf("modbus WriteRegister for pulse err: %s slave: %d io16Pin: %d value: %d", err.Error(), slaveId, ioPin, value)
+			}
+		} else if point.IoType == points.IoTypePulseOnFall { // 9: Pulse FALL
+			value = 9
+			err := cli.WriteRegisterInt16(slaveId, 5202, value)
+			if err != nil {
+				log.Errorf("modbus WriteRegister for pulse err: %s slave: %d io16Pin: %d value: %d", err.Error(), slaveId, ioPin, value)
+			}
+		} else {
+			err := cli.WriteRegisterInt16(slaveId, 5202, 0)
+			if err != nil {
+				log.Errorf("modbus WriteRegister for pulse err: %s slave: %d io16Pin: %d value: %d", err.Error(), slaveId, ioPin, value)
+			}
+		}
 	}
 }
