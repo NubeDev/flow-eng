@@ -87,15 +87,17 @@ func (inst *AI) Process() {
 		}
 	}
 
-	pv, err := inst.getPV(points.AnalogInput, inst.objectID)
+	pv, modbusUpdated, err := inst.getPV(points.AnalogInput, inst.objectID)
 	if err != nil {
 		inst.WritePinNull(node.Out)
 		return
 	}
 	if pv == nil {
 		inst.WritePinNull(node.Out)
-	} else {
+	} else if modbusUpdated {
 		inst.WritePinFloat(node.Out, *pv, settings.Decimal)
+	} else {
+		inst.WritePinNull(node.Out)
 	}
 }
 
@@ -115,13 +117,13 @@ func (inst *AI) setObjectId(settings *AISettings) {
 	}
 }
 
-func (inst *AI) getPV(objType points.ObjectType, id points.ObjectID) (*float64, error) {
+func (inst *AI) getPV(objType points.ObjectType, id points.ObjectID) (*float64, bool, error) {
 	pnt, ok := inst.getPoint(objType, id)
 	// fmt.Println(fmt.Sprintf("AI getPV() pnt.PresentValue: %v", pnt.PresentValue))
 	if ok {
-		return pnt.PresentValue, nil
+		return pnt.PresentValue, pnt.ModbusUpdated, nil
 	}
-	return float.New(0), nil
+	return float.New(0), false, nil
 }
 
 func (inst *AI) getPoint(objType points.ObjectType, id points.ObjectID) (*points.Point, bool) {

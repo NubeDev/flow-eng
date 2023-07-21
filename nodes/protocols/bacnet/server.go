@@ -63,7 +63,8 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	var err error
 	body = node.Defaults(body, serverNode, category)
 	outputMsg := node.BuildOutput(node.Msg, node.TypeString, nil, body.Outputs)
-	outputs := node.BuildOutputs(outputMsg)
+	stats := node.BuildOutput(node.PollingCount, node.TypeString, nil, body.Outputs)
+	outputs := node.BuildOutputs(outputMsg, stats)
 	body.IsParent = true
 	body = node.BuildNode(body, nil, outputs, body.Settings)
 	clients := &clients{}
@@ -133,6 +134,7 @@ func (inst *Server) writePV(objType points.ObjectType, id points.ObjectID, value
 		newPV := conversions.ValueTransformOnRead(value, pnt.ScaleEnable, pnt.Factor, pnt.ScaleInMin, pnt.ScaleInMax, pnt.ScaleOutMin, pnt.ScaleOutMax, pnt.Offset)
 		if pnt.PresentValue == nil || newPV != *pnt.PresentValue {
 			pnt.PendingMQTTPublish = true
+			pnt.ModbusUpdated = true
 			pnt.PresentValue = float.New(newPV)
 			err := inst.updatePoint(objType, id, pnt)
 			if err != nil {

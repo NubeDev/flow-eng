@@ -14,6 +14,7 @@ type Point struct {
 	IsIO                        bool // if it's an io-pin for a real device
 	IsWriteable                 bool
 	Enable                      bool
+	ModbusUpdated               bool // after first modbus poll will be set to true
 	ValueFromRead               float64
 	PresentValue                *float64
 	Offset                      float64

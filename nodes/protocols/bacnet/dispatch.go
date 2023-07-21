@@ -19,11 +19,9 @@ type toFlowOptions struct {
 
 // mqttPubRunner send messages to the broker, as in read a modbus point and send it to the bacnet server
 func (inst *Server) writeRunner() {
-	log.Info("start mqtt-pub-runner")
+	log.Info("bacnet-server: publish all mqtt point values")
 	p, _ := inst.getPoints()
-
 	for _, point := range p {
 		inst.mqttPublishPV(point)
 	}
-
 }

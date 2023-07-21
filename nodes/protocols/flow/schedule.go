@@ -83,13 +83,15 @@ func (inst *FFSchedule) getResult() {
 			inst.WritePinFloat(node.PeriodStopUnix, float64(schedule.PeriodStop))
 			inst.SetSubTitle(schedule.Name)
 			inst.SetWaringIcon(string(emoji.GreenCircle))
+		} else {
+			inst.hasWritten = false
 		}
 	}
 }
 
 func (inst *FFSchedule) Process() {
 	loopCount, _ := inst.Loop()
-	if loopCount == 10 {
+	if loopCount == 5 {
 		inst.getResult()
 	} else if loopCount%50 == 0 {
 		inst.getResult()

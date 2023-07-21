@@ -110,7 +110,7 @@ func (inst *Network) Process() {
 		go inst.subscribeToEachPoint()
 		go inst.subscribeToMissingPoints()
 		// go inst.pointsList()
-		// go inst.schedulesList()
+		go inst.schedulesList()
 		go inst.publish(loopCount)
 	}
 	retry := false
@@ -161,14 +161,12 @@ func (inst *Network) Process() {
 		// inst.fetchPointsList()
 		inst.connectionError()
 		inst.fetchExistingPointValues() // refresh point COV
-		// log.Infof("FLOW NETWORK: RETRY STORE: %+v", inst.GetStore().All())
-		// log.Infof("FLOW NETWORK: RETRY STORE Object: %+v", inst.GetStore().All()[inst.GetID()].Object)
 	}
-	/*
-		if loopCount%100 == 0 {
-			inst.fetchSchedulesList()
-		}
-	*/
+
+	if loopCount%20 == 0 {
+		inst.fetchSchedulesList()
+	}
+
 }
 
 func (inst *Network) setError(msg string, reset, setMQTTConnected bool) {

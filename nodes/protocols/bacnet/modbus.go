@@ -66,7 +66,9 @@ func (inst *Server) modbusRunner(settings map[string]interface{}) {
 		if !dontPollModbus {
 			inst.modbusInputsRunner(mb, pointsListRead) // process the inputs
 			time.Sleep(modbusDelay * time.Millisecond)
-			inst.modbusOutputsDispatch(mb)
+			if count > 2 { // make sure all the inputs have been read before doing the writes, this is to try and stop toggling a relay output
+				inst.modbusOutputsDispatch(mb)
+			}
 		}
 		go inst.writeRunner() // publish all mqtt values
 		time.Sleep(500 * time.Millisecond)
