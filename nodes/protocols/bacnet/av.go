@@ -89,25 +89,36 @@ func (inst *AV) Process() {
 			s.Set(setUUID(inst.GetParentId(), points.AnalogVariable, inst.objectID), point, 0)
 		}
 	}
-
-	in14, in15 := fromFlow(inst, inst.objectID)
-	pnt := inst.writePointPri(points.AnalogVariable, inst.objectID, in14, in15, loop)
-	if pnt != nil {
-		if pnt.PresentValue == nil {
+	if loop >= 1 {
+		in14, in15 := fromFlow(inst, inst.objectID)
+		pnt := inst.writePointPri(points.AnalogVariable, inst.objectID, in14, in15, loop)
+		if loop >= startProtocolRunnerCount+2 { // this is added to wait for the mqtt broker send the latest priory array to make sure we can a BACnet override
+			if pnt != nil {
+				if pnt.PresentValue == nil {
+					inst.WritePinNull(node.Out)
+				} else {
+					inst.WritePinFloat(node.Out, *pnt.PresentValue, 2)
+				}
+				currentPriority := points.GetHighest(pnt.WriteValue)
+				if currentPriority != nil {
+					inst.WritePinFloat(node.CurrentPriority, float64(currentPriority.Number), 0)
+				} else {
+					inst.WritePinNull(node.CurrentPriority)
+				}
+			} else {
+				inst.WritePinNull(node.Out)
+				inst.WritePinNull(node.CurrentPriority)
+			}
+		} else {
 			inst.WritePinNull(node.Out)
-		} else {
-			inst.WritePinFloat(node.Out, *pnt.PresentValue, 2)
-		}
-		currentPriority := points.GetHighest(pnt.WriteValue)
-		if currentPriority != nil {
-			inst.WritePinFloat(node.CurrentPriority, float64(currentPriority.Number), 0)
-		} else {
 			inst.WritePinNull(node.CurrentPriority)
 		}
+
 	} else {
 		inst.WritePinNull(node.Out)
 		inst.WritePinNull(node.CurrentPriority)
 	}
+
 }
 
 func (inst *AV) getPV(objType points.ObjectType, id points.ObjectID) (*float64, error) {
@@ -139,7 +150,6 @@ func (inst *AV) writePointPri(objType points.ObjectType, id points.ObjectID, in1
 	rewrite := math.Mod(float64(loop), rewriteValuesToBACnetEveryNumLoops+float64(p.ObjectID)) == 0 // this is a periodic rewrite with a loop offset based on ObjectID so that all the MQTT updates don't fire at the same time.
 	updatePoint := false
 	if p.WriteValueFromBACnet != nil {
-
 		if p.WriteValue == nil {
 			p.PendingMQTTPublish = true
 			updatePoint = true
@@ -148,7 +158,6 @@ func (inst *AV) writePointPri(objType points.ObjectType, id points.ObjectID, in1
 
 		bacnetPriority := points.GetHighest(p.WriteValueFromBACnet)
 		currentPriority := points.GetHighest(p.WriteValue)
-
 		// this prevents re-updating the point with a null priority array on every loop.  It doesn't set any values
 		if bacnetPriority == nil && currentPriority == nil {
 			bacnetPriority = &points.PriAndValue{Number: 16, Value: 0}

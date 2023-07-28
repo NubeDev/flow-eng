@@ -2,7 +2,6 @@ package db
 
 import (
 	"github.com/tidwall/buntdb"
-	"log"
 )
 
 type db struct {
@@ -15,7 +14,17 @@ func New(dbFile string) DB {
 	}
 	newDb, err := buntdb.Open(dbFile)
 	if err != nil {
-		log.Fatal(err)
+		return &db{DB: newDb}
+	}
+	size := 10 * 1024 * 1024 // 10mb
+	c := buntdb.Config{
+		SyncPolicy:           buntdb.EverySecond,
+		AutoShrinkPercentage: 30,
+		AutoShrinkMinSize:    size,
+	}
+	err = newDb.SetConfig(c)
+	if err != nil {
+		return &db{DB: newDb}
 	}
 	return &db{DB: newDb}
 }

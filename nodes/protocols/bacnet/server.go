@@ -38,6 +38,8 @@ type Server struct {
 
 var runnersLock bool
 
+const startProtocolRunnerCount = 10
+
 type clients struct {
 	mqttClient *mqttclient.Client
 }
@@ -93,7 +95,7 @@ func (inst *Server) Process() {
 		}
 	}
 	if !runnersLock {
-		if loopCount == 10 {
+		if loopCount == startProtocolRunnerCount {
 			go inst.protocolRunner()
 			runnersLock = true
 		}
@@ -161,6 +163,10 @@ func (inst *Server) updateFromBACnet(objType points.ObjectType, id points.Object
 		p.WriteValueFromBACnet = array
 		p.PendingWriteValueFromBACnet = true
 		err := inst.updatePoint(objType, id, p)
+		valuePri := points.GetHighest(array)
+		if valuePri != nil {
+			log.Infof("bacnet write mqtt value to objType: %s -> objId: %d value: %f pri: %d", objType, id, valuePri.Value, valuePri.Number)
+		}
 		if err != nil {
 			return err
 		}
