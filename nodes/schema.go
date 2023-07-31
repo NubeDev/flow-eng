@@ -1,24 +1,14 @@
 package nodes
 
 import (
-	"errors"
-	"fmt"
 	"github.com/NubeDev/flow-eng/schemas"
 )
 
-func GetSchema(nodeName string) (interface{}, error) {
-	s := &schemas.Schema{}
-	var found bool
+func GetSchema(category string, name string) *schemas.Schema {
 	for _, spec := range All() {
-		if nodeName == spec.GetName() {
-			s = spec.GetSchema()
-			found = true
+		if category == spec.GetInfo().Category && name == spec.GetName() {
+			return spec.GetSchema()
 		}
 	}
-
-	if !found {
-		return nil, errors.New(fmt.Sprintf("no node found by name: %s", nodeName))
-	}
-	return s, nil
-
+	return nil
 }
