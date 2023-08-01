@@ -32,11 +32,18 @@ type Server struct {
 	loopCount              uint64
 	firstMessageFromBacnet bool
 	deviceCount            string
+	deviceCountNumber      int
 	pollingCount           int64
 	finishModbusLoop       bool
+	devStats1              string
+	devStats2              string
+	devStats3              string
+	devStats4              string
 }
 
 var runnersLock bool
+
+const startProtocolRunnerCount = 10
 
 type clients struct {
 	mqttClient *mqttclient.Client
@@ -57,6 +64,13 @@ func bacnetOpts(opts *Bacnet) *Bacnet {
 var mqttQOS = mqttclient.AtMostOnce
 var mqttRetain = false
 
+const (
+	devStats1 = "dev-1-stats"
+	devStats2 = "dev-2-stats"
+	devStats3 = "dev-3-stats"
+	devStats4 = "dev-4-stats"
+)
+
 func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	opts = bacnetOpts(opts)
 	var application = opts.Application
@@ -64,11 +78,33 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	body = node.Defaults(body, serverNode, category)
 	outputMsg := node.BuildOutput(node.Msg, node.TypeString, nil, body.Outputs)
 	stats := node.BuildOutput(node.PollingCount, node.TypeString, nil, body.Outputs)
-	outputs := node.BuildOutputs(outputMsg, stats)
+	deviceError1 := node.BuildOutput(devStats1, node.TypeString, nil, body.Outputs)
+	deviceError2 := node.BuildOutput(devStats2, node.TypeString, nil, body.Outputs)
+	deviceError3 := node.BuildOutput(devStats3, node.TypeString, nil, body.Outputs)
+	deviceError4 := node.BuildOutput(devStats4, node.TypeString, nil, body.Outputs)
+	outputs := node.BuildOutputs(outputMsg, stats, deviceError1, deviceError2, deviceError3, deviceError4)
 	body.IsParent = true
 	body = node.BuildNode(body, nil, outputs, body.Settings)
 	clients := &clients{}
-	server := &Server{body, clients, false, false, false, opts.Store, application, 0, false, "", 0, false}
+	server := &Server{
+		body,
+		clients,
+		false,
+		false,
+		false,
+		opts.Store,
+		application,
+		0,
+		false,
+		"",
+		0,
+		0,
+		false,
+		"",
+		"",
+		"",
+		"",
+	}
 	server.clients.mqttClient = opts.MqttClient
 	body.SetSchema(BuildSchemaServer())
 	if application == names.Modbus {
@@ -93,7 +129,7 @@ func (inst *Server) Process() {
 		}
 	}
 	if !runnersLock {
-		if loopCount == 10 {
+		if loopCount == startProtocolRunnerCount {
 			go inst.protocolRunner()
 			runnersLock = true
 		}
@@ -108,7 +144,12 @@ func (inst *Server) Process() {
 			}
 		}
 	}
+	inst.setDeviceCount()
 	inst.WritePin(node.PollingCount, pollStats(inst.pollingCount))
+	inst.WritePin(devStats1, inst.devStats1)
+	inst.WritePin(devStats2, inst.devStats2)
+	inst.WritePin(devStats3, inst.devStats3)
+	inst.WritePin(devStats4, inst.devStats4)
 }
 
 func pollStats(pollingCount int64) string {
@@ -161,6 +202,10 @@ func (inst *Server) updateFromBACnet(objType points.ObjectType, id points.Object
 		p.WriteValueFromBACnet = array
 		p.PendingWriteValueFromBACnet = true
 		err := inst.updatePoint(objType, id, p)
+		valuePri := points.GetHighest(array)
+		if valuePri != nil {
+			log.Infof("bacnet write mqtt value to objType: %s -> objId: %d value: %f pri: %d", objType, id, valuePri.Value, valuePri.Number)
+		}
 		if err != nil {
 			return err
 		}
@@ -275,4 +320,57 @@ func (inst *Server) setMessage() {
 	}
 	log.Infof("start modbus polling on port: %s", schema.Serial)
 	inst.WritePin(node.Msg, fmt.Sprintf("port:%s & %s:IO16s", schema.Serial, schema.DeviceCount))
+}
+
+func (inst *Server) setDevStats1(msg string) {
+	inst.devStats1 = msg
+	if inst.deviceCountNumber < 1 {
+		inst.devStats1 = "not added"
+	} else {
+		inst.devStats1 = msg
+	}
+}
+
+func (inst *Server) setDevStats2(msg string) {
+	inst.devStats2 = msg
+	if inst.deviceCountNumber < 2 {
+		inst.devStats2 = "not added"
+	} else {
+		inst.devStats2 = msg
+	}
+}
+
+func (inst *Server) setDevStats3(msg string) {
+	inst.devStats3 = msg
+	if inst.deviceCountNumber < 3 {
+		inst.devStats3 = "not added"
+	} else {
+		inst.devStats3 = msg
+	}
+}
+
+func (inst *Server) setDevStats4(msg string) {
+	if inst.deviceCountNumber < 4 {
+		inst.devStats4 = "not added"
+	} else {
+		inst.devStats4 = msg
+	}
+}
+
+func (inst *Server) setDeviceCount() {
+	var count int
+	deviceCount := inst.deviceCount
+	if strings.Contains(deviceCount, "1x") {
+		count = 1
+	}
+	if strings.Contains(deviceCount, "2x") {
+		count = 2
+	}
+	if strings.Contains(deviceCount, "3x") {
+		count = 3
+	}
+	if strings.Contains(deviceCount, "4x") {
+		count = 4
+	}
+	inst.deviceCountNumber = count
 }

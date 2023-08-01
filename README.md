@@ -1,5 +1,10 @@
 # flow-eng
 
+update serial port permission when dev on local PC
+```
+sudo chmod 666 /dev/ttyUSB0
+```
+
 ## node payload
 
 using this api you can write a value to a node without having to download/deploy a new flow

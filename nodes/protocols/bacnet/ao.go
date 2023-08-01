@@ -105,15 +105,26 @@ func (inst *AO) Process() {
 			s.Set(setUUID(inst.GetParentId(), points.AnalogOutput, inst.objectID), point, 0)
 		}
 	}
-
-	in14, in15 := fromFlow(inst, inst.objectID)
-	pnt := inst.writePointPri(points.AnalogOutput, inst.objectID, in14, in15, loop)
-	if pnt != nil {
-		value := modbusScaleOutput(*pnt.PresentValue, pnt.Offset)
-		inst.WritePinFloat(node.Out, value, 2)
-		currentPriority := points.GetHighest(pnt.WriteValue)
-		if currentPriority != nil {
-			inst.WritePinFloat(node.CurrentPriority, float64(currentPriority.Number), 0)
+	if loop >= 1 {
+		in14, in15 := fromFlow(inst, inst.objectID)
+		pnt := inst.writePointPri(points.AnalogOutput, inst.objectID, in14, in15, loop)
+		if loop >= startProtocolRunnerCount+10 { // this is added to wait for the mqtt broker send the latest priory array to make sure we can a BACnet override
+			if pnt != nil {
+				value := modbusScaleOutput(*pnt.PresentValue, pnt.Offset)
+				inst.WritePinFloat(node.Out, value, 2)
+				currentPriority := points.GetHighest(pnt.WriteValue)
+				if currentPriority != nil {
+					inst.WritePinFloat(node.CurrentPriority, float64(currentPriority.Number), 0)
+				} else {
+					inst.WritePinNull(node.CurrentPriority)
+				}
+			} else {
+				inst.WritePinNull(node.Out)
+				inst.WritePinNull(node.CurrentPriority)
+			}
+		} else {
+			inst.WritePinNull(node.Out)
+			inst.WritePinNull(node.CurrentPriority)
 		}
 	} else {
 		inst.WritePinNull(node.Out)
@@ -174,8 +185,8 @@ func (inst *AO) writePointPri(objType points.ObjectType, id points.ObjectID, in1
 
 		bacnetPriority := points.GetHighest(p.WriteValueFromBACnet)
 		currentPriority := points.GetHighest(p.WriteValue)
-
 		if rewrite || currentPriority == nil || bacnetPriority == nil || bacnetPriority.Number != currentPriority.Number || bacnetPriority.Value != currentPriority.Value || !float.ComparePtrValues(p.WriteValue.P14, in14) || !float.ComparePtrValues(p.WriteValue.P15, in15) {
+
 			p.PendingMQTTPublish = true
 			p.WriteValue = p.WriteValueFromBACnet
 			p.WriteValue.P14 = in14

@@ -24,6 +24,7 @@ func (inst *Server) initModbus(settings map[string]interface{}) (*modbuscli.Modb
 	if schema.DeviceCount == noDevices {
 		return nil, errors.New(errNoDevices)
 	}
+	inst.deviceCount = schema.DeviceCount
 	port := "/dev/ttyAMA0"
 	if schema.Serial != "" {
 		port = schema.Serial
@@ -108,7 +109,6 @@ func modbusBulkWrite(pointsList []*points.Point) [8]float64 {
 					value = modbusScaleOutput(value, point.Offset) // point offset
 				}
 			}
-			// fmt.Println("POINT", point.ObjectID, value)
 			out[ioNumber.IoPin-1] = value
 		}
 	}
@@ -154,6 +154,42 @@ func (inst *Server) modbusOutputsDispatch(cli *modbuscli.Modbus) {
 
 var firstLoop = true
 
+var readError1 bool
+var readError2 bool
+var readError3 bool
+var readError4 bool
+
+func setReadError(slaveID int, err error) {
+	if slaveID == 1 {
+		if err != nil {
+			readError1 = true
+		} else {
+			readError1 = false
+		}
+	}
+	if slaveID == 2 {
+		if err != nil {
+			readError2 = true
+		} else {
+			readError2 = false
+		}
+	}
+	if slaveID == 3 {
+		if err != nil {
+			readError3 = true
+		} else {
+			readError3 = false
+		}
+	}
+	if slaveID == 4 {
+		if err != nil {
+			readError4 = true
+		} else {
+			readError4 = false
+		}
+	}
+}
+
 func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*points.Point) {
 	var err error
 	var tempList [8]float64
@@ -165,11 +201,11 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 	var completedCurrent bool
 	var completedDis bool
 	var returnedValue float64
-
+	var slaveId int
 	for _, point := range pointsList { // do modbus read
 		if !point.IsWriteable {
 			addr, _ := points.ModbusBuildInput(point.IoType, point.ObjectID)
-			slaveId := addr.DeviceAddr
+			slaveId = addr.DeviceAddr
 			io16Pin := addr.IoPin - 1
 			if slaveId <= 0 {
 				log.Errorf("modbus slave addrress cant not be less to 1")
@@ -191,6 +227,7 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 						log.Errorf("modbus modbusInputsRunner() writePv %s slave: %d", err.Error(), slaveId)
 					}
 				}
+				setReadError(slaveId, err)
 				time.Sleep(modbusDelay * time.Millisecond)
 			}
 			if !completedVolt && point.IoType == points.IoTypeVolts {
@@ -204,6 +241,7 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 						log.Errorf("modbus modbusInputsRunner() writePv %s slave: %d", err.Error(), slaveId)
 					}
 				}
+				setReadError(slaveId, err)
 				time.Sleep(modbusDelay * time.Millisecond)
 			}
 			if !completedCurrent && point.IoType == points.IoTypeCurrent {
@@ -217,14 +255,14 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 						log.Errorf("modbus modbusInputsRunner() writePv %s slave: %d", err.Error(), slaveId)
 					}
 				}
+				setReadError(slaveId, err)
 				time.Sleep(modbusDelay * time.Millisecond)
 			}
 			// update the store
-			// fmt.Println("SLAVE", slaveId, tempList)
 			if !completedDis && point.IoType == points.IoTypeDigital { // update anypoint that is type temp
 				diList, err = cli.ReadDIs(slaveId) // DO MODBUS READ FOR TEMPS OR DIs
 				if err != nil {
-					log.Errorf("modbus read temp %s slave: %d", err.Error(), slaveId)
+					log.Errorf("modbus read DIs %s slave: %d", err.Error(), slaveId)
 				} else {
 					returnedValue = diList[io16Pin]
 					err := inst.writePV(point.ObjectType, point.ObjectID, returnedValue)
@@ -232,6 +270,7 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 						log.Errorf("modbus modbusInputsRunner() writePv %s slave: %d", err.Error(), slaveId)
 					}
 				}
+				setReadError(slaveId, err)
 				time.Sleep(modbusDelay * time.Millisecond)
 			}
 
@@ -246,10 +285,30 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 						log.Errorf("modbus modbusInputsRunner() writePv %s slave: %d", err.Error(), slaveId)
 					}
 				}
+				setReadError(slaveId, err)
 				time.Sleep(modbusDelay * time.Millisecond)
 			}
 		}
-
+	}
+	if readError1 {
+		inst.setDevStats1("serial timeout")
+	} else {
+		inst.setDevStats1("")
+	}
+	if readError2 {
+		inst.setDevStats2("serial timeout")
+	} else {
+		inst.setDevStats2("")
+	}
+	if readError3 {
+		inst.setDevStats3("serial timeout")
+	} else {
+		inst.setDevStats3("")
+	}
+	if readError4 {
+		inst.setDevStats4("serial timeout")
+	} else {
+		inst.setDevStats4("")
 	}
 	firstLoop = false
 }
