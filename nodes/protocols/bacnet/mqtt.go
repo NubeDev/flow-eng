@@ -36,8 +36,8 @@ func (inst *Server) subscribeToBacnetServer() {
 	callback := func(client mqtt.Client, message mqtt.Message) {
 		mes := &topics.Message{UUID: helpers.ShortUUID("bus"), Msg: message}
 		if topics.IsPri(message.Topic()) {
-			err := inst.fromBacnet(mes)
 			log.Infof("mqtt-bacnet message from server topic: %s -> value: %s", mes.Msg.Topic(), string(mes.Msg.Payload()))
+			err := inst.fromBacnet(mes)
 			if err != nil {
 				if err.Error() != points.ErrStopMQTTLoop {
 					log.Error(err)
@@ -45,7 +45,7 @@ func (inst *Server) subscribeToBacnetServer() {
 			}
 		}
 	}
-	objsOuts := []string{"ao", "av", "bo", "bv"}
+	objsOuts := []string{"ao", "av", "bv"}
 	for _, obj := range objsOuts {
 		topic := fmt.Sprintf("%s/+/pri", topicObjectBuilder(points.ObjectType(obj)))
 		err := inst.clients.mqttClient.Subscribe(topic, mqttQOS, callback)

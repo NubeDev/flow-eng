@@ -92,7 +92,8 @@ func (inst *AV) Process() {
 	if loop >= 1 {
 		in14, in15 := fromFlow(inst, inst.objectID)
 		pnt := inst.writePointPri(points.AnalogVariable, inst.objectID, in14, in15, loop)
-		if loop >= startProtocolRunnerCount+2 { // this is added to wait for the mqtt broker send the latest priory array to make sure we can a BACnet override
+		// pprint.PrintJSON(pnt)
+		if loop >= startProtocolRunnerCount+10 { // this is added to wait for the mqtt broker send the latest priory array to make sure we can a BACnet override
 			if pnt != nil {
 				if pnt.PresentValue == nil {
 					inst.WritePinNull(node.Out)
@@ -146,7 +147,6 @@ func (inst *AV) writePointPri(objType points.ObjectType, id points.ObjectID, in1
 	if p == nil {
 		return nil
 	}
-
 	rewrite := math.Mod(float64(loop), rewriteValuesToBACnetEveryNumLoops+float64(p.ObjectID)) == 0 // this is a periodic rewrite with a loop offset based on ObjectID so that all the MQTT updates don't fire at the same time.
 	updatePoint := false
 	if p.WriteValueFromBACnet != nil {
