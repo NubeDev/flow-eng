@@ -124,6 +124,7 @@ func (inst *Server) modbusOutputsDispatch(cli *modbuscli.Modbus) {
 	}
 	if len(pointsList.DeviceOne) > 0 {
 		err := cli.Write(1, modbusBulkWrite(pointsList.DeviceOne))
+		setReadError(1, err)
 		if err != nil {
 			log.Errorf("modbus write %s slave: %d", err.Error(), 1)
 		}
@@ -131,6 +132,7 @@ func (inst *Server) modbusOutputsDispatch(cli *modbuscli.Modbus) {
 	}
 	if len(pointsList.DeviceTwo) > 0 {
 		err := cli.Write(2, modbusBulkWrite(pointsList.DeviceTwo))
+		setReadError(2, err)
 		if err != nil {
 			log.Errorf("modbus write %s slave: %d", err.Error(), 2)
 		}
@@ -138,6 +140,7 @@ func (inst *Server) modbusOutputsDispatch(cli *modbuscli.Modbus) {
 	}
 	if len(pointsList.DeviceThree) > 0 {
 		err := cli.Write(3, modbusBulkWrite(pointsList.DeviceThree))
+		setReadError(3, err)
 		if err != nil {
 			log.Errorf("modbus write %s slave: %d", err.Error(), 3)
 		}
@@ -145,6 +148,7 @@ func (inst *Server) modbusOutputsDispatch(cli *modbuscli.Modbus) {
 	}
 	if len(pointsList.DeviceFour) > 0 {
 		err := cli.Write(4, modbusBulkWrite(pointsList.DeviceFour))
+		setReadError(4, err)
 		if err != nil {
 			log.Errorf("modbus write %s slave: %d", err.Error(), 4)
 		}
@@ -291,24 +295,24 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 		}
 	}
 	if readError1 {
-		inst.setDevStats1("serial timeout")
+		inst.setDevStats1("offline")
 	} else {
-		inst.setDevStats1("")
+		inst.setDevStats1("ok")
 	}
 	if readError2 {
-		inst.setDevStats2("serial timeout")
+		inst.setDevStats2("offline")
 	} else {
-		inst.setDevStats2("")
+		inst.setDevStats2("ok")
 	}
 	if readError3 {
-		inst.setDevStats3("serial timeout")
+		inst.setDevStats3("offline")
 	} else {
-		inst.setDevStats3("")
+		inst.setDevStats3("ok")
 	}
 	if readError4 {
-		inst.setDevStats4("serial timeout")
+		inst.setDevStats4("offline")
 	} else {
-		inst.setDevStats4("")
+		inst.setDevStats4("ok")
 	}
 	firstLoop = false
 }

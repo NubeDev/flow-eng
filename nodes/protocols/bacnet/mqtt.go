@@ -82,23 +82,8 @@ func (inst *Server) mqttPublishPV(point *points.Point) error {
 			topic := ""
 
 			if false { // THIS WOULD BE USED FOR OUTPUT POINTS THAT DON'T USE THE PRIORITY ARRAY (ONLY PRESENT VALUE)
-				/*
-					payload = buildPayload("", point.PresentValue)
-					topic = fmt.Sprintf("bacnet/%s/%d/write/pv", obj, objectId) // bacnet/ai/1/write/pv
-					log.Infof("mqtt-bacnet publish (bacnet output) topic: %s -> value: %s", topic, payload)
-					if payload != "" {
-						err = inst.clients.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload)
-						if err != nil {
-							log.Errorf("bacnet-server: mqtt publish (bacnet output) err: %s", err.Error())
-							return err
-						} else {
-							point.PendingMQTTPublish = false
-							updatePoint = true
-						}
-					}
-				*/
+
 			} else {
-				// highest := points.GetHighest(point.WriteValue)
 				in14, in15 := points.GetWriteArrayValues(point.WriteValue)
 
 				if in14 == nil {
@@ -111,7 +96,7 @@ func (inst *Server) mqttPublishPV(point *points.Point) error {
 
 				log.Infof("mqtt-bacnet publish (bacnet variable) topic: %s -> value: %s", topic, payload)
 				if payload != "" {
-					err = inst.clients.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload)
+					err = inst.clients.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload) // write @14
 					if err != nil {
 						log.Errorf("bacnet-server: mqtt publish (bacnet variable) err: %s", err.Error())
 						return err
@@ -128,10 +113,9 @@ func (inst *Server) mqttPublishPV(point *points.Point) error {
 					topic = fmt.Sprintf("bacnet/%s/%d/write/pri/15", obj, objectId)
 					payload = buildPayload("", *point.WriteValue.P15)
 				}
-
 				log.Infof("mqtt-bacnet publish (bacnet variable) topic: %s -> value: %s", topic, payload)
 				if payload != "" {
-					err = inst.clients.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload)
+					err = inst.clients.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload) // write @15
 					if err != nil {
 						log.Errorf("bacnet-server: mqtt publish (bacnet variable) err: %s", err.Error())
 						return err
@@ -225,7 +209,7 @@ func (inst *Server) fromBacnet(msg interface{}) error {
 	if !inst.firstMessageFromBacnet { // this is to try and get the bacnet-server's last value sent from another bacnet master
 		err = payload.NewMessage(msg, true)
 		if err == nil {
-			inst.firstMessageFromBacnet = true
+			// inst.firstMessageFromBacnet = true // Aidan: disabled as this logic dosnt work, reason is that flo-eng wasn't using the priority array from driver-bacnet
 		}
 	} else {
 		err = payload.NewMessage(msg, false)

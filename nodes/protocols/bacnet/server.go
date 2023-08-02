@@ -323,7 +323,6 @@ func (inst *Server) setMessage() {
 }
 
 func (inst *Server) setDevStats1(msg string) {
-	inst.devStats1 = msg
 	if inst.deviceCountNumber < 1 {
 		inst.devStats1 = "not added"
 	} else {
@@ -332,7 +331,6 @@ func (inst *Server) setDevStats1(msg string) {
 }
 
 func (inst *Server) setDevStats2(msg string) {
-	inst.devStats2 = msg
 	if inst.deviceCountNumber < 2 {
 		inst.devStats2 = "not added"
 	} else {
@@ -341,7 +339,6 @@ func (inst *Server) setDevStats2(msg string) {
 }
 
 func (inst *Server) setDevStats3(msg string) {
-	inst.devStats3 = msg
 	if inst.deviceCountNumber < 3 {
 		inst.devStats3 = "not added"
 	} else {
