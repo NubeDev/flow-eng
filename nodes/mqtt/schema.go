@@ -3,6 +3,7 @@ package broker
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
 	log "github.com/sirupsen/logrus"
@@ -13,22 +14,17 @@ type nodeSchema struct {
 }
 
 func (inst *Broker) getConnectionsNames() (names []string, uuids []string) {
-	db := inst.GetDB()
-	if db != nil {
-		connections, err := inst.GetDB().GetConnections()
-		if err != nil {
-			log.Errorf("flow-networks get connections err %s", err.Error())
-			return nil, nil
-		}
-		for _, connection := range connections {
-			name := fmt.Sprintf("name:%s ip:%s port:%d", connection.Name, connection.Host, connection.Port)
-			names = append(names, name)
-			uuids = append(uuids, connection.UUID)
-		}
-		return names, uuids
+	connections, err := inst.Connections().GetConnections()
+	if err != nil {
+		log.Errorf("flow-networks get connections err %s", err.Error())
+		return nil, nil
 	}
-	log.Errorf("mqtt-broker failed to get db instance")
-	return nil, nil
+	for _, connection := range connections {
+		name := fmt.Sprintf("name:%s ip:%s port:%d", connection.Name, connection.Host, connection.Port)
+		names = append(names, name)
+		uuids = append(uuids, connection.UUID)
+	}
+	return names, uuids
 
 }
 

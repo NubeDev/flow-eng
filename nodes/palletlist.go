@@ -3,10 +3,11 @@ package nodes
 import (
 	"errors"
 	"fmt"
+
+	"github.com/NubeDev/flow-eng/connections"
 	"github.com/NubeDev/flow-eng/nodes/notify"
 	"github.com/NubeDev/flow-eng/nodes/trigger"
 
-	"github.com/NubeDev/flow-eng/db"
 	"github.com/NubeDev/flow-eng/helpers/store"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/boolean"
@@ -359,9 +360,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	)
 }
 
-func Builder(body *node.Spec, db db.DB, store *store.Store, opts ...interface{}) (node.Node, error) {
-	body.AddDB(db)
+func Builder(body *node.Spec, connIF connections.ConnectionIF, store *store.Store, opts ...interface{}) (node.Node, error) {
 	body.AddStore(store)
+	body.SetConnections(connIF)
 	n, err := builderConst(body)
 	if n != nil || err != nil {
 		return n, err

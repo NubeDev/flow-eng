@@ -2,7 +2,8 @@ package broker
 
 import (
 	"fmt"
-	"github.com/NubeDev/flow-eng/db"
+
+	"github.com/NubeDev/flow-eng/connections"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeDev/flow-eng/services/mqttclient"
@@ -14,7 +15,7 @@ type Broker struct {
 	*node.Spec
 	firstLoop     bool
 	loopCount     uint64
-	connection    *db.Connection
+	connection    *connections.Connection
 	mqttClient    *mqttclient.Client
 	mqttConnected bool
 }
@@ -109,7 +110,7 @@ func (inst *Broker) setConnection() {
 		log.Errorf("add mqtt broker failed to get settings err:%s", err.Error())
 		return
 	}
-	connection, err := inst.GetDB().GetConnection(settings.Conn)
+	connection, err := inst.Connections().GetConnection(settings.Conn)
 	if err != nil {
 		log.Error("add mqtt broker failed to find connection")
 		return

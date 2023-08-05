@@ -1,11 +1,12 @@
 package node
 
 import (
-	"github.com/NubeDev/flow-eng/db"
+	"time"
+
+	"github.com/NubeDev/flow-eng/connections"
 	"github.com/NubeDev/flow-eng/helpers/settings"
 	"github.com/NubeDev/flow-eng/helpers/store"
 	"github.com/NubeDev/flow-eng/schemas"
-	"time"
 )
 
 type CurrentState int
@@ -26,8 +27,8 @@ type Node interface {
 	SetProcessed()
 	GetProcessed() bool
 	Loop() (count uint64, firstLoop bool)
-	AddDB(d db.DB)
-	GetDB() db.DB
+	SetConnections(conn connections.ConnectionIF)
+	Connections() connections.ConnectionIF
 	AddStore(s *store.Store)
 	GetStore() *store.Store
 	SetSchema(schema *schemas.Schema)
@@ -138,7 +139,7 @@ type Spec struct {
 	Help          string                 `json:"help"`
 	loopCount     uint64
 	schema        *schemas.Schema
-	db            db.DB
+	conn          connections.ConnectionIF
 	store         *store.Store
 	nodes         []Node
 	processed     bool
@@ -181,10 +182,6 @@ func (n *Spec) GetIcon() string {
 	return n.Info.Icon
 }
 
-func (n *Spec) AddDB(d db.DB) {
-	n.db = d
-}
-
 func (n *Spec) GetNode(uuid string) Node {
 	for _, node := range n.nodes {
 		if node.GetID() == uuid {
@@ -202,16 +199,20 @@ func (n *Spec) AddNodes(f []Node) {
 	n.nodes = f
 }
 
-func (n *Spec) GetDB() db.DB {
-	return n.db
-}
-
 func (n *Spec) AddStore(s *store.Store) {
 	n.store = s
 }
 
 func (n *Spec) GetStore() *store.Store {
 	return n.store
+}
+
+func (n *Spec) SetConnections(c connections.ConnectionIF) {
+	n.conn = c
+}
+
+func (n *Spec) Connections() connections.ConnectionIF {
+	return n.conn
 }
 
 // Loop will give you the loop count and a flag if it's the first loop
