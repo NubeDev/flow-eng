@@ -31,8 +31,8 @@ func (inst *DeadBand) Process() {
 	}
 	setPoint, _ := inst.ReadPinAsFloat(node.Setpoint)
 	deadBand, _ := inst.ReadPinAsFloat(node.DeadBand)
-	risingEdge := setPoint + deadBand
-	fallingEdge := setPoint - deadBand
+	risingEdge := setPoint + (deadBand / 2)
+	fallingEdge := setPoint - (deadBand / 2)
 
 	if input > risingEdge {
 		inst.out = true
