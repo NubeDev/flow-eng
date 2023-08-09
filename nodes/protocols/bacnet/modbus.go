@@ -120,7 +120,6 @@ func (inst *Server) modbusOutputsDispatch(cli *modbuscli.Modbus) {
 	if pointsList == nil {
 		log.Errorf("modbus modbusOutputsDispatch() points is empty")
 		return
-
 	}
 	if len(pointsList.DeviceOne) > 0 {
 		err := cli.Write(1, modbusBulkWrite(pointsList.DeviceOne))
@@ -209,7 +208,7 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 	for _, point := range pointsList { // do modbus read
 		if !point.IsWriteable {
 			addr, _ := points.ModbusBuildInput(point.IoType, point.ObjectID)
-			slaveId = addr.DeviceAddr
+			slaveId = point.ModbusDevAddr
 			io16Pin := addr.IoPin - 1
 			if slaveId <= 0 {
 				log.Errorf("modbus slave addrress cant not be less to 1")

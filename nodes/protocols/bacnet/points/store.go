@@ -178,7 +178,7 @@ func (inst *Store) GetStore() *ObjectStore {
 	return inst.Store
 }
 
-func (inst *Store) AddPoint(point *Point, ignoreError bool) (*Point, error) {
+func (inst *Store) AddPoint(point *Point, ignoreError bool, deviceAddr int) (*Point, error) {
 	var err error
 	if point == nil {
 		return nil, errors.New(fmt.Sprintf("store-add-point: point can not be empty"))
@@ -188,15 +188,14 @@ func (inst *Store) AddPoint(point *Point, ignoreError bool) (*Point, error) {
 	if point.ObjectType == "" {
 		return nil, errors.New(fmt.Sprintf("store-add-point: point objectType can not be empty"))
 	}
-	//rubixUIStart, rubixUOStart := CalcPointCount(inst.ModbusDeviceCount, inst.Application)
+	// rubixUIStart, rubixUOStart := CalcPointCount(inst.ModbusDeviceCount, inst.Application)
 	if point.ObjectType == AnalogInput {
-		addr, _ := ModbusBuildInput(point.IoType, point.ObjectID)
-		point.ModbusDevAddr = addr.DeviceAddr
+		point.ModbusDevAddr = deviceAddr
 		point.Application = names.Modbus
 	}
 	if point.ObjectType == AnalogOutput {
 		addr, _ := ModbusBuildOutput(point.IoType, point.ObjectID)
-		point.ModbusDevAddr = addr.DeviceAddr
+		point.ModbusDevAddr = deviceAddr
 		if point.IoType == IoTypeDigital {
 			point.ModbusRegister = addr.Volt
 		}
@@ -270,7 +269,7 @@ func (inst *Store) checkExisting(point *Point, from, to int) error {
 		return err
 	}
 	// check if there is a free address
-	//err = inst.CheckExistingPointErr(point)
+	// err = inst.CheckExistingPointErr(point)
 	if err != nil {
 		return err
 	}

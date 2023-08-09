@@ -1,6 +1,7 @@
 package bacnetio
 
 import (
+	"errors"
 	"fmt"
 	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/helpers/float"
@@ -39,6 +40,10 @@ type Server struct {
 	devStats2              string
 	devStats3              string
 	devStats4              string
+	devAddr1               int
+	devAddr2               int
+	devAddr3               int
+	devAddr4               int
 }
 
 var runnersLock bool
@@ -104,6 +109,10 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 		"",
 		"",
 		"",
+		1,
+		2,
+		3,
+		4,
 	}
 	server.clients.mqttClient = opts.MqttClient
 	body.SetSchema(BuildSchemaServer())
@@ -116,6 +125,10 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 func (inst *Server) Process() {
 	loopCount, firstLoop := inst.Loop()
 	if firstLoop {
+		err := inst.setDeviceAddress()
+		if err != nil {
+			log.Error(err)
+		}
 		go inst.setMessage()
 		go inst.subscribe()
 		go inst.mqttReconnect()
@@ -312,8 +325,27 @@ func (inst *Server) GetModbusWriteablePoints() *points.ModbusPoints {
 	return out
 }
 
+func (inst *Server) setDeviceAddress() error {
+	schema, err := inst.getSchema()
+	if err != nil {
+		return err
+	}
+	if schema == nil {
+		return errors.New("failed to get bacnet-server settings")
+	}
+	inst.devAddr1 = schema.DeviceAddress1
+	inst.devAddr2 = schema.DeviceAddress2
+	inst.devAddr3 = schema.DeviceAddress3
+	inst.devAddr4 = schema.DeviceAddress4
+	return nil
+}
+
+func (inst *Server) getSchema() (*BacnetSchema, error) {
+	return GetBacnetSchema(inst.GetSettings())
+}
+
 func (inst *Server) setMessage() {
-	schema, err := GetBacnetSchema(inst.GetSettings())
+	schema, err := inst.getSchema()
 	if err != nil {
 		log.Error(err)
 		return

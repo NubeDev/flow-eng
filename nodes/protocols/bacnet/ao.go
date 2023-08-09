@@ -88,6 +88,7 @@ func (inst *AO) Process() {
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
 		inst.setObjectId(settings)
 		ioType := settings.IoType
+		deviceAddr := settings.DeviceNumber // modbus device address
 		if ioType == "" {
 			ioType = string(points.IoTypeVolts)
 		}
@@ -98,7 +99,7 @@ func (inst *AO) Process() {
 			name = parentTopic
 		}
 		point.Name = name
-		point, err = inst.store.AddPoint(point, false)
+		point, err = inst.store.AddPoint(point, false, deviceAddr)
 		if err != nil {
 			log.Errorf("bacnet-server add new point type: %s-%d", objectType, inst.objectID)
 		} else {
