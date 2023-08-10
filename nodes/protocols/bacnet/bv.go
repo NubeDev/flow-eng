@@ -82,7 +82,7 @@ func (inst *BV) Process() {
 			name = parentTopic
 		}
 		point.Name = name
-		point, err = inst.store.AddPoint(point, false)
+		point, err = inst.store.AddPoint(point, false, 0)
 		if err != nil {
 			log.Errorf("bacnet-server add new point type: %s-%d", objectType, inst.objectID)
 		} else {

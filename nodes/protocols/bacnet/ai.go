@@ -57,6 +57,7 @@ func (inst *AI) Process() {
 		transformProps := inst.getTransformProps(settings)
 		inst.setObjectId(settings)
 		ioType := settings.IoType
+		deviceAddr := settings.DeviceNumber
 		if ioType == "" {
 			ioType = string(points.IoTypeVolts)
 		}
@@ -79,7 +80,7 @@ func (inst *AI) Process() {
 			inst.WritePinNull(node.Out)
 			return
 		}
-		point, err = inst.store.AddPoint(point, true)
+		point, err = inst.store.AddPoint(point, true, deviceAddr)
 		if err != nil {
 			log.Errorf("bacnet-server add new point type: %s-%d", objectType, inst.objectID)
 		} else {
@@ -99,6 +100,7 @@ func (inst *AI) Process() {
 	} else {
 		inst.WritePinNull(node.Out)
 	}
+
 }
 
 func (inst *AI) setObjectId(settings *AISettings) {
