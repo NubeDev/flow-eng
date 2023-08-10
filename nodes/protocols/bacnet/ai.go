@@ -29,7 +29,7 @@ type AI struct {
 }
 
 func NewAI(body *node.Spec, opts ...any) (node.Node, error) {
-	bn := bacnetOpts(opts)
+	bn := bacnetOpts(opts...)
 	body = node.Defaults(body, bacnetAI, Category)
 	var inputs []*node.Input // no inputs required
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)

@@ -52,8 +52,8 @@ type clients struct {
 
 func bacnetOpts(opts ...any) *Bacnet {
 	var bn *Bacnet
-	if len(opts) == 2 {
-		bn = opts[1].(*Bacnet)
+	if len(opts) == 1 {
+		bn = opts[0].(*Bacnet)
 	} else {
 		bn = &Bacnet{}
 	}
@@ -71,7 +71,7 @@ const (
 )
 
 func NewServer(body *node.Spec, opts ...any) (node.Node, error) {
-	bn := bacnetOpts(opts)
+	bn := bacnetOpts(opts...)
 	var application = bn.Application
 	var err error
 	body = node.Defaults(body, serverNode, Category)
@@ -107,7 +107,7 @@ func NewServer(body *node.Spec, opts ...any) (node.Node, error) {
 	server.clients.mqttClient = bn.MqttClient
 	body.SetSchema(BuildSchemaServer())
 	if application == names.Modbus {
-		log.Infof("bacnet-server: start application: %s device-ip: %s", application, bn.Ip)
+		log.Debugf("bacnet-server: start application: %s device-ip: %s", application, bn.Ip)
 	}
 	return server, err
 }
@@ -203,7 +203,7 @@ func (inst *Server) updateFromBACnet(objType points.ObjectType, id points.Object
 		err := inst.updatePoint(objType, id, p)
 		valuePri := points.GetHighest(array)
 		if valuePri != nil {
-			log.Infof("bacnet write mqtt value to objType: %s -> objId: %d value: %f pri: %d", objType, id, valuePri.Value, valuePri.Number)
+			log.Debugf("bacnet write mqtt value to objType: %s -> objId: %d value: %f pri: %d", objType, id, valuePri.Value, valuePri.Number)
 		}
 		if err != nil {
 			return err
@@ -317,7 +317,7 @@ func (inst *Server) setMessage() {
 		log.Error(err)
 		return
 	}
-	log.Infof("start modbus polling on port: %s", schema.Serial)
+	log.Debugf("start modbus polling on port: %s", schema.Serial)
 	inst.WritePin(node.Msg, fmt.Sprintf("port:%s & %s:IO16s", schema.Serial, schema.DeviceCount))
 }
 

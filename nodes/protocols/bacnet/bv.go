@@ -29,7 +29,7 @@ type BV struct {
 }
 
 func NewBV(body *node.Spec, opts ...any) (node.Node, error) {
-	bn := bacnetOpts(opts)
+	bn := bacnetOpts(opts...)
 	body = node.Defaults(body, bacnetBV, Category)
 
 	in14 := node.BuildInput(node.In14, node.TypeBool, nil, body.Inputs, false, false)

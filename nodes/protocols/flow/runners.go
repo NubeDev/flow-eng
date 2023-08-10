@@ -3,20 +3,21 @@ package flow
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
+
 	"github.com/NubeDev/flow-eng/node"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/enescakir/emoji"
 	log "github.com/sirupsen/logrus"
-	"strings"
 )
 
 func (inst *Network) subscribeToEachPoint() {
 	callback := func(client mqtt.Client, message mqtt.Message) {
-		log.Infof("FLOW NETWORK: subscribeToEachPoint() response topic: %+v", string(message.Topic()))
+		log.Debugf("FLOW NETWORK: subscribeToEachPoint() response topic: %+v", string(message.Topic()))
 		if message.Payload() == nil {
-			log.Info("FLOW NETWORK: subscribeToEachPoint() response payload: NIL")
+			log.Debugf("FLOW NETWORK: subscribeToEachPoint() response payload: NIL")
 		} else {
-			log.Infof("FLOW NETWORK: subscribeToEachPoint() response payload: %+v", string(message.Payload()))
+			log.Debugf("FLOW NETWORK: subscribeToEachPoint() response payload: %+v", string(message.Payload()))
 		}
 
 		s := inst.GetStore()
@@ -46,33 +47,25 @@ func (inst *Network) subscribeToEachPoint() {
 	children, ok := s.Get(inst.GetID())
 	payloads := getPayloads(children, ok)
 	settings, _ := getSettings(inst.GetSettings())
-	log.Infof("Flow Network subscribeToEachPoint() connection: %v, payloads length: %v", settings.Conn, len(payloads))
 	inst.subscribeFailedPoints = true
 	for _, payload := range payloads {
-		log.Infof("Flow Network subscribeToEachPoint() payload: %+v", payload)
 		if payload.topic != "" {
 			if inst.mqttClient != nil {
 				err := inst.mqttClient.Subscribe(payload.topic, mqttQOS, callback)
 				if err != nil {
 					log.Errorf("Flow Network subscribeToEachPoint() subscribe topic: %s err: %s", payload.topic, err.Error())
 				} else {
-					log.Infof("Flow Network subscribeToEachPoint() subscribe topic: %s", payload.topic)
 					inst.subscribeFailedPoints = false
 				}
 			}
 		}
 	}
-	log.Infof("Flow Network subscribeToEachPoint() connection: %v, DONE SUBSCRIBING", settings.Conn)
+	log.Debugf("Flow Network subscribeToEachPoint() connection: %v, DONE SUBSCRIBING", settings.Conn)
 }
 
 func (inst *Network) subscribeToMissingPoints() {
 	callback := func(client mqtt.Client, message mqtt.Message) {
-		log.Infof("FLOW NETWORK: subscribeToMissingPoints() response topic: %+v", string(message.Topic()))
-		if message.Payload() == nil {
-			log.Info("FLOW NETWORK: subscribeToMissingPoints() response payload: NIL")
-		} else {
-			log.Infof("FLOW NETWORK: subscribeToMissingPoints() response payload: %+v", string(message.Payload()))
-		}
+		log.Debugf("FLOW NETWORK: subscribeToMissingPoints() response topic: %+v", string(message.Topic()))
 
 		var missingPoints []MqttPoint
 		err := json.Unmarshal(message.Payload(), &missingPoints)
@@ -80,7 +73,7 @@ func (inst *Network) subscribeToMissingPoints() {
 			log.Errorf("failed to unmarshal flow-framework missing points list err: %s", err.Error())
 			return
 		}
-		log.Infof("Flow Network subscribeToMissingPoints() missing points count: %d", len(missingPoints))
+		log.Debugf("Flow Network subscribeToMissingPoints() missing points count: %d", len(missingPoints))
 
 		s := inst.GetStore()
 		children, ok := s.Get(inst.GetID())
@@ -104,7 +97,6 @@ func (inst *Network) subscribeToMissingPoints() {
 
 		}
 	}
-	log.Infof("Flow Network subscribeToMissingPoints()")
 	var topic = "rubix/platform/points/missing/publish"
 	inst.subscribeFailedMissingPoints = true
 	if inst.mqttClient != nil {
@@ -112,7 +104,7 @@ func (inst *Network) subscribeToMissingPoints() {
 		if err != nil {
 			log.Errorf("Flow Network subscribeToMissingPoints() :%s Subscribe() err: %s", topic, err.Error())
 		} else {
-			log.Infof("Flow Network subscribeToMissingPoints() Subscribe() : %s", topic)
+			log.Debugf("Flow Network subscribeToMissingPoints() Subscribe() : %s", topic)
 			inst.subscribeFailedMissingPoints = false
 		}
 	}
@@ -153,7 +145,7 @@ func (inst *Network) pointsList() {
 			return
 		}
 		inst.pointsCount = len(points)
-		log.Infof("Flow Network pointsList() points count: %d", inst.pointsCount)
+		log.Debugf("Flow Network pointsList() points count: %d", inst.pointsCount)
 		s := inst.GetStore()
 		topic := fmt.Sprintf("pointsList_%s", inst.GetID())
 		if s != nil {
@@ -166,12 +158,11 @@ func (inst *Network) pointsList() {
 	var topic = "rubix/platform/points/publish"
 	inst.subscribeFailedPointsList = true
 	if inst.mqttClient != nil {
-		log.Info("Flow Network pointsList()")
 		err := inst.mqttClient.Subscribe(topic, mqttQOS, callback)
 		if err != nil {
 			log.Errorf("Flow Network pointsList() :%s Subscribe() err: %s", topic, err.Error())
 		} else {
-			log.Infof("Flow Network pointsList() Subscribe() : %s", topic)
+			log.Debugf("Flow Network pointsList() Subscribe() : %s", topic)
 			inst.subscribeFailedPointsList = false
 		}
 	}
@@ -208,7 +199,7 @@ func (inst *Network) schedulesList() {
 			log.Errorf("failed to unmarshal flow-framework schedules list err: %s", err.Error())
 			return
 		}
-		log.Infof("Flow Network schedulesList() schedules count: %d", len(schedules))
+		log.Debugf("Flow Network schedulesList() schedules count: %d", len(schedules))
 		s := inst.GetStore()
 		topic := fmt.Sprintf("schedulesList_%s", inst.GetID())
 		if s != nil {
@@ -225,7 +216,7 @@ func (inst *Network) schedulesList() {
 			log.Errorf("Flow Network schedulesList() :%s Subscribe() err: %s", topic, err.Error())
 
 		} else {
-			log.Infof("Flow Network schedulesList() Subscribe() : %s", topic)
+			log.Debugf("Flow Network schedulesList() Subscribe() : %s", topic)
 			inst.subscribeFailedSchedulesList = false
 		}
 	}
@@ -235,46 +226,27 @@ const fetchSelectedPointsCOVTopic = "rubix/platform/points/cov/selected"
 
 func (inst *Network) fetchExistingPointValues() {
 	settings, err := getSettings(inst.GetSettings())
-	log.Infof("FLOW NETWORK: fetchExistingPointValues() %v", settings.Conn)
+	log.Debugf("FLOW NETWORK: fetchExistingPointValues() %v", settings.Conn)
 	s := inst.GetStore()
-	// log.Infof("FLOW NETWORK: fetchExistingPointValues() inst.GetID(): %+v", inst.GetID())
 	children, ok := s.Get(inst.GetID())
 	payloads := getPayloads(children, ok)
 
 	var pointUUIDList []*MqttPoint
 	for _, payload := range payloads {
-		/*
-			if payload == nil {
-				log.Info("FLOW NETWORK: fetchExistingPointValues() payload IS NIL")
-			} else {
-				log.Infof("FLOW NETWORK: fetchExistingPointValues() payload: %+v", *payload)
-			}
-		*/
-
 		if payload.pointUUID != "" {
 			pnt := MqttPoint{
 				PointUUID: payload.pointUUID,
 			}
 			exists := false
 			for _, val := range pointUUIDList {
-				// log.Infof("FLOW NETWORK: fetchExistingPointValues() pointUUIDList val %+v", val)
 				if val != nil && val.PointUUID == pnt.PointUUID {
 					exists = true
 					break
 				}
 			}
 			if !exists {
-				// log.Info("FLOW NETWORK: fetchExistingPointValues() ADD TO LIST")
 				pointUUIDList = append(pointUUIDList, &pnt)
 			}
-		}
-	}
-
-	for i, v := range pointUUIDList {
-		if v == nil {
-			log.Infof("FLOW NETWORK: fetchExistingPointValues() pointUUIDList %v IS NIL", i)
-		} else {
-			log.Infof("FLOW NETWORK: fetchExistingPointValues() pointUUIDList %v: %+v", i, *v)
 		}
 	}
 
@@ -284,7 +256,6 @@ func (inst *Network) fetchExistingPointValues() {
 		return
 	}
 	if inst.mqttClient != nil {
-		log.Infof("FLOW NETWORK: inst.mqttClient.Publish(fetchSelectedPointsCOVTopic, mqttQOS, mqttRetain, data)")
 		err := inst.mqttClient.Publish(fetchSelectedPointsCOVTopic, mqttQOS, mqttRetain, data)
 		if err != nil {
 			log.Errorf("Flow Network fetchExistingPointValues() mqtt publish err: %s", err.Error())
@@ -297,7 +268,6 @@ func (inst *Network) fetchExistingPointValues() {
 const fetchAllPointsCOVTopic = "rubix/platform/points/cov/all"
 
 func (inst *Network) fetchAllPointValues() {
-	log.Info("FLOW NETWORK: fetchAllPointValues()")
 	if inst.mqttClient != nil {
 		err := inst.mqttClient.Publish(fetchAllPointsCOVTopic, mqttQOS, mqttRetain, "")
 		if err != nil {
@@ -326,15 +296,12 @@ func (inst *Network) publish(loopCount uint64) {
 	}
 	children, ok := s.Get(inst.GetID())
 	payloads := getPayloads(children, ok)
-	// log.Infof("Flow Network publish() point count to write: %d", len(payloads))
 
 	for _, payload := range payloads {
-		// fmt.Println(fmt.Sprintf("Flow Network publish() payload: %+v", payload))
 		if !payload.isWriteable {
 			continue
 		}
 		names := spitPointNames(payload.netDevPntNames)
-		// log.Infof("spitPointNames(): %+v", names)
 		if len(names) != 4 {
 			log.Errorf("Flow Network publish() err: failed to get point name, incorrect lenght")
 			continue
@@ -348,7 +315,6 @@ func (inst *Network) publish(loopCount uint64) {
 		republishLoop := false
 		if loopCount%100 == 0 { // republish every 100 loops
 			republishLoop = true
-			// log.Infof("Flow Network publish(): REPUBLISH LOOP!")
 		}
 
 		priority := map[string]*float64{}
@@ -357,7 +323,6 @@ func (inst *Network) publish(loopCount uint64) {
 			ffPointWriteNode := n.(*FFPointWrite)
 			priority = ffPointWriteNode.EvaluateInputsArray(republishLoop)
 			if len(priority) <= 0 {
-				// log.Infof("Flow Network publish() nothing to write name: %s", payload.netDevPntNames)
 				continue
 			}
 

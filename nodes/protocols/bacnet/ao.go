@@ -30,7 +30,7 @@ type AO struct {
 }
 
 func NewAO(body *node.Spec, opts ...any) (node.Node, error) {
-	bn := bacnetOpts(opts)
+	bn := bacnetOpts(opts...)
 	body = node.Defaults(body, bacnetAO, Category)
 
 	in14 := node.BuildInput(node.In14, node.TypeFloat, nil, body.Inputs, false, false)

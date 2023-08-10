@@ -29,7 +29,7 @@ type AV struct {
 }
 
 func NewAV(body *node.Spec, opts ...any) (node.Node, error) {
-	bn := bacnetOpts(opts)
+	bn := bacnetOpts(opts...)
 	body = node.Defaults(body, bacnetAV, Category)
 
 	in14 := node.BuildInput(node.In14, node.TypeFloat, nil, body.Inputs, false, false)

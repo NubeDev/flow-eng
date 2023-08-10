@@ -30,7 +30,7 @@ func RegisterNodeBuilder(category string, nodeName string, builderFunc NodeBuild
 	nodeBuilderMap[nodeName] = builderFunc
 }
 
-func Builder(body *node.Spec, connIF connections.ConnectionIF, store *store.Store, opts ...interface{}) (node.Node, error) {
+func Builder(body *node.Spec, connIF connections.ConnectionIF, store *store.Store, opts ...any) (node.Node, error) {
 	body.AddStore(store)
 	body.SetConnections(connIF)
 	nodeBuilderMap, ok := builders[body.Info.Category]
@@ -42,7 +42,7 @@ func Builder(body *node.Spec, connIF connections.ConnectionIF, store *store.Stor
 	if !ok {
 		return nil, noNodeFoundError(body.Info.Category, body.Info.Name)
 	}
-	return nodeFunc(body, store, opts)
+	return nodeFunc(body, opts...)
 }
 
 // All get all the node specs, will be used for the UI to list all the nodes
@@ -53,7 +53,7 @@ func All() []*node.Spec {
 	currentSpecPallet = []*node.Spec{}
 	for _, nodeMap := range builders {
 		for _, nodeFunc := range nodeMap {
-			n, err := nodeFunc(nil, nil)
+			n, err := nodeFunc(nil)
 			if n == nil || err != nil {
 				continue
 			}
