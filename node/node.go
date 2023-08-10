@@ -109,11 +109,12 @@ type Node interface {
 	GetPersitedData() any
 }
 
-func New(id, name, nodeName string, meta *Metadata, settings map[string]interface{}) *Spec {
+func New(id, category, name, nodeName string, meta *Metadata, settings map[string]interface{}) *Spec {
 	n := &Spec{
 		Inputs:  nil,
 		Outputs: nil,
 		Info: Info{
+			Category: category,
 			NodeID:   id,
 			Name:     name,
 			NodeName: nodeName,

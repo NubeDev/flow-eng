@@ -15,6 +15,7 @@ type NodeBuilderMap map[string]NodeBuilderFunc
 type CategoryBuilder map[string]NodeBuilderMap
 
 var builders CategoryBuilder
+var currentSpecPallet []*node.Spec
 
 func RegisterNodeBuilder(category string, nodeName string, builderFunc NodeBuilderFunc) {
 	if builders == nil {
@@ -46,7 +47,10 @@ func Builder(body *node.Spec, connIF connections.ConnectionIF, store *store.Stor
 
 // All get all the node specs, will be used for the UI to list all the nodes
 func All() []*node.Spec {
-	var specs = []*node.Spec{}
+	if currentSpecPallet != nil {
+		return currentSpecPallet
+	}
+	currentSpecPallet = []*node.Spec{}
 	for _, nodeMap := range builders {
 		for _, nodeFunc := range nodeMap {
 			n, err := nodeFunc(nil, nil)
@@ -54,10 +58,10 @@ func All() []*node.Spec {
 				continue
 			}
 			s := node.ConvertToSpec(n)
-			specs = append(specs, s)
+			currentSpecPallet = append(currentSpecPallet, s)
 		}
 	}
-	return specs
+	return currentSpecPallet
 }
 
 func GetSchema(category string, name string) *schemas.Schema {

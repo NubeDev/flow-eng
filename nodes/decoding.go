@@ -11,10 +11,8 @@ func Decode(encodedNodes *NodesList) ([]*node.Spec, error) {
 	var decodedNodes []*node.Spec
 	for _, encodedNode := range encodedNodes.Nodes {
 		var decodedNode *node.Spec
-		_, getName, _ := pallet.DecodeType(encodedNode.Type)
-		id := encodedNode.Id
-		name := getName
-		decodedNode = node.New(id, name, "", encodedNode.Metadata, encodedNode.Settings) // create a blank node
+		category, name, _ := pallet.DecodeType(encodedNode.Type)
+		decodedNode = node.New(encodedNode.Id, category, name, "", encodedNode.Metadata, encodedNode.Settings) // create a blank node
 		decodedNode.IsParent = encodedNode.IsParent
 		decodedNode.ParentId = encodedNode.ParentId
 		decodedNode.Info.Icon = encodedNode.Icon
