@@ -25,8 +25,8 @@ func build(body *node.Spec) *node.Spec {
 
 }
 
-func NewGet(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, getNode, category)
+func NewGet(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, getNode, Category)
 	body = build(body)
 	return &Get{body}, nil
 }

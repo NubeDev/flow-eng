@@ -8,9 +8,9 @@ type Avg struct {
 	*node.Spec
 }
 
-func NewAvg(body *node.Spec) (node.Node, error) {
+func NewAvg(body *node.Spec, _ ...any) (node.Node, error) {
 	var err error
-	body, err = nodeDefault(body, avg, category)
+	body, err = nodeDefault(body, avg, Category)
 	if err != nil {
 		return nil, err
 	}

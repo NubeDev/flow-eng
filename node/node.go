@@ -106,6 +106,7 @@ type Node interface {
 	GetPayloadType() DataTypes
 	SetDynamicInputs()
 	SetDynamicOutputs()
+	GetPersitedData() any
 }
 
 func New(id, name, nodeName string, meta *Metadata, settings map[string]interface{}) *Spec {
@@ -372,6 +373,10 @@ func (n *Spec) GetDisplay() string {
 
 func (n *Spec) SetDisplay(body string) {
 	n.Info.Display = body
+}
+
+func (n *Spec) GetPersitedData() any {
+	return nil
 }
 
 type Info struct {

@@ -32,9 +32,9 @@ type Network struct {
 var mqttQOS = mqttclient.AtMostOnce
 var mqttRetain = false
 
-func NewNetwork(body *node.Spec) (node.Node, error) {
+func NewNetwork(body *node.Spec, _ ...any) (node.Node, error) {
 	// var err error
-	body = node.Defaults(body, flowNetwork, category)
+	body = node.Defaults(body, flowNetwork, Category)
 	inputs := node.BuildInputs()
 	outputs := node.BuildOutputs(node.BuildOutput(node.Connected, node.TypeBool, nil, body.Outputs))
 	body.IsParent = true

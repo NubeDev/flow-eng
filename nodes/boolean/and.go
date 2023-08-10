@@ -8,9 +8,9 @@ type And struct {
 	*node.Spec
 }
 
-func NewAnd(body *node.Spec) (node.Node, error) {
+func NewAnd(body *node.Spec, _ ...any) (node.Node, error) {
 	var err error
-	body, err = nodeDefault(body, and, category)
+	body, err = nodeDefault(body, and, Category)
 	if err != nil {
 		return nil, err
 	}

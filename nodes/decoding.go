@@ -2,6 +2,7 @@ package nodes
 
 import (
 	"github.com/NubeDev/flow-eng/node"
+	"github.com/NubeDev/flow-eng/pallet"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -10,7 +11,7 @@ func Decode(encodedNodes *NodesList) ([]*node.Spec, error) {
 	var decodedNodes []*node.Spec
 	for _, encodedNode := range encodedNodes.Nodes {
 		var decodedNode *node.Spec
-		_, getName, _ := decodeType(encodedNode.Type)
+		_, getName, _ := pallet.DecodeType(encodedNode.Type)
 		id := encodedNode.Id
 		name := getName
 		decodedNode = node.New(id, name, "", encodedNode.Metadata, encodedNode.Settings) // create a blank node
@@ -21,7 +22,7 @@ func Decode(encodedNodes *NodesList) ([]*node.Spec, error) {
 		if encodedNode.Payload != nil {
 			decodedNode.Payload = &node.Payload{Any: encodedNode.Payload}
 		}
-		newNode, err := Builder(decodedNode, nil, nil)
+		newNode, err := pallet.Builder(decodedNode, nil, nil)
 		if err != nil {
 			log.Error(err)
 			return nil, err

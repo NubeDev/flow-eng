@@ -1,12 +1,9 @@
 package nodes
 
 import (
-	"errors"
-	"fmt"
-	flowctrl "github.com/NubeDev/flow-eng"
 	"github.com/NubeDev/flow-eng/node"
+	"github.com/NubeDev/flow-eng/pallet"
 	log "github.com/sirupsen/logrus"
-	"strings"
 )
 
 type NodesList struct {
@@ -14,11 +11,11 @@ type NodesList struct {
 }
 
 // Encode the flow from the flow-eng in correct format for react-flow
-func Encode(graph *flowctrl.Flow) (*NodesList, error) {
+func Encode(specs []*node.Spec) (*NodesList, error) {
 	var listSchema []*node.Schema
-	for _, _node := range graph.GetNodesSpec() { // we need to add each node that has one link
+	for _, _node := range specs { // we need to add each node that has one link
 		nodeSchema := &node.Schema{}
-		nodeType, err := setType(_node)
+		nodeType, err := pallet.SetType(_node)
 		if err != nil {
 			log.Error(err)
 			return nil, err
@@ -71,26 +68,4 @@ func Encode(graph *flowctrl.Flow) (*NodesList, error) {
 	}
 
 	return encodedNodes, nil
-}
-
-func setType(n *node.Spec) (string, error) {
-	if n == nil {
-		return "", errors.New("node info can not be empty")
-	}
-	if n.Info.Name == "" {
-		return "", errors.New("node name can not be empty")
-	}
-	if n.Info.Category == "" {
-		return "", errors.New("node category can not be empty")
-	}
-	return fmt.Sprintf("%s/%s", n.Info.Category, n.Info.Name), nil
-
-}
-
-func decodeType(nodeType string) (category, name string, err error) {
-	parts := strings.Split(nodeType, "/")
-	if len(parts) > 1 {
-		return parts[0], parts[1], nil
-	}
-	return "", "", errors.New("failed to get category and name from node-type")
 }

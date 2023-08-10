@@ -3,6 +3,8 @@ package bacnetio
 import (
 	"encoding/json"
 	"fmt"
+	"math"
+
 	"github.com/NubeDev/flow-eng/helpers"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/float"
@@ -13,7 +15,6 @@ import (
 	"github.com/NubeDev/flow-eng/services/mqttclient"
 	"github.com/NubeIO/lib-schema/schema"
 	log "github.com/sirupsen/logrus"
-	"math"
 )
 
 type AV struct {
@@ -27,9 +28,9 @@ type AV struct {
 	toFlowOptions *toFlowOptions
 }
 
-func NewAV(body *node.Spec, opts *Bacnet) (node.Node, error) {
-	opts = bacnetOpts(opts)
-	body = node.Defaults(body, bacnetAV, category)
+func NewAV(body *node.Spec, opts ...any) (node.Node, error) {
+	bn := bacnetOpts(opts)
+	body = node.Defaults(body, bacnetAV, Category)
 
 	in14 := node.BuildInput(node.In14, node.TypeFloat, nil, body.Inputs, false, false)
 	in15 := node.BuildInput(node.In15, node.TypeFloat, nil, body.Inputs, false, false)
@@ -47,9 +48,9 @@ func NewAV(body *node.Spec, opts *Bacnet) (node.Node, error) {
 		0,
 		points.AnalogVariable,
 		"",
-		opts.Store,
-		opts.Application,
-		opts.MqttClient,
+		bn.Store,
+		bn.Application,
+		bn.MqttClient,
 		flowOptions,
 	}
 	n.SetSchema(n.buildSchema())

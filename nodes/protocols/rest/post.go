@@ -11,8 +11,8 @@ type HttpWrite struct {
 	*resty.Client
 }
 
-func NewHttpWrite(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, writeNode, category)
+func NewHttpWrite(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, writeNode, Category)
 	url := node.BuildInput(node.URL, node.TypeString, nil, body.Inputs, false, false)
 	reqBody := node.BuildInput(node.Body, node.TypeString, nil, body.Inputs, false, false)
 	filter := node.BuildInput(node.Filter, node.TypeString, nil, body.Inputs, false, false)

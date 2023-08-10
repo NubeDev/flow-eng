@@ -1,7 +1,7 @@
 package system
 
 const (
-	category = "system"
+	Category = "system"
 )
 
 const (

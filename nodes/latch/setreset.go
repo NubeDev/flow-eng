@@ -2,6 +2,7 @@ package latch
 
 import (
 	"encoding/json"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
@@ -14,8 +15,8 @@ type SetResetLatch struct {
 	currentVal bool
 }
 
-func NewSetResetLatch(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, setResetLatch, category)
+func NewSetResetLatch(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, setResetLatch, Category)
 	set := node.BuildInput(node.Set, node.TypeBool, nil, body.Inputs, false, true)
 	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, false, true)
 

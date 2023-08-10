@@ -2,6 +2,9 @@ package notify
 
 import (
 	"encoding/json"
+	"net/smtp"
+	"strings"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
@@ -9,8 +12,6 @@ import (
 	"github.com/enescakir/emoji"
 	"github.com/jordan-wright/email"
 	log "github.com/sirupsen/logrus"
-	"net/smtp"
-	"strings"
 )
 
 type Gmail struct {
@@ -18,8 +19,8 @@ type Gmail struct {
 	lastFromAddress string
 }
 
-func NewGmail(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, gmail, category)
+func NewGmail(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, gmail, Category)
 
 	to := node.BuildInput(node.To, node.TypeString, nil, body.Inputs, true, false)
 	subject := node.BuildInput(node.Subject, node.TypeString, nil, body.Inputs, true, false)

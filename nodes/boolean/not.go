@@ -8,8 +8,8 @@ type Not struct {
 	*node.Spec
 }
 
-func NewNot(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, not, category)
+func NewNot(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, not, Category)
 	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs, false, true)
 	inputs := node.BuildInputs(in)
 

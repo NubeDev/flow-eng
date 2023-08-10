@@ -2,6 +2,9 @@ package bacnetio
 
 import (
 	"fmt"
+	"sort"
+	"strings"
+
 	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/names"
@@ -10,8 +13,6 @@ import (
 	"github.com/NubeDev/flow-eng/services/mqttclient"
 	"github.com/dustin/go-humanize"
 	log "github.com/sirupsen/logrus"
-	"sort"
-	"strings"
 )
 
 type Bacnet struct {
@@ -49,16 +50,14 @@ type clients struct {
 	mqttClient *mqttclient.Client
 }
 
-func bacnetOpts(opts *Bacnet) *Bacnet {
-	if opts != nil {
-		if opts.Store == nil {
-			log.Error("bacnet store can not be empty")
-		}
+func bacnetOpts(opts ...any) *Bacnet {
+	var bn *Bacnet
+	if len(opts) == 2 {
+		bn = opts[1].(*Bacnet)
+	} else {
+		bn = &Bacnet{}
 	}
-	if opts == nil {
-		return &Bacnet{}
-	}
-	return opts
+	return bn
 }
 
 var mqttQOS = mqttclient.AtMostOnce
@@ -71,11 +70,11 @@ const (
 	devStats4 = "dev-4-stats"
 )
 
-func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
-	opts = bacnetOpts(opts)
-	var application = opts.Application
+func NewServer(body *node.Spec, opts ...any) (node.Node, error) {
+	bn := bacnetOpts(opts)
+	var application = bn.Application
 	var err error
-	body = node.Defaults(body, serverNode, category)
+	body = node.Defaults(body, serverNode, Category)
 	outputMsg := node.BuildOutput(node.Msg, node.TypeString, nil, body.Outputs)
 	stats := node.BuildOutput(node.PollingCount, node.TypeString, nil, body.Outputs)
 	deviceError1 := node.BuildOutput(devStats1, node.TypeString, nil, body.Outputs)
@@ -92,7 +91,7 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 		false,
 		false,
 		false,
-		opts.Store,
+		bn.Store,
 		application,
 		0,
 		false,
@@ -105,10 +104,10 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 		"",
 		"",
 	}
-	server.clients.mqttClient = opts.MqttClient
+	server.clients.mqttClient = bn.MqttClient
 	body.SetSchema(BuildSchemaServer())
 	if application == names.Modbus {
-		log.Infof("bacnet-server: start application: %s device-ip: %s", application, opts.Ip)
+		log.Infof("bacnet-server: start application: %s device-ip: %s", application, bn.Ip)
 	}
 	return server, err
 }

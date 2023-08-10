@@ -23,9 +23,9 @@ type Broker struct {
 var mqttQOS = mqttclient.AtMostOnce
 var mqttRetain = false
 
-func NewBroker(body *node.Spec) (node.Node, error) {
+func NewBroker(body *node.Spec, _ ...any) (node.Node, error) {
 	// var err error
-	body = node.Defaults(body, mqttBroker, category)
+	body = node.Defaults(body, mqttBroker, Category)
 	inputs := node.BuildInputs()
 	outputs := node.BuildOutputs(node.BuildOutput(node.Connected, node.TypeBool, nil, body.Outputs))
 	body.IsParent = true

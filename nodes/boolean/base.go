@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	category = "boolean"
+	Category = "boolean"
 )
 
 const (
@@ -31,7 +31,7 @@ type nodeSettings struct {
 }
 
 func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error) {
-	body = node.Defaults(body, nodeName, category)
+	body = node.Defaults(body, nodeName, Category)
 	settings := &BoolDefaultSettings{}
 	err := mapstructure.Decode(body.Settings, &settings)
 	if err != nil {

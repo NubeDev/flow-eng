@@ -1,8 +1,9 @@
 package timing
 
 import (
-	"github.com/NubeDev/flow-eng/node"
 	"time"
+
+	"github.com/NubeDev/flow-eng/node"
 )
 
 type DelayOff struct {
@@ -12,8 +13,8 @@ type DelayOff struct {
 	lastDelay  time.Duration
 }
 
-func NewDelayOff(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, delayOff, category)
+func NewDelayOff(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, delayOff, Category)
 	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs, false, true)
 	delayInput := node.BuildInput(node.Interval, node.TypeFloat, 1, body.Inputs, true, false)
 	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, false, true)

@@ -1,16 +1,17 @@
 package numtransform
 
 import (
-	"github.com/NubeDev/flow-eng/node"
 	"math"
+
+	"github.com/NubeDev/flow-eng/node"
 )
 
 type Round struct {
 	*node.Spec
 }
 
-func NewRound(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, round, category)
+func NewRound(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, round, Category)
 	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false)
 	decimals := node.BuildInput(node.Decimals, node.TypeFloat, 2, body.Inputs, false, false)
 	inputs := node.BuildInputs(in, decimals)

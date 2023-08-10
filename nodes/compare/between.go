@@ -9,8 +9,8 @@ type Between struct {
 	*node.Spec
 }
 
-func NewBetween(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, betweenNode, category)
+func NewBetween(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, betweenNode, Category)
 
 	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false)
 	from := node.BuildInput(node.From, node.TypeFloat, 100, body.Inputs, false, false)

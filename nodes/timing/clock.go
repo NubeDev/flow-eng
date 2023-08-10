@@ -3,12 +3,13 @@ package timing
 import (
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
-	"time"
 )
 
 type Clock struct {
@@ -25,8 +26,8 @@ type Clock struct {
 	unixSecs     float64
 }
 
-func NewClock(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, clock, category)
+func NewClock(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, clock, Category)
 	interval := node.BuildInput(node.Interval, node.TypeFloat, 10, body.Inputs, true, false)
 	inputs := node.BuildInputs(interval)
 

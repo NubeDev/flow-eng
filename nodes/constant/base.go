@@ -4,7 +4,7 @@ const (
 	constNum  = "const-num"
 	constBool = "const-boolean"
 	constStr  = "const-string"
-	category  = "constant"
+	Category  = "constant"
 )
 
 const (

@@ -2,13 +2,14 @@ package streams
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
-	"time"
 )
 
 type Flatline struct {
@@ -19,8 +20,8 @@ type Flatline struct {
 	lastCOVTime  int64
 }
 
-func NewFlatline(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, flatLine, category)
+func NewFlatline(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, flatLine, Category)
 
 	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, true)
 	delayInput := node.BuildInput(node.Delay, node.TypeFloat, 30, body.Inputs, true, false)

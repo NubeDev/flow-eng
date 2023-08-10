@@ -1,16 +1,17 @@
 package math
 
 import (
-	"github.com/NubeDev/flow-eng/node"
 	"math"
+
+	"github.com/NubeDev/flow-eng/node"
 )
 
 type Floor struct {
 	*node.Spec
 }
 
-func NewFloor(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, floor, category)
+func NewFloor(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, floor, Category)
 	in1 := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false)
 	inputs := node.BuildInputs(in1)
 

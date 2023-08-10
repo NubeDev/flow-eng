@@ -13,8 +13,8 @@ type NumericWriteable struct {
 	*node.Spec
 }
 
-func NewNumericWriteable(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, numericWriteable, category)
+func NewNumericWriteable(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, numericWriteable, Category)
 	settings := &NumericWriteableSettings{}
 	err := mapstructure.Decode(body.Settings, &settings)
 	if err != nil {

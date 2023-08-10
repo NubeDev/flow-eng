@@ -3,13 +3,14 @@ package numtransform
 import (
 	"encoding/json"
 	"fmt"
+	"math"
+	"time"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
-	"math"
-	"time"
 )
 
 type Waveform struct {
@@ -26,8 +27,8 @@ type Waveform struct {
 	lastReset      bool
 }
 
-func NewWaveform(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, waveform, category)
+func NewWaveform(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, waveform, Category)
 	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false, false)
 	interval := node.BuildInput(node.Interval, node.TypeFloat, 1, body.Inputs, true, false)
 	period := node.BuildInput(node.Period, node.TypeFloat, 60, body.Inputs, true, false)

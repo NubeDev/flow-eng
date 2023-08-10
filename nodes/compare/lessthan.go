@@ -8,8 +8,8 @@ type CompareLessThan struct {
 	*node.Spec
 }
 
-func NewLessThan(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, LessThan, category)
+func NewLessThan(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, LessThan, Category)
 	in1 := node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs, false, false)
 	in2 := node.BuildInput(node.In2, node.TypeFloat, nil, body.Inputs, false, false)
 	inputs := node.BuildInputs(in1, in2)

@@ -9,8 +9,8 @@ type CountNum struct {
 	count float64
 }
 
-func NewCountNum(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, countNumNode, category)
+func NewCountNum(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, countNumNode, Category)
 	cov := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, true)
 	body.Inputs = node.BuildInputs(cov)
 	out := node.BuildOutput(node.CountOut, node.TypeFloat, nil, body.Outputs)

@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	category = "math"
+	Category = "math"
 	divide   = "divide"
 	add      = "add"
 	sub      = "subtract"
@@ -27,7 +27,7 @@ const (
 )
 
 func nodeDefault(body *node.Spec, nodeName, category string) (*node.Spec, error) {
-	body = node.Defaults(body, nodeName, category)
+	body = node.Defaults(body, nodeName, Category)
 	settings := &MathDefaultSettings{}
 	err := mapstructure.Decode(body.Settings, &settings)
 	if err != nil {

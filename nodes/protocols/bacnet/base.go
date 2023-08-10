@@ -3,6 +3,7 @@ package bacnetio
 import (
 	"errors"
 	"fmt"
+
 	"github.com/NubeDev/flow-eng/helpers/names"
 	"github.com/NubeDev/flow-eng/node"
 	points "github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
@@ -36,7 +37,7 @@ Address are the same as above the AI
 */
 
 const (
-	category   = "bacnet"
+	Category   = "bacnet"
 	serverNode = "bacnet-server"
 	bacnetBI   = "binary-input"
 	bacnetBO   = "binary-output"
@@ -74,7 +75,7 @@ func getBacnetType(nodeName string) (obj points.ObjectType, isWriteable, isIO bo
 
 func nodeDefault(body *node.Spec, nodeName, category string, application names.ApplicationName) (*node.Spec, error) {
 	var err error
-	body = node.Defaults(body, nodeName, category)
+	body = node.Defaults(body, nodeName, Category)
 	_, isWriteable, _, err := getBacnetType(nodeName)
 	// pointName := node.BuildInput(node.Name, node.TypeString, nil, body.Inputs)
 	// objectIDInput := node.BuildInput(node.ObjectId, node.TypeFloat, 0, body.Inputs, nil)  // not needed as it is now configured from settings

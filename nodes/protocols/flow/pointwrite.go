@@ -2,12 +2,13 @@ package flow
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/enescakir/emoji"
-	"time"
 )
 
 type InputData struct {
@@ -31,8 +32,8 @@ type FFPointWrite struct {
 	lastUpdate             time.Time
 }
 
-func NewFFPointWrite(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, flowPointWrite, category)
+func NewFFPointWrite(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, flowPointWrite, Category)
 	in1 := node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs, false, false)
 	in10 := node.BuildInput(node.In10, node.TypeFloat, nil, body.Inputs, false, false)
 	in15 := node.BuildInput(node.In15, node.TypeFloat, nil, body.Inputs, false, false)

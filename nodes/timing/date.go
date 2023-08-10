@@ -2,12 +2,13 @@ package timing
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
-	"time"
 )
 
 type Date struct {
@@ -22,8 +23,8 @@ type Date struct {
 	year         float64
 }
 
-func NewDate(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, date, category)
+func NewDate(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, date, Category)
 	interval := node.BuildInput(node.Interval, node.TypeFloat, 60, body.Inputs, true, false)
 	inputs := node.BuildInputs(interval)
 

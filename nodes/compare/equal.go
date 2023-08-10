@@ -8,8 +8,8 @@ type CompareEqual struct {
 	*node.Spec
 }
 
-func NewEqual(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, Equal, category)
+func NewEqual(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, Equal, Category)
 	in1 := node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs, false, false)
 	in2 := node.BuildInput(node.In2, node.TypeFloat, nil, body.Inputs, false, false)
 	inputs := node.BuildInputs(in1, in2)

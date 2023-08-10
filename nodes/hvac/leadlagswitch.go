@@ -10,8 +10,8 @@ type LeadLagSwitch struct {
 	swapLead   bool
 }
 
-func NewLeadLagSwitch(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, leadLagSwitch, category)
+func NewLeadLagSwitch(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, leadLagSwitch, Category)
 	in := node.BuildInput(node.RotateLead, node.TypeBool, nil, body.Inputs, false, false)
 	stage1 := node.BuildInput(node.Stage1, node.TypeBool, nil, body.Inputs, false, false)
 	stage2 := node.BuildInput(node.Stage2, node.TypeBool, nil, body.Inputs, false, false)

@@ -1,6 +1,10 @@
-package nodes
+package pallet
 
 import (
+	"errors"
+	"fmt"
+	"strings"
+
 	"github.com/NubeDev/flow-eng/node"
 )
 
@@ -70,7 +74,7 @@ func EncodePallet() ([]*PalletNode, error) {
 	var all []*PalletNode
 	for _, spec := range All() {
 		one := &PalletNode{}
-		nodeType, err := setType(spec)
+		nodeType, err := SetType(spec)
 		if err != nil {
 			return nil, err
 		}
@@ -92,4 +96,26 @@ func EncodePallet() ([]*PalletNode, error) {
 		all = append(all, one)
 	}
 	return all, nil
+}
+
+func SetType(n *node.Spec) (string, error) {
+	if n == nil {
+		return "", errors.New("node info can not be empty")
+	}
+	if n.Info.Name == "" {
+		return "", errors.New("node name can not be empty")
+	}
+	if n.Info.Category == "" {
+		return "", errors.New("node category can not be empty")
+	}
+	return fmt.Sprintf("%s/%s", n.Info.Category, n.Info.Name), nil
+
+}
+
+func DecodeType(nodeType string) (category, name string, err error) {
+	parts := strings.Split(nodeType, "/")
+	if len(parts) > 1 {
+		return parts[0], parts[1], nil
+	}
+	return "", "", errors.New("failed to get category and name from node-type")
 }

@@ -3,6 +3,7 @@ package link
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/NubeDev/flow-eng/helpers"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/conversions"
@@ -16,11 +17,8 @@ type BoolLinkInput struct {
 	lastTopic string
 }
 
-func NewBoolLinkInput(body *node.Spec, store *Store) (node.Node, error) {
-	if store == nil {
-		store = getStore()
-	}
-	body = node.Defaults(body, linkInputBool, category)
+func NewBoolLinkInput(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, linkInputBool, Category)
 	topic := node.BuildInput(node.Topic, node.TypeString, nil, body.Inputs, true, false)
 	value := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs, false, false)
 	inputs := node.BuildInputs(topic, value)
@@ -95,11 +93,8 @@ type BoolLinkOutput struct {
 	*node.Spec
 }
 
-func NewBoolLinkOutput(body *node.Spec, store *Store) (node.Node, error) {
-	if store == nil {
-		store = getStore()
-	}
-	body = node.Defaults(body, linkOutputBool, category)
+func NewBoolLinkOutput(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, linkOutputBool, Category)
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, nil, outputs, body.Settings)

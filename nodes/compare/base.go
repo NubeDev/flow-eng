@@ -1,7 +1,7 @@
 package compare
 
 const (
-	category = "compare"
+	Category = "compare"
 )
 
 const (

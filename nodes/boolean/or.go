@@ -8,9 +8,9 @@ type Or struct {
 	*node.Spec
 }
 
-func NewOr(body *node.Spec) (node.Node, error) {
+func NewOr(body *node.Spec, _ ...any) (node.Node, error) {
 	var err error
-	body, err = nodeDefault(body, or, category)
+	body, err = nodeDefault(body, or, Category)
 	if err != nil {
 		return nil, err
 	}

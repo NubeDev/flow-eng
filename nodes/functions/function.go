@@ -3,6 +3,7 @@ package functions
 import (
 	"bytes"
 	"fmt"
+
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeIO/lib-goja/js"
 	"github.com/mitchellh/mapstructure"
@@ -29,8 +30,8 @@ func getSettings(body map[string]interface{}) (string, error) {
 	return "", nil
 }
 
-func NewFunc(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, funcNode, category)
+func NewFunc(body *node.Spec, _ ...interface{}) (node.Node, error) {
+	body = node.Defaults(body, funcNode, Category)
 	inputs := node.BuildInputs(node.DynamicInputs(node.TypeString, nil, 2, 3, 3, body.Inputs, false)...)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)

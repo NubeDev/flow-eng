@@ -8,8 +8,8 @@ type Switch struct {
 	*node.Spec
 }
 
-func NewSwitch(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, switchNode, category)
+func NewSwitch(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, switchNode, Category)
 	inSwitch := node.BuildInput(node.Switch, node.TypeBool, nil, body.Inputs, false, true)
 	inTrue := node.BuildInput(node.InTrue, node.TypeFloat, nil, body.Inputs, false, false)
 	inFalse := node.BuildInput(node.InFalse, node.TypeFloat, nil, body.Inputs, false, false)

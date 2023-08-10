@@ -3,14 +3,15 @@ package hvac
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
+	"time"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
 	"github.com/gorhill/cronexpr"
 	"github.com/robfig/cron/v3"
-	"strconv"
-	"time"
 )
 
 type AccumulationPeriod struct {
@@ -23,8 +24,8 @@ type AccumulationPeriod struct {
 	lastPeriodSetting         int
 }
 
-func NewAccumulationPeriod(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, accumulationPeriod, category)
+func NewAccumulationPeriod(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, accumulationPeriod, Category)
 	enable := node.BuildInput(node.Enable, node.TypeBool, true, body.Inputs, false, false)
 	input := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, true)
 	inputs := node.BuildInputs(enable, input)

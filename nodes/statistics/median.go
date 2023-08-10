@@ -1,19 +1,20 @@
 package statistics
 
 import (
-	"github.com/NubeDev/flow-eng/helpers/conversions"
-	"github.com/NubeDev/flow-eng/node"
 	"math"
 	"sort"
+
+	"github.com/NubeDev/flow-eng/helpers/conversions"
+	"github.com/NubeDev/flow-eng/node"
 )
 
 type Median struct {
 	*node.Spec
 }
 
-func NewMedian(body *node.Spec) (node.Node, error) {
+func NewMedian(body *node.Spec, _ ...any) (node.Node, error) {
 	var err error
-	body, err = nodeDefault(body, median, category)
+	body, err = nodeDefault(body, median, Category)
 	if err != nil {
 		return nil, err
 	}

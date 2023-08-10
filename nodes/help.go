@@ -3,12 +3,14 @@ package nodes
 import (
 	"errors"
 	"fmt"
+
 	"github.com/NubeDev/flow-eng/node"
+	"github.com/NubeDev/flow-eng/pallet"
 )
 
 func NodeHelp() []*node.Help {
 	var all []*node.Help
-	for _, spec := range All() {
+	for _, spec := range pallet.All() {
 		all = append(all, spec.NodeHelp())
 	}
 	return all
@@ -17,7 +19,7 @@ func NodeHelp() []*node.Help {
 func NodeHelpByName(nodeName string) (*node.Help, error) {
 	var s *node.Help
 	var found bool
-	for _, spec := range All() {
+	for _, spec := range pallet.All() {
 		if nodeName == spec.GetName() {
 			s = spec.NodeHelp()
 			found = true

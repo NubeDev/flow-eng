@@ -9,8 +9,8 @@ type MqttPub struct {
 	topic string
 }
 
-func NewMqttPub(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, mqttPub, category)
+func NewMqttPub(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, mqttPub, Category)
 	top := node.BuildInput(node.Topic, node.TypeString, nil, body.Inputs, false, false)
 	msg := node.BuildInput(node.Message, node.TypeString, nil, body.Inputs, false, false)
 	inputs := node.BuildInputs(top, msg)

@@ -3,11 +3,12 @@ package nodejson
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
+	"time"
+
 	"github.com/NubeDev/flow-eng/helpers/cmap"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/tidwall/gjson"
-	"strconv"
-	"time"
 )
 
 type Store struct {
@@ -16,8 +17,8 @@ type Store struct {
 	store cmap.MapUtil
 }
 
-func NewStore(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, dataStore, category)
+func NewStore(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, dataStore, Category)
 	add := node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false, false)
 	maxSize := node.BuildInput(node.MaxSize, node.TypeFloat, nil, body.Inputs, false, false)
 	clear := node.BuildInput(node.Delete, node.TypeBool, nil, body.Inputs, false, false)

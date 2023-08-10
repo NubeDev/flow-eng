@@ -1,7 +1,7 @@
 package hvac
 
 const (
-	category = "hvac"
+	Category = "hvac"
 )
 
 const (

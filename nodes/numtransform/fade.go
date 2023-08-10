@@ -2,12 +2,13 @@ package numtransform
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
-	"time"
 )
 
 type Fade struct {
@@ -21,8 +22,8 @@ type Fade struct {
 	fadeInterval time.Duration
 }
 
-func NewFade(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, fade, category)
+func NewFade(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, fade, Category)
 	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false, false)
 	interval := node.BuildInput(node.Interval, node.TypeFloat, 60, body.Inputs, true, false)
 	from := node.BuildInput(node.From, node.TypeFloat, 0, body.Inputs, false, false)

@@ -2,13 +2,14 @@ package hvac
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/pid"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
-	"time"
 )
 
 type PIDNode struct {
@@ -19,8 +20,8 @@ type PIDNode struct {
 	lastReset bool
 }
 
-func NewPIDNode(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, pidNode, category)
+func NewPIDNode(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, pidNode, Category)
 	enable := node.BuildInput(node.Enable, node.TypeBool, false, body.Inputs, false, false)
 	processValue := node.BuildInput(node.ProcessValue, node.TypeFloat, nil, body.Inputs, false, false)
 	setPoint := node.BuildInput(node.Setpoint, node.TypeFloat, 0, body.Inputs, true, false)

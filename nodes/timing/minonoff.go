@@ -3,12 +3,13 @@ package timing
 import (
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
-	"time"
 )
 
 type MinOnOff struct {
@@ -26,8 +27,8 @@ type MinOnOff struct {
 	currentMinOff      bool
 }
 
-func NewMinOnOff(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, minOnOff, category)
+func NewMinOnOff(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, minOnOff, Category)
 	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs, false, false)
 	onInterval := node.BuildInput(node.MinOnTime, node.TypeFloat, 1, body.Inputs, true, false)
 	offInterval := node.BuildInput(node.MinOffTime, node.TypeFloat, 1, body.Inputs, true, false)

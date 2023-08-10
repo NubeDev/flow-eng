@@ -2,13 +2,14 @@ package timing
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
-	"time"
 )
 
 type Delay struct {
@@ -24,8 +25,8 @@ type DelayTimer struct {
 	Timer        *time.Timer
 }
 
-func NewDelay(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, delay, category)
+func NewDelay(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, delay, Category)
 	enable := node.BuildInput(node.Enable, node.TypeBool, true, body.Inputs, false, false)
 	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false)
 	delayInput := node.BuildInput(node.Delay, node.TypeFloat, 1, body.Inputs, true, false)

@@ -8,8 +8,8 @@ type Number struct {
 	*node.Spec
 }
 
-func NewNumber(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, constNum, category)
+func NewNumber(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, constNum, Category)
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)

@@ -2,12 +2,13 @@ package timing
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
-	"time"
 )
 
 type OneShot struct {
@@ -19,8 +20,8 @@ type OneShot struct {
 	lastInterval time.Duration
 }
 
-func NewOneShot(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, oneShot, category)
+func NewOneShot(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, oneShot, Category)
 	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs, false, true)
 	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, false, true)
 	interval := node.BuildInput(node.Interval, node.TypeFloat, 1, body.Inputs, true, false)

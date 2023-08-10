@@ -8,9 +8,9 @@ type Sub struct {
 	*node.Spec
 }
 
-func NewSub(body *node.Spec) (node.Node, error) {
+func NewSub(body *node.Spec, _ ...any) (node.Node, error) {
 	var err error
-	body, err = nodeDefault(body, sub, category)
+	body, err = nodeDefault(body, sub, Category)
 	if err != nil {
 		return nil, err
 	}

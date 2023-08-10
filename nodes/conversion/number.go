@@ -9,8 +9,8 @@ type Number struct {
 	*node.Spec
 }
 
-func NewNumber(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, conversionNum, category)
+func NewNumber(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, conversionNum, Category)
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false))
 	asBool := node.BuildOutput(node.Boolean, node.TypeBool, nil, body.Outputs)
 	asString := node.BuildOutput(node.String, node.TypeString, nil, body.Outputs)

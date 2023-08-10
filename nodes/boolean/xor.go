@@ -8,8 +8,8 @@ type Xor struct {
 	*node.Spec
 }
 
-func NewXor(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, xor, category)
+func NewXor(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, xor, Category)
 	in1 := node.BuildInput(node.In1, node.TypeBool, nil, body.Inputs, false, true)
 	in2 := node.BuildInput(node.In2, node.TypeBool, nil, body.Inputs, false, true)
 	inputs := node.BuildInputs(in1, in2)

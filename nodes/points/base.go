@@ -4,5 +4,5 @@ const (
 	booleanWriteable = "boolean-writeable"
 	numericWriteable = "numeric-writeable"
 	stringWriteable  = "string-writeable"
-	category         = "points"
+	Category         = "points"
 )

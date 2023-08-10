@@ -8,9 +8,9 @@ type Multiply struct {
 	*node.Spec
 }
 
-func NewMultiply(body *node.Spec) (node.Node, error) {
+func NewMultiply(body *node.Spec, _ ...any) (node.Node, error) {
 	var err error
-	body, err = nodeDefault(body, multiply, category)
+	body, err = nodeDefault(body, multiply, Category)
 	if err != nil {
 		return nil, err
 	}

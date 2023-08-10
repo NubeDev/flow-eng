@@ -2,6 +2,7 @@ package timing
 
 import (
 	"encoding/json"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/schemas"
@@ -9,7 +10,7 @@ import (
 )
 
 const (
-	category  = "time"
+	Category  = "time"
 	clock     = "clock"
 	date      = "date"
 	delay     = "delay"

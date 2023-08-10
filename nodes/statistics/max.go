@@ -8,9 +8,9 @@ type Max struct {
 	*node.Spec
 }
 
-func NewMax(body *node.Spec) (node.Node, error) {
+func NewMax(body *node.Spec, _ ...any) (node.Node, error) {
 	var err error
-	body, err = nodeDefault(body, max, category)
+	body, err = nodeDefault(body, max, Category)
 	if err != nil {
 		return nil, err
 	}
