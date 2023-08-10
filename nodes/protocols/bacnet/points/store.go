@@ -190,12 +190,12 @@ func (inst *Store) AddPoint(point *Point, ignoreError bool, deviceAddr int) (*Po
 	}
 	// rubixUIStart, rubixUOStart := CalcPointCount(inst.ModbusDeviceCount, inst.Application)
 	if point.ObjectType == AnalogInput {
-		point.ModbusDevAddr = deviceAddr
+		point.DeviceNumber = deviceAddr
 		point.Application = names.Modbus
 	}
 	if point.ObjectType == AnalogOutput {
 		addr, _ := ModbusBuildOutput(point.IoType, point.ObjectID)
-		point.ModbusDevAddr = deviceAddr
+		point.DeviceNumber = deviceAddr
 		if point.IoType == IoTypeDigital {
 			point.ModbusRegister = addr.Volt
 		}

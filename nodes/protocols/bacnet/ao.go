@@ -75,8 +75,6 @@ func (inst *AO) setObjectId(settings *AOSettings) {
 
 func (inst *AO) Process() {
 	settings, _ := inst.getSettings(inst.GetSettings())
-	// transformProps := inst.getTransformProps(settings)
-	transformProps := &valueTransformProperties{}
 	loop, firstLoop := inst.Loop()
 	s := inst.GetStore()
 	if s == nil {
@@ -88,10 +86,11 @@ func (inst *AO) Process() {
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
 		inst.setObjectId(settings)
 		ioType := settings.IoType
-		deviceAddr := settings.DeviceNumber // modbus device address
+		deviceAddr := settings.DeviceNumber
 		if ioType == "" {
 			ioType = string(points.IoTypeVolts)
 		}
+		transformProps := &valueTransformProperties{}
 		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true, inst.application, transformProps)
 		name := inst.GetNodeName()
 		parentTopic := helpers.CleanParentName(name, inst.GetParentName())

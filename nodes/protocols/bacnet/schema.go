@@ -8,14 +8,13 @@ import (
 )
 
 type serverSchema struct {
-	DeviceCount schemas.EnumString   `json:"deviceCount"`
-	Serial      schemas.EnumString   `json:"serial"`
-	Timeout     schemas.NumberLimits `json:"timeout"`
-
+	DeviceCount    schemas.EnumString   `json:"deviceCount"`
+	Serial         schemas.EnumString   `json:"serial"`
+	Timeout        schemas.NumberLimits `json:"timeout"`
 	DeviceAddress1 schemas.NumberLimits `json:"deviceAddress1"`
-	DeviceAddress2 schemas.NumberLimits `json:"DeviceAddress2"`
-	DeviceAddress3 schemas.NumberLimits `json:"DeviceAddress3"`
-	DeviceAddress4 schemas.NumberLimits `json:"DeviceAddress4"`
+	DeviceAddress2 schemas.NumberLimits `json:"deviceAddress2"`
+	DeviceAddress3 schemas.NumberLimits `json:"deviceAddress3"`
+	DeviceAddress4 schemas.NumberLimits `json:"deviceAddress4"`
 }
 
 const noDevices = "Select an IO-16"

@@ -31,7 +31,7 @@ type Point struct {
 	PendingMQTTPublish          bool
 	InError                     bool
 	Message                     string
-	ModbusDevAddr               int
+	DeviceNumber                int // number 1, 2 , 3 or 4 IO-16s (not modbus address)
 	ModbusRegister              int
 }
 

@@ -57,7 +57,7 @@ func (inst *AI) Process() {
 		transformProps := inst.getTransformProps(settings)
 		inst.setObjectId(settings)
 		ioType := settings.IoType
-		deviceAddr := settings.DeviceNumber // modbus device address
+		deviceAddr := settings.DeviceNumber
 		if ioType == "" {
 			ioType = string(points.IoTypeVolts)
 		}
@@ -100,6 +100,7 @@ func (inst *AI) Process() {
 	} else {
 		inst.WritePinNull(node.Out)
 	}
+
 }
 
 func (inst *AI) setObjectId(settings *AISettings) {
