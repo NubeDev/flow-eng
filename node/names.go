@@ -231,6 +231,7 @@ const (
 
 	OutTopic OutputName = "topic"
 	Out      OutputName = "output"
+	OnStart  OutputName = "on-start"
 	Elapsed  OutputName = "elapsed"
 
 	MinOutput OutputName = "min"

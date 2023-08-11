@@ -1,18 +1,22 @@
 package rest
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/go-resty/resty/v2"
+	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
-type HttpWrite struct {
+type HTTP struct {
 	*node.Spec
-	*resty.Client
+	client    *resty.Client
+	lastValue interface{}
 }
 
 func NewHttpWrite(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, writeNode, category)
+	body = node.Defaults(body, httpNode, category)
 	url := node.BuildInput(node.URL, node.TypeString, nil, body.Inputs, false, false)
 	reqBody := node.BuildInput(node.Body, node.TypeString, nil, body.Inputs, false, false)
 	filter := node.BuildInput(node.Filter, node.TypeString, nil, body.Inputs, false, false)
@@ -24,56 +28,80 @@ func NewHttpWrite(body *node.Spec) (node.Node, error) {
 
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	body.SetSchema(buildSchema())
-	return &HttpWrite{body, resty.New()}, nil
+	n := &HTTP{body, resty.New(), nil}
+	n.SetSchema(n.buildSchema())
+	return n, nil
 }
 
-func (inst *HttpWrite) request(method, body interface{}) (resp *resty.Response, err error) {
+func (inst *HTTP) request(method string, body string) (resp *resty.Response, err error) {
 	resp = &resty.Response{}
 	client := inst.getClient()
+	var parsedBody interface{}
+	var jsonMap map[string]interface{}
+	err = json.Unmarshal([]byte(body), &jsonMap)
+	if err != nil {
+		fmt.Println(err, "parse fail of type map")
+	} else {
+		parsedBody = jsonMap
+	}
+
+	err = json.Unmarshal([]byte(body), &parsedBody)
+	if err != nil {
+		fmt.Println(err, "parse fail of type interface{}")
+	} else {
+		parsedBody = jsonMap
+	}
+
 	url, _ := inst.ReadPinAsString(node.URL)
 	if method == patch {
 		resp, err = client.R().
-			EnableTrace().
-			SetBody(body).
+			SetBody(parsedBody).
 			Patch(url)
 		return resp, err
 	}
+	if method == get {
+		resp, err = client.R().
+			Get(url)
+		return resp, err
+	}
+
 	return resp, err
 }
 
-func (inst *HttpWrite) do() {
+func (inst *HTTP) do() {
 	filter, _ := inst.ReadPinAsString(node.Filter)
 	reqBody, _ := inst.ReadPinAsString(node.Body)
-	method, err := getSettings(inst.GetSettings())
-	if method == "" {
-		method = patch
-	}
-	resp, err := inst.request(method, reqBody)
+	method, err := inst.getSettings()
 	if err != nil {
-		inst.WritePinNull(node.Out)
+		log.Error(err)
+		return
+	}
+	resp, err := inst.request(method.Method, reqBody)
+	if err != nil {
+		inst.WritePin(node.Out, err.Error())
 		return
 	}
 	if filter != "" {
 		value := gjson.Get(resp.String(), filter)
+		inst.lastValue = value.String()
 		inst.WritePin(node.Out, value.String())
 	} else {
+		inst.lastValue = resp.String()
 		inst.WritePin(node.Out, resp.String())
 	}
 
 }
 
-func (inst *HttpWrite) getClient() *resty.Client {
-	return inst.Client
+func (inst *HTTP) getClient() *resty.Client {
+	return inst.client
 }
 
-func (inst *HttpWrite) Process() {
+func (inst *HTTP) Process() {
 	_, cov := inst.InputUpdated(node.TriggerInput)
 	if cov {
 		go inst.do()
-
 	} else {
-		inst.WritePinNull(node.Out)
+		inst.WritePin(node.Out, inst.lastValue)
 	}
 
 }

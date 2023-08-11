@@ -52,8 +52,7 @@ const (
 
 	flowLoopCount = "flow-loop-count"
 
-	getHttpNode   = "http-get"
-	writeHttpNode = "http-write"
+	httpNode = "http-method"
 
 	accumulationPeriod = "accumulation-period"
 	deadBandNode       = "dead-band"

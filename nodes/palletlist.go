@@ -197,20 +197,18 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	preventDuplicates, _ := filter.NewPreventDuplicates(nil)
 
 	// rest
-	getNode, _ := rest.NewGet(nil)
 	writeNode, _ := rest.NewHttpWrite(nil)
 
 	if disableNodes {
 		dataStore = nil
-		jsonFilter = nil
+		// jsonFilter = nil
 		pingNode = nil
-		getNode = nil
-		writeNode = nil
-		funcNode = nil
+		// writeNode = nil
+		// funcNode = nil
 		mqttBroker = nil
 		mqttSub = nil
 		mqttPub = nil
-		logNode = nil
+		// logNode = nil
 	}
 
 	return node.BuildNodes(
@@ -226,7 +224,6 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(flowPointWrite),
 		node.ConvertToSpec(flowSchedule),
 
-		node.ConvertToSpec(getNode),
 		node.ConvertToSpec(writeNode),
 
 		node.ConvertToSpec(mqttBroker),
@@ -532,9 +529,7 @@ func builderFilter(body *node.Spec) (node.Node, error) {
 
 func builderRest(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
-	case getHttpNode:
-		return rest.NewGet(body)
-	case writeHttpNode:
+	case httpNode:
 		return rest.NewHttpWrite(body)
 	}
 	return nil, nil

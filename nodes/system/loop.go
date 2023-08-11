@@ -14,7 +14,8 @@ func NewLoopCount(body *node.Spec) (node.Node, error) {
 	inputs := node.BuildInputs(toggleOnCount)
 	outNum := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	outToggle := node.BuildOutput(node.Toggle, node.TypeBool, nil, body.Outputs)
-	outputs := node.BuildOutputs(outNum, outToggle)
+	oneShot := node.BuildOutput(node.OnStart, node.TypeBool, nil, body.Outputs)
+	outputs := node.BuildOutputs(outNum, outToggle, oneShot)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	return &Loop{body}, nil
 }
@@ -32,6 +33,13 @@ func (inst *Loop) Process() {
 	if toggleOnCount <= 0 {
 		toggleOnCount = 1
 	}
+	if counter < 10 {
+		inst.WritePinTrue(node.OnStart)
+
+	} else {
+		inst.WritePinFalse(node.OnStart)
+	}
+
 	t := counter % toggleOnCount / (toggleOnCount / 2)
 	if t == 1 {
 		inst.WritePinTrue(node.Toggle)
