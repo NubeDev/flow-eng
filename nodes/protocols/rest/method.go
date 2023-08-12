@@ -2,11 +2,12 @@ package rest
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/go-resty/resty/v2"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
+	"strings"
 )
 
 type HTTP struct {
@@ -17,13 +18,11 @@ type HTTP struct {
 
 func NewHttpWrite(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, httpNode, category)
-	url := node.BuildInput(node.URL, node.TypeString, nil, body.Inputs, false, false)
-	reqBody := node.BuildInput(node.Body, node.TypeString, nil, body.Inputs, false, false)
+	input := node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false, false)
 	filter := node.BuildInput(node.Filter, node.TypeString, nil, body.Inputs, false, false)
-	trigger := node.BuildInput(node.TriggerInput, node.TypeBool, nil, body.Inputs, false, false)
 	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false, false)
 
-	inputs := node.BuildInputs(url, reqBody, filter, trigger, enable)
+	inputs := node.BuildInputs(input, filter, enable)
 	out := node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs)
 
 	outputs := node.BuildOutputs(out)
@@ -33,44 +32,21 @@ func NewHttpWrite(body *node.Spec) (node.Node, error) {
 	return n, nil
 }
 
-func (inst *HTTP) request(method string, body string) (resp *resty.Response, err error) {
-	resp = &resty.Response{}
-	client := inst.getClient()
-	var parsedBody interface{}
-	var jsonMap map[string]interface{}
-	err = json.Unmarshal([]byte(body), &jsonMap)
-	if err != nil {
-		fmt.Println(err, "parse fail of type map")
+func (inst *HTTP) Process() {
+	reqBody, null := inst.ReadPinAsString(node.In)
+	enable, _ := inst.ReadPinAsBool(node.Enable)
+	if !enable {
+		inst.WritePin(node.Out, inst.lastValue)
+	}
+	if !null {
+		go inst.processReq(reqBody)
 	} else {
-		parsedBody = jsonMap
+		inst.WritePin(node.Out, inst.lastValue)
 	}
-
-	err = json.Unmarshal([]byte(body), &parsedBody)
-	if err != nil {
-		fmt.Println(err, "parse fail of type interface{}")
-	} else {
-		parsedBody = jsonMap
-	}
-
-	url, _ := inst.ReadPinAsString(node.URL)
-	if method == patch {
-		resp, err = client.R().
-			SetBody(parsedBody).
-			Patch(url)
-		return resp, err
-	}
-	if method == get {
-		resp, err = client.R().
-			Get(url)
-		return resp, err
-	}
-
-	return resp, err
 }
 
-func (inst *HTTP) do() {
+func (inst *HTTP) processReq(reqBody string) {
 	filter, _ := inst.ReadPinAsString(node.Filter)
-	reqBody, _ := inst.ReadPinAsString(node.Body)
 	method, err := inst.getSettings()
 	if err != nil {
 		log.Error(err)
@@ -92,16 +68,109 @@ func (inst *HTTP) do() {
 
 }
 
+func (inst *HTTP) request(method string, bodyString string) (*resty.Response, error) {
+	body, err := inst.filterBody(method, bodyString)
+	if body == nil {
+		return nil, err
+	}
+	resp, err := inst.httpSelect(body)
+	if err != nil {
+		return nil, err
+	}
+	return resp, err
+}
+
 func (inst *HTTP) getClient() *resty.Client {
 	return inst.client
 }
 
-func (inst *HTTP) Process() {
-	_, cov := inst.InputUpdated(node.TriggerInput)
-	if cov {
-		go inst.do()
-	} else {
-		inst.WritePin(node.Out, inst.lastValue)
-	}
+type bodyType string
 
+const errNoBodyType = "http-node: no body type"
+const errBodyEmpty = "http-node: body can not be empty"
+
+func (inst *HTTP) filterBody(method, bodySting string) (*Body, error) {
+	var err error
+	body, err := parseBodyString(bodySting)
+	if body == nil {
+		return nil, errors.New(errBodyEmpty)
+	}
+	if err != nil {
+		return nil, err
+	}
+	if method != "" {
+		method = body.Method
+	}
+	body.Method = method
+	return body, errors.New(errNoBodyType)
+}
+
+func parseBodyString(bodyString string) (*Body, error) {
+	body := &Body{}
+	err := json.Unmarshal([]byte(bodyString), &body)
+	return body, err
+}
+
+type Body struct {
+	URL     string            `json:"url"`
+	Trigger bool              `json:"trigger"`
+	Body    interface{}       `json:"body"`
+	Method  string            `json:"method"`
+	Headers map[string]string `json:"headers"`
+	Filter  string            `json:"filter"` // https://github.com/tidwall/gjson#path-syntax
+}
+
+func (inst *HTTP) httpSelect(body *Body) (*resty.Response, error) {
+	var method string
+	var url string
+	var err error
+	if body.Method != "" {
+		method = body.Method
+	}
+	url = body.URL
+	method = strings.ToUpper(method)
+
+	resp := &resty.Response{}
+	switch method {
+	case get:
+		resp, err = inst.httpGet(url, body)
+	case post:
+		resp, err = inst.httpPost(url, body)
+	case put:
+		resp, err = inst.httpPut(url, body)
+	case patch:
+		resp, err = inst.httpPut(url, body)
+	case httpDelete:
+		resp, err = inst.httpDelete(url, body)
+	}
+	return resp, err
+}
+
+func (inst *HTTP) httpCommon(body *Body) *resty.Request {
+	return inst.getClient().R().SetHeaders(body.Headers).SetBody(body.Body)
+}
+
+func (inst *HTTP) httpGet(url string, body *Body) (*resty.Response, error) {
+	return inst.httpCommon(body).
+		Get(url)
+}
+
+func (inst *HTTP) httpPost(url string, body *Body) (*resty.Response, error) {
+	return inst.httpCommon(body).
+		Post(url)
+}
+
+func (inst *HTTP) httpPut(url string, body *Body) (*resty.Response, error) {
+	return inst.httpCommon(body).
+		Put(url)
+}
+
+func (inst *HTTP) httpPatch(url string, body *Body) (*resty.Response, error) {
+	return inst.httpCommon(body).
+		Patch(url)
+}
+
+func (inst *HTTP) httpDelete(url string, body *Body) (*resty.Response, error) {
+	return inst.httpCommon(body).
+		Delete(url)
 }

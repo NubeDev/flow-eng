@@ -78,7 +78,7 @@ func (inst *Func) Process() {
 	in2 := inst.ReadPin(node.In2)
 
 	nodeInputs := map[string]interface{}{"in1": in1, "in2": in2}
-	props["input"] = nodeInputs
+	props["RQLInput"] = nodeInputs
 	err = inst.eng.AddRule(rule, props)
 	if err != nil {
 		return
@@ -90,5 +90,6 @@ func (inst *Func) Process() {
 		fmt.Println("ExecuteByName", err)
 		// return
 	}
+
 	inst.WritePin(node.Out, res.String())
 }
