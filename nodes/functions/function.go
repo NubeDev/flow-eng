@@ -78,7 +78,7 @@ func (inst *Func) Process() {
 	in2 := inst.ReadPin(node.In2)
 
 	nodeInputs := map[string]interface{}{"in1": in1, "in2": in2}
-	props["RQLInput"] = nodeInputs
+	props["input"] = nodeInputs
 	err = inst.eng.AddRule(rule, props)
 	if err != nil {
 		return

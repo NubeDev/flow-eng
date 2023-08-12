@@ -5,12 +5,12 @@ module github.com/NubeDev/flow-eng
 go 1.18
 
 require (
-	github.com/NubeIO/lib-goja v0.0.4
 	github.com/NubeIO/lib-schema v0.2.18
 	github.com/NubeIO/module-core-rql v0.0.0-20230808031702-4f5f7b9389af
 	github.com/NubeIO/nubeio-rubix-lib-modbus-go v0.0.5
 	github.com/NubeIO/nubeio-rubix-lib-models-go v1.7.9
 	github.com/andanhm/go-prettytime v1.1.0
+	github.com/carlescere/scheduler v0.0.0-20170109141437-ee74d2f83d82
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f
 	github.com/dop251/goja v0.0.0-20230707174833-636fdf960de1
 	github.com/dustin/go-humanize v1.0.0
@@ -30,7 +30,6 @@ require (
 )
 
 require (
-	github.com/NubeIO/lib-uuid v0.0.3 // indirect
 	github.com/NubeIO/nubeio-rubix-lib-helpers-go v0.2.7 // indirect
 	github.com/dlclark/regexp2 v1.7.0 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
@@ -42,7 +41,6 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
-	github.com/sonyarouje/simdb v0.1.0 // indirect
 	github.com/tidwall/btree v0.7.1 // indirect
 	github.com/tidwall/grect v0.1.4 // indirect
 	github.com/tidwall/match v1.1.1 // indirect

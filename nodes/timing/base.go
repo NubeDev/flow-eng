@@ -9,16 +9,17 @@ import (
 )
 
 const (
-	category  = "time"
-	clock     = "clock"
-	date      = "date"
-	delay     = "delay"
-	delayOn   = "delay-on"
-	delayOff  = "delay-off"
-	dutyCycle = "duty-cycle"
-	minOnOff  = "min-on-off"
-	oneShot   = "one-shot"
-	stopwatch = "stopwatch"
+	category    = "time"
+	clock       = "clock"
+	date        = "date"
+	delay       = "delay"
+	delayOn     = "delay-on"
+	delayOff    = "delay-off"
+	dutyCycle   = "duty-cycle"
+	minOnOff    = "min-on-off"
+	oneShot     = "one-shot"
+	stopwatch   = "stopwatch"
+	timeTrigger = "time-trigger"
 )
 
 type defaultNodeSchema struct {

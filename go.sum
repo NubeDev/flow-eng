@@ -3,12 +3,8 @@ github.com/Azure/azure-sdk-for-go/sdk/azidentity v0.11.0/go.mod h1:HcM1YX14R7CJc
 github.com/Azure/azure-sdk-for-go/sdk/internal v0.7.0/go.mod h1:yqy467j36fJxcRV2TzfVZ1pCb5vxm4BtZPUdYWe/Xo8=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/Masterminds/semver/v3 v3.1.1/go.mod h1:VPu/7SZ7ePZ3QOrcuXROw5FAcLl4a0cBrbBpGY/8hQs=
-github.com/NubeIO/lib-goja v0.0.4 h1:IPAL5judMwdB93qe84izkQGd/6kj3CCb0fohTRSAQKQ=
-github.com/NubeIO/lib-goja v0.0.4/go.mod h1:AEkr3/NdsfXWXTi1zU2tF0zWvvDiVY6jprog0B0U1r4=
 github.com/NubeIO/lib-schema v0.2.18 h1:PmoZAdZFg22zZaXO29hYRL5a/IwZPXAEM9okY5x0A4M=
 github.com/NubeIO/lib-schema v0.2.18/go.mod h1:TGKDA6IIWHDwr5Aabawj6FF7NXUWXqu4ozWfph/hIjw=
-github.com/NubeIO/lib-uuid v0.0.3 h1:OkjJWXLOLmEZozBYESsqXZUy9JJ3YKAfxpb2v9rDg6k=
-github.com/NubeIO/lib-uuid v0.0.3/go.mod h1:lLx2E+mqNntnVsgnA44rEVQXoXzKTcZDYTQdNacJLDg=
 github.com/NubeIO/module-core-rql v0.0.0-20230808031702-4f5f7b9389af h1:2VaFOVxRRnkGcwSb3LxQeuCzIFJlWrecoGIWtUNYtkI=
 github.com/NubeIO/module-core-rql v0.0.0-20230808031702-4f5f7b9389af/go.mod h1:5Bj+rkF5Oh8mxlUs2HMssbOGZvNH85VglS0arFwZ3fs=
 github.com/NubeIO/nubeio-rubix-lib-helpers-go v0.2.7 h1:QKgcOjDkVujyAXWK+OysVFnQKzpZx335vGPG95UNXuI=
@@ -23,6 +19,8 @@ github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578/go.mod h1:uGdko
 github.com/THREATINT/go-net v1.2.10/go.mod h1:4n3ITWyUUfaEp8JNAompTT+PuPANXL9i9TyOUijGnwk=
 github.com/andanhm/go-prettytime v1.1.0 h1:7Zr0ZiYUhV+aG7fFaVx+z/8di961R6btNyidMo9Gptw=
 github.com/andanhm/go-prettytime v1.1.0/go.mod h1:uizwLzwLZu1FTvSz8DSGkqm8Vc4edGa2VIMu16aoiZg=
+github.com/carlescere/scheduler v0.0.0-20170109141437-ee74d2f83d82 h1:9bAydALqAjBfPHd/eAiJBHnMZUYov8m2PkXVr+YGQeI=
+github.com/carlescere/scheduler v0.0.0-20170109141437-ee74d2f83d82/go.mod h1:tyA14J0sA3Hph4dt+AfCjPrYR13+vVodshQSM7km9qw=
 github.com/carlmjohnson/errutil v0.21.5/go.mod h1:DMNW3MBHsaV/EPm8pjs4sA/gNjNsG4rUzbAfOh++gSM=
 github.com/carlmjohnson/exitcode v0.20.2/go.mod h1:MZ6ThCDx517DQcrpYnnns1pLh8onjFl+B/AsrOrdmpc=
 github.com/carlmjohnson/flagext v0.22.1/go.mod h1:SKojRbVQTvw04RKgb+4Y1mSlAPFC3p76pUNXGUaJZuQ=
@@ -192,8 +190,6 @@ github.com/sirupsen/logrus v1.4.2/go.mod h1:tLMulIdttU9McNUspp0xgXVQah82FyeX6Mwd
 github.com/sirupsen/logrus v1.8.1/go.mod h1:yWOB1SBYBC5VeMP7gHvWumXLIWorT60ONWic61uBYv0=
 github.com/sirupsen/logrus v1.9.3 h1:dueUQJ1C2q9oE3F7wvmSGAaVtTmUizReu6fjN8uqzbQ=
 github.com/sirupsen/logrus v1.9.3/go.mod h1:naHLuLoDiP4jHNo9R0sCBMtWGeIprob74mVsIT4qYEQ=
-github.com/sonyarouje/simdb v0.1.0 h1:oCxF05HdVmG3vdZZf5oLINIS0UYLoZBVx/IOJzpMA2A=
-github.com/sonyarouje/simdb v0.1.0/go.mod h1:sBxWOZxv78yOmCzIyXbUWzHua9+QpXwwnFdlLK/UiUU=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.2.0/go.mod h1:qt09Ya8vawLte6SNmTgCsAVtYtaKzEcn8ATUoHMkEqE=

@@ -231,6 +231,7 @@ const (
 
 	OutTopic OutputName = "topic"
 	Out      OutputName = "output"
+	Response OutputName = "response"
 	OnStart  OutputName = "on-start"
 	Elapsed  OutputName = "elapsed"
 

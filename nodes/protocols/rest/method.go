@@ -3,6 +3,7 @@ package rest
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/go-resty/resty/v2"
 	log "github.com/sirupsen/logrus"
@@ -24,8 +25,9 @@ func NewHttpWrite(body *node.Spec) (node.Node, error) {
 
 	inputs := node.BuildInputs(input, filter, enable)
 	out := node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs)
+	response := node.BuildOutput(node.Response, node.TypeString, nil, body.Outputs)
 
-	outputs := node.BuildOutputs(out)
+	outputs := node.BuildOutputs(out, response)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	n := &HTTP{body, resty.New(), nil}
 	n.SetSchema(n.buildSchema())
@@ -33,29 +35,34 @@ func NewHttpWrite(body *node.Spec) (node.Node, error) {
 }
 
 func (inst *HTTP) Process() {
-	reqBody, null := inst.ReadPinAsString(node.In)
+	bodyString, null := inst.ReadPinAsString(node.In)
 	enable, _ := inst.ReadPinAsBool(node.Enable)
 	if !enable {
 		inst.WritePin(node.Out, inst.lastValue)
 	}
 	if !null {
-		go inst.processReq(reqBody)
+		go inst.processReq(bodyString)
 	} else {
 		inst.WritePin(node.Out, inst.lastValue)
 	}
 }
 
-func (inst *HTTP) processReq(reqBody string) {
+func (inst *HTTP) processReq(bodyString string) {
 	filter, _ := inst.ReadPinAsString(node.Filter)
 	method, err := inst.getSettings()
 	if err != nil {
 		log.Error(err)
 		return
 	}
-	resp, err := inst.request(method.Method, reqBody)
+	resp, responseOut, filterFromBody, err := inst.request(method.Method, bodyString)
+	inst.WritePin(node.Response, jsonToString(responseOut))
+
 	if err != nil {
 		inst.WritePin(node.Out, err.Error())
 		return
+	}
+	if filterFromBody != "" {
+		filter = filterFromBody
 	}
 	if filter != "" {
 		value := gjson.Get(resp.String(), filter)
@@ -65,19 +72,36 @@ func (inst *HTTP) processReq(reqBody string) {
 		inst.lastValue = resp.String()
 		inst.WritePin(node.Out, resp.String())
 	}
-
 }
 
-func (inst *HTTP) request(method string, bodyString string) (*resty.Response, error) {
+func jsonToString(body interface{}) string {
+	marshal, err := json.Marshal(body)
+	if err != nil {
+		return ""
+	}
+	return string(marshal)
+}
+
+func (inst *HTTP) request(method string, bodyString string) (*resty.Response, *responseOutput, string, error) {
 	body, err := inst.filterBody(method, bodyString)
+	out := &responseOutput{}
 	if body == nil {
-		return nil, err
+		if err != nil {
+			out.Error = err.Error()
+		}
+		return nil, out, "", err
 	}
 	resp, err := inst.httpSelect(body)
 	if err != nil {
-		return nil, err
+		return nil, out, "", err
 	}
-	return resp, err
+	if resp == nil {
+		out.Error = "response was empty"
+		return nil, out, "", err
+	}
+	out.Code = resp.StatusCode()
+	out.Response = resp.String()
+	return resp, out, body.Filter, err
 }
 
 func (inst *HTTP) getClient() *resty.Client {
@@ -173,4 +197,21 @@ func (inst *HTTP) httpPatch(url string, body *Body) (*resty.Response, error) {
 func (inst *HTTP) httpDelete(url string, body *Body) (*resty.Response, error) {
 	return inst.httpCommon(body).
 		Delete(url)
+}
+
+func (inst *HTTP) responseHandler(body *Body, err error, statusCode int, resp *resty.Response) string {
+	if err != nil {
+		return fmt.Sprintf("url: %s method: %s status-code: %d err: %v", body.URL, body.Method, statusCode, err)
+	}
+	if !resp.IsSuccess() {
+		return fmt.Sprintf("url: %s method: %s status-code: %d", body.URL, body.Method, statusCode)
+	}
+	return resp.Status()
+}
+
+type responseOutput struct {
+	Code     int         `json:"code"`
+	Response interface{} `json:"response"`
+	Error    string      `json:"error"`
+	Message  string      `json:"message"`
 }
