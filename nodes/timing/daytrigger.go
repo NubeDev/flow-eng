@@ -24,7 +24,7 @@ type DayTrigger struct {
 func NewDayTrigger(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, dayTrigger, category)
 	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false, true)
-	timeSetting := node.BuildInput(node.Time, node.TypeString, 0, body.Inputs, true, false)
+	timeSetting := node.BuildInput(node.Time, node.TypeString, nil, body.Inputs, true, false)
 	inputs := node.BuildInputs(enable, timeSetting)
 
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
@@ -56,15 +56,12 @@ func (inst *DayTrigger) init() {
 	inst.lockDuration = settings.LockDuration
 	inst.at = inst.ReadPinOrSettingsString(node.Time)
 	day := settings.DaySelection
-
 	_, _, _, err := ttime.ParseTime(inst.at)
 	if err != nil {
 		log.Error(fmt.Sprintf("day-trigger: failed to parse time err: %s", err.Error()))
 		return
 	}
-
 	scheduler := gocron.NewScheduler()
-
 	if day == everyDay {
 		scheduler.Every(1).Day().At(inst.at).Do(inst.job)
 	}
@@ -95,7 +92,6 @@ func (inst *DayTrigger) init() {
 
 func (inst *DayTrigger) setSubtitle(day string) {
 	var title string
-	fmt.Println(inst.at)
 	if day == everyDay {
 		title = fmt.Sprintf("trigger every day at:(%s) hold for: (%d:sec)", inst.at, inst.lockDuration)
 	} else {
@@ -117,7 +113,7 @@ type dayTriggerSettings struct {
 	LockDuration int    `json:"lock_duration"`
 }
 
-const everyDay = "everyDay"
+const everyDay = "every-day"
 
 func (inst *DayTrigger) buildSchema() *schemas.Schema {
 	props := &dayTriggerSettingsSchema{}

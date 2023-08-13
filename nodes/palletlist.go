@@ -160,7 +160,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	minOnOff, _ := timing.NewMinOnOff(nil)
 	oneShot, _ := timing.NewOneShot(nil)
 	stopwatch, _ := timing.NewStopwatch(nil)
-	timeTrigger, _ := timing.NewTimeTrigger(nil)
+	timedTrigger, _ := timing.NewTimedTrigger(nil)
 	dayTrigger, _ := timing.NewDayTrigger(nil)
 
 	// numtransform
@@ -351,7 +351,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(minOnOff),
 		node.ConvertToSpec(oneShot),
 		node.ConvertToSpec(stopwatch),
-		node.ConvertToSpec(timeTrigger),
+		node.ConvertToSpec(timedTrigger),
 		node.ConvertToSpec(dayTrigger),
 
 		node.ConvertToSpec(cov),
@@ -809,8 +809,8 @@ func builderTiming(body *node.Spec) (node.Node, error) {
 		return timing.NewOneShot(body)
 	case stopwatch:
 		return timing.NewStopwatch(body)
-	case timeTrigger:
-		return timing.NewTimeTrigger(body)
+	case timedTrigger:
+		return timing.NewTimedTrigger(body)
 	case dayTrigger:
 		return timing.NewDayTrigger(body)
 	}

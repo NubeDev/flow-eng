@@ -71,6 +71,7 @@ type NumberLimits struct {
 type EnumString struct {
 	Type     string   `json:"type" default:"string"`
 	Title    string   `json:"title" default:""`
+	Help     string   `json:"help" default:""`
 	Default  string   `json:"default" default:""`
 	Options  []string `json:"enum" default:"[]"`
 	EnumName []string `json:"enumNames" default:"[]"`
@@ -79,6 +80,7 @@ type EnumString struct {
 type EnumInt struct {
 	Type     string `json:"type" default:"number"`
 	Title    string `json:"title" default:""`
+	Help     string `json:"help" default:""`
 	Default  int    `json:"default" default:""`
 	Options  []int  `json:"enum" default:"[]"`
 	EnumName []int  `json:"enumNames" default:"[]"`

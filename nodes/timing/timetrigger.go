@@ -12,30 +12,30 @@ import (
 	"time"
 )
 
-const timeTriggerDesc = ""
+const timeTriggerDesc = "this is a node guide"
 
-type TimeTrigger struct {
+type TimedTrigger struct {
 	*node.Spec
 	lock         bool
 	every        uint64
 	lockDuration int
 }
 
-func NewTimeTrigger(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, timeTrigger, category)
+func NewTimedTrigger(body *node.Spec) (node.Node, error) {
+	body = node.Defaults(body, timedTrigger, category)
 	enable := node.BuildInput(node.Enable, node.TypeBool, true, body.Inputs, false, false, node.SetInputHelp(node.EnableHelp))
 	inputs := node.BuildInputs(enable)
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs, node.SetOutputHelp(node.OutHelp))
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
-	n := &TimeTrigger{body, false, 0, 0}
+	n := &TimedTrigger{body, false, 0, 0}
 	n.SetSchema(n.buildSchema())
-	n.SetDescription(timeTriggerDesc)
+	n.SetHelp(timeTriggerDesc)
 	return n, nil
 }
 
-func (inst *TimeTrigger) Process() {
+func (inst *TimedTrigger) Process() {
 	_, firstLoop := inst.Loop()
 	if firstLoop {
 		inst.init()
@@ -44,7 +44,7 @@ func (inst *TimeTrigger) Process() {
 
 }
 
-func (inst *TimeTrigger) job() {
+func (inst *TimedTrigger) job() {
 	inst.lock = true
 	if inst.every <= 1 {
 		time.Sleep(800 * time.Millisecond)
@@ -54,14 +54,12 @@ func (inst *TimeTrigger) job() {
 	inst.lock = false
 }
 
-func (inst *TimeTrigger) init() {
+func (inst *TimedTrigger) init() {
 	settings, _ := inst.getSettings(inst.GetSettings())
 	inst.every = settings.Trigger
 	inst.lockDuration = settings.LockDuration
 	timeUnits := settings.TimeUnits
-
 	scheduler := gocron.NewScheduler()
-
 	if timeUnits == ttime.Sec {
 		scheduler.Every(inst.every).Seconds().Do(inst.job)
 	}
@@ -77,7 +75,7 @@ func (inst *TimeTrigger) init() {
 	inst.setSubtitle(timeUnits)
 }
 
-func (inst *TimeTrigger) setSubtitle(timeUnits string) {
+func (inst *TimedTrigger) setSubtitle(timeUnits string) {
 	title := fmt.Sprintf("trigger at:(%d:%s) lock: (%d:%s)", inst.every, timeUnits, inst.lockDuration, timeUnits)
 	inst.SetSubTitle(title)
 }
@@ -94,21 +92,24 @@ type schedulerSettings struct {
 	TimeUnits    string `json:"time_units"`
 }
 
-func (inst *TimeTrigger) buildSchema() *schemas.Schema {
+func (inst *TimedTrigger) buildSchema() *schemas.Schema {
 	props := &schedulerSettingsSchema{}
 
 	props.Trigger.Title = "trigger at"
+	props.Trigger.Help = "this is help"
 	props.Trigger.Default = 2
 	props.Trigger.Minimum = 2
 	props.Trigger.Maximum = 100000000
 
 	// time selection
 	props.TimeUnits.Title = "Interval Units"
+	props.TimeUnits.Help = "this is help"
 	props.TimeUnits.Default = ttime.Sec
 	props.TimeUnits.Options = []string{ttime.Sec, ttime.Min, ttime.Hr, ttime.Day}
 	props.TimeUnits.EnumName = []string{ttime.Sec, ttime.Min, ttime.Hr, ttime.Day}
 
 	props.LockDuration.Title = "for duration (x) seconds"
+	props.LockDuration.Help = "this is help"
 	props.LockDuration.Default = 1
 	props.LockDuration.Minimum = 1
 	props.LockDuration.Maximum = 100000000
@@ -133,7 +134,7 @@ func (inst *TimeTrigger) buildSchema() *schemas.Schema {
 	}
 	return s
 }
-func (inst *TimeTrigger) getSettings(body map[string]interface{}) (*schedulerSettings, error) {
+func (inst *TimedTrigger) getSettings(body map[string]interface{}) (*schedulerSettings, error) {
 	settings := &schedulerSettings{}
 	marshal, err := json.Marshal(body)
 	if err != nil {

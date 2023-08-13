@@ -104,7 +104,7 @@ func (n *Spec) InputHasConnectionOrValue(name InputName) bool {
 func (n *Spec) ReadPinOrSettingsFloat(name InputName) float64 {
 	name = InputName(fmt.Sprintf("[%s]", name))
 	input := n.GetInput(name)
-	useSetting := !n.InputHasConnection(name) && n.ReadPin(name) == nil && input.SettingName != ""
+	useSetting := n.readPinOrSettingsCheck(name, input)
 	if useSetting {
 		if n.Settings != nil {
 			val := reflect.ValueOf(n.Settings)
@@ -127,7 +127,7 @@ func (n *Spec) ReadPinOrSettingsFloat(name InputName) float64 {
 func (n *Spec) ReadPinOrSettingsBool(name InputName) bool {
 	name = InputName(fmt.Sprintf("[%s]", name))
 	input := n.GetInput(name)
-	useSetting := !n.InputHasConnection(name) && n.ReadPin(name) == nil && input.SettingName != ""
+	useSetting := n.readPinOrSettingsCheck(name, input)
 	if useSetting {
 		if n.Settings != nil {
 			val := reflect.ValueOf(n.Settings)
@@ -154,10 +154,18 @@ func (n *Spec) ReadPinOrSettingsBool(name InputName) bool {
 	}
 }
 
+func (n *Spec) readPinOrSettingsCheck(name InputName, input *Input) bool {
+	hasConnection := n.InputHasConnection(name)
+	pinIsNil := n.ReadPin(name) == nil
+	hasSettingName := input.SettingName != ""
+	useSetting := !hasConnection && pinIsNil && hasSettingName
+	return useSetting
+}
+
 func (n *Spec) ReadPinOrSettingsString(name InputName) string {
 	name = InputName(fmt.Sprintf("[%s]", name))
 	input := n.GetInput(name)
-	useSetting := !n.InputHasConnection(name) && n.ReadPin(name) == nil && input.SettingName != ""
+	useSetting := n.readPinOrSettingsCheck(name, input)
 	if useSetting {
 		if n.Settings != nil {
 			val := reflect.ValueOf(n.Settings)
