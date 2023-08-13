@@ -116,6 +116,7 @@ const (
 	minOnOff    = "min-on-off"
 	oneShot     = "one-shot"
 	stopwatch   = "stopwatch"
+	dayTrigger  = "day-trigger"
 	timeTrigger = "time-trigger"
 
 	// switch

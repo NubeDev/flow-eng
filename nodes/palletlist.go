@@ -161,6 +161,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	oneShot, _ := timing.NewOneShot(nil)
 	stopwatch, _ := timing.NewStopwatch(nil)
 	timeTrigger, _ := timing.NewTimeTrigger(nil)
+	dayTrigger, _ := timing.NewDayTrigger(nil)
 
 	// numtransform
 	fade, _ := numtransform.NewFade(nil)
@@ -351,6 +352,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(oneShot),
 		node.ConvertToSpec(stopwatch),
 		node.ConvertToSpec(timeTrigger),
+		node.ConvertToSpec(dayTrigger),
 
 		node.ConvertToSpec(cov),
 		node.ConvertToSpec(random),
@@ -808,6 +810,8 @@ func builderTiming(body *node.Spec) (node.Node, error) {
 	case stopwatch:
 		return timing.NewStopwatch(body)
 	case timeTrigger:
+		return timing.NewTimeTrigger(body)
+	case dayTrigger:
 		return timing.NewTimeTrigger(body)
 	}
 

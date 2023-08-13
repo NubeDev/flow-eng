@@ -59,7 +59,7 @@ func (inst *TimeTrigger) init() {
 	inst.lockDuration = settings.LockDuration
 	timeUnits := settings.TimeUnits
 	if timeUnits == ttime.Sec {
-		scheduler.Every(inst.every).Seconds().NotImmediately().Run(inst.job)
+		scheduler.Every(inst.every).Seconds().Run(inst.job)
 	}
 	if timeUnits == ttime.Min {
 		scheduler.Every(inst.every).Minutes().Run(inst.job)
@@ -74,7 +74,7 @@ func (inst *TimeTrigger) init() {
 }
 
 func (inst *TimeTrigger) setSubtitle(timeUnits string) {
-	title := fmt.Sprintf("trigger every:(%d:%s) lock: (%d:%s)", inst.every, timeUnits, inst.lockDuration, timeUnits)
+	title := fmt.Sprintf("trigger at:(%d:%s) lock: (%d:%s)", inst.every, timeUnits, inst.lockDuration, timeUnits)
 	inst.SetSubTitle(title)
 }
 
@@ -93,7 +93,7 @@ type schedulerSettings struct {
 func (inst *TimeTrigger) buildSchema() *schemas.Schema {
 	props := &schedulerSettingsSchema{}
 
-	props.Trigger.Title = "trigger every"
+	props.Trigger.Title = "trigger at"
 	props.Trigger.Default = 2
 	props.Trigger.Minimum = 2
 	props.Trigger.Maximum = 100000000

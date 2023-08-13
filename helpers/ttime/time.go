@@ -16,6 +16,22 @@ const (
 	Min = "min"
 	Hr  = "hour"
 	Day = "day"
+
+	Sun  = "Sun"
+	Mon  = "Mon"
+	Tue  = "Tue"
+	Wed  = "Wed"
+	Thur = "Thur"
+	Fri  = "Fri"
+	Sat  = "Sat"
+
+	Sunday    = "Sunday"
+	Monday    = "Monday"
+	Tuesday   = "Tuesday"
+	Wednesday = "Wednesday"
+	Thursday  = "Thursday"
+	Friday    = "Friday"
+	Saturday  = "Saturday"
 )
 
 func TimePretty(t time.Time) string {
