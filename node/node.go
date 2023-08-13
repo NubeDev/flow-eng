@@ -246,6 +246,10 @@ func (n *Spec) GetInfo() Info {
 	return n.Info
 }
 
+func (n *Spec) SetDescription(description string) {
+	n.Info.Description = description
+}
+
 func (n *Spec) SetHelp(body string) {
 	n.Help = body
 }

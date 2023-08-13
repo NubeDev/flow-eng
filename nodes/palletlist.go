@@ -160,6 +160,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	minOnOff, _ := timing.NewMinOnOff(nil)
 	oneShot, _ := timing.NewOneShot(nil)
 	stopwatch, _ := timing.NewStopwatch(nil)
+	timedTrigger, _ := timing.NewTimedTrigger(nil)
+	dayTrigger, _ := timing.NewDayTrigger(nil)
 
 	// numtransform
 	fade, _ := numtransform.NewFade(nil)
@@ -197,20 +199,18 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	preventDuplicates, _ := filter.NewPreventDuplicates(nil)
 
 	// rest
-	getNode, _ := rest.NewGet(nil)
 	writeNode, _ := rest.NewHttpWrite(nil)
 
 	if disableNodes {
 		dataStore = nil
-		jsonFilter = nil
+		// jsonFilter = nil
 		pingNode = nil
-		getNode = nil
-		writeNode = nil
-		funcNode = nil
+		// writeNode = nil
+		// funcNode = nil
 		mqttBroker = nil
 		mqttSub = nil
 		mqttPub = nil
-		logNode = nil
+		// logNode = nil
 	}
 
 	return node.BuildNodes(
@@ -226,7 +226,6 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(flowPointWrite),
 		node.ConvertToSpec(flowSchedule),
 
-		node.ConvertToSpec(getNode),
 		node.ConvertToSpec(writeNode),
 
 		node.ConvertToSpec(mqttBroker),
@@ -352,6 +351,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(minOnOff),
 		node.ConvertToSpec(oneShot),
 		node.ConvertToSpec(stopwatch),
+		node.ConvertToSpec(timedTrigger),
+		node.ConvertToSpec(dayTrigger),
 
 		node.ConvertToSpec(cov),
 		node.ConvertToSpec(random),
@@ -532,9 +533,7 @@ func builderFilter(body *node.Spec) (node.Node, error) {
 
 func builderRest(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
-	case getHttpNode:
-		return rest.NewGet(body)
-	case writeHttpNode:
+	case httpNode:
 		return rest.NewHttpWrite(body)
 	}
 	return nil, nil
@@ -810,7 +809,12 @@ func builderTiming(body *node.Spec) (node.Node, error) {
 		return timing.NewOneShot(body)
 	case stopwatch:
 		return timing.NewStopwatch(body)
+	case timedTrigger:
+		return timing.NewTimedTrigger(body)
+	case dayTrigger:
+		return timing.NewDayTrigger(body)
 	}
+
 	return nil, nil
 }
 

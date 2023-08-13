@@ -52,8 +52,7 @@ const (
 
 	flowLoopCount = "flow-loop-count"
 
-	getHttpNode   = "http-get"
-	writeHttpNode = "http-write"
+	httpNode = "http-method"
 
 	accumulationPeriod = "accumulation-period"
 	deadBandNode       = "dead-band"
@@ -108,15 +107,17 @@ const (
 	injectNode = "inject"
 	iterate    = "iterate"
 
-	clock     = "clock"
-	date      = "date"
-	delay     = "delay"
-	delayOn   = "delay-on"
-	delayOff  = "delay-off"
-	dutyCycle = "duty-cycle"
-	minOnOff  = "min-on-off"
-	oneShot   = "one-shot"
-	stopwatch = "stopwatch"
+	clock        = "clock"
+	date         = "date"
+	delay        = "delay"
+	delayOn      = "delay-on"
+	delayOff     = "delay-off"
+	dutyCycle    = "duty-cycle"
+	minOnOff     = "min-on-off"
+	oneShot      = "one-shot"
+	stopwatch    = "stopwatch"
+	dayTrigger   = "day-trigger"
+	timedTrigger = "timed-trigger"
 
 	// switch
 	switchNode      = "switch"

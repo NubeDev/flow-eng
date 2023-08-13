@@ -1,9 +1,8 @@
 package rest
 
 const (
-	category  = "http"
-	getNode   = "http-get"
-	writeNode = "http-write"
+	category = "http"
+	httpNode = "http-method"
 
 	// methods
 	get        = "GET"

@@ -166,14 +166,17 @@ func (inst *Server) Process() {
 	inst.WritePin(devStats2, deviceMsg(inst.devStats2, inst.devAddr2))
 	inst.WritePin(devStats3, deviceMsg(inst.devStats3, inst.devAddr3))
 	inst.WritePin(devStats4, deviceMsg(inst.devStats4, inst.devAddr4))
-	// inst.SetStatusError(fmt.Sprintf("failed to set serial port: %s", "port"))
-	// inst.SetErrorIcon(string(emoji.RedCircle))
-	//
-	// inst.SetWaringMessage("waring")
-	// inst.SetWaringIcon(string(emoji.OrangeCircle))
-	//
-	// inst.SetNotifyMessage("SetNotifyMessage")
-	// inst.SetNotifyIcon(string(emoji.GreenCircle))
+
+	inst.SetSubTitle("hello title")
+
+	inst.SetStatusError(fmt.Sprintf("failed to set serial port: %s", "port"))
+	inst.SetErrorIcon(string(emoji.RedCircle))
+
+	inst.SetWaringMessage("waring")
+	inst.SetWaringIcon(string(emoji.OrangeCircle))
+
+	inst.SetNotifyMessage("SetNotifyMessage")
+	inst.SetNotifyIcon(string(emoji.GreenCircle))
 
 }
 

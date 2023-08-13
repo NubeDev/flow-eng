@@ -46,7 +46,10 @@ const (
 	InString  InputName = "string"
 	InBoolean InputName = "boolean"
 
-	Enable InputName = "enable"
+	Enable         InputName = "enable"
+	EnableHelp     InputHelp = "if true will allow the node to execute its logic"
+	RunOnStart     InputName = "run-on-start"
+	RunOnStartOnce InputName = "run-once"
 
 	MinOnTime  InputName = "min-on-time"
 	MinOffTime InputName = "min-off-time"
@@ -229,9 +232,13 @@ const (
 	Month      OutputName = "month"
 	Year       OutputName = "year"
 
-	OutTopic OutputName = "topic"
-	Out      OutputName = "output"
-	Elapsed  OutputName = "elapsed"
+	OutTopic    OutputName = "topic"
+	Out         OutputName = "output"
+	OutHelp     OutputHelp = "will round the node processed calculation"
+	CurrentTime OutputName = "current-time"
+	Response    OutputName = "response"
+	OnStart     OutputName = "on-start"
+	Elapsed     OutputName = "elapsed"
 
 	MinOutput OutputName = "min"
 	MaxOutput OutputName = "max"
