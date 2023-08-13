@@ -8,29 +8,30 @@ import (
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
-	"github.com/carlescere/scheduler"
+	"github.com/jasonlvhit/gocron"
 	"time"
 )
+
+const timeTriggerDesc = ""
 
 type TimeTrigger struct {
 	*node.Spec
 	lock         bool
-	every        int
+	every        uint64
 	lockDuration int
 }
 
 func NewTimeTrigger(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, timeTrigger, category)
-	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false, true)
-
+	enable := node.BuildInput(node.Enable, node.TypeBool, true, body.Inputs, false, false, node.SetInputHelp(node.EnableHelp))
 	inputs := node.BuildInputs(enable)
-
-	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs, node.SetOutputHelp(node.OutHelp))
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 
 	n := &TimeTrigger{body, false, 0, 0}
 	n.SetSchema(n.buildSchema())
+	n.SetDescription(timeTriggerDesc)
 	return n, nil
 }
 
@@ -58,17 +59,20 @@ func (inst *TimeTrigger) init() {
 	inst.every = settings.Trigger
 	inst.lockDuration = settings.LockDuration
 	timeUnits := settings.TimeUnits
+
+	scheduler := gocron.NewScheduler()
+
 	if timeUnits == ttime.Sec {
-		scheduler.Every(inst.every).Seconds().Run(inst.job)
+		scheduler.Every(inst.every).Seconds().Do(inst.job)
 	}
 	if timeUnits == ttime.Min {
-		scheduler.Every(inst.every).Minutes().Run(inst.job)
+		scheduler.Every(inst.every).Minutes().Do(inst.job)
 	}
 	if timeUnits == ttime.Hr {
-		scheduler.Every(inst.every).Hours().Run(inst.job)
+		scheduler.Every(inst.every).Hours().Do(inst.job)
 	}
 	if timeUnits == ttime.Day {
-		scheduler.Every(inst.every).Day().Run(inst.job)
+		scheduler.Every(inst.every).Day().Do(inst.job)
 	}
 	inst.setSubtitle(timeUnits)
 }
@@ -85,7 +89,7 @@ type schedulerSettingsSchema struct {
 }
 
 type schedulerSettings struct {
-	Trigger      int    `json:"trigger"`
+	Trigger      uint64 `json:"trigger"`
 	LockDuration int    `json:"lock_duration"`
 	TimeUnits    string `json:"time_units"`
 }

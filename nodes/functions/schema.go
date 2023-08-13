@@ -9,14 +9,11 @@ type nodeSchema struct {
 	Code schemas.String `json:"code"`
 }
 
-const eg = `let in1 = Number(arg["in1"])
-let in2 = Number(arg["in2"])
+const eg = `
+let in1 = Number(input.in1)
+let in2 = Number(input.in2)
 
-for (let i = 0; i < 5; i++) {
-  in1 += i
-}
-
-return in1+in2
+RQL.Result = in1+in2
 `
 
 func buildSchema() *schemas.Schema {

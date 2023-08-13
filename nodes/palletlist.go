@@ -812,7 +812,7 @@ func builderTiming(body *node.Spec) (node.Node, error) {
 	case timeTrigger:
 		return timing.NewTimeTrigger(body)
 	case dayTrigger:
-		return timing.NewTimeTrigger(body)
+		return timing.NewDayTrigger(body)
 	}
 
 	return nil, nil

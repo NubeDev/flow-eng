@@ -10,15 +10,15 @@ require (
 	github.com/NubeIO/nubeio-rubix-lib-modbus-go v0.0.5
 	github.com/NubeIO/nubeio-rubix-lib-models-go v1.7.9
 	github.com/andanhm/go-prettytime v1.1.0
-	github.com/carlescere/scheduler v0.0.0-20170109141437-ee74d2f83d82
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f
 	github.com/dop251/goja v0.0.0-20230707174833-636fdf960de1
 	github.com/dustin/go-humanize v1.0.0
 	github.com/eclipse/paho.mqtt.golang v1.4.1
 	github.com/enescakir/emoji v1.0.0
-	github.com/go-co-op/gocron v1.17.0
+	github.com/go-co-op/gocron v1.31.1
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
+	github.com/jasonlvhit/gocron v0.0.1
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
@@ -47,6 +47,7 @@ require (
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/tidwall/rtred v0.1.2 // indirect
 	github.com/tidwall/tinyqueue v0.1.1 // indirect
+	go.uber.org/atomic v1.9.0 // indirect
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect
 	golang.org/x/sys v0.6.0 // indirect

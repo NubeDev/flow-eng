@@ -1,10 +1,9 @@
 package ttime
 
 import (
-	"fmt"
+	"errors"
 	"github.com/andanhm/go-prettytime"
 	"github.com/rvflash/elapsed"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -24,14 +23,6 @@ const (
 	Thur = "Thur"
 	Fri  = "Fri"
 	Sat  = "Sat"
-
-	Sunday    = "Sunday"
-	Monday    = "Monday"
-	Tuesday   = "Tuesday"
-	Wednesday = "Wednesday"
-	Thursday  = "Thursday"
-	Friday    = "Friday"
-	Saturday  = "Saturday"
 )
 
 func TimePretty(t time.Time) string {
@@ -81,124 +72,39 @@ func Duration(amount float64, units string) time.Duration {
 	return time.Duration(amount * float64(time.Second))
 }
 
-func GetMinDifference(t1 time.Time, t2 time.Time) float64 {
-	return t1.Sub(t2).Minutes()
-}
-
-func AdjustTime(original time.Time, adjustment string) (time.Time, error) {
-	duration, err := parseDuration(adjustment)
+func ParseTime(str string) (hour, min, sec int, err error) {
+	chunks := strings.Split(str, ":")
+	var hourStr, minStr, secStr string
+	switch len(chunks) {
+	case 1:
+		hourStr = chunks[0]
+		minStr = "0"
+		secStr = "0"
+	case 2:
+		hourStr = chunks[0]
+		minStr = chunks[1]
+		secStr = "0"
+	case 3:
+		hourStr = chunks[0]
+		minStr = chunks[1]
+		secStr = chunks[2]
+	}
+	hour, err = strconv.Atoi(hourStr)
 	if err != nil {
-		return time.Time{}, err
+		return 0, 0, 0, errors.New("bad time")
 	}
-
-	return original.Add(duration), nil
-}
-
-// ParseDuration converts a systemd relative time string into time.Duration
-func parseDuration(raw string) (time.Duration, error) {
-	re, err := regexp.Compile(`^\s*-?\s*(\d+\s*[a-z]+)`)
+	min, err = strconv.Atoi(minStr)
 	if err != nil {
-		return 0, err
+		return 0, 0, 0, errors.New("bad time")
 	}
-
-	if !re.MatchString(raw) {
-		return 0, fmt.Errorf("ParseDuration: incorrect format for raw input %s", raw)
-	}
-
-	reNegative, err := regexp.Compile(`^\s*-.*`)
+	sec, err = strconv.Atoi(secStr)
 	if err != nil {
-		return 0, err
-	}
-	isNegative := reNegative.MatchString(raw)
-
-	reGroups, err := regexp.Compile(`\d+\s*[a-z]+`)
-	if err != nil {
-		return 0, err
+		return 0, 0, 0, errors.New("bad time")
 	}
 
-	matches := reGroups.FindAllString(raw, -1)
-
-	totalDuration := time.Duration(0)
-	reSubGroup, err := regexp.Compile(`^(\d+)\s*([a-z]+)$`)
-	if err != nil {
-		return 0, err
-	}
-	for _, match := range matches {
-		matchTrimmed := strings.Replace(match, " ", "", -1)
-		subGroupMatches := reSubGroup.FindStringSubmatch(matchTrimmed)
-
-		// if we run into a case where there aren't exactly two matches
-		// then that means this is an unexpected string and we should error out
-		if len(subGroupMatches) != 3 {
-			return 0, fmt.Errorf("Unexpected match count for '%s': expected 2 and got %d", matchTrimmed, len(subGroupMatches))
-		}
-
-		subGroupMatchValue, err := strconv.Atoi(subGroupMatches[1])
-		if err != nil {
-			return 0, err
-		}
-
-		subGroupMatchUnit, err := unitToDuration(subGroupMatches[2])
-		if err != nil {
-			return 0, err
-		}
-
-		totalDuration += time.Duration(subGroupMatchValue) * subGroupMatchUnit
+	if hour > 23 || min > 59 || sec > 59 {
+		return 0, 0, 0, errors.New("bad time")
 	}
 
-	if isNegative {
-		totalDuration *= -1
-	}
-
-	return totalDuration, nil
-}
-
-// UnitToDuration converts a systemd unit (e.g. "day") to time.Duration
-func unitToDuration(unit string) (time.Duration, error) {
-	// microseconds
-	if matched, err := regexp.MatchString(`^us(ec)?$`, unit); err == nil && matched {
-		return time.Microsecond, nil
-	}
-
-	// milliseconds
-	if matched, err := regexp.MatchString(`^ms(ec)?$`, unit); err == nil && matched {
-		return time.Millisecond, nil
-	}
-
-	// seconds
-	if matched, err := regexp.MatchString(`^s(ec(onds?)?)?$`, unit); err == nil && matched {
-		return time.Second, nil
-	}
-
-	// minutes
-	if matched, err := regexp.MatchString(`^m(in(utes?)?)?$`, unit); err == nil && matched {
-		return time.Minute, nil
-	}
-
-	// hours
-	if matched, err := regexp.MatchString(`^(hr|h(ours?)?)$`, unit); err == nil && matched {
-		return time.Hour, nil
-	}
-
-	// days
-	if matched, err := regexp.MatchString(`^d(ays?)?$`, unit); err == nil && matched {
-		return 24 * time.Hour, nil
-	}
-
-	// weeks
-	if matched, err := regexp.MatchString(`^w(eeks?)?$`, unit); err == nil && matched {
-		return 7 * 24 * time.Hour, nil
-	}
-
-	// months
-	if matched, err := regexp.MatchString(`^(M|months?)$`, unit); err == nil && matched {
-		return time.Duration(30.44 * float64(24) * float64(time.Hour)), nil
-	}
-
-	// years
-	if matched, err := regexp.MatchString(`^y(ears?)?$`, unit); err == nil && matched {
-		return time.Duration(365.25 * float64(24) * float64(time.Hour)), nil
-	}
-
-	return 0, fmt.Errorf("Unit %s did not match", unit)
+	return
 }

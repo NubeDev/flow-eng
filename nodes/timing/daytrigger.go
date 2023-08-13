@@ -8,7 +8,8 @@ import (
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
-	"github.com/carlescere/scheduler"
+	"github.com/jasonlvhit/gocron"
+	log "github.com/sirupsen/logrus"
 	"time"
 )
 
@@ -23,8 +24,8 @@ type DayTrigger struct {
 func NewDayTrigger(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, dayTrigger, category)
 	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false, true)
-
-	inputs := node.BuildInputs(enable)
+	timeSetting := node.BuildInput(node.Time, node.TypeString, 0, body.Inputs, true, false)
+	inputs := node.BuildInputs(enable, timeSetting)
 
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
@@ -53,59 +54,82 @@ func (inst *DayTrigger) job() {
 func (inst *DayTrigger) init() {
 	settings, _ := inst.getSettings(inst.GetSettings())
 	inst.lockDuration = settings.LockDuration
+	inst.at = inst.ReadPinOrSettingsString(node.Time)
 	day := settings.DaySelection
+
+	_, _, _, err := ttime.ParseTime(inst.at)
+	if err != nil {
+		log.Error(fmt.Sprintf("day-trigger: failed to parse time err: %s", err.Error()))
+		return
+	}
+
+	scheduler := gocron.NewScheduler()
+
+	if day == everyDay {
+		scheduler.Every(1).Day().At(inst.at).Do(inst.job)
+	}
 	if day == ttime.Sun {
-		scheduler.Every().Sunday().At(inst.at).Run(inst.job)
+		scheduler.Every(1).Sunday().At(inst.at).Do(inst.job)
 	}
 	if day == ttime.Mon {
-		scheduler.Every().Monday().At(inst.at).Run(inst.job)
+		scheduler.Every(1).Monday().At(inst.at).Do(inst.job)
 	}
 	if day == ttime.Tue {
-		scheduler.Every().Tuesday().At(inst.at).Run(inst.job)
+		scheduler.Every(1).Tuesday().At(inst.at).Do(inst.job)
 	}
 	if day == ttime.Wed {
-		scheduler.Every().Wednesday().At(inst.at).Run(inst.job)
+		scheduler.Every(1).Wednesday().At(inst.at).Do(inst.job)
 	}
 	if day == ttime.Thur {
-		scheduler.Every().Thursday().At(inst.at).Run(inst.job)
+		scheduler.Every(1).Thursday().At(inst.at).Do(inst.job)
 	}
-	if day == ttime.Friday {
-		scheduler.Every().Friday().At(inst.at).Run(inst.job)
+	if day == ttime.Fri {
+		scheduler.Every(1).Friday().At(inst.at).Do(inst.job)
 	}
-	if day == ttime.Saturday {
-		scheduler.Every().Saturday().At(inst.at).Run(inst.job)
+	if day == ttime.Sat {
+		scheduler.Every(1).Saturday().At(inst.at).Do(inst.job)
 	}
+	scheduler.Start()
 	inst.setSubtitle(day)
 }
 
-func (inst *DayTrigger) setSubtitle(timeUnits string) {
-	title := fmt.Sprintf("trigger at:(%d:%s) lock: (%d:%s)", inst.at, timeUnits, inst.lockDuration, timeUnits)
+func (inst *DayTrigger) setSubtitle(day string) {
+	var title string
+	fmt.Println(inst.at)
+	if day == everyDay {
+		title = fmt.Sprintf("trigger every day at:(%s) hold for: (%d:sec)", inst.at, inst.lockDuration)
+	} else {
+		title = fmt.Sprintf("trigger at:(%s:%s) hold for: (%d:sec)", inst.at, day, inst.lockDuration)
+	}
+
 	inst.SetSubTitle(title)
 }
 
 type dayTriggerSettingsSchema struct {
-	TriggerAt    schemas.String     `json:"trigger"`
+	Time         schemas.String     `json:"time"`
 	DaySelection schemas.EnumString `json:"day_selection"`
 	LockDuration schemas.Integer    `json:"lock_duration"`
 }
 
 type dayTriggerSettings struct {
-	TriggerAt    string `json:"trigger"`
+	Time         string `json:"time"`
 	DaySelection string `json:"day_selection"`
 	LockDuration int    `json:"lock_duration"`
 }
+
+const everyDay = "everyDay"
 
 func (inst *DayTrigger) buildSchema() *schemas.Schema {
 	props := &dayTriggerSettingsSchema{}
 
 	// time selection
 	props.DaySelection.Title = "Day To Trigger"
-	props.DaySelection.Default = ttime.Mon
-	props.DaySelection.Options = []string{ttime.Sun, ttime.Mon, ttime.Tue, ttime.Wed, ttime.Thur, ttime.Fri, ttime.Sat}
-	props.DaySelection.EnumName = []string{ttime.Sun, ttime.Mon, ttime.Tue, ttime.Wed, ttime.Thur, ttime.Fri, ttime.Sat}
+	props.DaySelection.Default = everyDay
+	props.DaySelection.Options = []string{everyDay, ttime.Sun, ttime.Mon, ttime.Tue, ttime.Wed, ttime.Thur, ttime.Fri, ttime.Sat}
+	props.DaySelection.EnumName = []string{everyDay, ttime.Sun, ttime.Mon, ttime.Tue, ttime.Wed, ttime.Thur, ttime.Fri, ttime.Sat}
 
-	props.TriggerAt.Title = "trigger at (eg 08:00, 20:00)"
-	props.TriggerAt.Default = "08:00"
+	props.Time.Title = "trigger at (eg 08:00, 20:00)"
+	props.Time.Default = "08:00"
 
 	props.LockDuration.Title = "for duration (x) seconds"
 	props.LockDuration.Default = 1
@@ -121,7 +145,7 @@ func (inst *DayTrigger) buildSchema() *schemas.Schema {
 				"inline": true,
 			},
 		},
-		"ui:order": array.Slice{"trigger", "day_selection", "lock_duration"},
+		"ui:order": array.Slice{"time", "day_selection", "lock_duration"},
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{

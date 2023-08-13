@@ -1,6 +1,7 @@
 package rules
 
 import (
+	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"time"
 )
 
@@ -8,6 +9,11 @@ import (
 func (inst *RQL) Sleep(duration int) {
 	d := time.Duration(duration)
 	time.Sleep(d * time.Second)
+}
+
+// TimeNow now
+func (inst *RQL) TimeNow() time.Time {
+	return time.Now()
 }
 
 // TimeUTC returns time in UTC
@@ -26,8 +32,12 @@ func (inst *RQL) TimeWithMS() string {
 }
 
 // Time returns time formatted as `15:04:05`
-func (inst *RQL) Time() string {
-	return time.Now().Format("15:04:05")
+func (inst *RQL) Time(t time.Time) string {
+	if t.IsZero() {
+		return time.Now().Format("15:04:05")
+	} else {
+		return t.Format("15:04:05")
+	}
 }
 
 // Date returns date formatted as `2006.01.02`
@@ -48,4 +58,12 @@ func (inst *RQL) Day() string {
 // TimeDateDay returns time/date formatted as `2006-01-02 15:04:05 Monday`
 func (inst *RQL) TimeDateDay() string {
 	return time.Now().Format("2006-01-02 15:04:05 Monday")
+}
+
+func (inst *RQL) AddSeconds(t time.Time, second int) time.Time {
+	return ttime.AddSeconds(t, second)
+}
+
+func (inst *RQL) AddMinutes(t time.Time, minutes int) time.Time {
+	return ttime.AddSeconds(t, minutes)
 }
