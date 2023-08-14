@@ -39,6 +39,7 @@ func (inst *Broker) buildSchema() *schemas.Schema {
 	names, uuids := inst.getConnectionsNames()
 	props := &nodeSchema{}
 	props.Conn.Title = "connections"
+	props.Conn.Help = "please add/select a new or existing connection"
 	if len(names) > 0 {
 		props.Conn.Default = names[0]
 	} else {

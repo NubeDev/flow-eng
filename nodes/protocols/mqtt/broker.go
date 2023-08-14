@@ -11,6 +11,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const brokerHelp = `
+A node used for pub/sub to an MQTT broker.
+Please add a connection and select the connection to the broker`
+
 type Broker struct {
 	*node.Spec
 	firstLoop     bool
@@ -26,9 +30,10 @@ var mqttRetain = false
 func NewBroker(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, mqttBroker, category)
 	inputs := node.BuildInputs()
-	outputs := node.BuildOutputs(node.BuildOutput(node.Connected, node.TypeBool, nil, body.Outputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Connected, node.TypeBool, nil, body.Outputs, node.SetOutputHelp(node.ConnectedHelp)))
 	body.IsParent = true
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
+	body.SetHelp(brokerHelp)
 	network := &Broker{body, false, 0, nil, nil, false}
 	network.Spec = body
 	return network, nil
@@ -115,11 +120,12 @@ func (inst *Broker) publish() {
 		}
 		var bodyPayload string
 		var useBodyTopic bool
+		var mqttTopic string
 		n := inst.GetNode(payload.NodeUUID)
-		t, _ := n.ReadPinAsString(node.Topic)
+		mqttTopic, _ = n.ReadPinAsString(node.Topic)
 		p, _ := n.ReadPinAsString(node.Message)
 
-		if t == "" {
+		if mqttTopic == "" {
 			body, err := parseBodyString(p)
 			if err != nil {
 				log.Errorf("mqtt-broker parse body err:%s", err.Error())
@@ -129,9 +135,9 @@ func (inst *Broker) publish() {
 				log.Errorf("mqtt-broker parse body is empty")
 				continue
 			}
-			t = body.Topic // use topic from payload
+			mqttTopic = body.Topic // use topic from payload
 			useBodyTopic = true
-			if t == "" {
+			if mqttTopic == "" {
 				log.Errorf("mqtt-broker topic can not be empty")
 				continue
 			}
@@ -144,12 +150,16 @@ func (inst *Broker) publish() {
 		} else {
 			bodyPayload = p
 		}
+		if mqttTopic == "" {
+			log.Errorf("mqtt-broker topic can not be empty")
+			continue
+		}
 		if p != "" {
-			if t == payload.Topic || useBodyTopic {
+			if mqttTopic == payload.Topic || useBodyTopic {
 				if inst.mqttClient != nil {
 					updated, _ := n.InputUpdated(node.Message)
 					if updated {
-						err := inst.mqttClient.Publish(t, mqttQOS, mqttRetain, bodyPayload)
+						err := inst.mqttClient.Publish(mqttTopic, mqttQOS, mqttRetain, bodyPayload)
 						if err != nil {
 							log.Errorf("mqtt-broker publish err:%s", err.Error())
 						}

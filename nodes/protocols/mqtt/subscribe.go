@@ -1,8 +1,8 @@
 package broker
 
-import (
-	"github.com/NubeDev/flow-eng/node"
-)
+import "github.com/NubeDev/flow-eng/node"
+
+const subHelp = `A node for subscribing to an MQTT topic and message to a broker. (must be added inside the MQTT broker node)`
 
 type MqttSub struct {
 	*node.Spec
@@ -11,10 +11,11 @@ type MqttSub struct {
 
 func NewMqttSub(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, mqttSub, category)
-	top := node.BuildInput(node.Topic, node.TypeString, nil, body.Inputs, false, false)
+	top := node.BuildInput(node.Topic, node.TypeString, nil, body.Inputs, false, false, node.SetInputHelp("mqtt topic example: my/topic"))
 	inputs := node.BuildInputs(top)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
+	body.SetHelp(subHelp)
 	return &MqttSub{body, ""}, nil
 }
 

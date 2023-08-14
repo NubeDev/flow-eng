@@ -247,7 +247,8 @@ const (
 	LastUpdated     OutputName = "last-updated"
 	CurrentPriority OutputName = "current-priority"
 
-	Connected OutputName = "connected"
+	Connected     OutputName = "connected"
+	ConnectedHelp OutputHelp = "will be true if connected to service and false if not"
 
 	CountOut OutputName = "count"
 	OutEqTo  OutputName = "out=to"
