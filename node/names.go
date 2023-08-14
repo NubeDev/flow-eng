@@ -114,6 +114,7 @@ const (
 	X10 InputName = "x10"
 
 	In        InputName = "input"
+	InHelp    InputHelp = "node input value to be processed"
 	Match     InputName = "match"
 	Value     InputName = "value"
 	Threshold InputName = "threshold"
@@ -128,9 +129,10 @@ const (
 	Message      InputName = "message"
 	Subject      InputName = "subject"
 
-	Filter   InputName = "filter"
-	Body     InputName = "body"
-	Equation InputName = "equation"
+	Filter     InputName = "filter"
+	FilterHelp InputHelp = "filter"
+	Body       InputName = "body"
+	Equation   InputName = "equation"
 
 	Ip          InputName = "ip"
 	Time        InputName = "time"
@@ -234,7 +236,7 @@ const (
 
 	OutTopic    OutputName = "topic"
 	Out         OutputName = "output"
-	OutHelp     OutputHelp = "will round the node processed calculation"
+	OutHelp     OutputHelp = "the result payload of the node processed calculation"
 	CurrentTime OutputName = "current-time"
 	Response    OutputName = "response"
 	OnStart     OutputName = "on-start"

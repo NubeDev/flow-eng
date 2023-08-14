@@ -58,12 +58,3 @@ func (n *Spec) NodeHelp() *Help {
 	}
 	return out
 }
-
-const (
-	InHelp            InputHelp = "interval"
-	IntervalInputHelp InputHelp = "interval"
-)
-
-const (
-	IntervalOutputHelp OutputHelp = "interval"
-)

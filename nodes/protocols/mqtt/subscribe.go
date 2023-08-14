@@ -13,7 +13,7 @@ func NewMqttSub(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, mqttSub, category)
 	top := node.BuildInput(node.Topic, node.TypeString, nil, body.Inputs, false, false, node.SetInputHelp("mqtt topic example: my/topic"))
 	inputs := node.BuildInputs(top)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs, node.SetOutputHelp(node.OutHelp)))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetHelp(subHelp)
 	return &MqttSub{body, ""}, nil

@@ -11,6 +11,51 @@ import (
 	"strings"
 )
 
+const httpHelp = `
+A node used for sending HTTP/HTTPS requests
+Methods supported: GET, POST, PUT, PATCH, DELETE
+
+In the body you can send
+
+- url
+- trigger
+- body
+- method
+- headers: {
+    "Content-Type": "application/json",
+    "Token": "abc1234"
+}
+- filter: filter the output response  (see for more info: https://github.com/tidwall/gjson#path-syntax)
+
+
+example body using the function node
+
+
+let in1 = Number(input.in1)
+let msg = {}
+
+msg.body = {
+    "priority": {
+        "_16": in1
+    }
+}
+
+msg.method = "get"
+msg.url = "http://0.0.0.0:1660/api/points/write/pnt_62f12094bf1b4fb1"
+msg.trigger = false
+msg.filter = "name"
+
+RQL.Result =  JSON.stringify(msg)
+
+`
+
+const responseHelp = `
+Will output the HTTP response
+- body as a string
+- status code
+- errors
+`
+
 type HTTP struct {
 	*node.Spec
 	client    *resty.Client
@@ -19,16 +64,17 @@ type HTTP struct {
 
 func NewHttpWrite(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, httpNode, category)
-	input := node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false, false)
-	filter := node.BuildInput(node.Filter, node.TypeString, nil, body.Inputs, false, false)
-	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false, false)
+	input := node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false, false, node.SetInputHelp(node.InHelp))
+	filter := node.BuildInput(node.Filter, node.TypeString, nil, body.Inputs, false, false, node.SetInputHelp(node.FilterHelp))
+	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false, false, node.SetInputHelp(node.EnableHelp))
 
 	inputs := node.BuildInputs(input, filter, enable)
-	out := node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs)
-	response := node.BuildOutput(node.Response, node.TypeString, nil, body.Outputs)
+	out := node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs, node.SetOutputHelp(node.OutHelp))
+	response := node.BuildOutput(node.Response, node.TypeString, nil, body.Outputs, node.SetOutputHelp(responseHelp))
 
 	outputs := node.BuildOutputs(out, response)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
+	body.SetHelp(httpHelp)
 	n := &HTTP{body, resty.New(), nil}
 	n.SetSchema(n.buildSchema())
 	return n, nil
@@ -107,8 +153,6 @@ func (inst *HTTP) request(method string, bodyString string) (*resty.Response, *r
 func (inst *HTTP) getClient() *resty.Client {
 	return inst.client
 }
-
-type bodyType string
 
 const errNoBodyType = "http-node: no body type"
 const errBodyEmpty = "http-node: body can not be empty"
