@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/NubeDev/flow-eng/nodes/notify"
+	broker2 "github.com/NubeDev/flow-eng/nodes/protocols/mqtt"
 	"github.com/NubeDev/flow-eng/nodes/trigger"
 
 	"github.com/NubeDev/flow-eng/db"
@@ -23,7 +24,6 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/link"
 	"github.com/NubeDev/flow-eng/nodes/math"
 	"github.com/NubeDev/flow-eng/nodes/mathematics"
-	broker "github.com/NubeDev/flow-eng/nodes/mqtt"
 	"github.com/NubeDev/flow-eng/nodes/numtransform"
 	point "github.com/NubeDev/flow-eng/nodes/points"
 	bacnetio "github.com/NubeDev/flow-eng/nodes/protocols/bacnet"
@@ -179,9 +179,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	bacPointAV, _ := bacnetio.NewAV(nil, nil)
 	bacPointBV, _ := bacnetio.NewBV(nil, nil)
 
-	mqttBroker, _ := broker.NewBroker(nil)
-	mqttSub, _ := broker.NewMqttSub(nil)
-	mqttPub, _ := broker.NewMqttPub(nil)
+	mqttBroker, _ := broker2.NewBroker(nil)
+	mqttSub, _ := broker2.NewMqttSub(nil)
+	mqttPub, _ := broker2.NewMqttPub(nil)
 
 	logNode, _ := debugging.NewLog(nil)
 
@@ -207,9 +207,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		pingNode = nil
 		// writeNode = nil
 		// funcNode = nil
-		mqttBroker = nil
-		mqttSub = nil
-		mqttPub = nil
+		//mqttBroker = nil
+		//mqttSub = nil
+		//mqttPub = nil
 		logNode = nil
 	}
 
@@ -845,11 +845,11 @@ func builderProtocols(body *node.Spec, opts []interface{}) (node.Node, error) {
 func builderMQTT(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case mqttBroker:
-		return broker.NewBroker(body)
+		return broker2.NewBroker(body)
 	case mqttSub:
-		return broker.NewMqttSub(body)
+		return broker2.NewMqttSub(body)
 	case mqttPub:
-		return broker.NewMqttPub(body)
+		return broker2.NewMqttPub(body)
 	}
 	return nil, nil
 }

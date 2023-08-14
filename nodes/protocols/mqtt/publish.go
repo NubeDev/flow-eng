@@ -24,21 +24,21 @@ func (inst *MqttPub) set() {
 	nodeUUID := inst.GetID()
 	d, ok := s.Get(parentId)
 	var mqttData *mqttStore
-	if !ok {
+	if !ok { // never added so add
 		s.Set(parentId, &mqttStore{
 			parentID: parentId,
 			payloads: []*mqttPayload{&mqttPayload{
-				nodeUUID:    nodeUUID,
-				topic:       inst.topic,
-				isPublisher: true,
+				NodeUUID:    nodeUUID,
+				Topic:       inst.topic,
+				IsPublisher: true,
 			}},
 		}, 0)
-	} else {
+	} else { // add new payload to existing
 		mqttData = d.(*mqttStore)
 		payload := &mqttPayload{
-			nodeUUID:    nodeUUID,
-			topic:       inst.topic,
-			isPublisher: true,
+			NodeUUID:    nodeUUID,
+			Topic:       inst.topic,
+			IsPublisher: true,
 		}
 		mqttData, _ = addUpdatePayload(nodeUUID, mqttData, payload)
 		s.Set(parentId, mqttData, 0)

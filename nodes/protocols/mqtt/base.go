@@ -13,15 +13,15 @@ type mqttStore struct {
 }
 
 type mqttPayload struct {
-	nodeUUID    string
-	topic       string
-	payload     string
-	isPublisher bool
+	NodeUUID    string `json:"node_uuid"`
+	Topic       string `json:"topic"`
+	Payload     string `json:"payload"`
+	IsPublisher bool   `json:"is_publisher"`
 }
 
 func addUpdatePayload(nodeUUID string, p *mqttStore, newPayload *mqttPayload) (data *mqttStore, found bool) {
 	for i, payload := range p.payloads {
-		if payload.nodeUUID == nodeUUID {
+		if payload.NodeUUID == nodeUUID {
 			p.payloads[i] = newPayload
 			found = true
 		}

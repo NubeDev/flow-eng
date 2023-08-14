@@ -12,7 +12,11 @@ type nodeSchema struct {
 	Conn schemas.EnumString `json:"connections"`
 }
 
+const selectConnection = "Please add/select a MQTT connection"
+
 func (inst *Broker) getConnectionsNames() (names []string, uuids []string) {
+	names = append(names, selectConnection)
+	uuids = append(uuids, selectConnection)
 	db := inst.GetDB()
 	if db != nil {
 		connections, err := inst.GetDB().GetConnections()
@@ -27,11 +31,10 @@ func (inst *Broker) getConnectionsNames() (names []string, uuids []string) {
 		}
 		return names, uuids
 	}
-	log.Errorf("mqtt-broker failed to get db instance")
+	log.Errorf("flow-networks failed to get db instance")
 	return nil, nil
 
 }
-
 func (inst *Broker) buildSchema() *schemas.Schema {
 	names, uuids := inst.getConnectionsNames()
 	props := &nodeSchema{}

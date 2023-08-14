@@ -28,15 +28,15 @@ func (inst *MqttSub) set() {
 		s.Set(parentId, &mqttStore{
 			parentID: parentId,
 			payloads: []*mqttPayload{&mqttPayload{
-				nodeUUID: nodeUUID,
-				topic:    inst.topic,
+				NodeUUID: nodeUUID,
+				Topic:    inst.topic,
 			}},
 		}, 0)
 	} else {
 		mqttData = d.(*mqttStore)
 		payload := &mqttPayload{
-			nodeUUID: nodeUUID,
-			topic:    inst.topic,
+			NodeUUID: nodeUUID,
+			Topic:    inst.topic,
 		}
 		mqttData, _ = addUpdatePayload(nodeUUID, mqttData, payload)
 		s.Set(parentId, mqttData, 0)

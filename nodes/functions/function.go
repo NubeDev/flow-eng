@@ -33,7 +33,7 @@ func NewFunc(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, funcNode, category)
 
 	dynamicInputs := node.DynamicInputs(node.TypeString, nil, 2, 3, 3, body.Inputs, false)
-	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false, false)
+	enable := node.BuildInput(node.Enable, node.TypeBool, true, body.Inputs, false, false)
 	onlyRunOnStart := node.BuildInput(node.RunOnStartOnce, node.TypeBool, nil, body.Inputs, false, false)
 	dynamicInputs = append(dynamicInputs, enable, onlyRunOnStart)
 	inputs := node.BuildInputs(dynamicInputs...)
