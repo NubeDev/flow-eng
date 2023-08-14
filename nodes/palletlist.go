@@ -96,6 +96,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	funcNode, _ := functions.NewFunc(nil)
 
 	jsonFilter, _ := nodejson.NewFilter(nil)
+	jsonBuilder, _ := nodejson.NewJSONBuilder(nil)
 	dataStore, _ := nodejson.NewStore(nil)
 
 	// hvac
@@ -280,6 +281,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(psychroDBWB),
 
 		node.ConvertToSpec(jsonFilter),
+		node.ConvertToSpec(jsonBuilder),
 		node.ConvertToSpec(dataStore),
 
 		node.ConvertToSpec(numLatch),
@@ -573,6 +575,8 @@ func builderJson(body *node.Spec) (node.Node, error) {
 	switch body.GetName() {
 	case jsonFilter:
 		return nodejson.NewFilter(body)
+	case jsonBuilder:
+		return nodejson.NewJSONBuilder(body)
 	case dataStore:
 		return nodejson.NewStore(body)
 	}

@@ -42,8 +42,9 @@ const (
 	round      = "round"
 	waveform   = "waveform"
 
-	dataStore  = "data-store"
-	jsonFilter = "json-filter"
+	dataStore   = "data-store"
+	jsonFilter  = "json-filter"
+	jsonBuilder = "json-builder"
 
 	flowNetwork    = "flow-network"
 	flowPoint      = "flow-point"
