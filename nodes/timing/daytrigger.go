@@ -58,7 +58,9 @@ func (inst *DayTrigger) init() {
 	day := settings.DaySelection
 	_, _, _, err := ttime.ParseTime(inst.at)
 	if err != nil {
-		log.Error(fmt.Sprintf("day-trigger: failed to parse time err: %s", err.Error()))
+		errMsg := fmt.Sprintf("day-trigger: failed to parse time err: %s", err.Error())
+		log.Error(errMsg)
+		inst.setSubtitle(errMsg)
 		return
 	}
 	scheduler := gocron.NewScheduler()
@@ -86,8 +88,9 @@ func (inst *DayTrigger) init() {
 	if day == ttime.Sat {
 		scheduler.Every(1).Saturday().At(inst.at).Do(inst.job)
 	}
-	scheduler.Start()
 	inst.setSubtitle(day)
+	scheduler.Start()
+
 }
 
 func (inst *DayTrigger) setSubtitle(day string) {

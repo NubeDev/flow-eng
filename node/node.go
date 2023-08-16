@@ -44,7 +44,7 @@ type Node interface {
 	SortOutputs()
 	GetOutputs() []*Output
 	GetOutput(name OutputName) *Output
-	InputUpdated(name InputName) (updated bool, boolCOV bool)
+	InputUpdated(name InputName) (updated bool, boolCOV bool, value interface{})
 	InputHasConnection(name InputName) bool
 	InputsLen() int
 	OutputsLen() int
@@ -60,6 +60,7 @@ type Node interface {
 	ReadMultiple(count int) []interface{}
 	ReadMultipleFloatPointer(count int) []*float64
 	ReadMultipleFloat(count int) []float64
+	ReadMultipleInputs(count int) []ReadMultipleInputs
 	WritePin(OutputName, interface{})
 	WritePinFloat(name OutputName, value float64, precision ...int)
 	WritePinBool(OutputName, bool)

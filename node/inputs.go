@@ -82,6 +82,7 @@ func DynamicInputs(dataType DataTypes, defaultVal interface{}, count, minAllowed
 	if count < minAllowed {
 		count = minAllowed
 	}
+	maxAllowed += 1 // this is needed otherwise the last input will not be added
 	if len(overrideNames) > 0 {
 		for _, names := range overrideNames {
 			for i, name := range names {

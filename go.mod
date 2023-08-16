@@ -25,6 +25,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rvflash/elapsed v0.3.0
 	github.com/sirupsen/logrus v1.9.3
+	github.com/thedevsaddam/gojsonq/v2 v2.5.2
 	github.com/tidwall/buntdb v1.2.8
 	github.com/tidwall/gjson v1.14.4
 )

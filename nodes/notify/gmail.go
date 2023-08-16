@@ -72,7 +72,7 @@ func (inst *Gmail) sendEmail() {
 }
 
 func (inst *Gmail) Process() {
-	_, cov := inst.InputUpdated(node.TriggerInput)
+	_, cov, _ := inst.InputUpdated(node.TriggerInput)
 	if cov {
 		inst.sendEmail()
 	}

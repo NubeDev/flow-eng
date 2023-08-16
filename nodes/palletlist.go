@@ -91,12 +91,15 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	conversionString, _ := conversion.NewString(nil)
 	conversionNum, _ := conversion.NewNumber(nil)
+	conversionString2Num, _ := conversion.NewStr2Num(nil)
+	conversionNum2Str, _ := conversion.NewNum2Str(nil)
 	conversionBool, _ := conversion.NewBoolean(nil)
 
 	funcNode, _ := functions.NewFunc(nil)
 
 	jsonFilter, _ := nodejson.NewFilter(nil)
 	jsonBuilder, _ := nodejson.NewJSONBuilder(nil)
+	jsonNumberBuilder, _ := nodejson.NewJSONNumberBuilder(nil)
 	dataStore, _ := nodejson.NewStore(nil)
 
 	// hvac
@@ -208,9 +211,9 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		pingNode = nil
 		// writeNode = nil
 		// funcNode = nil
-		//mqttBroker = nil
-		//mqttSub = nil
-		//mqttPub = nil
+		// mqttBroker = nil
+		// mqttSub = nil
+		// mqttPub = nil
 		logNode = nil
 	}
 
@@ -252,6 +255,8 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(conversionString),
 		node.ConvertToSpec(conversionNum),
+		node.ConvertToSpec(conversionString2Num),
+		node.ConvertToSpec(conversionNum2Str),
 		node.ConvertToSpec(conversionBool),
 
 		node.ConvertToSpec(countNode),
@@ -282,6 +287,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(jsonFilter),
 		node.ConvertToSpec(jsonBuilder),
+		node.ConvertToSpec(jsonNumberBuilder),
 		node.ConvertToSpec(dataStore),
 
 		node.ConvertToSpec(numLatch),
@@ -577,6 +583,8 @@ func builderJson(body *node.Spec) (node.Node, error) {
 		return nodejson.NewFilter(body)
 	case jsonBuilder:
 		return nodejson.NewJSONBuilder(body)
+	case jsonNumberBuilder:
+		return nodejson.NewJSONNumberBuilder(body)
 	case dataStore:
 		return nodejson.NewStore(body)
 	}
@@ -687,6 +695,10 @@ func builderConversion(body *node.Spec) (node.Node, error) {
 		return conversion.NewNumber(body)
 	case conversionBool:
 		return conversion.NewBoolean(body)
+	case conversionString2Num:
+		return conversion.NewStr2Num(body)
+	case conversionNum2Str:
+		return conversion.NewNum2Str(body)
 	}
 	return nil, nil
 }

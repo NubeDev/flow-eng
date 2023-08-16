@@ -12,27 +12,26 @@ import (
 )
 
 const httpHelp = `
-A node used for sending HTTP/HTTPS requests
-Methods supported: GET, POST, PUT, PATCH, DELETE
+
+# A node used for sending HTTP/HTTPS requests
+
+Methods supported: ***GET***, ***POST***, ***PUT***, ***PATCH***, ***DELETE***
 
 In the body you can send
 
-- url
-- trigger
-- body
-- method
-- headers: {
-    "Content-Type": "application/json",
-    "Token": "abc1234"
-}
+- url: http://192.168.15.10/api/ping
+- trigger: if trigger is false then the HTTP request will not be processed
+- body: {name: "nube-io"}
+- method: get, post, patch, put, delete
+- headers: {"Content-Type": "application/json","Token": "abc1234"}
 - filter: filter the output response  (see for more info: https://github.com/tidwall/gjson#path-syntax)
 
 
-example body using the function node
+## example body using the function node
 
-
-let in1 = Number(input.in1)
-let msg = {}
+` + "```" + `
+let in1 = Number(input.in1) // Number will convert the string to a number
+let msg = {} // empty object
 
 msg.body = {
     "priority": {
@@ -40,12 +39,13 @@ msg.body = {
     }
 }
 
-msg.method = "get"
+msg.method = "get" // HTTP method
 msg.url = "http://0.0.0.0:1660/api/points/write/pnt_62f12094bf1b4fb1"
-msg.trigger = false
-msg.filter = "name"
+msg.trigger = true // if false will not process the request
+msg.filter = "name" // {name:"nube", year:2021} will only return ("nube")
 
-RQL.Result =  JSON.stringify(msg)
+RQL.Result =  JSON.stringify(msg) // send as string
+` + "```" + `
 
 `
 
@@ -60,6 +60,7 @@ type HTTP struct {
 	*node.Spec
 	client    *resty.Client
 	lastValue interface{}
+	locked    bool
 }
 
 func NewHttpWrite(body *node.Spec) (node.Node, error) {
@@ -75,7 +76,7 @@ func NewHttpWrite(body *node.Spec) (node.Node, error) {
 	outputs := node.BuildOutputs(out, response)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetHelp(httpHelp)
-	n := &HTTP{body, resty.New(), nil}
+	n := &HTTP{body, resty.New(), nil, false}
 	n.SetSchema(n.buildSchema())
 	return n, nil
 }
@@ -87,7 +88,12 @@ func (inst *HTTP) Process() {
 		inst.WritePin(node.Out, inst.lastValue)
 	}
 	if !null {
-		go inst.processReq(bodyString)
+		if !inst.locked {
+			go inst.processReq(bodyString)
+		} else {
+			inst.WritePin(node.Out, inst.lastValue)
+		}
+
 	} else {
 		inst.WritePin(node.Out, inst.lastValue)
 	}
@@ -100,6 +106,7 @@ func (inst *HTTP) processReq(bodyString string) {
 		log.Error(err)
 		return
 	}
+	inst.locked = true
 	resp, responseOut, filterFromBody, err := inst.request(method.Method, bodyString)
 	inst.WritePin(node.Response, jsonToString(responseOut))
 
@@ -118,6 +125,7 @@ func (inst *HTTP) processReq(bodyString string) {
 		inst.lastValue = resp.String()
 		inst.WritePin(node.Out, resp.String())
 	}
+	inst.locked = false
 }
 
 func jsonToString(body interface{}) string {

@@ -32,7 +32,7 @@ func NewInject(body *node.Spec) (node.Node, error) {
 func (inst *Inject) Process() {
 	message := inst.ReadPin(node.Message)
 	enable, enableNull := inst.ReadPinAsBool(node.Enable)
-	_, covBool := inst.InputUpdated(node.TriggerInput)
+	_, covBool, _ := inst.InputUpdated(node.TriggerInput)
 
 	// fall back to values set in setting if input is not connected
 	if enableNull && inst.s["enable"] != nil {

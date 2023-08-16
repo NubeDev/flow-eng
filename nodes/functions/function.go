@@ -31,12 +31,11 @@ func getSettings(body map[string]interface{}) (string, error) {
 
 func NewFunc(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, funcNode, category)
-
-	dynamicInputs := node.DynamicInputs(node.TypeString, nil, 2, 3, 3, body.Inputs, false)
+	in1 := node.BuildInput(node.In1, node.TypeString, nil, body.Inputs, false, false)
+	in2 := node.BuildInput(node.In2, node.TypeString, nil, body.Inputs, false, false)
 	enable := node.BuildInput(node.Enable, node.TypeBool, true, body.Inputs, false, false)
 	onlyRunOnStart := node.BuildInput(node.RunOnStartOnce, node.TypeBool, nil, body.Inputs, false, false)
-	dynamicInputs = append(dynamicInputs, enable, onlyRunOnStart)
-	inputs := node.BuildInputs(dynamicInputs...)
+	inputs := node.BuildInputs(in1, in2, enable, onlyRunOnStart)
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	body.SetSchema(buildSchema())
@@ -85,9 +84,16 @@ func (inst *Func) Process() {
 		Script: code,
 		Enable: true,
 	}
+
 	props["RQL"] = rule
-	in1 := inst.ReadPin(node.In1)
-	in2 := inst.ReadPin(node.In2)
+	updatedIn1, _, in1 := inst.InputUpdated(node.In1)
+	if updatedIn1 {
+		fmt.Println("IN1 @@@@@@@@@@@@@@@", updatedIn1, in1)
+	}
+	updatedIn2, _, in2 := inst.InputUpdated(node.In2)
+	if updatedIn2 {
+		fmt.Println("IN2 @@@@@@@@@@@@@@@", updatedIn2, in2)
+	}
 
 	nodeInputs := map[string]interface{}{"in1": in1, "in2": in2}
 	props["input"] = nodeInputs

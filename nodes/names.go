@@ -42,9 +42,10 @@ const (
 	round      = "round"
 	waveform   = "waveform"
 
-	dataStore   = "data-store"
-	jsonFilter  = "json-filter"
-	jsonBuilder = "json-builder"
+	dataStore         = "data-store"
+	jsonFilter        = "json-filter"
+	jsonBuilder       = "json-string-builder"
+	jsonNumberBuilder = "json-number-builder"
 
 	flowNetwork    = "flow-network"
 	flowPoint      = "flow-point"
@@ -73,9 +74,12 @@ const (
 	hysteresis  = "hysteresis"
 	funcNode    = "func"
 
-	conversionString = "conversion-string"
-	conversionNum    = "conversion-number"
-	conversionBool   = "conversion-boolean"
+	// conversion
+	conversionString     = "conversion-string"
+	conversionNum        = "conversion-number"
+	conversionBool       = "conversion-boolean"
+	conversionString2Num = "conversion-string-to-num"
+	conversionNum2Str    = "conversion-number-to-string"
 
 	max       = "max"
 	min       = "min"

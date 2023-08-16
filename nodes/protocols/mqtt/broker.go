@@ -157,7 +157,7 @@ func (inst *Broker) publish() {
 		if p != "" {
 			if mqttTopic == payload.Topic || useBodyTopic {
 				if inst.mqttClient != nil {
-					updated, _ := n.InputUpdated(node.Message)
+					updated, _, _ := n.InputUpdated(node.Message)
 					if updated {
 						err := inst.mqttClient.Publish(mqttTopic, mqttQOS, mqttRetain, bodyPayload)
 						if err != nil {

@@ -2,8 +2,28 @@ package rules
 
 import (
 	"fmt"
+	"github.com/thedevsaddam/gojsonq/v2"
 	"testing"
 )
+
+func TestFilterTest(t *testing.T) {
+	body := `{"in1":"{\"in1\":\"107.00\",\"in2\":\"2\",\"in3\":null,\"in4\":null,\"in5\":null,\"in6\":null,\"in7\":null,\"in8\":null,\"in9\":null,\"in10\":null}","in2":"33","in3":null,"in4":null,"in5":null,"in6":null,"in7":null,"in8":null,"in9":null,"in10":null}`
+	// body = `{\"in1\":\"107.00\",\"in2\":\"2\",\"in3\":null,\"in4\":null,\"in5\":null,\"in6\":null,\"in7\":null,\"in8\":null,\"in9\":null,\"in10\":null}`
+
+	// body := `{"name":{"first":"Janet","last":"Prichard"},"age":47}`
+	// value := gjson.Get(body, "in1")
+	// // value2 := gjson.Get(value.String(), "")
+	//
+	// fmt.Println(value.String())
+
+	// const json = `{"name":{"first":"Tom","last":"Hanks"},"age":61}`
+	name := gojsonq.New().FromString(body).Find("in1")
+	name2 := gojsonq.New().FromString(fmt.Sprint(name)).Find("in1")
+
+	fmt.Println(name2)
+	fmt.Println(name)
+
+}
 
 func TestNewRuleEngine(t *testing.T) {
 

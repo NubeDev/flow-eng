@@ -55,7 +55,7 @@ func (inst *Ping) ping(ipList []string) {
 }
 
 func (inst *Ping) Process() {
-	firstLoop, trigger := inst.InputUpdated(node.TriggerInput)
+	firstLoop, trigger, _ := inst.InputUpdated(node.TriggerInput)
 	read := inst.ReadPin(node.Ip)
 	var ipList []string
 	err := json.Unmarshal([]byte(read.(string)), &ipList)
