@@ -158,4 +158,6 @@ const (
 	outputFloat  = "output-float"
 	outputBool   = "output-boolean"
 	outputString = "output-string"
+
+	rqlGet = "rql-get"
 )

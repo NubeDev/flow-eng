@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/NubeDev/flow-eng/nodes/notify"
 	broker2 "github.com/NubeDev/flow-eng/nodes/protocols/mqtt"
+	"github.com/NubeDev/flow-eng/nodes/rql"
 	"github.com/NubeDev/flow-eng/nodes/trigger"
 
 	"github.com/NubeDev/flow-eng/db"
@@ -204,6 +205,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	// rest
 	writeNode, _ := rest.NewHttpWrite(nil)
+	rqlGet, _ := rql.NewRQLGet(nil)
 
 	if disableNodes {
 		dataStore = nil
@@ -231,6 +233,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 		node.ConvertToSpec(flowSchedule),
 
 		node.ConvertToSpec(writeNode),
+		node.ConvertToSpec(rqlGet),
 
 		node.ConvertToSpec(mqttBroker),
 		node.ConvertToSpec(mqttSub),
@@ -503,6 +506,8 @@ func builderMisc(body *node.Spec) (node.Node, error) {
 		return link.NewBoolLinkInput(body, con)
 	case linkOutputBool:
 		return link.NewBoolLinkOutput(body, con)
+	case rqlGet:
+		return rql.NewRQLGet(body)
 	}
 	return nil, nil
 }
