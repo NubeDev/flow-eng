@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const help = `
+const getHelp = `
 
 # A node used for sending HTTP/HTTPS requests
 
@@ -42,7 +42,7 @@ func NewRQLGet(body *node.Spec) (node.Node, error) {
 
 	outputs := node.BuildOutputs(out, response)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	body.SetHelp(help)
+	body.SetHelp(getHelp)
 	n := &Get{body, resty.New(), nil, false}
 	n.SetSchema(n.buildSchema())
 	return n, nil
@@ -69,7 +69,7 @@ func (inst *Get) Process() {
 func (inst *Get) processReq() {
 	inst.locked = true
 	body := &body{}
-	settings, err := inst.getSettings()
+	settings, err := getSettings(inst.GetSettings())
 	if err != nil {
 		return
 	}
@@ -147,8 +147,6 @@ func filterResults(data *rule, resultsFilter string) (any, error) {
 	if data == nil {
 		return nil, errors.New("")
 	}
-	fmt.Println(resultsFilter)
-	fmt.Println(len(data.Result))
 	results := data.Result
 	if len(results) > 0 {
 
@@ -166,18 +164,18 @@ func filterResults(data *rule, resultsFilter string) (any, error) {
 }
 
 type rule struct {
-	UUID              string   `json:"uuid"`
-	Name              string   `json:"name"`
-	LatestRunDate     string   `json:"latest_run_date"`
-	Script            string   `json:"script"`
-	Schedule          string   `json:"schedule"`
-	Enable            bool     `json:"enable"`
-	ResultStorageSize int      `json:"result_storage_size"`
-	Result            []result `json:"result"`
+	UUID              string        `json:"uuid"`
+	Name              string        `json:"name"`
+	LatestRunDate     string        `json:"latest_run_date"`
+	Script            string        `json:"script"`
+	Schedule          string        `json:"schedule"`
+	Enable            bool          `json:"enable"`
+	ResultStorageSize int           `json:"result_storage_size"`
+	Result            []rulesResult `json:"rulesResult"`
 }
 
-type result struct {
-	Result    interface{} `json:"result"`
+type rulesResult struct {
+	Result    interface{} `json:"rulesResult"`
 	Timestamp string      `json:"timestamp"`
 	Time      time.Time   `json:"time"`
 }

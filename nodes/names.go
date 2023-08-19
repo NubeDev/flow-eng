@@ -160,4 +160,5 @@ const (
 	outputString = "output-string"
 
 	rqlGet = "rql-get"
+	rqlRun = "rql-run"
 )

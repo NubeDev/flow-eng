@@ -13,12 +13,33 @@ type nodeSchema struct {
 }
 
 const (
-	resultLatest = "latest result"
-	resultOldest = "oldest result"
+	resultLatest = "latest rulesResult"
+	resultOldest = "oldest rulesResult"
 	resultAll    = "all results"
 )
 
 func (inst *Get) buildSchema() *schemas.Schema {
+	props := &nodeSchema{}
+	props.Rule.Title = "Enter rule by name"
+
+	props.Results.Title = "selected results"
+	props.Results.Default = resultLatest
+	opts := []string{resultLatest, resultOldest, resultAll}
+	props.Results.Options = opts
+	props.Results.EnumName = opts
+
+	schema.Set(props)
+	s := &schemas.Schema{
+		Schema: schemas.SchemaBody{
+			Title:      "RQL get rule",
+			Properties: props,
+		},
+		UiSchema: nil,
+	}
+	return s
+}
+
+func (inst *Run) buildSchema() *schemas.Schema {
 	props := &nodeSchema{}
 	props.Rule.Title = "Enter rule by name"
 
@@ -44,8 +65,7 @@ type nodeSettings struct {
 	Results string `json:"results"`
 }
 
-func (inst *Get) getSettings() (*nodeSettings, error) {
-	body := inst.GetSettings()
+func getSettings(body map[string]interface{}) (*nodeSettings, error) {
 	settings := &nodeSettings{}
 	marshal, err := json.Marshal(body)
 	if err != nil {

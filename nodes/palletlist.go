@@ -206,6 +206,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 	// rest
 	writeNode, _ := rest.NewHttpWrite(nil)
 	rqlGet, _ := rql.NewRQLGet(nil)
+	rqlRun, _ := rql.NewRQLRun(nil)
 
 	if disableNodes {
 		dataStore = nil
@@ -234,6 +235,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(writeNode),
 		node.ConvertToSpec(rqlGet),
+		node.ConvertToSpec(rqlRun),
 
 		node.ConvertToSpec(mqttBroker),
 		node.ConvertToSpec(mqttSub),
@@ -508,6 +510,8 @@ func builderMisc(body *node.Spec) (node.Node, error) {
 		return link.NewBoolLinkOutput(body, con)
 	case rqlGet:
 		return rql.NewRQLGet(body)
+	case rqlRun:
+		return rql.NewRQLRun(body)
 	}
 	return nil, nil
 }
