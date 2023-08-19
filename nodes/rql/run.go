@@ -3,7 +3,6 @@ package rql
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/NubeDev/flow-eng/helpers/pprint"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/go-resty/resty/v2"
 	"github.com/tidwall/gjson"
@@ -72,9 +71,6 @@ func (inst *Run) processReq(bodyAsString string) {
 	url := runRule(settings.Name)
 	get, err := inst.httpPost(url, inputBody)
 	inst.locked = false
-	fmt.Println(get.String())
-	fmt.Println(get.Status())
-
 	if get == nil {
 		return
 	}
@@ -106,8 +102,6 @@ func (inst *Run) httpPost(url string, body *runExistingBody) (*resty.Response, e
 	if body != nil {
 		inputBody = body
 	}
-	fmt.Println("#############")
-	pprint.PrintJSON(inputBody)
 	return inst.httpCommon(body).
 		SetBody(inputBody).
 		Post(url)
