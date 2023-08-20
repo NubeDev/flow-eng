@@ -33,7 +33,7 @@ func NewRQLRun(body *node.Spec) (node.Node, error) {
 
 	outputs := node.BuildOutputs(out, response)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	body.SetHelp(getHelp)
+	body.SetHelp(runHelp)
 	n := &Run{body, resty.New(), nil, false}
 	n.SetSchema(n.buildSchema())
 	return n, nil

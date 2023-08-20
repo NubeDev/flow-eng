@@ -1,67 +1,10 @@
 package rules
 
 import (
-	"encoding/json"
-	"fmt"
-	"github.com/tidwall/gjson"
 	"math"
 	"math/rand"
 	"time"
 )
-
-func (inst *RQL) JSONFilter(body string, filter string) (interface{}, error) {
-	// var m interface{}
-	// err := mapstructure.Decode(body, &m)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-	// gjson.Parse(body)
-
-	// if err := json.Unmarshal([]byte(body), &m); err != nil {
-	// 	// return nil, err
-	// 	fmt.Println(err)
-	// }
-	//
-	// fmt.Println(m)
-
-	value := gjson.Get(body, filter)
-
-	return value.Value(), nil
-}
-
-func (inst *RQL) Parse(body string) (interface{}, error) {
-	// var m interface{}
-	// err := mapstructure.Decode(body, &m)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-	// gjson.Parse(body)
-
-	// if err := json.Unmarshal([]byte(body), &m); err != nil {
-	// 	// return nil, err
-	// 	fmt.Println(err)
-	// }
-	//
-	// fmt.Println(m)
-
-	m, ok := gjson.Parse(body).Value().(interface{})
-	fmt.Println(m)
-	fmt.Println(ok)
-	if !ok {
-
-		// not a map
-	}
-
-	return m, nil
-}
-
-func (inst *RQL) Stringify(body interface{}) (string, error) {
-	b, err := json.Marshal(body)
-	if err != nil {
-		return "", nil
-	}
-	return string(b), nil
-}
 
 // RandInt returns a random int within the specified range.
 func (inst *RQL) RandInt(range1, range2 int) int {

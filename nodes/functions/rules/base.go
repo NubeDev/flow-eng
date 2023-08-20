@@ -25,9 +25,12 @@ type PropertiesMap map[string]interface{}
 type State string
 
 const (
-	Processing State = "Processing"
-	Disabled   State = "Disabled"
-	Completed  State = "Completed"
+	Processing            State = "processing"
+	Disabled              State = "disabled"
+	Completed             State = "completed"
+	Bypass                State = "bypass"
+	InputValuesNotUpdated State = "input values not updated"
+	Error                 State = "error"
 )
 
 type Rule struct {
@@ -96,6 +99,17 @@ func (inst *RuleEngine) AddRule(body *RQL, props PropertiesMap) error {
 
 func (inst *RuleEngine) GetRules() (RuleMap, error) {
 	return inst.rules, nil
+}
+
+func (inst *RuleEngine) GetRuleState(name string) (State, error) {
+	rule, ok := inst.rules[name]
+	if !ok {
+		return Error, errors.New(fmt.Sprintf("rule:%s does not exist", name))
+	}
+	if rule == nil {
+		return Error, nil
+	}
+	return rule.State, nil
 }
 
 func (inst *RuleEngine) GetRule(name string) (*Rule, error) {
@@ -222,12 +236,13 @@ func (inst *RuleEngine) execute(name string, props PropertiesMap, reset bool) (g
 	rule.lock = true
 	rule.State = Processing
 	v, err := rule.vm.RunString(rule.script)
+	if err != nil {
+		return nil, err
+	}
 	rule.lock = false
 	rule.TimeTaken = time.Since(start).String()
 	rule.State = Completed
 	rule.TimeCompleted = time.Now()
-	nextTime, err := ttime.AdjustTime(rule.TimeCompleted, rule.Schedule)
-	rule.NextTimeScheduled = nextTime
 	if reset {
 		err = inst.resetRule(name, props)
 	}

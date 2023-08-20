@@ -73,6 +73,7 @@ func (inst *TimedTrigger) init() {
 		scheduler.Every(inst.every).Day().Do(inst.job)
 	}
 	inst.setSubtitle(timeUnits)
+	scheduler.Start()
 }
 
 func (inst *TimedTrigger) setSubtitle(timeUnits string) {
