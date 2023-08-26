@@ -83,12 +83,11 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 	var application = opts.Application
 	var err error
 	body = node.Defaults(body, serverNode, category)
-	stats := node.BuildOutput(node.Msg, node.TypeString, nil, body.Outputs)
 	deviceError1 := node.BuildOutput(devStats1, node.TypeString, nil, body.Outputs)
 	deviceError2 := node.BuildOutput(devStats2, node.TypeString, nil, body.Outputs)
 	deviceError3 := node.BuildOutput(devStats3, node.TypeString, nil, body.Outputs)
 	deviceError4 := node.BuildOutput(devStats4, node.TypeString, nil, body.Outputs)
-	outputs := node.BuildOutputs(stats, deviceError1, deviceError2, deviceError3, deviceError4)
+	outputs := node.BuildOutputs(deviceError1, deviceError2, deviceError3, deviceError4)
 	body.IsParent = true
 	body = node.BuildNode(body, nil, outputs, body.Settings)
 	clients := &clients{}
@@ -160,23 +159,12 @@ func (inst *Server) Process() {
 			}
 		}
 	}
-	message := fmt.Sprintf("%s %s", pollStats(inst.pollingCount), inst.deviceSelectionCount)
-	inst.WritePin(node.Msg, message)
+	message := fmt.Sprintf("poll count: %s", pollStats(inst.pollingCount))
+	inst.SetSubTitle(message)
 	inst.WritePin(devStats1, deviceMsg(inst.devStats1, inst.devAddr1))
 	inst.WritePin(devStats2, deviceMsg(inst.devStats2, inst.devAddr2))
 	inst.WritePin(devStats3, deviceMsg(inst.devStats3, inst.devAddr3))
 	inst.WritePin(devStats4, deviceMsg(inst.devStats4, inst.devAddr4))
-
-	inst.SetSubTitle("hello title")
-
-	inst.SetStatusError(fmt.Sprintf("failed to set serial port: %s", "port"))
-	inst.SetErrorIcon(string(emoji.RedCircle))
-
-	inst.SetWaringMessage("waring")
-	inst.SetWaringIcon(string(emoji.OrangeCircle))
-
-	inst.SetNotifyMessage("SetNotifyMessage")
-	inst.SetNotifyIcon(string(emoji.GreenCircle))
 
 }
 
@@ -205,8 +193,8 @@ func (inst *Server) setWaringMessage(message string, clear bool) {
 	if clear {
 		inst.SetStatusMessage("")
 	}
-	// inst.SetWaringMessage(message)
-	// inst.SetWaringIcon(string(emoji.OrangeCircle))
+	inst.SetWaringMessage(message)
+	inst.SetWaringIcon(string(emoji.OrangeCircle))
 }
 
 func (inst *Server) setStatusMessage(message string, clear bool) {
@@ -220,9 +208,11 @@ func (inst *Server) setStatusMessage(message string, clear bool) {
 func (inst *Server) setStatusError(message string, clear bool) {
 	if clear {
 		inst.SetStatusError("")
+	} else {
+		inst.SetStatusError(message)
+		inst.SetErrorIcon(string(emoji.RedCircle))
 	}
-	// inst.SetStatusError(message)
-	// inst.SetErrorIcon(string(emoji.RedCircle))
+
 }
 
 func (inst *Server) writePV(objType points.ObjectType, id points.ObjectID, value float64) error {

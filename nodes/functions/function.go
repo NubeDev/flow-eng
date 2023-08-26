@@ -83,17 +83,20 @@ func (inst *Func) process() {
 
 	if inst.disable() {
 		inst.writeValues(nil, rules.Disabled)
+		inst.lockNode(false)
 		return
 	}
 	if inst.allowToRunFirstLoop() { // only execute on the first loop
 	} else {
 		inst.writeValues(nil, rules.Completed)
+		inst.lockNode(false)
 		return
 	}
 
 	code, err := getSettings(inst.Settings)
 	if err != nil {
 		inst.writeValues(err, rules.Error)
+		inst.lockNode(false)
 		return
 	}
 
@@ -113,6 +116,7 @@ func (inst *Func) process() {
 
 	if !updatedIn1 && !updatedIn2 { // write the last value
 		inst.writeValues(err, rules.InputValuesNotUpdated)
+		inst.lockNode(false)
 		return
 	}
 
@@ -122,17 +126,20 @@ func (inst *Func) process() {
 	err = inst.eng.AddRule(rule, props)
 	if err != nil {
 		inst.writeValues(err, rules.Error)
+		inst.lockNode(false)
 		return
 	}
 
 	res, err := inst.eng.ExecuteAndRemove(name, props, true)
 	if err != nil {
 		inst.writeValues(err, rules.Error)
+		inst.lockNode(false)
 		return
 	}
 	inst.lastResult = res.String()
 	inst.writeValues(nil, rules.Completed)
 	inst.lockCount = 0
+	inst.lockNode(false)
 
 }
 
@@ -147,12 +154,6 @@ func (inst *Func) writeValues(err error, state rules.State) {
 		inst.WritePin(node.Msg, fmt.Sprintf("%s %d", state, inst.lockCount))
 	} else {
 		inst.WritePin(node.Msg, state)
-	}
-
-	if state == rules.Completed {
-		inst.lockNode(false)
-	} else {
-		inst.lockNode(true)
 	}
 }
 
