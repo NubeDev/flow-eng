@@ -92,6 +92,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 	conversionString, _ := conversion.NewString(nil)
 	conversionNum, _ := conversion.NewNumber(nil)
+	conversionUnit, _ := conversion.NewUnits(nil)
 	conversionString2Num, _ := conversion.NewStr2Num(nil)
 	conversionNum2Str, _ := conversion.NewNum2Str(nil)
 	conversionBool, _ := conversion.NewBoolean(nil)
@@ -260,6 +261,7 @@ func All() []*node.Spec { // get all the nodes, will be used for the UI to list 
 
 		node.ConvertToSpec(conversionString),
 		node.ConvertToSpec(conversionNum),
+		node.ConvertToSpec(conversionUnit),
 		node.ConvertToSpec(conversionString2Num),
 		node.ConvertToSpec(conversionNum2Str),
 		node.ConvertToSpec(conversionBool),
@@ -708,6 +710,8 @@ func builderConversion(body *node.Spec) (node.Node, error) {
 		return conversion.NewStr2Num(body)
 	case conversionNum2Str:
 		return conversion.NewNum2Str(body)
+	case conversionUnit:
+		return conversion.NewUnits(body)
 	}
 	return nil, nil
 }

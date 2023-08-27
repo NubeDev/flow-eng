@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-const timeTriggerDesc = "this is a node guide"
+const timeTriggerDesc = `node used for triggering an true/false value as per the node settings`
 
 type TimedTrigger struct {
 	*node.Spec
@@ -28,7 +28,6 @@ func NewTimedTrigger(body *node.Spec) (node.Node, error) {
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs, node.SetOutputHelp(node.OutHelp))
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-
 	n := &TimedTrigger{body, false, 0, 0}
 	n.SetSchema(n.buildSchema())
 	n.SetHelp(timeTriggerDesc)

@@ -32,6 +32,7 @@ require (
 )
 
 require (
+	github.com/NubeIO/lib-units v0.0.1 // indirect
 	github.com/NubeIO/nubeio-rubix-lib-helpers-go v0.2.7 // indirect
 	github.com/dlclark/regexp2 v1.7.0 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect

@@ -5,6 +5,8 @@ github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03
 github.com/Masterminds/semver/v3 v3.1.1/go.mod h1:VPu/7SZ7ePZ3QOrcuXROw5FAcLl4a0cBrbBpGY/8hQs=
 github.com/NubeIO/lib-schema v0.2.18 h1:PmoZAdZFg22zZaXO29hYRL5a/IwZPXAEM9okY5x0A4M=
 github.com/NubeIO/lib-schema v0.2.18/go.mod h1:TGKDA6IIWHDwr5Aabawj6FF7NXUWXqu4ozWfph/hIjw=
+github.com/NubeIO/lib-units v0.0.1 h1:YPpJ3crb445vyB4CID480ns1umKkENYgjKunNeTmjV4=
+github.com/NubeIO/lib-units v0.0.1/go.mod h1:sbzVQrq5nOdwUvOqH395v7u3qcnqVNt+0yGBa2yZztM=
 github.com/NubeIO/module-core-rql v0.0.0-20230808031702-4f5f7b9389af h1:2VaFOVxRRnkGcwSb3LxQeuCzIFJlWrecoGIWtUNYtkI=
 github.com/NubeIO/module-core-rql v0.0.0-20230808031702-4f5f7b9389af/go.mod h1:5Bj+rkF5Oh8mxlUs2HMssbOGZvNH85VglS0arFwZ3fs=
 github.com/NubeIO/nubeio-rubix-lib-helpers-go v0.2.7 h1:QKgcOjDkVujyAXWK+OysVFnQKzpZx335vGPG95UNXuI=

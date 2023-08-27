@@ -80,6 +80,7 @@ const (
 	conversionBool       = "conversion-boolean"
 	conversionString2Num = "conversion-string-to-num"
 	conversionNum2Str    = "conversion-number-to-string"
+	conversionUnit       = "conversion-unit"
 
 	max       = "max"
 	min       = "min"
