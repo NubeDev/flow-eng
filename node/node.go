@@ -4,6 +4,7 @@ import (
 	"github.com/NubeDev/flow-eng/db"
 	"github.com/NubeDev/flow-eng/helpers/settings"
 	"github.com/NubeDev/flow-eng/helpers/store"
+	"github.com/NubeDev/flow-eng/rubixos"
 	"github.com/NubeDev/flow-eng/schemas"
 	"time"
 )
@@ -106,6 +107,7 @@ type Node interface {
 	GetPayloadType() DataTypes
 	SetDynamicInputs()
 	SetDynamicOutputs()
+	GetRubixOSConfig() (*rubixos.Config, error)
 }
 
 func New(id, name, nodeName string, meta *Metadata, settings map[string]interface{}) *Spec {
@@ -376,6 +378,10 @@ func (n *Spec) GetDisplay() string {
 
 func (n *Spec) SetDisplay(body string) {
 	n.Info.Display = body
+}
+
+func (n *Spec) GetRubixOSConfig() (*rubixos.Config, error) {
+	return rubixos.GetConfig()
 }
 
 type Info struct {

@@ -2,7 +2,9 @@ package modbuscli
 
 import (
 	"errors"
+	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeIO/nubeio-rubix-lib-modbus-go/modbus"
+	"github.com/martinlindhe/unit"
 )
 
 func tempRegs() (start int, count int) {
@@ -54,7 +56,7 @@ func decodeDIs(in []bool) [8]float64 {
 	return out
 }
 
-func (inst *Modbus) ReadTemps(slave int) (raw [8]float64, err error) {
+func (inst *Modbus) ReadTemps(slave int, isImperial bool) (raw [8]float64, err error) {
 	start, count := tempRegs()
 	registers, _, err := inst.readRegisters(slave, start, count, false, false)
 	if err != nil {
@@ -63,7 +65,12 @@ func (inst *Modbus) ReadTemps(slave int) (raw [8]float64, err error) {
 	if len(registers) < 8 {
 		return raw, errors.New("read length must be 8")
 	}
-	return convert(registers), err
+	asC := convert(registers)
+	if isImperial {
+		asF := convertTempToImperial(asC)
+		return asF, nil
+	}
+	return asC, err
 }
 
 func (inst *Modbus) ReadDIs(slave int) (raw [8]float64, err error) {
@@ -121,6 +128,15 @@ func convert(raw []byte) [8]float64 {
 		out[i] = DecodeUI(u)
 	}
 	// log.Print(out)
+	return out
+}
+
+func convertTempToImperial(temps [8]float64) [8]float64 {
+	var out [8]float64
+	for i, u := range temps {
+		v := unit.FromCelsius(u).Fahrenheit()
+		out[i] = float.RoundTo(v, 2)
+	}
 	return out
 }
 

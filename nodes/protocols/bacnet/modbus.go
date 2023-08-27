@@ -242,7 +242,7 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 			}
 
 			if !completedTemp && (point.IoType == points.IoTypeTemp) {
-				tempList, err = cli.ReadTemps(slaveId) // DO MODBUS READ FOR TEMPS OR DIs
+				tempList, err = cli.ReadTemps(slaveId, inst.isImperial) // DO MODBUS READ FOR TEMPS OR DIs
 				if err != nil {
 					log.Errorf("modbus read temp %s slave: %d", err.Error(), slaveId)
 				} else {

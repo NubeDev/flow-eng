@@ -28,6 +28,7 @@ require (
 	github.com/thedevsaddam/gojsonq/v2 v2.5.2
 	github.com/tidwall/buntdb v1.2.8
 	github.com/tidwall/gjson v1.14.4
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -41,6 +42,7 @@ require (
 	github.com/grid-x/serial v0.0.0-20191104121038-e24bc9bf6f08 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/martinlindhe/unit v0.0.0-20230420213220-4adfd7d0a0d6 // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
 	github.com/tidwall/btree v0.7.1 // indirect
 	github.com/tidwall/grect v0.1.4 // indirect

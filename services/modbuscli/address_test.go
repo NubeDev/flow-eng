@@ -42,7 +42,7 @@ func Test_ReadTemp(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
-	registers, err := init.ReadTemps(1)
+	registers, err := init.ReadTemps(1, true)
 	if err != nil {
 		fmt.Println(err)
 		return

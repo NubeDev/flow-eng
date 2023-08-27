@@ -46,6 +46,7 @@ type Server struct {
 	devAddr2               int
 	devAddr3               int
 	devAddr4               int
+	isImperial             bool
 }
 
 var runnersLock bool
@@ -114,6 +115,7 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 		2,
 		3,
 		4,
+		false,
 	}
 	server.clients.mqttClient = opts.MqttClient
 	body.SetSchema(BuildSchemaServer())
@@ -124,6 +126,7 @@ func NewServer(body *node.Spec, opts *Bacnet) (node.Node, error) {
 }
 
 func (inst *Server) Process() {
+
 	loopCount, firstLoop := inst.Loop()
 	if firstLoop {
 		inst.setDeviceCount()
@@ -134,6 +137,13 @@ func (inst *Server) Process() {
 		go inst.subscribe()
 		go inst.mqttReconnect()
 		inst.deviceSelectionCount = inst.getDeviceCount()
+
+		config, err := inst.GetRubixOSConfig()
+		if err == nil {
+			if config != nil {
+				inst.isImperial = config.UnitsImperial
+			}
+		}
 	}
 	if loopCount == 3 { // publish all the point names
 		p, ok := inst.getPoints()
