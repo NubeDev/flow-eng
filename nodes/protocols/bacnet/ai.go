@@ -111,7 +111,11 @@ func (inst *AI) setObjectId(settings *AISettings) {
 	name := bacnetAddress(4, "AI", "UI")
 	if len(name) >= id {
 		if settings != nil {
-			ioType := strings.ReplaceAll(settings.IoType, "_", " ")
+			ioTypeClean := settings.IoType
+			if ioTypeClean == string(points.IoTypeTemp) {
+				ioTypeClean = "TEMP"
+			}
+			ioType := strings.ReplaceAll(ioTypeClean, "_", " ")
 			inst.SetSubTitle(strings.ToUpper(fmt.Sprintf("%s %s", name[id-1], ioType)))
 		} else {
 			inst.SetSubTitle(name[id-1])
