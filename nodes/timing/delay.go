@@ -62,12 +62,10 @@ func (inst *Delay) Process() {
 		inputFloatPtr = nil
 	}
 
-	// delayDuration, _ := inst.ReadPinAsTimeSettings(node.Delay)
 	if inst.delayDuration != inst.lastDelay {
 		inst.lastDelay = inst.delayDuration
 	}
 
-	// if (inputFloatPtr == nil && inst.lastValue != nil) || (inputFloatPtr != nil && inst.lastValue == nil) || *inputFloatPtr != *inst.lastValue {
 	if !float.ComparePtrValues(inst.lastValue, inputFloatPtr) {
 
 		newDelay := &DelayTimer{false, nil}
@@ -157,7 +155,7 @@ func (inst *Delay) setSubtitle() {
 	if settings == nil {
 		return
 	}
-	inst.SetSubTitle(fmt.Sprintf("%f %s", float.RoundTo(settings.Delay, 2), settings.DelayTimeUnits))
+	inst.SetSubTitle(fmt.Sprintf("%s %s", fmt.Sprint(float.RoundTo(settings.Delay, 2)), settings.DelayTimeUnits))
 }
 
 // Custom Node Settings Schema
