@@ -46,7 +46,10 @@ const (
 	InString  InputName = "string"
 	InBoolean InputName = "boolean"
 
-	Enable InputName = "enable"
+	Enable         InputName = "enable"
+	EnableHelp     InputHelp = "if true will allow the node to execute its logic"
+	RunOnStart     InputName = "run-on-start"
+	RunOnStartOnce InputName = "run-once"
 
 	MinOnTime  InputName = "min-on-time"
 	MinOffTime InputName = "min-off-time"
@@ -84,6 +87,11 @@ const (
 	In2  InputName = "in2"
 	In3  InputName = "in3"
 	In4  InputName = "in4"
+	In5  InputName = "in5"
+	In6  InputName = "in6"
+	In7  InputName = "in7"
+	In8  InputName = "in8"
+	In9  InputName = "in9"
 	In10 InputName = "in10"
 	In11 InputName = "in11"
 	In12 InputName = "in12"
@@ -111,6 +119,7 @@ const (
 	X10 InputName = "x10"
 
 	In        InputName = "input"
+	InHelp    InputHelp = "node input value to be processed"
 	Match     InputName = "match"
 	Value     InputName = "value"
 	Threshold InputName = "threshold"
@@ -125,9 +134,10 @@ const (
 	Message      InputName = "message"
 	Subject      InputName = "subject"
 
-	Filter   InputName = "filter"
-	Body     InputName = "body"
-	Equation InputName = "equation"
+	Filter     InputName = "filter"
+	FilterHelp InputHelp = "filter"
+	Body       InputName = "body"
+	Equation   InputName = "equation"
 
 	Ip          InputName = "ip"
 	Time        InputName = "time"
@@ -229,9 +239,13 @@ const (
 	Month      OutputName = "month"
 	Year       OutputName = "year"
 
-	OutTopic OutputName = "topic"
-	Out      OutputName = "output"
-	Elapsed  OutputName = "elapsed"
+	OutTopic    OutputName = "topic"
+	Out         OutputName = "output"
+	OutHelp     OutputHelp = "the result payload of the node processed calculation"
+	CurrentTime OutputName = "current-time"
+	Response    OutputName = "response"
+	OnStart     OutputName = "on-start"
+	Elapsed     OutputName = "elapsed"
 
 	MinOutput OutputName = "min"
 	MaxOutput OutputName = "max"
@@ -240,7 +254,8 @@ const (
 	LastUpdated     OutputName = "last-updated"
 	CurrentPriority OutputName = "current-priority"
 
-	Connected OutputName = "connected"
+	Connected     OutputName = "connected"
+	ConnectedHelp OutputHelp = "will be true if connected to service and false if not"
 
 	CountOut OutputName = "count"
 	OutEqTo  OutputName = "out=to"

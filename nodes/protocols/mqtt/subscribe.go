@@ -1,8 +1,8 @@
 package broker
 
-import (
-	"github.com/NubeDev/flow-eng/node"
-)
+import "github.com/NubeDev/flow-eng/node"
+
+const subHelp = `A node for subscribing to an MQTT topic and message to a broker. (must be added inside the MQTT broker node)`
 
 type MqttSub struct {
 	*node.Spec
@@ -11,10 +11,11 @@ type MqttSub struct {
 
 func NewMqttSub(body *node.Spec, _ ...any) (node.Node, error) {
 	body = node.Defaults(body, mqttSub, Category)
-	top := node.BuildInput(node.Topic, node.TypeString, nil, body.Inputs, false, false)
+	top := node.BuildInput(node.Topic, node.TypeString, nil, body.Inputs, false, false, node.SetInputHelp("mqtt topic example: my/topic"))
 	inputs := node.BuildInputs(top)
-	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
+	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs, node.SetOutputHelp(node.OutHelp)))
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
+	body.SetHelp(subHelp)
 	return &MqttSub{body, ""}, nil
 }
 
@@ -28,15 +29,15 @@ func (inst *MqttSub) set() {
 		s.Set(parentId, &mqttStore{
 			parentID: parentId,
 			payloads: []*mqttPayload{&mqttPayload{
-				nodeUUID: nodeUUID,
-				topic:    inst.topic,
+				NodeUUID: nodeUUID,
+				Topic:    inst.topic,
 			}},
 		}, 0)
 	} else {
 		mqttData = d.(*mqttStore)
 		payload := &mqttPayload{
-			nodeUUID: nodeUUID,
-			topic:    inst.topic,
+			NodeUUID: nodeUUID,
+			Topic:    inst.topic,
 		}
 		mqttData, _ = addUpdatePayload(nodeUUID, mqttData, payload)
 		s.Set(parentId, mqttData, 0)

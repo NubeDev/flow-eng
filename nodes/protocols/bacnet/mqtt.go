@@ -9,7 +9,6 @@ import (
 	"github.com/NubeDev/flow-eng/helpers/topics"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/enescakir/emoji"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -24,10 +23,10 @@ func (inst *Server) mqttReconnect() {
 		if err != nil {
 			log.Errorf("bacnet-server failed to reconnect with mqtt broker")
 			inst.reconnectedOk = false
-			inst.SetWaringMessage("bacnet-server failed to reconnect with mqtt broker")
-			inst.SetWaringIcon(string(emoji.OrangeCircle))
+			inst.setWaringMessage("bacnet-server failed to reconnect with mqtt broker", false)
 		} else {
 			inst.reconnectedOk = true
+			inst.setWaringMessage("", true)
 		}
 	}
 	inst.pingLock = false

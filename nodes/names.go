@@ -42,8 +42,10 @@ const (
 	round      = "round"
 	waveform   = "waveform"
 
-	dataStore  = "data-store"
-	jsonFilter = "json-filter"
+	dataStore         = "data-store"
+	jsonFilter        = "json-filter"
+	jsonBuilder       = "json-string-builder"
+	jsonNumberBuilder = "json-number-builder"
 
 	flowNetwork    = "flow-network"
 	flowPoint      = "flow-point"
@@ -52,8 +54,7 @@ const (
 
 	flowLoopCount = "flow-loop-count"
 
-	getHttpNode   = "http-get"
-	writeHttpNode = "http-write"
+	httpNode = "http-method"
 
 	accumulationPeriod = "accumulation-period"
 	deadBandNode       = "dead-band"
@@ -73,9 +74,13 @@ const (
 	hysteresis  = "hysteresis"
 	funcNode    = "func"
 
-	conversionString = "conversion-string"
-	conversionNum    = "conversion-number"
-	conversionBool   = "conversion-boolean"
+	// conversion
+	conversionString     = "conversion-string"
+	conversionNum        = "conversion-number"
+	conversionBool       = "conversion-boolean"
+	conversionString2Num = "conversion-string-to-num"
+	conversionNum2Str    = "conversion-number-to-string"
+	conversionUnit       = "conversion-unit"
 
 	max       = "max"
 	min       = "min"
@@ -108,15 +113,17 @@ const (
 	injectNode = "inject"
 	iterate    = "iterate"
 
-	clock     = "clock"
-	date      = "date"
-	delay     = "delay"
-	delayOn   = "delay-on"
-	delayOff  = "delay-off"
-	dutyCycle = "duty-cycle"
-	minOnOff  = "min-on-off"
-	oneShot   = "one-shot"
-	stopwatch = "stopwatch"
+	clock        = "clock"
+	date         = "date"
+	delay        = "delay"
+	delayOn      = "delay-on"
+	delayOff     = "delay-off"
+	dutyCycle    = "duty-cycle"
+	minOnOff     = "min-on-off"
+	oneShot      = "one-shot"
+	stopwatch    = "stopwatch"
+	dayTrigger   = "day-trigger"
+	timedTrigger = "timed-trigger"
 
 	// switch
 	switchNode      = "switch"
@@ -152,4 +159,7 @@ const (
 	outputFloat  = "output-float"
 	outputBool   = "output-boolean"
 	outputString = "output-string"
+
+	rqlGet = "rql-get"
+	rqlRun = "rql-run"
 )

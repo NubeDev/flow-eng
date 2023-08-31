@@ -1,6 +1,7 @@
 package bacnetio
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -12,6 +13,7 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/services/mqttclient"
 	"github.com/dustin/go-humanize"
+	"github.com/enescakir/emoji"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -34,12 +36,18 @@ type Server struct {
 	firstMessageFromBacnet bool
 	deviceCount            string
 	deviceCountNumber      int
+	deviceSelectionCount   string
 	pollingCount           int64
 	finishModbusLoop       bool
 	devStats1              string
 	devStats2              string
 	devStats3              string
 	devStats4              string
+	devAddr1               int
+	devAddr2               int
+	devAddr3               int
+	devAddr4               int
+	isImperial             bool
 }
 
 var runnersLock bool
@@ -75,13 +83,11 @@ func NewServer(body *node.Spec, opts ...any) (node.Node, error) {
 	var application = bn.Application
 	var err error
 	body = node.Defaults(body, serverNode, Category)
-	outputMsg := node.BuildOutput(node.Msg, node.TypeString, nil, body.Outputs)
-	stats := node.BuildOutput(node.PollingCount, node.TypeString, nil, body.Outputs)
 	deviceError1 := node.BuildOutput(devStats1, node.TypeString, nil, body.Outputs)
 	deviceError2 := node.BuildOutput(devStats2, node.TypeString, nil, body.Outputs)
 	deviceError3 := node.BuildOutput(devStats3, node.TypeString, nil, body.Outputs)
 	deviceError4 := node.BuildOutput(devStats4, node.TypeString, nil, body.Outputs)
-	outputs := node.BuildOutputs(outputMsg, stats, deviceError1, deviceError2, deviceError3, deviceError4)
+	outputs := node.BuildOutputs(deviceError1, deviceError2, deviceError3, deviceError4)
 	body.IsParent = true
 	body = node.BuildNode(body, nil, outputs, body.Settings)
 	clients := &clients{}
@@ -97,12 +103,18 @@ func NewServer(body *node.Spec, opts ...any) (node.Node, error) {
 		false,
 		"",
 		0,
+		"",
 		0,
 		false,
 		"",
 		"",
 		"",
 		"",
+		1,
+		2,
+		3,
+		4,
+		false,
 	}
 	server.clients.mqttClient = bn.MqttClient
 	body.SetSchema(BuildSchemaServer())
@@ -113,11 +125,24 @@ func NewServer(body *node.Spec, opts ...any) (node.Node, error) {
 }
 
 func (inst *Server) Process() {
+
 	loopCount, firstLoop := inst.Loop()
 	if firstLoop {
-		go inst.setMessage()
+		inst.setDeviceCount()
+		err := inst.setDeviceAddress()
+		if err != nil {
+			log.Error(err)
+		}
 		go inst.subscribe()
 		go inst.mqttReconnect()
+		inst.deviceSelectionCount = inst.getDeviceCount()
+
+		config, err := inst.GetRubixOSConfig()
+		if err == nil {
+			if config != nil {
+				inst.isImperial = config.UnitsImperial
+			}
+		}
 	}
 	if loopCount == 3 { // publish all the point names
 		p, ok := inst.getPoints()
@@ -143,12 +168,17 @@ func (inst *Server) Process() {
 			}
 		}
 	}
-	inst.setDeviceCount()
-	inst.WritePin(node.PollingCount, pollStats(inst.pollingCount))
-	inst.WritePin(devStats1, inst.devStats1)
-	inst.WritePin(devStats2, inst.devStats2)
-	inst.WritePin(devStats3, inst.devStats3)
-	inst.WritePin(devStats4, inst.devStats4)
+	message := fmt.Sprintf("poll count: %s", pollStats(inst.pollingCount))
+	inst.SetSubTitle(message)
+	inst.WritePin(devStats1, deviceMsg(inst.devStats1, inst.devAddr1))
+	inst.WritePin(devStats2, deviceMsg(inst.devStats2, inst.devAddr2))
+	inst.WritePin(devStats3, deviceMsg(inst.devStats3, inst.devAddr3))
+	inst.WritePin(devStats4, deviceMsg(inst.devStats4, inst.devAddr4))
+
+}
+
+func deviceMsg(message string, addr int) string {
+	return fmt.Sprintf("addr: %d %s", addr, message)
 }
 
 func pollStats(pollingCount int64) string {
@@ -166,6 +196,32 @@ func (inst *Server) getPV(objType points.ObjectType, id points.ObjectID) (*float
 
 	}
 	return float.New(0), nil
+}
+
+func (inst *Server) setWaringMessage(message string, clear bool) {
+	if clear {
+		inst.SetStatusMessage("")
+	}
+	inst.SetWaringMessage(message)
+	inst.SetWaringIcon(string(emoji.OrangeCircle))
+}
+
+func (inst *Server) setStatusMessage(message string, clear bool) {
+	if clear {
+		inst.SetStatusMessage("")
+	}
+	inst.SetStatusMessage(message)
+	inst.SetNotifyIcon(string(emoji.GreenCircle))
+}
+
+func (inst *Server) setStatusError(message string, clear bool) {
+	if clear {
+		inst.SetStatusError("")
+	} else {
+		inst.SetStatusError(message)
+		inst.SetErrorIcon(string(emoji.RedCircle))
+	}
+
 }
 
 func (inst *Server) writePV(objType points.ObjectType, id points.ObjectID, value float64) error {
@@ -275,7 +331,7 @@ func (inst *Server) GetModbusWriteablePoints() *points.ModbusPoints {
 	}
 	p, _ := inst.getPoints()
 	for _, point := range p {
-		if point.ModbusDevAddr == 1 {
+		if point.DeviceNumber == 1 {
 			if point.IsWriteable {
 				out.DeviceOne = append(out.DeviceOne, point)
 				sort.Slice(out.DeviceOne[:], func(i, j int) bool { // sort by the modbus register
@@ -283,7 +339,7 @@ func (inst *Server) GetModbusWriteablePoints() *points.ModbusPoints {
 				})
 			}
 		}
-		if point.ModbusDevAddr == 2 {
+		if point.DeviceNumber == 2 {
 			if point.IsWriteable {
 				out.DeviceTwo = append(out.DeviceTwo, point)
 				sort.Slice(out.DeviceTwo[:], func(i, j int) bool { // sort by the modbus register
@@ -291,7 +347,7 @@ func (inst *Server) GetModbusWriteablePoints() *points.ModbusPoints {
 				})
 			}
 		}
-		if point.ModbusDevAddr == 3 {
+		if point.DeviceNumber == 3 {
 			if point.IsWriteable {
 				out.DeviceThree = append(out.DeviceThree, point)
 				sort.Slice(out.DeviceThree[:], func(i, j int) bool { // sort by the modbus register
@@ -299,7 +355,7 @@ func (inst *Server) GetModbusWriteablePoints() *points.ModbusPoints {
 				})
 			}
 		}
-		if point.ModbusDevAddr == 4 {
+		if point.DeviceNumber == 4 {
 			if point.IsWriteable {
 				out.DeviceFour = append(out.DeviceFour, point)
 				sort.Slice(out.DeviceFour[:], func(i, j int) bool { // sort by the modbus register
@@ -311,14 +367,23 @@ func (inst *Server) GetModbusWriteablePoints() *points.ModbusPoints {
 	return out
 }
 
-func (inst *Server) setMessage() {
-	schema, err := GetBacnetSchema(inst.GetSettings())
+func (inst *Server) setDeviceAddress() error {
+	schema, err := inst.getSchema()
 	if err != nil {
-		log.Error(err)
-		return
+		return err
 	}
-	log.Debugf("start modbus polling on port: %s", schema.Serial)
-	inst.WritePin(node.Msg, fmt.Sprintf("port:%s & %s:IO16s", schema.Serial, schema.DeviceCount))
+	if schema == nil {
+		return errors.New("failed to get bacnet-server settings")
+	}
+	inst.devAddr1 = schema.DeviceAddress1
+	inst.devAddr2 = schema.DeviceAddress2
+	inst.devAddr3 = schema.DeviceAddress3
+	inst.devAddr4 = schema.DeviceAddress4
+	return nil
+}
+
+func (inst *Server) getSchema() (*BacnetSchema, error) {
+	return GetBacnetSchema(inst.GetSettings())
 }
 
 func (inst *Server) setDevStats1(msg string) {
@@ -353,8 +418,26 @@ func (inst *Server) setDevStats4(msg string) {
 	}
 }
 
+func (inst *Server) getDeviceCount() string {
+	schema, err := inst.getSchema()
+	if err != nil {
+		return ""
+	}
+	if schema != nil {
+		return schema.DeviceCount
+	}
+	return ""
+}
+
 func (inst *Server) setDeviceCount() {
 	var count int
+	schema, err := inst.getSchema()
+	if err != nil {
+		return
+	}
+	if schema != nil {
+		inst.deviceCount = schema.DeviceCount
+	}
 	deviceCount := inst.deviceCount
 	if strings.Contains(deviceCount, "1x") {
 		count = 1

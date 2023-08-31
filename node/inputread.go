@@ -13,11 +13,10 @@ import (
 )
 
 // InputUpdated if true means that the node input value has updated
-func (n *Spec) InputUpdated(name InputName) (updated bool, boolCOV bool) {
-
+func (n *Spec) InputUpdated(name InputName) (updated bool, boolCOV bool, value interface{}) {
 	input := n.GetInput(name)
 	if input == nil {
-		return false, false
+		return false, false, nil
 	}
 	if input.values.Length() > 1 { // work out if the input has updated
 		input.values.RemoveFirst()
@@ -38,7 +37,7 @@ func (n *Spec) InputUpdated(name InputName) (updated bool, boolCOV bool) {
 		boolCOV = false
 	}
 
-	return input.updated, boolCOV
+	return input.updated, boolCOV, input.GetValue()
 
 }
 
@@ -104,7 +103,7 @@ func (n *Spec) InputHasConnectionOrValue(name InputName) bool {
 func (n *Spec) ReadPinOrSettingsFloat(name InputName) float64 {
 	name = InputName(fmt.Sprintf("[%s]", name))
 	input := n.GetInput(name)
-	useSetting := !n.InputHasConnection(name) && n.ReadPin(name) == nil && input.SettingName != ""
+	useSetting := n.readPinOrSettingsCheck(name, input)
 	if useSetting {
 		if n.Settings != nil {
 			val := reflect.ValueOf(n.Settings)
@@ -127,7 +126,7 @@ func (n *Spec) ReadPinOrSettingsFloat(name InputName) float64 {
 func (n *Spec) ReadPinOrSettingsBool(name InputName) bool {
 	name = InputName(fmt.Sprintf("[%s]", name))
 	input := n.GetInput(name)
-	useSetting := !n.InputHasConnection(name) && n.ReadPin(name) == nil && input.SettingName != ""
+	useSetting := n.readPinOrSettingsCheck(name, input)
 	if useSetting {
 		if n.Settings != nil {
 			val := reflect.ValueOf(n.Settings)
@@ -154,10 +153,18 @@ func (n *Spec) ReadPinOrSettingsBool(name InputName) bool {
 	}
 }
 
+func (n *Spec) readPinOrSettingsCheck(name InputName, input *Input) bool {
+	hasConnection := n.InputHasConnection(name)
+	pinIsNil := n.ReadPin(name) == nil
+	hasSettingName := input.SettingName != ""
+	useSetting := !hasConnection && pinIsNil && hasSettingName
+	return useSetting
+}
+
 func (n *Spec) ReadPinOrSettingsString(name InputName) string {
 	name = InputName(fmt.Sprintf("[%s]", name))
 	input := n.GetInput(name)
-	useSetting := !n.InputHasConnection(name) && n.ReadPin(name) == nil && input.SettingName != ""
+	useSetting := n.readPinOrSettingsCheck(name, input)
 	if useSetting {
 		if n.Settings != nil {
 			val := reflect.ValueOf(n.Settings)
@@ -264,7 +271,6 @@ func (n *Spec) ReadPinAsDuration(name InputName) (value time.Duration, null bool
 	if r == nil {
 		return 0, true
 	}
-	fmt.Println(r)
 	return time.Duration(conversions.GetInt(r)), false
 }
 
@@ -340,6 +346,29 @@ func (n *Spec) ReadMultiple(count int) []interface{} {
 	for i, input := range n.GetInputs() {
 		if i < count {
 			out = append(out, n.ReadPin(input.Name))
+		}
+	}
+	return out
+}
+
+type ReadMultipleInputs struct {
+	Name     InputName
+	DataType DataTypes
+	Value    interface{}
+}
+
+func (n *Spec) ReadMultipleInputs(count int) []ReadMultipleInputs {
+	var out []ReadMultipleInputs
+	for i, input := range n.GetInputs() {
+		if i < count {
+			if i < count {
+				newItem := ReadMultipleInputs{
+					Name:     input.Name,
+					DataType: input.DataType,
+					Value:    n.ReadPin(input.Name),
+				}
+				out = append(out, newItem)
+			}
 		}
 	}
 	return out

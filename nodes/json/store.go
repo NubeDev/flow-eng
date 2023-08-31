@@ -30,10 +30,8 @@ func NewStore(body *node.Spec, _ ...any) (node.Node, error) {
 }
 
 func (inst *Store) Process() {
-	updated, _ := inst.InputUpdated(node.In)
+	updated, _, _ := inst.InputUpdated(node.In)
 	add, _ := inst.ReadPinAsString(node.In)
-	// maxSize := inst.ReadPinAsInt(node.MaxSize)
-	// clear := inst.ReadPinAsInt(node.Delete)
 	if updated {
 		if add != "null" {
 			if add != "<nil>" {

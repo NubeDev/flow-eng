@@ -1,7 +1,9 @@
 package nodejson
 
 const (
-	jsonFilter = "json-filter"
-	dataStore  = "data-store"
-	Category   = "json"
+	Category          = "json"
+	jsonFilter        = "json-filter"
+	jsonBuilder       = "json-string-builder"
+	jsonNumberBuilder = "json-number-builder"
+	dataStore         = "data-store"
 )

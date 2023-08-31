@@ -4,11 +4,11 @@ import "github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
 
 type ModbusInputAddr struct {
 	BacnetAddr int `json:"bacnetAddr"`
-	DeviceAddr int `json:"modbusAddr"`
-	IoPin      int `json:"ioPin"`
-	Temp       int `json:"temp"`
-	Volt       int `json:"volt"`
-	Current    int `json:"current"`
+	// DeviceAddr int `json:"modbusAddr"`
+	IoPin   int `json:"ioPin"`
+	Temp    int `json:"temp"`
+	Volt    int `json:"volt"`
+	Current int `json:"current"`
 }
 
 func ModbusBuildOutput(ioType IoType, id ObjectID) (OutputAddr, model.ObjectType) {
@@ -70,7 +70,7 @@ func InputAddress(deviceCount int, filterByBacnet int) ([]ModbusInputAddr, Modbu
 		count++
 		for i := range ints {
 			innerCount++
-			address.DeviceAddr = count
+			// address.DeviceAddr = count
 			address.IoPin = i + ioNumber
 			address.BacnetAddr = innerCount
 			address.Temp = i + temp
@@ -93,10 +93,10 @@ func InputAddress(deviceCount int, filterByBacnet int) ([]ModbusInputAddr, Modbu
 
 type OutputAddr struct {
 	BacnetAddr int `json:"bacnetAddr"`
-	DeviceAddr int `json:"modbusAddr"`
-	IoPin      int `json:"ioPin"`
-	Relay      int `json:"relay"`
-	Volt       int `json:"volt"`
+	// DeviceAddr int `json:"modbusAddr"`
+	IoPin int `json:"ioPin"`
+	Relay int `json:"relay"`
+	Volt  int `json:"volt"`
 }
 
 func outputAddress(deviceCount int, filterByBacnet int) ([]OutputAddr, OutputAddr) {
@@ -121,7 +121,7 @@ func outputAddress(deviceCount int, filterByBacnet int) ([]OutputAddr, OutputAdd
 		count++
 		for i := range ints {
 			innerCount++
-			address.DeviceAddr = count
+			// address.DeviceAddr = count
 			address.IoPin = i + ioNumber
 			address.BacnetAddr = innerCount
 			address.Relay = i + relay

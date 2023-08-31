@@ -8,7 +8,6 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/services/modbuscli"
 	"github.com/NubeIO/nubeio-rubix-lib-modbus-go/modbus"
-	"github.com/enescakir/emoji"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -18,8 +17,6 @@ func (inst *Server) initModbus(settings map[string]interface{}) (*modbuscli.Modb
 	schema, err := GetBacnetSchema(settings)
 	if err != nil {
 		log.Error(err)
-		inst.SetStatusError("failed to set node settings")
-		inst.SetErrorIcon(string(emoji.RedCircle))
 		return nil, err
 	}
 	if schema.DeviceCount == noDevices {
@@ -38,11 +35,11 @@ func (inst *Server) initModbus(settings map[string]interface{}) (*modbuscli.Modb
 	}
 	init, err := cli.Init(cli)
 	if err != nil {
-		inst.SetStatusError(fmt.Sprintf("failed to set serial port: %s", port))
-		inst.SetErrorIcon(string(emoji.RedCircle))
+		inst.setStatusError(fmt.Sprintf("failed to set serial port: %s", port), true)
 		log.Error(err)
 		return nil, err
 	}
+	inst.setStatusError("", true)
 	return init, nil
 }
 
@@ -74,8 +71,9 @@ func (inst *Server) modbusRunner(settings map[string]interface{}) {
 		}
 		go inst.writeRunner() // publish all mqtt values
 		time.Sleep(500 * time.Millisecond)
-		inst.SetNotifyMessage(pollStats(inst.pollingCount))
-		inst.SetNotifyIcon(string(emoji.GreenCircle)) // process the outs
+		if inst.pollingCount > 10000000 {
+			inst.pollingCount = 1000
+		}
 		count++
 	}
 }
@@ -121,78 +119,101 @@ func (inst *Server) modbusOutputsDispatch(cli *modbuscli.Modbus) {
 	if pointsList == nil {
 		log.Errorf("modbus modbusOutputsDispatch() points is empty")
 		return
-
 	}
+
 	if len(pointsList.DeviceOne) > 0 {
-		err := cli.Write(1, modbusBulkWrite(pointsList.DeviceOne))
-		setReadError(1, err)
+		err := cli.Write(inst.devAddr1, modbusBulkWrite(pointsList.DeviceOne))
+		inst.setReadError(inst.devAddr1, err)
 		if err != nil {
-			log.Errorf("modbus write %s slave: %d", err.Error(), 1)
+			log.Errorf("modbus write %s slave: %d on device: 1", err.Error(), inst.devAddr1)
 		}
 		time.Sleep(modbusDelay * time.Millisecond)
 	}
 	if len(pointsList.DeviceTwo) > 0 {
-		err := cli.Write(2, modbusBulkWrite(pointsList.DeviceTwo))
-		setReadError(2, err)
+		err := cli.Write(inst.devAddr2, modbusBulkWrite(pointsList.DeviceTwo))
+		inst.setReadError(inst.devAddr2, err)
 		if err != nil {
-			log.Errorf("modbus write %s slave: %d", err.Error(), 2)
+			log.Errorf("modbus write %s slave: %d device: 2", err.Error(), inst.devAddr2)
 		}
 		time.Sleep(modbusDelay * time.Millisecond)
 	}
 	if len(pointsList.DeviceThree) > 0 {
-		err := cli.Write(3, modbusBulkWrite(pointsList.DeviceThree))
-		setReadError(3, err)
+		err := cli.Write(inst.devAddr3, modbusBulkWrite(pointsList.DeviceThree))
+		inst.setReadError(inst.devAddr3, err)
 		if err != nil {
-			log.Errorf("modbus write %s slave: %d", err.Error(), 3)
+			log.Errorf("modbus write %s slave: %d device: 3", err.Error(), inst.devAddr3)
 		}
 		time.Sleep(modbusDelay * time.Millisecond)
 	}
 	if len(pointsList.DeviceFour) > 0 {
-		err := cli.Write(4, modbusBulkWrite(pointsList.DeviceFour))
-		setReadError(4, err)
+		err := cli.Write(inst.devAddr4, modbusBulkWrite(pointsList.DeviceFour))
+		inst.setReadError(inst.devAddr4, err)
 		if err != nil {
-			log.Errorf("modbus write %s slave: %d", err.Error(), 4)
+			log.Errorf("modbus write %s slave: %d device: 4", err.Error(), inst.devAddr4)
 		}
 		time.Sleep(modbusDelay * time.Millisecond)
 	}
 }
 
-var firstLoop = true
+var firstLoopState = true
 
-var readError1 bool
-var readError2 bool
-var readError3 bool
-var readError4 bool
+type pollState string
 
-func setReadError(slaveID int, err error) {
-	if slaveID == 1 {
+const (
+	polled          pollState = "polled"
+	polledWithError pollState = "error"
+)
+
+var readError1 pollState
+var readError2 pollState
+var readError3 pollState
+var readError4 pollState
+
+func (inst *Server) setReadError(slaveID int, err error) {
+	if slaveID == inst.devAddr1 {
 		if err != nil {
-			readError1 = true
+			readError1 = polledWithError
 		} else {
-			readError1 = false
+			readError1 = polled
 		}
 	}
-	if slaveID == 2 {
+	if slaveID == inst.devAddr2 {
 		if err != nil {
-			readError2 = true
+			readError2 = polledWithError
 		} else {
-			readError2 = false
+			readError2 = polled
 		}
 	}
-	if slaveID == 3 {
+	if slaveID == inst.devAddr3 {
 		if err != nil {
-			readError3 = true
+			readError3 = polledWithError
 		} else {
-			readError3 = false
+			readError3 = polled
 		}
 	}
-	if slaveID == 4 {
+	if slaveID == inst.devAddr4 {
 		if err != nil {
-			readError4 = true
+			readError4 = polledWithError
 		} else {
-			readError4 = false
+			readError4 = polled
 		}
 	}
+}
+
+func (inst *Server) getDeviceAddress(deviceNumber int) int {
+	if deviceNumber == 1 {
+		return inst.devAddr1
+	}
+	if deviceNumber == 2 {
+		return inst.devAddr2
+	}
+	if deviceNumber == 3 {
+		return inst.devAddr3
+	}
+	if deviceNumber == 4 {
+		return inst.devAddr4
+	}
+	return 0
 }
 
 func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*points.Point) {
@@ -210,19 +231,19 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 	for _, point := range pointsList { // do modbus read
 		if !point.IsWriteable {
 			addr, _ := points.ModbusBuildInput(point.IoType, point.ObjectID)
-			slaveId = addr.DeviceAddr
+			slaveId = inst.getDeviceAddress(point.DeviceNumber)
 			io16Pin := addr.IoPin - 1
 			if slaveId <= 0 {
 				log.Errorf("modbus slave addrress cant not be less to 1")
 				continue
 			}
 
-			if firstLoop { // setup all the pulse inputs
+			if firstLoopState { // setup all the pulse inputs
 				inst.modbusPointSetup(cli, point, slaveId, addr.IoPin)
 			}
 
 			if !completedTemp && (point.IoType == points.IoTypeTemp) {
-				tempList, err = cli.ReadTemps(slaveId) // DO MODBUS READ FOR TEMPS OR DIs
+				tempList, err = cli.ReadTemps(slaveId, inst.isImperial) // DO MODBUS READ FOR TEMPS OR DIs
 				if err != nil {
 					log.Errorf("modbus read temp %s slave: %d", err.Error(), slaveId)
 				} else {
@@ -232,7 +253,7 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 						log.Errorf("modbus modbusInputsRunner() writePv %s slave: %d", err.Error(), slaveId)
 					}
 				}
-				setReadError(slaveId, err)
+				inst.setReadError(slaveId, err)
 				time.Sleep(modbusDelay * time.Millisecond)
 			}
 			if !completedVolt && point.IoType == points.IoTypeVolts {
@@ -246,7 +267,7 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 						log.Errorf("modbus modbusInputsRunner() writePv %s slave: %d", err.Error(), slaveId)
 					}
 				}
-				setReadError(slaveId, err)
+				inst.setReadError(slaveId, err)
 				time.Sleep(modbusDelay * time.Millisecond)
 			}
 			if !completedCurrent && point.IoType == points.IoTypeCurrent {
@@ -260,7 +281,7 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 						log.Errorf("modbus modbusInputsRunner() writePv %s slave: %d", err.Error(), slaveId)
 					}
 				}
-				setReadError(slaveId, err)
+				inst.setReadError(slaveId, err)
 				time.Sleep(modbusDelay * time.Millisecond)
 			}
 			// update the store
@@ -275,7 +296,7 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 						log.Errorf("modbus modbusInputsRunner() writePv %s slave: %d", err.Error(), slaveId)
 					}
 				}
-				setReadError(slaveId, err)
+				inst.setReadError(slaveId, err)
 				time.Sleep(modbusDelay * time.Millisecond)
 			}
 
@@ -290,32 +311,43 @@ func (inst *Server) modbusInputsRunner(cli *modbuscli.Modbus, pointsList []*poin
 						log.Errorf("modbus modbusInputsRunner() writePv %s slave: %d", err.Error(), slaveId)
 					}
 				}
-				setReadError(slaveId, err)
+				inst.setReadError(slaveId, err)
 				time.Sleep(modbusDelay * time.Millisecond)
 			}
 		}
 	}
-	if readError1 {
+	if readError1 == polled {
+		inst.setDevStats1("polled ok")
+	} else if readError1 == polledWithError {
 		inst.setDevStats1("offline")
 	} else {
-		inst.setDevStats1("ok")
+		inst.setDevStats1("not polled")
 	}
-	if readError2 {
+
+	if readError2 == polled {
+		inst.setDevStats2("polled ok")
+	} else if readError2 == polledWithError {
 		inst.setDevStats2("offline")
 	} else {
-		inst.setDevStats2("ok")
+		inst.setDevStats2("not polled")
 	}
-	if readError3 {
+
+	if readError3 == polled {
+		inst.setDevStats3("polled ok")
+	} else if readError3 == polledWithError {
 		inst.setDevStats3("offline")
 	} else {
-		inst.setDevStats3("ok")
+		inst.setDevStats3("not polled")
 	}
-	if readError4 {
+
+	if readError4 == polled {
+		inst.setDevStats4("polled ok")
+	} else if readError4 == polledWithError {
 		inst.setDevStats4("offline")
 	} else {
-		inst.setDevStats4("ok")
+		inst.setDevStats4("not polled")
 	}
-	firstLoop = false
+	firstLoopState = false
 }
 
 func (inst *Server) modbusPointSetup(cli *modbuscli.Modbus, point *points.Point, slaveId, ioPin int) {

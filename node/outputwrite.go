@@ -17,6 +17,16 @@ func (n *Spec) WritePin(name OutputName, value interface{}) {
 	}
 }
 
+func (n *Spec) WritePinAsString(name OutputName, value string) {
+	out := n.GetOutput(name)
+	if out == nil {
+		return
+	}
+	if name == out.Name {
+		out.Write(value)
+	}
+}
+
 func (n *Spec) WritePinNull(name OutputName) {
 	out := n.GetOutput(name)
 	if out == nil {

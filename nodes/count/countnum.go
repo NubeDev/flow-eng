@@ -19,7 +19,7 @@ func NewCountNum(body *node.Spec, _ ...any) (node.Node, error) {
 }
 
 func (inst *CountNum) Process() {
-	updated, _ := inst.InputUpdated(node.In)
+	updated, _, _ := inst.InputUpdated(node.In)
 	if updated {
 		inst.count++
 	}

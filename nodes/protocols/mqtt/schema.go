@@ -13,7 +13,11 @@ type nodeSchema struct {
 	Conn schemas.EnumString `json:"connections"`
 }
 
+const selectConnection = "Please add/select a MQTT connection"
+
 func (inst *Broker) getConnectionsNames() (names []string, uuids []string) {
+	names = append(names, selectConnection)
+	uuids = append(uuids, selectConnection)
 	connections, err := inst.Connections().GetConnections()
 	if err != nil {
 		log.Errorf("flow-networks get connections err %s", err.Error())
@@ -25,13 +29,13 @@ func (inst *Broker) getConnectionsNames() (names []string, uuids []string) {
 		uuids = append(uuids, connection.UUID)
 	}
 	return names, uuids
-
 }
 
 func (inst *Broker) buildSchema() *schemas.Schema {
 	names, uuids := inst.getConnectionsNames()
 	props := &nodeSchema{}
 	props.Conn.Title = "connections"
+	props.Conn.Help = "please add/select a new or existing connection"
 	if len(names) > 0 {
 		props.Conn.Default = names[0]
 	} else {

@@ -13,9 +13,20 @@ import (
 
 type Random struct {
 	*node.Spec
-	lastInput  bool
-	lastOutput float64
+	lastTrigger bool
+	lastOutput  float64
 }
+
+const randomHelp = `
+## Random Number
+
+When ***trigger*** transitions from ***false*** to ***true*** a random number between ***min*** and ***max*** values is produced at ***output***.
+
+Also the node will produce an random number if the input ***trigger*** is set to ***null***
+
+The number of decimal places that ‘output’ values have can be set from settings.
+
+`
 
 func NewRandom(body *node.Spec, _ ...any) (node.Node, error) {
 	body = node.Defaults(body, RandomFloat, Category)
@@ -28,7 +39,7 @@ func NewRandom(body *node.Spec, _ ...any) (node.Node, error) {
 	outputs := node.BuildOutputs(out)
 
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	body.SetHelp("When ‘trigger’ transitions from ‘false’ to ‘true’, a random number between ‘min’ and ‘max’ values is produced at ‘output’. The number of decimal places that ‘output’ values have can be set from settings.")
+	body.SetHelp(randomHelp)
 
 	n := &Random{body, true, 0}
 	n.SetSchema(n.buildSchema())
@@ -38,9 +49,9 @@ func NewRandom(body *node.Spec, _ ...any) (node.Node, error) {
 func (inst *Random) Process() {
 	min := inst.ReadPinOrSettingsFloat(node.MinInput)
 	max := inst.ReadPinOrSettingsFloat(node.MaxInput)
-	input, _ := inst.ReadPinAsBool(node.TriggerInput)
+	trigger, triggerNull := inst.ReadPinAsBool(node.TriggerInput)
 
-	if input && !inst.lastInput {
+	if (trigger && !inst.lastTrigger) || triggerNull {
 		settings, err := inst.getSettings(inst.GetSettings())
 		if err != nil {
 			log.Errorf("Random Node err: failed to get settings err:%s", err.Error())
@@ -52,7 +63,7 @@ func (inst *Random) Process() {
 		inst.WritePinFloat(node.Out, random, precision)
 		inst.lastOutput = random
 	}
-	inst.lastInput = input
+	inst.lastTrigger = trigger
 	inst.WritePinFloat(node.Out, inst.lastOutput)
 }
 

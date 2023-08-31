@@ -2,6 +2,7 @@ package nodes
 
 import (
 	"github.com/NubeDev/flow-eng/nodes/notify"
+	"github.com/NubeDev/flow-eng/nodes/rql"
 	switches "github.com/NubeDev/flow-eng/nodes/switch"
 	"github.com/NubeDev/flow-eng/nodes/trigger"
 	"github.com/NubeDev/flow-eng/pallet"
@@ -20,11 +21,11 @@ import (
 	"github.com/NubeDev/flow-eng/nodes/link"
 	"github.com/NubeDev/flow-eng/nodes/math"
 	"github.com/NubeDev/flow-eng/nodes/mathematics"
-	broker "github.com/NubeDev/flow-eng/nodes/mqtt"
 	"github.com/NubeDev/flow-eng/nodes/numtransform"
 	point "github.com/NubeDev/flow-eng/nodes/points"
 	bacnetio "github.com/NubeDev/flow-eng/nodes/protocols/bacnet"
 	"github.com/NubeDev/flow-eng/nodes/protocols/flow"
+	broker "github.com/NubeDev/flow-eng/nodes/protocols/mqtt"
 	"github.com/NubeDev/flow-eng/nodes/protocols/rest"
 	"github.com/NubeDev/flow-eng/nodes/statistics"
 	"github.com/NubeDev/flow-eng/nodes/streams"
@@ -68,6 +69,8 @@ func RegisterAllNodes() {
 	pallet.RegisterNodeBuilder(link.Category, linkOutputNum, link.NewNumLinkOutput)
 	pallet.RegisterNodeBuilder(link.Category, linkInputBool, link.NewBoolLinkInput)
 	pallet.RegisterNodeBuilder(link.Category, linkOutputBool, link.NewBoolLinkOutput)
+	pallet.RegisterNodeBuilder(rql.Category, rqlGet, rql.NewRQLGet)
+	pallet.RegisterNodeBuilder(rql.Category, rqlRun, rql.NewRQLRun)
 
 	// builderSystem
 	pallet.RegisterNodeBuilder(system.Category, flowLoopCount, system.NewLoopCount)
@@ -82,8 +85,7 @@ func RegisterAllNodes() {
 	pallet.RegisterNodeBuilder(filter.Category, preventDuplicates, filter.NewPreventDuplicates)
 
 	// builderRest
-	pallet.RegisterNodeBuilder(rest.Category, getHttpNode, rest.NewGet)
-	pallet.RegisterNodeBuilder(rest.Category, writeHttpNode, rest.NewHttpWrite)
+	pallet.RegisterNodeBuilder(rest.Category, httpNode, rest.NewHttpWrite)
 
 	// builderNotify
 	pallet.RegisterNodeBuilder(notify.Category, gmail, notify.NewGmail)
@@ -101,6 +103,8 @@ func RegisterAllNodes() {
 	// builderJson
 	pallet.RegisterNodeBuilder(nodejson.Category, jsonFilter, nodejson.NewFilter)
 	pallet.RegisterNodeBuilder(nodejson.Category, dataStore, nodejson.NewStore)
+	pallet.RegisterNodeBuilder(nodejson.Category, jsonBuilder, nodejson.NewJSONBuilder)
+	pallet.RegisterNodeBuilder(nodejson.Category, jsonNumberBuilder, nodejson.NewJSONNumberBuilder)
 
 	// builderFlowNetworks
 	pallet.RegisterNodeBuilder(flow.Category, flowNetwork, flow.NewNetwork)
@@ -148,6 +152,9 @@ func RegisterAllNodes() {
 	pallet.RegisterNodeBuilder(conversion.Category, conversionString, conversion.NewString)
 	pallet.RegisterNodeBuilder(conversion.Category, conversionNum, conversion.NewNumber)
 	pallet.RegisterNodeBuilder(conversion.Category, conversionBool, conversion.NewBoolean)
+	pallet.RegisterNodeBuilder(conversion.Category, conversionNum2Str, conversion.NewNum2Str)
+	pallet.RegisterNodeBuilder(conversion.Category, conversionString2Num, conversion.NewStr2Num)
+	pallet.RegisterNodeBuilder(conversion.Category, conversionUnit, conversion.NewUnits)
 
 	// builderSwitch
 	pallet.RegisterNodeBuilder(switches.Category, switchNode, switches.NewSwitch)
@@ -203,6 +210,8 @@ func RegisterAllNodes() {
 	pallet.RegisterNodeBuilder(timing.Category, minOnOff, timing.NewMinOnOff)
 	pallet.RegisterNodeBuilder(timing.Category, oneShot, timing.NewOneShot)
 	pallet.RegisterNodeBuilder(timing.Category, stopwatch, timing.NewStopwatch)
+	pallet.RegisterNodeBuilder(timing.Category, timedTrigger, timing.NewTimedTrigger)
+	pallet.RegisterNodeBuilder(timing.Category, dayTrigger, timing.NewDayTrigger)
 
 	// builderProtocols
 	pallet.RegisterNodeBuilder(bacnetio.Category, bacnetServer, bacnetio.NewServer)

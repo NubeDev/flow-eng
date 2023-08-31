@@ -28,11 +28,11 @@ func (inst *Number) Process() {
 		inst.WritePinNull(node.Out)
 		return
 	}
-
 	in1, null := inst.ReadPinAsFloat(node.In)
 	if null {
 		inst.WritePinNull(node.Out)
 	} else {
 		inst.WritePinFloat(node.Out, in1)
 	}
+
 }

@@ -34,6 +34,30 @@ func GetStringOk(in interface{}) (val string, ok bool) {
 	return val, true
 }
 
+func GetStringPointer(in interface{}) (val *string) {
+	switch i := in.(type) {
+	case bool:
+		val = str.New(fmt.Sprintf("%v", i))
+	case int:
+		val = str.New(fmt.Sprintf("%v", i))
+	case float64:
+		val = str.New(fmt.Sprintf("%v", i))
+	case float32:
+		val = str.New(fmt.Sprintf("%v", i))
+	case int64:
+		val = str.New(fmt.Sprintf("%v", i))
+	case uint64:
+		val = str.New(fmt.Sprintf("%v", i))
+	case string:
+		val = str.New(i)
+	case interface{}:
+		val = str.New(fmt.Sprint(in))
+	default:
+		return str.New("")
+	}
+	return val
+}
+
 func GetStringPointerOk(in interface{}) (val *string, ok bool) {
 	switch i := in.(type) {
 	case bool:

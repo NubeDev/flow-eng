@@ -33,7 +33,6 @@ var mqttQOS = mqttclient.AtMostOnce
 var mqttRetain = false
 
 func NewNetwork(body *node.Spec, _ ...any) (node.Node, error) {
-	// var err error
 	body = node.Defaults(body, flowNetwork, Category)
 	inputs := node.BuildInputs()
 	outputs := node.BuildOutputs(node.BuildOutput(node.Connected, node.TypeBool, nil, body.Outputs))
@@ -52,7 +51,7 @@ func (inst *Network) setConnection() {
 		return
 	}
 	var connection *connections.Connection
-	var connectionName = "flow framework integration over MQTT (dont not edit/delete)" // this name is set in rubix-edge-wires
+	var connectionName = "flow framework integration over MQTT (dont edit/delete)" // this name is set in rubix-edge-wires
 
 	connection, err = inst.Connections().GetConnection(settings.Conn)
 	if err != nil {
@@ -91,6 +90,7 @@ func (inst *Network) setConnection() {
 		inst.mqttConnected = true
 		inst.setError("", true, true)
 	}
+	inst.setSubTitle(fmt.Sprintf("%s:%d", connection.Host, connection.Port))
 
 }
 
@@ -101,24 +101,18 @@ func (inst *Network) GetSchema() *schemas.Schema {
 
 func (inst *Network) Process() {
 	loopCount, firstLoop := inst.Loop()
-	// log.Info("FLOW NETWORK: loopCount:", loopCount)
-	// log.Info("FLOW NETWORK: firstLoop:", firstLoop)
 	if firstLoop {
-		// log.Infof("FLOW NETWORK: LOOP 2 STORE: %+v", inst.GetStore().All())
 		go inst.setConnection()
 	}
 	if loopCount == 3 {
 		go inst.subscribeToEachPoint()
 		go inst.subscribeToMissingPoints()
-		// go inst.pointsList()
 		go inst.schedulesList()
 		go inst.publish(loopCount)
 	}
 	retry := false
 	if loopCount == 4 {
 		go inst.fetchAllPointValues()
-		// log.Infof("FLOW NETWORK: LOOP 4 STORE: %+v", inst.GetStore().All())
-		// log.Infof("FLOW NETWORK: LOOP 4 STORE Object: %+v", inst.GetStore().All()[inst.GetID()].Object)
 		retry = true
 	}
 	if loopCount > 5 && loopCount%retryCount == 0 {
@@ -138,16 +132,6 @@ func (inst *Network) Process() {
 			log.Errorf("flow-network: reset subscribe to missing points as first time failed: %d, inst.subscribeFailedMissingPoints: %v, inst.mqttConnected: %v", loopCount, inst.subscribeFailedMissingPoints, inst.mqttConnected)
 			go inst.subscribeToMissingPoints()
 		}
-		/*  Points list and Schedules list are now done in UI
-		if inst.subscribeFailedPointsList || !inst.mqttConnected {
-			log.Errorf("flow-network: reset fetch points list as first time failed: %d, inst.subscribeFailedPointsList: %v, inst.mqttConnected: %v", loopCount, inst.subscribeFailedPointsList, inst.mqttConnected)
-			go inst.pointsList()
-		}
-		if inst.subscribeFailedSchedulesList || !inst.mqttConnected {
-			log.Errorf("flow-network: reset fetch schedule list as first time failed: %d, inst.subscribeFailedSchedulesList: %v, inst.mqttConnected: %v", loopCount, inst.subscribeFailedSchedulesList, inst.mqttConnected)
-			go inst.schedulesList()
-		}
-		*/
 	}
 
 	if inst.mqttConnected && !inst.error {
@@ -159,7 +143,6 @@ func (inst *Network) Process() {
 		go inst.publish(loopCount)
 	}
 	if retry { // get the points every 50 loops
-		// inst.fetchPointsList()
 		inst.connectionError()
 		inst.fetchExistingPointValues() // refresh point COV
 	}
@@ -168,6 +151,10 @@ func (inst *Network) Process() {
 		inst.fetchSchedulesList()
 	}
 
+}
+
+func (inst *Network) setSubTitle(msg string) {
+	inst.SetSubTitle(msg)
 }
 
 func (inst *Network) setError(msg string, reset, setMQTTConnected bool) {

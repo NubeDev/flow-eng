@@ -90,8 +90,6 @@ func (inst *Stopwatch) setSubtitle(timeUnits string) {
 	inst.SetSubTitle(timeUnits)
 }
 
-// Custom Node Settings Schema
-
 type StopwatchSettingsSchema struct {
 	TimeUnits schemas.EnumString `json:"time_units"`
 }

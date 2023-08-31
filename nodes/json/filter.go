@@ -1,6 +1,7 @@
 package nodejson
 
 import (
+	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/tidwall/gjson"
 )
@@ -20,8 +21,8 @@ func NewFilter(body *node.Spec, _ ...any) (node.Node, error) {
 }
 
 func (inst *Filter) Process() {
-	in1, _ := inst.ReadPinAsString(node.In)
+	in1 := inst.ReadPin(node.In)
 	equation, _ := inst.ReadPinAsString(node.Filter)
-	value := gjson.Get(in1, equation)
+	value := gjson.Get(fmt.Sprint(in1), equation)
 	inst.WritePin(node.Out, value.Value())
 }

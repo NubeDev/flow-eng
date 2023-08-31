@@ -2,6 +2,7 @@ package timing
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/NubeDev/flow-eng/helpers/array"
@@ -17,6 +18,7 @@ type Delay struct {
 	activeDelays  []*DelayTimer
 	lastValue     *float64
 	lastDelay     time.Duration
+	delayDuration time.Duration
 	currentOutput *float64
 }
 
@@ -29,20 +31,24 @@ func NewDelay(body *node.Spec, _ ...any) (node.Node, error) {
 	body = node.Defaults(body, delay, Category)
 	enable := node.BuildInput(node.Enable, node.TypeBool, true, body.Inputs, false, false)
 	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false)
-	delayInput := node.BuildInput(node.Delay, node.TypeFloat, 1, body.Inputs, true, false)
-	inputs := node.BuildInputs(enable, in, delayInput)
+	inputs := node.BuildInputs(enable, in)
 
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	delayArray := make([]*DelayTimer, 0)
 
-	n := &Delay{body, delayArray, nil, 5 * time.Second, nil}
+	n := &Delay{body, delayArray, nil, 5 * time.Second, 0, nil}
 	n.SetSchema(n.buildSchema())
 	return n, nil
 }
 
 func (inst *Delay) Process() {
+	_, firstLoop := inst.Loop()
+	if firstLoop {
+		inst.init()
+	}
+
 	enable, _ := inst.ReadPinAsBool(node.Enable)
 	if !enable {
 		inst.ClearAllDelays()
@@ -57,17 +63,14 @@ func (inst *Delay) Process() {
 		inputFloatPtr = nil
 	}
 
-	delayDuration, _ := inst.ReadPinAsTimeSettings(node.Delay)
-	if delayDuration != inst.lastDelay {
-		inst.setSubtitle(delayDuration)
-		inst.lastDelay = delayDuration
+	if inst.delayDuration != inst.lastDelay {
+		inst.lastDelay = inst.delayDuration
 	}
 
-	// if (inputFloatPtr == nil && inst.lastValue != nil) || (inputFloatPtr != nil && inst.lastValue == nil) || *inputFloatPtr != *inst.lastValue {
 	if !float.ComparePtrValues(inst.lastValue, inputFloatPtr) {
 
 		newDelay := &DelayTimer{false, nil}
-		newDelay.Timer = time.AfterFunc(delayDuration, func() {
+		newDelay.Timer = time.AfterFunc(inst.delayDuration, func() {
 			delayObj := newDelay
 			if inputFloatPtr == nil {
 				inst.WritePinNull(node.Out)
@@ -87,6 +90,32 @@ func (inst *Delay) Process() {
 		inst.WritePinFloat(node.Out, *inst.currentOutput)
 	}
 	inst.ClearCompletedDelays()
+
+}
+
+func (inst *Delay) init() {
+	settings, err := inst.getSettings()
+	if err != nil {
+		return
+	}
+	if settings == nil {
+		return
+	}
+	delayTime := time.Duration(settings.Delay)
+	delaySetting := settings.DelayTimeUnits
+	if delaySetting == ttime.Ms {
+		inst.delayDuration = delayTime * time.Millisecond
+	}
+	if delaySetting == ttime.Sec {
+		inst.delayDuration = delayTime * time.Second
+	}
+	if delaySetting == ttime.Min {
+		inst.delayDuration = delayTime * time.Minute
+	}
+	if delaySetting == ttime.Hr {
+		inst.delayDuration = delayTime * time.Hour
+	}
+	inst.setSubtitle()
 }
 
 func (inst *Delay) ClearCompletedDelays() {
@@ -119,9 +148,15 @@ func (inst *Delay) Stop() {
 	inst.ClearAllDelays()
 }
 
-func (inst *Delay) setSubtitle(intervalDuration time.Duration) {
-	subtitleText := intervalDuration.String()
-	inst.SetSubTitle(subtitleText)
+func (inst *Delay) setSubtitle() {
+	settings, err := inst.getSettings()
+	if err != nil {
+		return
+	}
+	if settings == nil {
+		return
+	}
+	inst.SetSubTitle(fmt.Sprintf("%s %s", fmt.Sprint(float.RoundTo(settings.Delay, 2)), settings.DelayTimeUnits))
 }
 
 // Custom Node Settings Schema
@@ -141,13 +176,11 @@ func (inst *Delay) buildSchema() *schemas.Schema {
 	// time selection
 	props.Delay.Title = "Delay"
 	props.Delay.Default = 1
-
 	// time selection
 	props.DelayTimeUnits.Title = "Delay Units"
 	props.DelayTimeUnits.Default = ttime.Sec
 	props.DelayTimeUnits.Options = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
 	props.DelayTimeUnits.EnumName = []string{ttime.Ms, ttime.Sec, ttime.Min, ttime.Hr}
-
 	schema.Set(props)
 
 	uiSchema := array.Map{
@@ -169,9 +202,9 @@ func (inst *Delay) buildSchema() *schemas.Schema {
 	return s
 }
 
-func (inst *Delay) getSettings(body map[string]interface{}) (*DelaySettings, error) {
+func (inst *Delay) getSettings() (*DelaySettings, error) {
 	settings := &DelaySettings{}
-	marshal, err := json.Marshal(body)
+	marshal, err := json.Marshal(inst.GetSettings())
 	if err != nil {
 		return settings, err
 	}

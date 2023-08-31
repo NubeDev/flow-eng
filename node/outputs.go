@@ -2,6 +2,12 @@ package node
 
 import "fmt"
 
+func SetOutputHelp(help OutputHelp) *OutputOpts {
+	return &OutputOpts{
+		Help: help,
+	}
+}
+
 type OutputOpts struct {
 	Help OutputHelp
 }

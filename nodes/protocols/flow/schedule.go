@@ -67,6 +67,7 @@ func (inst *FFSchedule) getResult() {
 	if err != nil {
 		log.Errorf("Flow Network Schedules getResult() err: %s", err.Error())
 	}
+	inst.hasWritten = false
 	for _, schedule := range schedules {
 		if settings.Schedule == schedule.Name {
 			value := schedule.IsActive
@@ -84,8 +85,7 @@ func (inst *FFSchedule) getResult() {
 			inst.WritePinFloat(node.PeriodStopUnix, float64(schedule.PeriodStop))
 			inst.SetSubTitle(schedule.Name)
 			inst.SetWaringIcon(string(emoji.GreenCircle))
-		} else {
-			inst.hasWritten = false
+			inst.hasWritten = true
 		}
 	}
 }

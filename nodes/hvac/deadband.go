@@ -1,6 +1,8 @@
 package hvac
 
 import (
+	"fmt"
+	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/node"
 )
 
@@ -29,23 +31,18 @@ func (inst *DeadBand) Process() {
 	}
 	setPoint, _ := inst.ReadPinAsFloat(node.Setpoint)
 	deadBand, _ := inst.ReadPinAsFloat(node.DeadBand)
-	risingEdge := setPoint + deadBand/2
-	fallingEdge := deadBand - deadBand/2
+	risingEdge := setPoint + (deadBand / 2)
+	fallingEdge := setPoint - (deadBand / 2)
 
-	if risingEdge >= fallingEdge {
-		if input <= fallingEdge {
-			inst.out = false
-		}
-		if input >= risingEdge {
-			inst.out = true
-		}
-	} else if risingEdge < fallingEdge {
-		if input >= fallingEdge {
-			inst.out = false
-		}
-		if input <= risingEdge {
-			inst.out = true
-		}
+	if input > risingEdge {
+		inst.out = true
 	}
+	if input <= fallingEdge {
+		inst.out = false
+	}
+	r := fmt.Sprint(float.RoundTo(risingEdge, 1))
+	f := fmt.Sprint(float.RoundTo(fallingEdge, 1))
+	msg := fmt.Sprintf("rise > %s fall <= %s", r, f)
+	inst.SetSubTitle(msg)
 	inst.WritePinBool(node.Out, inst.out)
 }

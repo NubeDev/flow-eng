@@ -6,6 +6,7 @@ import (
 	"github.com/NubeDev/flow-eng/connections"
 	"github.com/NubeDev/flow-eng/helpers/settings"
 	"github.com/NubeDev/flow-eng/helpers/store"
+	"github.com/NubeDev/flow-eng/rubixos"
 	"github.com/NubeDev/flow-eng/schemas"
 )
 
@@ -45,7 +46,7 @@ type Node interface {
 	SortOutputs()
 	GetOutputs() []*Output
 	GetOutput(name OutputName) *Output
-	InputUpdated(name InputName) (updated bool, boolCOV bool)
+	InputUpdated(name InputName) (updated bool, boolCOV bool, value interface{})
 	InputHasConnection(name InputName) bool
 	InputsLen() int
 	OutputsLen() int
@@ -61,6 +62,7 @@ type Node interface {
 	ReadMultiple(count int) []interface{}
 	ReadMultipleFloatPointer(count int) []*float64
 	ReadMultipleFloat(count int) []float64
+	ReadMultipleInputs(count int) []ReadMultipleInputs
 	WritePin(OutputName, interface{})
 	WritePinFloat(name OutputName, value float64, precision ...int)
 	WritePinBool(OutputName, bool)
@@ -107,6 +109,7 @@ type Node interface {
 	SetDynamicInputs()
 	SetDynamicOutputs()
 	GetPersistedData() any
+	GetRubixOSConfig() (*rubixos.Config, error)
 }
 
 func New(id, category, name, nodeName string, meta *Metadata, settings map[string]interface{}) *Spec {
@@ -249,6 +252,10 @@ func (n *Spec) GetInfo() Info {
 	return n.Info
 }
 
+func (n *Spec) SetDescription(description string) {
+	n.Info.Description = description
+}
+
 func (n *Spec) SetHelp(body string) {
 	n.Help = body
 }
@@ -378,6 +385,10 @@ func (n *Spec) SetDisplay(body string) {
 
 func (n *Spec) GetPersistedData() any {
 	return nil
+}
+
+func (n *Spec) GetRubixOSConfig() (*rubixos.Config, error) {
+	return rubixos.GetConfig()
 }
 
 type Info struct {
