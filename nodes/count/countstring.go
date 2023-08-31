@@ -25,3 +25,7 @@ func (inst *CountString) Process() {
 	}
 	inst.WritePinFloat(node.CountOut, inst.count)
 }
+
+func (inst *CountString) GetPersistedData() any {
+	return &inst.count
+}
