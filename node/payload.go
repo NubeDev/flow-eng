@@ -20,11 +20,11 @@ func (n *Spec) GetPayload() *Payload {
 	return n.Payload
 }
 
-func (n *Spec) GetPayloadNull() (value any, null bool) {
+func (n *Spec) GetPayloadNull() (value any, lastUpdated time.Time, null bool) {
 	if n.Payload == nil {
-		return nil, true
+		return nil, time.Now(), true
 	}
-	return n.Payload.Any, false
+	return n.Payload.Any, n.Payload.LastUpdate, false
 }
 
 func (n *Spec) ReadPayloadAsBool() (value, noPayload, nullPayload bool) {

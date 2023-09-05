@@ -8,6 +8,7 @@ import (
 	"github.com/enescakir/emoji"
 	log "github.com/sirupsen/logrus"
 	"strings"
+	"time"
 )
 
 func (inst *Network) subscribeToEachPoint() {
@@ -32,7 +33,8 @@ func (inst *Network) subscribeToEachPoint() {
 				n := inst.GetNode(payload.nodeUUID)
 				if n != nil {
 					n.SetPayload(&node.Payload{
-						Any: message,
+						Any:        message,
+						LastUpdate: time.Now(),
 					})
 					n.SetWaringMessage("")
 					n.SetWaringIcon(string(emoji.GreenCircle))
@@ -141,7 +143,6 @@ func (inst *Network) fetchPointsList() {
 	}
 }
 
-// pointsList
 // TODO: the points list topic gets a message on EVERY FF Point CRUD.  This produces MANY updates and many FF DB calls. Consider removing them.
 func (inst *Network) pointsList() {
 	callback := func(client mqtt.Client, message mqtt.Message) {

@@ -38,7 +38,7 @@ func NewNetwork(body *node.Spec) (node.Node, error) {
 	body = node.Defaults(body, flowNetwork, category)
 	inputs := node.BuildInputs()
 	connected := node.BuildOutput(node.Connected, node.TypeBool, nil, body.Outputs)
-	message := node.BuildOutput(node.Msg, node.TypeString, nil, body.Outputs)
+	message := node.BuildOutput(node.LastUpdated, node.TypeString, nil, body.Outputs)
 	outputs := node.BuildOutputs(connected, message)
 	body.IsParent = true
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
@@ -155,7 +155,7 @@ func (inst *Network) Process() {
 		inst.fetchSchedulesList()
 	}
 
-	inst.WritePin(node.Msg, fmt.Sprintf("last point refresh: %s", ttime.TimePretty(inst.lastFetch)))
+	inst.WritePin(node.LastUpdated, ttime.TimePretty(inst.lastFetch))
 
 }
 

@@ -125,7 +125,7 @@ func (inst *FFPoint) Process() {
 	}
 
 	if inst.checkStillExists() {
-		val, null := inst.GetPayloadNull()
+		val, lastUpdated, null := inst.GetPayloadNull()
 		// fmt.Println(fmt.Sprintf("FLOW POINT Process() payload: val: %+v,  null: %v", val, null))
 		var writeNull bool
 		if null {
@@ -150,7 +150,7 @@ func (inst *FFPoint) Process() {
 				}
 				// THIS IS USED TO SHOW THE LAST UPDATED AS THE LAST VALUE FETCH
 				inst.lastValue = float.New(*value)
-				inst.lastUpdate = time.Now()
+				inst.lastUpdate = lastUpdated
 
 				if currentPri == nil {
 					inst.WritePinNull(node.CurrentPriority)
@@ -158,7 +158,7 @@ func (inst *FFPoint) Process() {
 					inst.WritePinFloat(node.CurrentPriority, float64(*currentPri))
 				}
 
-				inst.WritePin(node.LastUpdated, ttime.TimeSince(inst.lastUpdate))
+				inst.WritePin(node.LastUpdated, ttime.TimePretty(inst.lastUpdate))
 			} else {
 				if err != nil {
 					fmt.Println(fmt.Sprintf("FLOW POINT Process() parseCOV() err: %v", err))

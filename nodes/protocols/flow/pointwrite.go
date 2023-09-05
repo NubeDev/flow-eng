@@ -128,7 +128,8 @@ func (inst *FFPointWrite) Process() {
 		} else {
 			_, value, currentPri, err := parseCOV(val.Any)
 			if err == nil {
-				inst.lastUpdate = time.Now()
+				_, lastUpdated, _ := inst.GetPayloadNull()
+				inst.lastUpdate = lastUpdated
 				if value == nil {
 					inst.WritePinNull(node.Out)
 				} else {
@@ -140,7 +141,7 @@ func (inst *FFPointWrite) Process() {
 				} else {
 					inst.WritePinFloat(node.CurrentPriority, float64(*currentPri))
 				}
-				inst.WritePin(node.LastUpdated, ttime.TimeSince(inst.lastUpdate))
+
 			} else {
 				writeNull = true
 			}
@@ -155,6 +156,7 @@ func (inst *FFPointWrite) Process() {
 		inst.WritePinNull(node.CurrentPriority)
 		inst.WritePinNull(node.LastUpdated)
 	}
+	inst.WritePin(node.LastUpdated, ttime.TimePretty(inst.lastUpdate))
 }
 
 func (inst *FFPointWrite) GetLastPriorityWrite() (priorityArrayWrite map[string]*float64) {
