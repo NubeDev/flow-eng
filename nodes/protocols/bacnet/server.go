@@ -371,9 +371,17 @@ func (inst *Server) GetModbusWriteablePoints() *points.ModbusPoints {
 func (inst *Server) setDeviceAddress() error {
 	schema, err := inst.getSchema()
 	if err != nil {
+		inst.devAddr1 = 1
+		inst.devAddr2 = 2
+		inst.devAddr3 = 3
+		inst.devAddr4 = 4
 		return err
 	}
 	if schema == nil {
+		inst.devAddr1 = 1
+		inst.devAddr2 = 2
+		inst.devAddr3 = 3
+		inst.devAddr4 = 4
 		return errors.New("failed to get bacnet-server settings")
 	}
 	inst.devAddr1 = schema.DeviceAddress1
