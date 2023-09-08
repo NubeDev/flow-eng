@@ -94,7 +94,7 @@ type Node interface {
 	ReadPayloadAsFloat() (value float64, noPayload, nullPayload bool)
 	ReadPayloadAsBool() (value bool, noPayload, nullPayload bool)
 	ReadPayloadAsString() (value string, noPayload, nullPayload bool)
-	GetPayloadNull() (value any, null bool)
+	GetPayloadNull() (value any, lastUpdated time.Time, null bool)
 	GetNode(uuid string) Node
 	GetNodes() []Node
 	AddNodes(f []Node)

@@ -2,8 +2,10 @@ package flow
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/NubeDev/flow-eng/connections"
+	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeDev/flow-eng/services/mqttclient"
@@ -27,6 +29,7 @@ type Network struct {
 	subscribeFailedPointsList    bool
 	subscribeFailedSchedulesList bool
 	subscribeFailedMissingPoints bool
+	lastFetch                    time.Time
 }
 
 var mqttQOS = mqttclient.AtMostOnce
@@ -35,10 +38,12 @@ var mqttRetain = false
 func NewNetwork(body *node.Spec, _ ...any) (node.Node, error) {
 	body = node.Defaults(body, flowNetwork, Category)
 	inputs := node.BuildInputs()
-	outputs := node.BuildOutputs(node.BuildOutput(node.Connected, node.TypeBool, nil, body.Outputs))
+	connected := node.BuildOutput(node.Connected, node.TypeBool, nil, body.Outputs)
+	message := node.BuildOutput(node.LastUpdated, node.TypeString, nil, body.Outputs)
+	outputs := node.BuildOutputs(connected, message)
 	body.IsParent = true
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
-	network := &Network{body, false, 0, nil, nil, false, nil, 0, "", false, 0, false, false, false, false}
+	network := &Network{body, false, 0, nil, nil, false, nil, 0, "", false, 0, false, false, false, false, time.Now()}
 	return network, nil
 }
 
@@ -90,7 +95,6 @@ func (inst *Network) setConnection() {
 		inst.mqttConnected = true
 		inst.setError("", true, true)
 	}
-	inst.setSubTitle(fmt.Sprintf("%s:%d", connection.Host, connection.Port))
 
 }
 
@@ -145,11 +149,14 @@ func (inst *Network) Process() {
 	if retry { // get the points every 50 loops
 		inst.connectionError()
 		inst.fetchExistingPointValues() // refresh point COV
+		inst.lastFetch = time.Now()
 	}
 
 	if loopCount%20 == 0 {
 		inst.fetchSchedulesList()
 	}
+
+	inst.WritePin(node.LastUpdated, ttime.TimePretty(inst.lastFetch))
 
 }
 

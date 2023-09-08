@@ -6,6 +6,7 @@ go 1.18
 
 require (
 	github.com/NubeIO/lib-schema v0.2.18
+	github.com/NubeIO/lib-units v0.0.1
 	github.com/NubeIO/module-core-rql v0.0.0-20230808031702-4f5f7b9389af
 	github.com/NubeIO/nubeio-rubix-lib-modbus-go v0.0.5
 	github.com/NubeIO/nubeio-rubix-lib-models-go v1.7.9
@@ -20,6 +21,7 @@ require (
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/jasonlvhit/gocron v0.0.1
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
+	github.com/martinlindhe/unit v0.0.0-20230420213220-4adfd7d0a0d6
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/robfig/cron/v3 v3.0.1
@@ -32,7 +34,6 @@ require (
 )
 
 require (
-	github.com/NubeIO/lib-units v0.0.1 // indirect
 	github.com/NubeIO/nubeio-rubix-lib-helpers-go v0.2.7 // indirect
 	github.com/dlclark/regexp2 v1.7.0 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
@@ -43,7 +44,6 @@ require (
 	github.com/grid-x/serial v0.0.0-20191104121038-e24bc9bf6f08 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/martinlindhe/unit v0.0.0-20230420213220-4adfd7d0a0d6 // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
 	github.com/tidwall/btree v0.7.1 // indirect
 	github.com/tidwall/grect v0.1.4 // indirect

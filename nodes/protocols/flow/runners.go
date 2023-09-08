@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/NubeDev/flow-eng/node"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -33,7 +34,8 @@ func (inst *Network) subscribeToEachPoint() {
 				n := inst.GetNode(payload.nodeUUID)
 				if n != nil {
 					n.SetPayload(&node.Payload{
-						Any: message,
+						Any:        message,
+						LastUpdate: time.Now(),
 					})
 					n.SetWaringMessage("")
 					n.SetWaringIcon(string(emoji.GreenCircle))
@@ -133,7 +135,6 @@ func (inst *Network) fetchPointsList() {
 	}
 }
 
-// pointsList
 // TODO: the points list topic gets a message on EVERY FF Point CRUD.  This produces MANY updates and many FF DB calls. Consider removing them.
 func (inst *Network) pointsList() {
 	callback := func(client mqtt.Client, message mqtt.Message) {

@@ -42,22 +42,22 @@ func BuildSchemaServer() *schemas.Schema {
 	var min int = 1
 	var max int = 50
 
-	props.DeviceAddress1.Title = "device-1"
+	props.DeviceAddress1.Title = "address device-1"
 	props.DeviceAddress1.Default = 1
 	props.DeviceAddress1.Min = min
 	props.DeviceAddress1.Max = max
 
-	props.DeviceAddress2.Title = "device-2"
+	props.DeviceAddress2.Title = "address device-2"
 	props.DeviceAddress2.Default = 2
 	props.DeviceAddress2.Min = min
 	props.DeviceAddress2.Max = max
 
-	props.DeviceAddress3.Title = "device-3"
+	props.DeviceAddress3.Title = "address device-3"
 	props.DeviceAddress3.Default = 3
 	props.DeviceAddress3.Min = min
 	props.DeviceAddress3.Max = max
 
-	props.DeviceAddress4.Title = "device-4"
+	props.DeviceAddress4.Title = "address device-4"
 	props.DeviceAddress4.Default = 4
 	props.DeviceAddress4.Min = min
 	props.DeviceAddress4.Max = max

@@ -30,5 +30,4 @@ func (inst *Divide) Process() {
 		output := in1 / in2
 		inst.WritePinFloat(node.Out, output)
 	}
-
 }
