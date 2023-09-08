@@ -217,8 +217,8 @@ func (inst *PACControl) Process() {
 					}
 				}
 				if inst.compStage == 0 {
-					inst.htgMode = false
-					inst.htgModeEndTime = time.Now().Unix()
+					inst.clgMode = false
+					inst.clgModeEndTime = time.Now().Unix()
 					inst.stageStartTime = 0
 				}
 			}
