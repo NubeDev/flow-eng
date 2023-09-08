@@ -9,8 +9,8 @@ type Scale struct {
 	*node.Spec
 }
 
-func NewScale(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, scaleNode, category)
+func NewScale(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, scaleNode, Category)
 	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false)
 	minIn := node.BuildInput(node.InMin, node.TypeFloat, 0, body.Inputs, false, false)
 	maxIn := node.BuildInput(node.InMax, node.TypeFloat, 10, body.Inputs, false, false)

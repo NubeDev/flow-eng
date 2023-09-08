@@ -1,18 +1,19 @@
 package statistics
 
 import (
+	"sort"
+
 	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/node"
-	"sort"
 )
 
 type Rank struct {
 	*node.Spec
 }
 
-func NewRank(body *node.Spec) (node.Node, error) {
+func NewRank(body *node.Spec, _ ...any) (node.Node, error) {
 	var err error
-	body, err = nodeDefault(body, rank, category)
+	body, err = nodeDefault(body, rank, Category)
 	if err != nil {
 		return nil, err
 	}

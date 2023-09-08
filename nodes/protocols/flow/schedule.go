@@ -3,12 +3,13 @@ package flow
 import (
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/enescakir/emoji"
 	log "github.com/sirupsen/logrus"
-	"time"
 )
 
 type FFSchedule struct {
@@ -20,8 +21,8 @@ type FFSchedule struct {
 	hasWritten  bool
 }
 
-func NewFFSchedule(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, flowSchedule, category)
+func NewFFSchedule(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, flowSchedule, Category)
 	inputs := node.BuildInputs()
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs)
 	lastUpdated := node.BuildOutput(node.LastUpdated, node.TypeString, nil, body.Outputs)

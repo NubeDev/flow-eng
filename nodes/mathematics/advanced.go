@@ -8,9 +8,9 @@ type Advanced struct {
 	*node.Spec
 }
 
-func NewAdvanced(body *node.Spec) (node.Node, error) {
+func NewAdvanced(body *node.Spec, _ ...any) (node.Node, error) {
 	var err error
-	body, err = nodeDefault(body, mathAdvanced, category)
+	body, err = nodeDefault(body, mathAdvanced, Category)
 	if err != nil {
 		return nil, err
 	}

@@ -1,16 +1,17 @@
 package math
 
 import (
-	"github.com/NubeDev/flow-eng/node"
 	"math"
+
+	"github.com/NubeDev/flow-eng/node"
 )
 
 type Modulo struct {
 	*node.Spec
 }
 
-func NewModulo(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, modulo, category)
+func NewModulo(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, modulo, Category)
 	in1 := node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs, false, false)
 	in2 := node.BuildInput(node.In2, node.TypeFloat, 2, body.Inputs, false, false)
 	inputs := node.BuildInputs(in1, in2)

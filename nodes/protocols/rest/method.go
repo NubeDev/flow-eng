@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
+
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/go-resty/resty/v2"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
-	"strings"
 )
 
 const httpHelp = `
@@ -63,8 +64,8 @@ type HTTP struct {
 	locked    bool
 }
 
-func NewHttpWrite(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, httpNode, category)
+func NewHttpWrite(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, httpNode, Category)
 	input := node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false, false, node.SetInputHelp(node.InHelp))
 	filter := node.BuildInput(node.Filter, node.TypeString, nil, body.Inputs, false, false, node.SetInputHelp(node.FilterHelp))
 	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false, false, node.SetInputHelp(node.EnableHelp))

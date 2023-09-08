@@ -3,6 +3,7 @@ package hvac
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/node"
@@ -15,8 +16,8 @@ type SensorSelect struct {
 	*node.Spec
 }
 
-func NewSensorSelect(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, sensorSelect, category)
+func NewSensorSelect(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, sensorSelect, Category)
 	settings := &SensorSelectSettings{}
 	err := mapstructure.Decode(body.Settings, &settings)
 	if err != nil {

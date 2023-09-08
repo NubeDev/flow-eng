@@ -2,14 +2,15 @@ package trigger
 
 import (
 	"encoding/json"
+	"math"
+	"strconv"
+	"time"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
 	log "github.com/sirupsen/logrus"
-	"math"
-	"strconv"
-	"time"
 
 	"github.com/NubeDev/flow-eng/node"
 )
@@ -32,7 +33,7 @@ const (
 	Run       = 2
 )
 
-func NewIterate(body *node.Spec) (node.Node, error) {
+func NewIterate(body *node.Spec, _ ...any) (node.Node, error) {
 	body = node.Defaults(body, Iterator, Category)
 
 	interval := node.BuildInput(node.Interval, node.TypeFloat, 10, body.Inputs, true, false)

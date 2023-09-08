@@ -3,6 +3,7 @@ package link
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/NubeDev/flow-eng/helpers"
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/node"
@@ -15,11 +16,8 @@ type StringLinkInput struct {
 	lastTopic string
 }
 
-func NewStringLinkInput(body *node.Spec, store *Store) (node.Node, error) {
-	if store == nil {
-		store = getStore()
-	}
-	body = node.Defaults(body, linkInputString, category)
+func NewStringLinkInput(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, linkInputString, Category)
 	topic := node.BuildInput(node.Topic, node.TypeString, nil, body.Inputs, true, false)
 	value := node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false, false)
 	inputs := node.BuildInputs(topic, value)
@@ -94,11 +92,8 @@ type StringLinkOutput struct {
 	*node.Spec
 }
 
-func NewStringLinkOutput(body *node.Spec, store *Store) (node.Node, error) {
-	if store == nil {
-		store = getStore()
-	}
-	body = node.Defaults(body, linkOutputString, category)
+func NewStringLinkOutput(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, linkOutputString, Category)
 	out := node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs)
 	outputs := node.BuildOutputs(out)
 	body = node.BuildNode(body, nil, outputs, body.Settings)

@@ -1,17 +1,18 @@
 package conversion
 
 import (
+	"strconv"
+
 	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/node"
-	"strconv"
 )
 
 type String struct {
 	*node.Spec
 }
 
-func NewString(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, conversionString, category)
+func NewString(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, conversionString, Category)
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false, false))
 	asBool := node.BuildOutput(node.Boolean, node.TypeBool, nil, body.Outputs)
 	asFloat := node.BuildOutput(node.Float, node.TypeFloat, nil, body.Outputs)

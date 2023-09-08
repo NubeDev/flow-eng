@@ -13,8 +13,8 @@ type StringWriteable struct {
 	*node.Spec
 }
 
-func NewStringWriteable(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, stringWriteable, category)
+func NewStringWriteable(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, stringWriteable, Category)
 	settings := &StringWriteableSettings{}
 	err := mapstructure.Decode(body.Settings, &settings)
 	if err != nil {

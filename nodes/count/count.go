@@ -3,6 +3,7 @@ package count
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
@@ -19,8 +20,8 @@ type Count struct {
 	lastSetVal    float64
 }
 
-func NewCount(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, countNode, category)
+func NewCount(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, countNode, Category)
 	countUp := node.BuildInput(node.CountUp, node.TypeBool, nil, body.Inputs, false, true)
 	countDown := node.BuildInput(node.CountDown, node.TypeBool, nil, body.Inputs, false, true)
 	stepSize := node.BuildInput(node.StepSize, node.TypeFloat, 1, body.Inputs, true, false)

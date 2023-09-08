@@ -9,8 +9,8 @@ type Hysteresis struct {
 	currentVal bool
 }
 
-func NewHysteresis(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, hysteresis, category)
+func NewHysteresis(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, hysteresis, Category)
 	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false)
 	risingEdge := node.BuildInput(node.RisingEdge, node.TypeFloat, 100, body.Inputs, false, false)
 	fallingEdge := node.BuildInput(node.FallingEdge, node.TypeFloat, 0, body.Inputs, false, false)

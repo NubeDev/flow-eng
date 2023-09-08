@@ -3,13 +3,14 @@ package hvac
 import (
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
 	log "github.com/sirupsen/logrus"
-	"time"
 )
 
 type PACControl struct {
@@ -33,8 +34,8 @@ type PACControl struct {
 // cool offset
 // heat offset
 
-func NewPACControl(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, pacControlNode, category)
+func NewPACControl(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, pacControlNode, Category)
 	enable := node.BuildInput(node.Enable, node.TypeBool, true, body.Inputs, false, false)
 	zoneTemp := node.BuildInput(node.ZoneTemp, node.TypeFloat, nil, body.Inputs, false, false)
 	setPoint := node.BuildInput(node.Setpoint, node.TypeFloat, 22, body.Inputs, true, false)

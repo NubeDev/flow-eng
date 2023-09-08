@@ -3,6 +3,7 @@ package conversion
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
@@ -19,8 +20,8 @@ type Units struct {
 
 const unitsDesc = `node used for converting values between metric and imperial and vice-versa`
 
-func NewUnits(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, conversionUnit, category)
+func NewUnits(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, conversionUnit, Category)
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false))
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	outErr := node.BuildOutput(node.ErrMsg, node.TypeString, nil, body.Outputs)

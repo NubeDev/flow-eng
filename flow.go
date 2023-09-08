@@ -3,9 +3,11 @@ package flowctrl
 import (
 	"errors"
 	"fmt"
+
 	"github.com/NubeDev/flow-eng/graph"
 	"github.com/NubeDev/flow-eng/helpers/uuid"
 	"github.com/NubeDev/flow-eng/node"
+	"github.com/NubeDev/flow-eng/nodes"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -15,6 +17,7 @@ type Flow struct {
 }
 
 func New() *Flow {
+	nodes.RegisterAllNodes()
 	return &Flow{nil, nil}
 }
 

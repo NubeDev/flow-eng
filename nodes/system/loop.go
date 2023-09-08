@@ -8,8 +8,8 @@ type Loop struct {
 	*node.Spec
 }
 
-func NewLoopCount(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, flowLoopCount, category)
+func NewLoopCount(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, flowLoopCount, Category)
 	toggleOnCount := node.BuildInput(node.TriggerOnCount, node.TypeFloat, 100, body.Inputs, false, false) // will trigger every 10 loops
 	inputs := node.BuildInputs(toggleOnCount)
 	outNum := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)

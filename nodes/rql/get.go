@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/go-resty/resty/v2"
 	"github.com/tidwall/gjson"
-	"time"
 )
 
 const getHelp = `
@@ -30,8 +31,8 @@ type Get struct {
 	locked    bool
 }
 
-func NewRQLGet(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, rqlGet, category)
+func NewRQLGet(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, rqlGet, Category)
 	input := node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false, false, node.SetInputHelp(node.InHelp))
 	filter := node.BuildInput(node.Filter, node.TypeString, nil, body.Inputs, false, false, node.SetInputHelp(node.FilterHelp))
 	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false, false, node.SetInputHelp(node.EnableHelp))

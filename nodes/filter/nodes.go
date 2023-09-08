@@ -2,6 +2,7 @@ package filter
 
 import (
 	"fmt"
+
 	"github.com/NubeDev/flow-eng/helpers/str"
 
 	"github.com/NubeDev/flow-eng/helpers/float"
@@ -43,8 +44,8 @@ type PreventDuplicates struct {
 	lastValue *float64
 }
 
-func NewPreventNull(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, preventNull, category)
+func NewPreventNull(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, preventNull, Category)
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
@@ -52,8 +53,8 @@ func NewPreventNull(body *node.Spec) (node.Node, error) {
 	return &PreventNull{body, 0}, nil
 }
 
-func NewPreventEqualFloat(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, preventEqualFloat, category)
+func NewPreventEqualFloat(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, preventEqualFloat, Category)
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false), node.BuildInput(node.Match, node.TypeFloat, nil, body.Inputs, false, false))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
@@ -61,8 +62,8 @@ func NewPreventEqualFloat(body *node.Spec) (node.Node, error) {
 	return &PreventEqualFloat{body, nil}, nil
 }
 
-func NewPreventEqualString(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, preventEqualString, category)
+func NewPreventEqualString(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, preventEqualString, Category)
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false, false), node.BuildInput(node.Match, node.TypeString, nil, body.Inputs, false, false))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeString, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
@@ -70,8 +71,8 @@ func NewPreventEqualString(body *node.Spec) (node.Node, error) {
 	return &PreventEqualString{body, str.New("")}, nil
 }
 
-func NewOnlyBetween(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, onlyBetween, category)
+func NewOnlyBetween(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, onlyBetween, Category)
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false), node.BuildInput(node.MinInput, node.TypeFloat, nil, body.Inputs, false, false), node.BuildInput(node.MaxInput, node.TypeFloat, nil, body.Inputs, false, false))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
@@ -79,8 +80,8 @@ func NewOnlyBetween(body *node.Spec) (node.Node, error) {
 	return &OnlyBetween{body, 0}, nil
 }
 
-func NewOnlyGreater(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, onlyGreater, category)
+func NewOnlyGreater(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, onlyGreater, Category)
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false), node.BuildInput(node.Threshold, node.TypeFloat, nil, body.Inputs, false, false))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
@@ -88,8 +89,8 @@ func NewOnlyGreater(body *node.Spec) (node.Node, error) {
 	return &OnlyGreater{body, 0}, nil
 }
 
-func NewOnlyLower(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, onlyLower, category)
+func NewOnlyLower(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, onlyLower, Category)
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false), node.BuildInput(node.Threshold, node.TypeFloat, nil, body.Inputs, false, false))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)
@@ -97,8 +98,8 @@ func NewOnlyLower(body *node.Spec) (node.Node, error) {
 	return &OnlyLower{body, 0}, nil
 }
 
-func NewPreventDuplicates(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, preventDuplicates, category)
+func NewPreventDuplicates(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, preventDuplicates, Category)
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false))
 	outputs := node.BuildOutputs(node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs))
 	body = node.BuildNode(body, inputs, outputs, nil)

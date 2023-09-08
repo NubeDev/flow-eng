@@ -10,8 +10,8 @@ type NumLatch struct {
 	lastTrigger bool
 }
 
-func NewNumLatch(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, numLatch, category)
+func NewNumLatch(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, numLatch, Category)
 	input := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false)
 	latch := node.BuildInput(node.Latch, node.TypeBool, nil, body.Inputs, false, true)
 	inputs := node.BuildInputs(input, latch)

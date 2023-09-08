@@ -13,8 +13,8 @@ type BooleanWriteable struct {
 	*node.Spec
 }
 
-func NewBooleanWriteable(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, booleanWriteable, category)
+func NewBooleanWriteable(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, booleanWriteable, Category)
 	settings := &BooleanWriteableSettings{}
 	err := mapstructure.Decode(body.Settings, &settings)
 	if err != nil {

@@ -3,11 +3,12 @@ package bacnetio
 import (
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	"github.com/NubeDev/flow-eng/services/modbuscli"
 	"github.com/NubeIO/nubeio-rubix-lib-modbus-go/modbus"
 	log "github.com/sirupsen/logrus"
-	"time"
 )
 
 const errNoDevices = "no IO16 where selected so dont inti modbus"
@@ -58,7 +59,7 @@ func (inst *Server) modbusRunner(settings map[string]interface{}) {
 	}
 	var count int64
 	for {
-		log.Infof("modbus polling loop count: %d application-type: %s", count, inst.application)
+		log.Debugf("modbus polling loop count: %d application-type: %s", count, inst.application)
 		inst.pollingCount = count
 		pointsListRead, _ := inst.getPointsReadOnly()
 		if !dontPollModbus {

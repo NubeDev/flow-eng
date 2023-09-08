@@ -3,12 +3,13 @@ package bacnetio
 import (
 	"errors"
 	"fmt"
+	"strings"
+
 	"github.com/NubeDev/flow-eng/helpers"
 	"github.com/NubeDev/flow-eng/helpers/topics"
 	"github.com/NubeDev/flow-eng/nodes/protocols/bacnet/points"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	log "github.com/sirupsen/logrus"
-	"strings"
 )
 
 func (inst *Server) mqttReconnect() {
@@ -35,7 +36,7 @@ func (inst *Server) subscribeToBacnetServer() {
 	callback := func(client mqtt.Client, message mqtt.Message) {
 		mes := &topics.Message{UUID: helpers.ShortUUID("bus"), Msg: message}
 		if topics.IsPri(message.Topic()) {
-			log.Infof("mqtt-bacnet message from server topic: %s -> value: %s", mes.Msg.Topic(), string(mes.Msg.Payload()))
+			log.Debugf("mqtt-bacnet message from server topic: %s -> value: %s", mes.Msg.Topic(), string(mes.Msg.Payload()))
 			err := inst.fromBacnet(mes)
 			if err != nil {
 				if err.Error() != points.ErrStopMQTTLoop {
@@ -93,7 +94,7 @@ func (inst *Server) mqttPublishPV(point *points.Point) error {
 					payload = buildPayload("", *point.WriteValue.P14)
 				}
 
-				log.Infof("mqtt-bacnet publish (bacnet variable) topic: %s -> value: %s", topic, payload)
+				log.Debugf("mqtt-bacnet publish (bacnet variable) topic: %s -> value: %s", topic, payload)
 				if payload != "" {
 					err = inst.clients.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload) // write @14
 					if err != nil {
@@ -112,7 +113,7 @@ func (inst *Server) mqttPublishPV(point *points.Point) error {
 					topic = fmt.Sprintf("bacnet/%s/%d/write/pri/15", obj, objectId)
 					payload = buildPayload("", *point.WriteValue.P15)
 				}
-				log.Infof("mqtt-bacnet publish (bacnet variable) topic: %s -> value: %s", topic, payload)
+				log.Debugf("mqtt-bacnet publish (bacnet variable) topic: %s -> value: %s", topic, payload)
 				if payload != "" {
 					err = inst.clients.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload) // write @15
 					if err != nil {
@@ -132,7 +133,7 @@ func (inst *Server) mqttPublishPV(point *points.Point) error {
 				payload = buildPayload("", *point.PresentValue)
 			}
 			topic := fmt.Sprintf("bacnet/%s/%d/write/pv", obj, objectId) // bacnet/ai/1/write/pv
-			log.Infof("mqtt-bacnet publish (bacnet input) topic: %s -> value: %s", topic, payload)
+			log.Debugf("mqtt-bacnet publish (bacnet input) topic: %s -> value: %s", topic, payload)
 			if payload != "" {
 				err = inst.clients.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload)
 				if err != nil {
@@ -172,7 +173,7 @@ func (inst *Server) mqttPublishNames(point *points.Point) {
 		name = strings.ToUpper(name)
 	}
 	payload := buildPayloadName(name)
-	log.Infof("mqtt-bacnet publish name topic: %s -> value: %s", topic, payload)
+	log.Debugf("mqtt-bacnet publish name topic: %s -> value: %s", topic, payload)
 	if payload != "" {
 		err = inst.clients.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload)
 		if err != nil {

@@ -1,7 +1,7 @@
 package streams
 
 const (
-	category = "streams"
+	Category = "streams"
 )
 
 const (

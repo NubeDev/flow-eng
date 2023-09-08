@@ -1,6 +1,6 @@
 package functions
 
 const (
+	Category = "function"
 	funcNode = "func"
-	category = "function"
 )

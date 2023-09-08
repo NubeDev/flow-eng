@@ -2,6 +2,7 @@ package debugging
 
 import (
 	"fmt"
+
 	"github.com/NubeDev/flow-eng/node"
 	log "github.com/sirupsen/logrus"
 )
@@ -11,12 +12,12 @@ type Log struct {
 }
 
 const (
-	category = "debug"
+	Category = "debug"
 	logNode  = "log"
 )
 
-func NewLog(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, logNode, category)
+func NewLog(body *node.Spec, _ ...interface{}) (node.Node, error) {
+	body = node.Defaults(body, logNode, Category)
 	comment := node.BuildInput(node.Comment, node.TypeString, nil, body.Inputs, false, false)
 	num := node.BuildInput(node.InNumber, node.TypeFloat, nil, body.Inputs, false, false)
 	str := node.BuildInput(node.InString, node.TypeString, nil, body.Inputs, false, false)

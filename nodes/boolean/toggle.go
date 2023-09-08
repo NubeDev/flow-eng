@@ -10,8 +10,8 @@ type Toggle struct {
 	lastIn     bool
 }
 
-func NewToggle(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, toggle, category)
+func NewToggle(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, toggle, Category)
 	in := node.BuildInput(node.In, node.TypeBool, nil, body.Inputs, false, true)
 	inputs := node.BuildInputs(in)
 

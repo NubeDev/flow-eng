@@ -3,13 +3,14 @@ package timing
 import (
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
 	"github.com/jasonlvhit/gocron"
-	"time"
 )
 
 const timeTriggerDesc = `node used for triggering an true/false value as per the node settings`
@@ -21,8 +22,8 @@ type TimedTrigger struct {
 	lockDuration int
 }
 
-func NewTimedTrigger(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, timedTrigger, category)
+func NewTimedTrigger(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, timedTrigger, Category)
 	enable := node.BuildInput(node.Enable, node.TypeBool, true, body.Inputs, false, false, node.SetInputHelp(node.EnableHelp))
 	inputs := node.BuildInputs(enable)
 	out := node.BuildOutput(node.Out, node.TypeBool, nil, body.Outputs, node.SetOutputHelp(node.OutHelp))

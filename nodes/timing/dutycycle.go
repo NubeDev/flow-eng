@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
-	"time"
 )
 
 type DutyCycle struct {
@@ -23,8 +24,8 @@ type DutyCycle struct {
 	currentOutput bool
 }
 
-func NewDutyCycle(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, dutyCycle, category)
+func NewDutyCycle(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, dutyCycle, Category)
 	enable := node.BuildInput(node.Enable, node.TypeBool, true, body.Inputs, false, false)
 	interval := node.BuildInput(node.Interval, node.TypeFloat, 10, body.Inputs, true, false)
 	dutyCycleInput := node.BuildInput(node.DutyCycle, node.TypeFloat, 50, body.Inputs, true, false)

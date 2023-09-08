@@ -9,8 +9,8 @@ type Number struct {
 	*node.Spec
 }
 
-func NewNumber(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, conversionNum, category)
+func NewNumber(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, conversionNum, Category)
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false))
 	asBool := node.BuildOutput(node.Boolean, node.TypeBool, nil, body.Outputs)
 	asString := node.BuildOutput(node.String, node.TypeString, nil, body.Outputs)
@@ -43,8 +43,8 @@ type Str2Num struct {
 	*node.Spec
 }
 
-func NewStr2Num(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, conversionString2Num, category)
+func NewStr2Num(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, conversionString2Num, Category)
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false, false))
 	asFloat := node.BuildOutput(node.Float, node.TypeFloat, nil, body.Outputs)
 	outputs := node.BuildOutputs(asFloat)
@@ -70,8 +70,8 @@ type Num2Str struct {
 	*node.Spec
 }
 
-func NewNum2Str(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, conversionNum2Str, category)
+func NewNum2Str(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, conversionNum2Str, Category)
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false))
 	asString := node.BuildOutput(node.String, node.TypeString, nil, body.Outputs)
 	outputs := node.BuildOutputs(asString)

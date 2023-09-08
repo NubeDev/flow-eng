@@ -3,13 +3,14 @@ package streams
 import (
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
-	"time"
 )
 
 type RollingAverage struct {
@@ -22,8 +23,8 @@ type RollingAverage struct {
 	lastOutput          *float64
 }
 
-func NewRollingAverage(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, rollingAverage, category)
+func NewRollingAverage(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, rollingAverage, Category)
 	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, true)
 	interval := node.BuildInput(node.Interval, node.TypeFloat, 30, body.Inputs, true, false)
 	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, false, true)

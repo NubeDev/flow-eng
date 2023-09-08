@@ -1,16 +1,17 @@
 package numtransform
 
 import (
-	"github.com/NubeDev/flow-eng/node"
 	"math"
+
+	"github.com/NubeDev/flow-eng/node"
 )
 
 type Polynomial struct {
 	*node.Spec
 }
 
-func NewPolynomial(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, polynomial, category)
+func NewPolynomial(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, polynomial, Category)
 	x := node.BuildInput(node.X, node.TypeFloat, nil, body.Inputs, false, false)
 	x0 := node.BuildInput(node.X0, node.TypeFloat, nil, body.Inputs, false, false)
 	x1 := node.BuildInput(node.X1, node.TypeFloat, nil, body.Inputs, false, false)

@@ -2,12 +2,13 @@ package timing
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
-	"time"
 )
 
 type Stopwatch struct {
@@ -20,8 +21,8 @@ type Stopwatch struct {
 	accumulation float64
 }
 
-func NewStopwatch(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, stopwatch, category)
+func NewStopwatch(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, stopwatch, Category)
 	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false, true)
 	reset := node.BuildInput(node.Reset, node.TypeBool, nil, body.Inputs, false, true)
 	inputs := node.BuildInputs(enable, reset)

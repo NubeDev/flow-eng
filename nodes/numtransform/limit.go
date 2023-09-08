@@ -9,8 +9,8 @@ type Limit struct {
 	*node.Spec
 }
 
-func NewLimit(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, limitNode, category)
+func NewLimit(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, limitNode, Category)
 	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false)
 	min := node.BuildInput(node.MinInput, node.TypeFloat, 0, body.Inputs, false, false)
 	max := node.BuildInput(node.MaxInput, node.TypeFloat, 100, body.Inputs, false, false)

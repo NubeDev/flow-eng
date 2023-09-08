@@ -2,21 +2,22 @@ package flow
 
 import (
 	"fmt"
-	"github.com/NubeDev/flow-eng/db"
+	"time"
+
+	"github.com/NubeDev/flow-eng/connections"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeDev/flow-eng/services/mqttclient"
 	"github.com/enescakir/emoji"
 	log "github.com/sirupsen/logrus"
-	"time"
 )
 
 type Network struct {
 	*node.Spec
 	firstLoop                    bool
 	loopCount                    uint64
-	connection                   *db.Connection
+	connection                   *connections.Connection
 	mqttClient                   *mqttclient.Client
 	mqttConnected                bool
 	points                       []*point
@@ -34,8 +35,8 @@ type Network struct {
 var mqttQOS = mqttclient.AtMostOnce
 var mqttRetain = false
 
-func NewNetwork(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, flowNetwork, category)
+func NewNetwork(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, flowNetwork, Category)
 	inputs := node.BuildInputs()
 	connected := node.BuildOutput(node.Connected, node.TypeBool, nil, body.Outputs)
 	message := node.BuildOutput(node.LastUpdated, node.TypeString, nil, body.Outputs)
@@ -54,10 +55,10 @@ func (inst *Network) setConnection() {
 		inst.setError(errMes, false, false)
 		return
 	}
-	var connection *db.Connection
+	var connection *connections.Connection
 	var connectionName = "flow framework integration over MQTT (dont edit/delete)" // this name is set in rubix-edge-wires
 
-	connection, err = inst.GetDB().GetConnection(settings.Conn)
+	connection, err = inst.Connections().GetConnection(settings.Conn)
 	if err != nil {
 		errMes := fmt.Sprintf("flow-network error in getting connection: %+v. err:%s", settings.Conn, err.Error())
 		log.Errorf(errMes)
@@ -65,7 +66,7 @@ func (inst *Network) setConnection() {
 	}
 
 	if connection == nil {
-		connection, err = inst.GetDB().GetConnectionByName(connectionName)
+		connection, err = inst.Connections().GetConnectionByName(connectionName)
 		if err != nil {
 			errMes := fmt.Sprintf("flow-network error in getting connection name: %+v. err:%s", connectionName, err.Error())
 			log.Errorf(errMes)

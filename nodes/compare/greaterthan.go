@@ -8,8 +8,8 @@ type CompareGreaterThan struct {
 	*node.Spec
 }
 
-func NewGreaterThan(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, GreaterThan, category)
+func NewGreaterThan(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, GreaterThan, Category)
 	in1 := node.BuildInput(node.In1, node.TypeFloat, nil, body.Inputs, false, false)
 	in2 := node.BuildInput(node.In2, node.TypeFloat, nil, body.Inputs, false, false)
 	inputs := node.BuildInputs(in1, in2)

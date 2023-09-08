@@ -8,8 +8,8 @@ type Boolean struct {
 	*node.Spec
 }
 
-func NewBoolean(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, conversionBool, category)
+func NewBoolean(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, conversionBool, Category)
 	inputs := node.BuildInputs(node.BuildInput(node.In, node.TypeBool, nil, body.Inputs, false, false))
 	asFloat := node.BuildOutput(node.Float, node.TypeFloat, nil, body.Outputs)
 	asString := node.BuildOutput(node.String, node.TypeString, nil, body.Outputs)

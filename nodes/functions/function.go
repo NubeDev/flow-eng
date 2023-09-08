@@ -2,6 +2,7 @@ package functions
 
 import (
 	"fmt"
+
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes/functions/rules"
 	"github.com/NubeIO/module-core-rql/helpers/uuid"
@@ -32,8 +33,8 @@ func getSettings(body map[string]interface{}) (string, error) {
 	return "", nil
 }
 
-func NewFunc(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, funcNode, category)
+func NewFunc(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, funcNode, Category)
 	in1 := node.BuildInput(node.In1, node.TypeString, nil, body.Inputs, false, false)
 	in2 := node.BuildInput(node.In2, node.TypeString, nil, body.Inputs, false, false)
 	enable := node.BuildInput(node.Enable, node.TypeBool, true, body.Inputs, false, false)

@@ -3,21 +3,22 @@ package switches
 import (
 	"encoding/json"
 	"fmt"
+	"math"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
 	"github.com/mitchellh/mapstructure"
-	"math"
 )
 
 type NumOutputSelect struct {
 	*node.Spec
 }
 
-func NewNumOutputSelect(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, numOutputSelect, category)
+func NewNumOutputSelect(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, numOutputSelect, Category)
 	settings := &NumOutputSelectSettings{}
 	err := mapstructure.Decode(body.Settings, &settings)
 	if err != nil {

@@ -10,9 +10,9 @@ type MinMaxAvg struct {
 	*node.Spec
 }
 
-func NewMinMaxAvg(body *node.Spec) (node.Node, error) {
+func NewMinMaxAvg(body *node.Spec, _ ...any) (node.Node, error) {
 	var err error
-	body, err = nodeDefault(body, minMaxAvg, category)
+	body, err = nodeDefault(body, minMaxAvg, Category)
 	if err != nil {
 		return nil, err
 	}

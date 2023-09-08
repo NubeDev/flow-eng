@@ -1,16 +1,17 @@
 package math
 
 import (
-	"github.com/NubeDev/flow-eng/node"
 	"math"
+
+	"github.com/NubeDev/flow-eng/node"
 )
 
 type Absolute struct {
 	*node.Spec
 }
 
-func NewAbsolute(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, absolute, category)
+func NewAbsolute(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, absolute, Category)
 	in1 := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false)
 	inputs := node.BuildInputs(in1)
 

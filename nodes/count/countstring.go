@@ -9,8 +9,8 @@ type CountString struct {
 	count float64
 }
 
-func NewCountString(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, countStringNode, category)
+func NewCountString(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, countStringNode, Category)
 	cov := node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false, true)
 	body.Inputs = node.BuildInputs(cov)
 	out := node.BuildOutput(node.CountOut, node.TypeFloat, nil, body.Outputs)
@@ -24,4 +24,8 @@ func (inst *CountString) Process() {
 		inst.count++
 	}
 	inst.WritePinFloat(node.CountOut, inst.count)
+}
+
+func (inst *CountString) GetPersistedData() any {
+	return &inst.count
 }

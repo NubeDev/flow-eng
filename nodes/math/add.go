@@ -2,6 +2,7 @@ package math
 
 import (
 	"fmt"
+
 	"github.com/NubeDev/flow-eng/node"
 )
 
@@ -9,9 +10,9 @@ type Add struct {
 	*node.Spec
 }
 
-func NewAdd(body *node.Spec) (node.Node, error) {
+func NewAdd(body *node.Spec, _ ...any) (node.Node, error) {
 	var err error
-	body, err = nodeDefault(body, add, category)
+	body, err = nodeDefault(body, add, Category)
 	if err != nil {
 		return nil, err
 	}

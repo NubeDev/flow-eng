@@ -3,6 +3,7 @@ package hvac
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/psychrometrics"
 	"github.com/NubeDev/flow-eng/node"
@@ -18,8 +19,8 @@ type PsychroDBWB struct {
 	lastAltitude float64
 }
 
-func NewPsychroDBWB(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, psychroDBWB, category)
+func NewPsychroDBWB(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, psychroDBWB, Category)
 	dryBulbT := node.BuildInput(node.DryBulbTemp, node.TypeFloat, nil, body.Inputs, false, false)
 	wetBulbT := node.BuildInput(node.WetBulbTemp, node.TypeFloat, nil, body.Inputs, false, false)
 	inputs := node.BuildInputs(dryBulbT, wetBulbT)

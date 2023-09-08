@@ -1,7 +1,7 @@
 package rql
 
 const (
-	category = "rql"
+	Category = "rql"
 	rqlGet   = "rql-get"
 	rqlRun   = "rql-run"
 )

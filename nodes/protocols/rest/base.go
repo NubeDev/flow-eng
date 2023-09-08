@@ -1,7 +1,7 @@
 package rest
 
 const (
-	category = "http"
+	Category = "http"
 	httpNode = "http-method"
 
 	// methods

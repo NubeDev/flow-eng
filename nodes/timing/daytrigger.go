@@ -3,6 +3,8 @@ package timing
 import (
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
@@ -10,7 +12,6 @@ import (
 	"github.com/NubeIO/lib-schema/schema"
 	"github.com/jasonlvhit/gocron"
 	log "github.com/sirupsen/logrus"
-	"time"
 )
 
 type DayTrigger struct {
@@ -21,8 +22,8 @@ type DayTrigger struct {
 	lockDuration int
 }
 
-func NewDayTrigger(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, dayTrigger, category)
+func NewDayTrigger(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, dayTrigger, Category)
 	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false, true)
 	timeSetting := node.BuildInput(node.Time, node.TypeString, nil, body.Inputs, true, false)
 	inputs := node.BuildInputs(enable, timeSetting)

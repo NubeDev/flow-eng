@@ -3,13 +3,14 @@ package numtransform
 import (
 	"encoding/json"
 	"fmt"
+	"math"
+	"time"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
-	"math"
-	"time"
 )
 
 type RateLimit struct {
@@ -22,8 +23,8 @@ type RateLimit struct {
 	lastUpdate   int64
 }
 
-func NewRateLimit(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, rateLimit, category)
+func NewRateLimit(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, rateLimit, Category)
 	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false, false)
 	input := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false)
 	step := node.BuildInput(node.StepSize, node.TypeFloat, 1, body.Inputs, true, false)

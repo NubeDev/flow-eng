@@ -1,7 +1,7 @@
 package notify
 
 const (
-	category = "notify"
+	Category = "notify"
 	gmail    = "gmail"
 	ping     = "ping"
 )

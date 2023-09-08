@@ -1,7 +1,7 @@
 package latch
 
 const (
-	category = "latch"
+	Category = "latch"
 )
 
 const (

@@ -3,6 +3,7 @@ package rql
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/go-resty/resty/v2"
 	"github.com/tidwall/gjson"
@@ -21,8 +22,8 @@ type Run struct {
 	locked    bool
 }
 
-func NewRQLRun(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, rqlRun, category)
+func NewRQLRun(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, rqlRun, Category)
 	input := node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false, false, node.SetInputHelp(node.InHelp))
 	filter := node.BuildInput(node.Filter, node.TypeString, nil, body.Inputs, false, false, node.SetInputHelp(node.FilterHelp))
 	enable := node.BuildInput(node.Enable, node.TypeBool, nil, body.Inputs, false, false, node.SetInputHelp(node.EnableHelp))

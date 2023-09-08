@@ -8,8 +8,8 @@ type CompareEqualString struct {
 	*node.Spec
 }
 
-func NewEqualString(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, EqualString, category)
+func NewEqualString(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, EqualString, Category)
 	in1 := node.BuildInput(node.In1, node.TypeString, nil, body.Inputs, false, false)
 	in2 := node.BuildInput(node.In2, node.TypeString, nil, body.Inputs, false, false)
 	inputs := node.BuildInputs(in1, in2)

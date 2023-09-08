@@ -1,8 +1,10 @@
 package node
 
 import (
-	"github.com/NubeDev/flow-eng/helpers"
 	"strings"
+
+	"github.com/NubeDev/flow-eng/connections"
+	"github.com/NubeDev/flow-eng/helpers"
 )
 
 func SetInputName(name InputName) string {
@@ -24,6 +26,7 @@ func ConvertToSpec(n Node) *Spec {
 	if n == nil {
 		return nil
 	}
+	n.SetConnections(connections.GetGlobalConnectionIF())
 
 	return &Spec{
 		Inputs:        n.GetInputs(),

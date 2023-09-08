@@ -10,8 +10,8 @@ type StringLatch struct {
 	lastTrigger bool
 }
 
-func NewStringLatch(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, stringLatch, category)
+func NewStringLatch(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, stringLatch, Category)
 	input := node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false, false)
 	latch := node.BuildInput(node.Latch, node.TypeBool, nil, body.Inputs, false, true)
 

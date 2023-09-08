@@ -10,9 +10,9 @@ type Range struct {
 	*node.Spec
 }
 
-func NewRange(body *node.Spec) (node.Node, error) {
+func NewRange(body *node.Spec, _ ...any) (node.Node, error) {
 	var err error
-	body, err = nodeDefault(body, rangeNode, category)
+	body, err = nodeDefault(body, rangeNode, Category)
 	if err != nil {
 		return nil, err
 	}

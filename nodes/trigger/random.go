@@ -2,6 +2,7 @@ package trigger
 
 import (
 	"encoding/json"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/node"
@@ -27,7 +28,7 @@ The number of decimal places that ‘output’ values have can be set from setti
 
 `
 
-func NewRandom(body *node.Spec) (node.Node, error) {
+func NewRandom(body *node.Spec, _ ...any) (node.Node, error) {
 	body = node.Defaults(body, RandomFloat, Category)
 	min := node.BuildInput(node.MinInput, node.TypeFloat, 0, body.Inputs, true, false)
 	max := node.BuildInput(node.MaxInput, node.TypeFloat, 100, body.Inputs, true, false)

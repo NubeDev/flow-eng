@@ -3,12 +3,13 @@ package trigger
 import (
 	"encoding/json"
 	"fmt"
+	"math"
+	"time"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeIO/lib-schema/schema"
-	"math"
-	"time"
 
 	"github.com/NubeDev/flow-eng/node"
 )
@@ -22,7 +23,7 @@ type COVNode struct {
 	currentOutput bool
 }
 
-func NewCOVNode(body *node.Spec) (node.Node, error) {
+func NewCOVNode(body *node.Spec, _ ...any) (node.Node, error) {
 	body = node.Defaults(body, COV, Category)
 	input := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, true)
 	interval := node.BuildInput(node.Interval, node.TypeFloat, 1, body.Inputs, true, false)

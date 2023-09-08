@@ -10,8 +10,8 @@ type Filter struct {
 	*node.Spec
 }
 
-func NewFilter(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, jsonFilter, category)
+func NewFilter(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, jsonFilter, Category)
 	in := node.BuildInput(node.In, node.TypeString, nil, body.Inputs, false, false)
 	equation := node.BuildInput(node.Filter, node.TypeString, nil, body.Inputs, false, false)
 	inputs := node.BuildInputs(in, equation)

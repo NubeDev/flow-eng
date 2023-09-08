@@ -1,7 +1,7 @@
 package filter
 
 const (
-	category = "filter"
+	Category = "filter"
 )
 
 // NODEs will single in/out

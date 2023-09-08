@@ -11,8 +11,8 @@ type DeadBand struct {
 	out bool
 }
 
-func NewDeadBand(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, deadBandNode, category)
+func NewDeadBand(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, deadBandNode, Category)
 	in := node.BuildInput(node.In, node.TypeFloat, nil, body.Inputs, false, false)
 	setPoint := node.BuildInput(node.Setpoint, node.TypeFloat, 22, body.Inputs, false, false)
 	deadBand := node.BuildInput(node.DeadBand, node.TypeFloat, 1, body.Inputs, false, false)

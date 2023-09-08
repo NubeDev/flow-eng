@@ -3,6 +3,7 @@ package nodejson
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/NubeDev/flow-eng/helpers/array"
 	"github.com/NubeDev/flow-eng/helpers/conversions"
 	"github.com/NubeDev/flow-eng/node"
@@ -18,8 +19,8 @@ type JSONNumberBuilder struct {
 
 const maxInputs = 10
 
-func NewJSONNumberBuilder(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, jsonNumberBuilder, category)
+func NewJSONNumberBuilder(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, jsonNumberBuilder, Category)
 	settings := &BoolDefaultSettings{}
 	mapstructure.Decode(body.Settings, &settings)
 	var count = 2
@@ -108,8 +109,8 @@ type JSONBuilder struct {
 }
 
 // NewJSONBuilder for strings
-func NewJSONBuilder(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, jsonBuilder, category)
+func NewJSONBuilder(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, jsonBuilder, Category)
 	settings := &BoolDefaultSettings{}
 	mapstructure.Decode(body.Settings, &settings)
 	var count = 2

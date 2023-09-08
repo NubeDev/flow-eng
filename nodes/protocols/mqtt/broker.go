@@ -3,7 +3,8 @@ package broker
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/NubeDev/flow-eng/db"
+
+	"github.com/NubeDev/flow-eng/connections"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/NubeDev/flow-eng/services/mqttclient"
@@ -19,7 +20,7 @@ type Broker struct {
 	*node.Spec
 	firstLoop     bool
 	loopCount     uint64
-	connection    *db.Connection
+	connection    *connections.Connection
 	mqttClient    *mqttclient.Client
 	mqttConnected bool
 }
@@ -27,8 +28,8 @@ type Broker struct {
 var mqttQOS = mqttclient.AtMostOnce
 var mqttRetain = false
 
-func NewBroker(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, mqttBroker, category)
+func NewBroker(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, mqttBroker, Category)
 	inputs := node.BuildInputs()
 	outputs := node.BuildOutputs(node.BuildOutput(node.Connected, node.TypeBool, nil, body.Outputs, node.SetOutputHelp(node.ConnectedHelp)))
 	body.IsParent = true
@@ -176,7 +177,7 @@ func (inst *Broker) setConnection() {
 		log.Errorf("add mqtt broker failed to get settings err:%s", err.Error())
 		return
 	}
-	connection, err := inst.GetDB().GetConnection(settings.Conn)
+	connection, err := inst.Connections().GetConnection(settings.Conn)
 	if err != nil {
 		log.Error("add mqtt broker failed to find connection")
 		return

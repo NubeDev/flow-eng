@@ -3,9 +3,10 @@ package flow
 import (
 	"encoding/json"
 	"errors"
+	"time"
+
 	"github.com/NubeDev/flow-eng/node"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"time"
 )
 
 func setError(body *node.Spec, message string) *node.Spec {
@@ -16,7 +17,7 @@ func setError(body *node.Spec, message string) *node.Spec {
 var retryCount uint64 = 100
 
 const (
-	category       = "flow"
+	Category       = "flow"
 	flowNetwork    = "flow-network"
 	flowPoint      = "flow-point"
 	flowSchedule   = "flow-schedule"

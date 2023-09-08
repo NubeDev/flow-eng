@@ -2,12 +2,13 @@ package flow
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/NubeDev/flow-eng/helpers/float"
 	"github.com/NubeDev/flow-eng/helpers/ttime"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/schemas"
 	"github.com/enescakir/emoji"
-	"time"
 )
 
 type FFPoint struct {
@@ -18,8 +19,8 @@ type FFPoint struct {
 	lastUpdate  time.Time
 }
 
-func NewFFPoint(body *node.Spec) (node.Node, error) {
-	body = node.Defaults(body, flowPoint, category)
+func NewFFPoint(body *node.Spec, _ ...any) (node.Node, error) {
+	body = node.Defaults(body, flowPoint, Category)
 	inputs := node.BuildInputs()
 	out := node.BuildOutput(node.Out, node.TypeFloat, nil, body.Outputs)
 	currentPriority := node.BuildOutput(node.CurrentPriority, node.TypeFloat, nil, body.Outputs)

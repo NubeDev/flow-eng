@@ -1,7 +1,7 @@
 package subflow
 
 const (
-	category = "sub-flow"
+	Category = "sub-flow"
 )
 
 const (
