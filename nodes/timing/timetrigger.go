@@ -36,6 +36,11 @@ func NewTimedTrigger(body *node.Spec, _ ...any) (node.Node, error) {
 }
 
 func (inst *TimedTrigger) Process() {
+	enable, _ := inst.ReadPinAsBool(node.Enable)
+	if !enable {
+		inst.WritePinBool(node.Out, false)
+		return
+	}
 	_, firstLoop := inst.Loop()
 	if firstLoop {
 		inst.init()
