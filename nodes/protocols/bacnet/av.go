@@ -3,6 +3,7 @@ package bacnetio
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/NubeIO/lib-units/units"
 	"math"
 
 	"github.com/NubeDev/flow-eng/helpers"
@@ -76,7 +77,7 @@ func (inst *AV) Process() {
 		settings, err := inst.getSettings(inst.GetSettings())
 		inst.setObjectId(settings)
 		transformProps := inst.getTransformProps(settings)
-		point := addPoint(points.IoTypeNumber, objectType, inst.objectID, isWriteable, isIO, true, inst.application, transformProps)
+		point := addPoint(points.IoTypeNumber, objectType, inst.objectID, isWriteable, isIO, true, inst.application, transformProps, addPointOpts{settings.Unit})
 		name := inst.GetNodeName()
 		parentTopic := helpers.CleanParentName(name, inst.GetParentName())
 		if parentTopic != "" {
@@ -214,11 +215,13 @@ func (inst *AV) updatePoint(objType points.ObjectType, id points.ObjectID, point
 // Custom Node Settings Schema
 
 type AVSettingsSchema struct {
-	InstanceNumber schemas.Integer `json:"instance-number"`
+	InstanceNumber schemas.Integer    `json:"instance-number"`
+	Unit           schemas.EnumString `json:"unit"`
 }
 
 type AVSettings struct {
-	InstanceNumber int `json:"instance-number"`
+	InstanceNumber int    `json:"instance-number"`
+	Unit           string `json:"unit"`
 }
 
 func (inst *AV) buildSchema() *schemas.Schema {
@@ -228,10 +231,17 @@ func (inst *AV) buildSchema() *schemas.Schema {
 	props.InstanceNumber.Default = 1
 	props.InstanceNumber.Minimum = 1
 
+	noUnits := units.GetBACnetUnitByValue(95) // no units
+	unitName, unitValue := units.BACnetUnitsNames()
+	props.Unit.Title = "Select Unit"
+	props.Unit.Default = fmt.Sprint(noUnits.UnitValue)
+	props.Unit.Options = unitValue
+	props.Unit.EnumName = unitName
+
 	schema.Set(props)
 
 	uiSchema := array.Map{
-		"ui:order": array.Slice{"instance-number"},
+		"ui:order": array.Slice{"instance-number", "unit"},
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{

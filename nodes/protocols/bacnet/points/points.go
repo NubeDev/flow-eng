@@ -33,6 +33,7 @@ type Point struct {
 	Message                     string
 	DeviceNumber                int // number 1, 2 , 3 or 4 IO-16s (not modbus address)
 	ModbusRegister              int
+	Unit                        string
 }
 
 type ModbusPoints struct {

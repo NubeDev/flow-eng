@@ -76,7 +76,7 @@ func (inst *BV) Process() {
 		settings, err := inst.getSettings(inst.GetSettings())
 		inst.setObjectId(settings)
 		transformProps := inst.getTransformProps(settings)
-		point := addPoint(points.IoTypeNumber, objectType, inst.objectID, isWriteable, isIO, true, inst.application, transformProps)
+		point := addPoint(points.IoTypeNumber, objectType, inst.objectID, isWriteable, isIO, true, inst.application, transformProps, addPointOpts{})
 		name := inst.GetNodeName()
 		parentTopic := helpers.CleanParentName(name, inst.GetParentName())
 		if parentTopic != "" {

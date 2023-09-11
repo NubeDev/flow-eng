@@ -14,3 +14,12 @@ func TestGetConfig(t *testing.T) {
 	}
 	fmt.Println(got.UnitsImperial)
 }
+
+func TestGetConfigBACnet(t *testing.T) {
+	got, err := GetBACnetConfig()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(got)
+}

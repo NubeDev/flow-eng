@@ -3,6 +3,7 @@ package bacnetio
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/NubeIO/lib-units/units"
 	"strings"
 
 	"github.com/NubeDev/flow-eng/helpers"
@@ -52,9 +53,11 @@ func NewAI(body *node.Spec, opts ...any) (node.Node, error) {
 }
 
 func (inst *AI) Process() {
-	settings, err := inst.getSettings(inst.GetSettings())
+	var decimalPlace int
 	_, firstLoop := inst.Loop()
 	if firstLoop {
+		settings, err := inst.getSettings(inst.GetSettings())
+		decimalPlace = settings.Decimal
 		transformProps := inst.getTransformProps(settings)
 		inst.setObjectId(settings)
 		ioType := settings.IoType
@@ -63,7 +66,7 @@ func (inst *AI) Process() {
 			ioType = string(points.IoTypeVolts)
 		}
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
-		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true, inst.application, transformProps)
+		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true, inst.application, transformProps, addPointOpts{unit: settings.Unit})
 		name := inst.GetNodeName()
 		parentTopic := helpers.CleanParentName(name, inst.GetParentName())
 		if parentTopic != "" {
@@ -97,7 +100,7 @@ func (inst *AI) Process() {
 	if pv == nil {
 		inst.WritePinNull(node.Out)
 	} else if modbusUpdated {
-		inst.WritePinFloat(node.Out, *pv, settings.Decimal)
+		inst.WritePinFloat(node.Out, *pv, decimalPlace)
 	} else {
 		inst.WritePinNull(node.Out)
 	}
@@ -159,6 +162,7 @@ type AISettingsSchema struct {
 	ScaleOutMax  schemas.NumberNoLimits `json:"scale-out-max"`
 	Factor       schemas.NumberNoLimits `json:"factor"`
 	Offset       schemas.NumberNoLimits `json:"offset"`
+	Unit         schemas.EnumString     `json:"unit"`
 }
 
 type AISettings struct {
@@ -173,6 +177,7 @@ type AISettings struct {
 	ScaleOutMax  float64 `json:"scale-out-max"`
 	Factor       float64 `json:"factor"`
 	Offset       float64 `json:"offset"`
+	Unit         string  `json:"unit"`
 }
 
 func (inst *AI) buildSchema() *schemas.Schema {
@@ -219,13 +224,20 @@ func (inst *AI) buildSchema() *schemas.Schema {
 	props.Offset.Title = "Offset"
 	props.Offset.Default = 0
 
+	noUnits := units.GetBACnetUnitByValue(95) // no units
+	unitName, unitValue := units.BACnetUnitsNames()
+	props.Unit.Title = "Select Unit"
+	props.Unit.Default = fmt.Sprint(noUnits.UnitValue)
+	props.Unit.Options = unitValue
+	props.Unit.EnumName = unitName
+
 	schema.Set(props)
 
 	uiSchema := array.Map{
 		"io-type": array.Map{
 			"ui:widget": "select",
 		},
-		"ui:order": array.Slice{"device-number", "input-number", "io-type", "decimal", "scale-enable", "scale-in-min", "scale-in-max", "scale-out-min", "scale-out-max", "factor", "offset"},
+		"ui:order": array.Slice{"device-number", "input-number", "io-type", "decimal", "scale-enable", "scale-in-min", "scale-in-max", "scale-out-min", "scale-out-max", "factor", "offset", "unit"},
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{

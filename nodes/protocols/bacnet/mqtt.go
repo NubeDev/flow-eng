@@ -1,8 +1,10 @@
 package bacnetio
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/NubeDev/flow-eng/helpers"
@@ -177,11 +179,68 @@ func (inst *Server) mqttPublishNames(point *points.Point) {
 	if payload != "" {
 		err = inst.clients.mqttClient.Publish(topic, mqttQOS, mqttRetain, payload)
 		if err != nil {
-			log.Errorf("bacnet-server: mqtt publish err: %s", err.Error())
+			log.Errorf("bacnet-server: mqtt publish name err: %s", err.Error())
 			return
 		}
 	}
+	inst.bacnetPublishUnits(obj, int(objectId), point)
 	return
+}
+
+type unitPayload struct {
+	ObjectType     string `json:"objectType"`
+	ObjectInstance string `json:"objectInstance"`
+	Property       string `json:"property"`
+	DeviceInstance string `json:"deviceInstance"`
+	Mac            string `json:"mac"`
+	Value          string `json:"value"`
+}
+
+func (inst *Server) bacnetPublishUnits(objectType string, objectId int, point *points.Point) {
+	var objectTypeInt int
+	var validPoint bool
+	if objectType == "ai" {
+		objectTypeInt = 0
+		validPoint = true
+	}
+	if objectType == "ao" {
+		objectTypeInt = 1
+		validPoint = true
+	}
+	if objectType == "av" {
+		objectTypeInt = 2
+		validPoint = true
+	}
+	if !validPoint {
+		return
+	}
+
+	unit := point.Unit
+	if unit == "" {
+		log.Errorf("bacnet-units no unit was set in point: %s-%d", objectType, objectId)
+		return
+	}
+
+	topic := "bacnet/cmd/write_value"
+	payload := unitPayload{
+		ObjectType:     fmt.Sprint(objectTypeInt),
+		ObjectInstance: strconv.Itoa(objectId),
+		Property:       "117",
+		DeviceInstance: strconv.Itoa(inst.bacnetServerDeviceId),
+		Mac:            fmt.Sprintf("%s:%d", inst.bacnetServerIP, inst.bacnetServerPort),
+		Value:          unit,
+	}
+	p, err := json.Marshal(payload)
+	if err != nil {
+		log.Errorf("bacnet-units marshall payload: %s", err.Error())
+		return
+	}
+	err = inst.clients.mqttClient.Publish(topic, mqttQOS, mqttRetain, string(p))
+	if err != nil {
+		log.Errorf("bacnet-server: mqtt publish unit err: %s", err.Error())
+		return
+	}
+	log.Infof("mqtt-bacnet publish units: %s", unit)
 }
 
 func getTopic(msg interface{}) string {

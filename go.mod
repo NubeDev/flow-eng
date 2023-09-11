@@ -6,7 +6,7 @@ go 1.18
 
 require (
 	github.com/NubeIO/lib-schema v0.2.18
-	github.com/NubeIO/lib-units v0.0.1
+	github.com/NubeIO/lib-units v0.0.4
 	github.com/NubeIO/module-core-rql v0.0.0-20230808031702-4f5f7b9389af
 	github.com/NubeIO/nubeio-rubix-lib-modbus-go v0.0.5
 	github.com/NubeIO/nubeio-rubix-lib-models-go v1.7.9
@@ -28,7 +28,6 @@ require (
 	github.com/rvflash/elapsed v0.3.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/thedevsaddam/gojsonq/v2 v2.5.2
-	github.com/tidwall/buntdb v1.2.8
 	github.com/tidwall/gjson v1.14.4
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -45,12 +44,8 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
-	github.com/tidwall/btree v0.7.1 // indirect
-	github.com/tidwall/grect v0.1.4 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
-	github.com/tidwall/rtred v0.1.2 // indirect
-	github.com/tidwall/tinyqueue v0.1.1 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect

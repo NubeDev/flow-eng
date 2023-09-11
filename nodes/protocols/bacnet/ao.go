@@ -3,6 +3,7 @@ package bacnetio
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/NubeIO/lib-units/units"
 	"math"
 	"strings"
 
@@ -75,7 +76,7 @@ func (inst *AO) setObjectId(settings *AOSettings) {
 }
 
 func (inst *AO) Process() {
-	settings, _ := inst.getSettings(inst.GetSettings())
+
 	loop, firstLoop := inst.Loop()
 	s := inst.GetStore()
 	if s == nil {
@@ -84,6 +85,7 @@ func (inst *AO) Process() {
 		return
 	}
 	if firstLoop {
+		settings, _ := inst.getSettings(inst.GetSettings())
 		objectType, isWriteable, isIO, err := getBacnetType(inst.Info.Name)
 		inst.setObjectId(settings)
 		ioType := settings.IoType
@@ -92,7 +94,7 @@ func (inst *AO) Process() {
 			ioType = string(points.IoTypeVolts)
 		}
 		transformProps := &valueTransformProperties{}
-		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true, inst.application, transformProps)
+		point := addPoint(points.IoType(ioType), objectType, inst.objectID, isWriteable, isIO, true, inst.application, transformProps, addPointOpts{unit: settings.Unit})
 		name := inst.GetNodeName()
 		parentTopic := helpers.CleanParentName(name, inst.GetParentName())
 		if parentTopic != "" {
@@ -238,32 +240,14 @@ type AOSettingsSchema struct {
 	DeviceNumber schemas.Integer    `json:"device-number"`
 	OutputNumber schemas.Integer    `json:"output-number"`
 	IoType       schemas.EnumString `json:"io-type"`
-	/*
-		Decimal      schemas.Number         `json:"decimal"`
-		ScaleEnable  schemas.Boolean        `json:"scale-enable"`
-		ScaleInMin   schemas.NumberNoLimits `json:"scale-in-min"`
-		ScaleInMax   schemas.NumberNoLimits `json:"scale-in-max"`
-		ScaleOutMin  schemas.NumberNoLimits `json:"scale-out-min"`
-		ScaleOutMax  schemas.NumberNoLimits `json:"scale-out-max"`
-		Factor       schemas.NumberNoLimits `json:"factor"`
-		Offset       schemas.NumberNoLimits `json:"offset"`
-	*/
+	Unit         schemas.EnumString `json:"unit"`
 }
 
 type AOSettings struct {
 	DeviceNumber int    `json:"device-number"`
 	OutputNumber int    `json:"output-number"`
 	IoType       string `json:"io-type"`
-	/*
-		Decimal      int     `json:"decimal"`
-		ScaleEnable  bool    `json:"scale-enable"`
-		ScaleInMin   float64 `json:"scale-in-min"`
-		ScaleInMax   float64 `json:"scale-in-max"`
-		ScaleOutMin  float64 `json:"scale-out-min"`
-		ScaleOutMax  float64 `json:"scale-out-max"`
-		Factor       float64 `json:"factor"`
-		Offset       float64 `json:"offset"`
-	*/
+	Unit         string `json:"unit"`
 }
 
 func (inst *AO) buildSchema() *schemas.Schema {
@@ -284,36 +268,12 @@ func (inst *AO) buildSchema() *schemas.Schema {
 	props.IoType.Options = []string{string(points.IoTypeVolts), string(points.IoTypeDigital)}
 	props.IoType.EnumName = []string{string(points.IoTypeVolts), string(points.IoTypeDigital)}
 
-	/*
-		props.Decimal.Title = "Rounding To # Decimals"
-		props.Decimal.Default = 2
-		props.Decimal.Minimum = 0
-		props.Decimal.Maximum = 10
-
-		props.ScaleEnable.Title = "Enable Scale/Limit Transformation"
-		props.ScaleEnable.Default = false
-
-		props.ScaleInMin.Title = "Scale: Output Min (Output 0-10v)"
-		props.ScaleInMin.Default = 0
-		props.ScaleInMin.ReadOnly = true
-
-		props.ScaleInMax.Title = "Scale: Output Max (Output 0-10v)"
-		props.ScaleInMax.Default = 10
-		props.ScaleInMax.ReadOnly = true
-
-		props.ScaleOutMin.Title = "Scale/Limit: Output Min"
-		props.ScaleOutMin.Default = 0
-
-		props.ScaleOutMax.Title = "Scale/Limit: Output Max"
-		props.ScaleOutMax.Default = 10
-
-		props.Factor.Title = "Multiplication Factor"
-		props.Factor.Default = 0
-
-		props.Offset.Title = "Offset"
-		props.Offset.Default = 0
-
-	*/
+	noUnits := units.GetBACnetUnitByValue(95) // no units
+	unitName, unitValue := units.BACnetUnitsNames()
+	props.Unit.Title = "Select Unit"
+	props.Unit.Default = fmt.Sprint(noUnits.UnitValue)
+	props.Unit.Options = unitValue
+	props.Unit.EnumName = unitName
 
 	schema.Set(props)
 
@@ -322,7 +282,7 @@ func (inst *AO) buildSchema() *schemas.Schema {
 			"ui:widget": "select",
 		},
 		// "ui:order": array.Slice{"device-number", "output-number", "io-type", "decimal", "scale-enable", "scale-in-min", "scale-in-max", "scale-out-min", "scale-out-max", "factor", "offset"},
-		"ui:order": array.Slice{"device-number", "output-number", "io-type"},
+		"ui:order": array.Slice{"device-number", "output-number", "io-type", "unit"},
 	}
 	s := &schemas.Schema{
 		Schema: schemas.SchemaBody{

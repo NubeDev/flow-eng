@@ -102,7 +102,11 @@ func nodeDefault(body *node.Spec, nodeName, category string, application names.A
 	return body, err
 }
 
-func addPoint(ioType points.IoType, objectType points.ObjectType, id points.ObjectID, isWriteable, isIO, enable bool, application names.ApplicationName, transform *valueTransformProperties) *points.Point {
+type addPointOpts struct {
+	unit string
+}
+
+func addPoint(ioType points.IoType, objectType points.ObjectType, id points.ObjectID, isWriteable, isIO, enable bool, application names.ApplicationName, transform *valueTransformProperties, addPointOpts addPointOpts) *points.Point {
 	point := &points.Point{
 		ObjectType:  objectType,
 		Application: application,
@@ -117,6 +121,7 @@ func addPoint(ioType points.IoType, objectType points.ObjectType, id points.Obje
 		ScaleInMax:  transform.ScaleInMax,
 		ScaleOutMin: transform.ScaleOutMin,
 		ScaleOutMax: transform.ScaleOutMax,
+		Unit:        addPointOpts.unit,
 	}
 	return point
 }

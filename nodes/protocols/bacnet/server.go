@@ -48,6 +48,9 @@ type Server struct {
 	devAddr3               int
 	devAddr4               int
 	isImperial             bool
+	bacnetServerDeviceId   int
+	bacnetServerPort       int
+	bacnetServerIP         string
 }
 
 var runnersLock bool
@@ -115,6 +118,9 @@ func NewServer(body *node.Spec, opts ...any) (node.Node, error) {
 		3,
 		4,
 		false,
+		0,
+		0,
+		"",
 	}
 	server.clients.mqttClient = bn.MqttClient
 	body.SetSchema(BuildSchemaServer())
@@ -143,6 +149,15 @@ func (inst *Server) Process() {
 				inst.isImperial = config.UnitsImperial
 			}
 		}
+		port, deviceID, ip, err := inst.getServerConfig()
+		if err != nil {
+			log.Errorf("bacnet-units get config: %s", err.Error())
+		} else {
+			inst.bacnetServerDeviceId = deviceID
+			inst.bacnetServerPort = port
+			inst.bacnetServerIP = ip
+		}
+
 	}
 	if loopCount == 3 { // publish all the point names
 		p, ok := inst.getPoints()
