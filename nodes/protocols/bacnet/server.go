@@ -407,7 +407,7 @@ func (inst *Server) setDeviceAddress() error {
 		inst.devAddr3 = schema.DeviceAddress3
 	}
 	if schema.DeviceAddress4 <= 0 {
-		inst.devAddr4 = 3
+		inst.devAddr4 = 4
 	} else {
 		inst.devAddr4 = schema.DeviceAddress4
 	}
