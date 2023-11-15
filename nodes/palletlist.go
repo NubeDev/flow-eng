@@ -2,6 +2,7 @@ package nodes
 
 import (
 	"github.com/NubeDev/flow-eng/nodes/notify"
+	"github.com/NubeDev/flow-eng/nodes/protocols/ros"
 	"github.com/NubeDev/flow-eng/nodes/rql"
 	switches "github.com/NubeDev/flow-eng/nodes/switch"
 	"github.com/NubeDev/flow-eng/nodes/trigger"
@@ -111,6 +112,12 @@ func RegisterAllNodes() {
 	pallet.RegisterNodeBuilder(flow.Category, flowPoint, flow.NewFFPoint)
 	pallet.RegisterNodeBuilder(flow.Category, flowPointWrite, flow.NewFFPointWrite)
 	pallet.RegisterNodeBuilder(flow.Category, flowSchedule, flow.NewFFSchedule)
+
+	// builderROSNetworks
+	pallet.RegisterNodeBuilder(ros.Category, rosNetwork, ros.NewROSNetwork)
+	pallet.RegisterNodeBuilder(ros.Category, rosPoint, ros.NewROSPoint)
+	pallet.RegisterNodeBuilder(ros.Category, rosPointWrite, ros.NewROSPointWrite)
+	pallet.RegisterNodeBuilder(ros.Category, rosSchedule, ros.NewROSSchedule)
 
 	// builderHVAC
 	pallet.RegisterNodeBuilder(hvac.Category, accumulationPeriod, hvac.NewAccumulationPeriod)

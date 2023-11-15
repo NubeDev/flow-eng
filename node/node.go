@@ -97,6 +97,7 @@ type Node interface {
 	GetPayloadNull() (value any, lastUpdated time.Time, null bool)
 	GetNode(uuid string) Node
 	GetNodes() []Node
+	GetNodesByType(nodeType string) []Node
 	AddNodes(f []Node)
 	SetIcon(icon string)
 	GetIcon() string
@@ -198,6 +199,16 @@ func (n *Spec) GetNode(uuid string) Node {
 
 func (n *Spec) GetNodes() []Node {
 	return n.nodes
+}
+
+func (n *Spec) GetNodesByType(nodeType string) []Node {
+	var out []Node
+	for _, node := range n.nodes {
+		if node.GetName() == nodeType {
+			out = append(out, node)
+		}
+	}
+	return out
 }
 
 func (n *Spec) AddNodes(f []Node) {
