@@ -52,6 +52,11 @@ const (
 	flowSchedule   = "flow-schedule"
 	flowPointWrite = "flow-point-write"
 
+	rosNetwork    = "rubix-network"
+	rosPoint      = "rubix-point"
+	rosSchedule   = "rubix-schedule"
+	rosPointWrite = "rubix-point-write"
+
 	flowLoopCount = "flow-loop-count"
 
 	httpNode = "http-method"
