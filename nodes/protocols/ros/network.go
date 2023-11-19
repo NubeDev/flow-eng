@@ -41,6 +41,7 @@ func NewROSNetwork(body *node.Spec, _ ...any) (node.Node, error) {
 	connected := node.BuildOutput(node.Connected, node.TypeBool, nil, body.Outputs)
 	message := node.BuildOutput(node.LastUpdated, node.TypeString, nil, body.Outputs)
 	outputs := node.BuildOutputs(connected, message)
+	body.IsParent = true
 	body = node.BuildNode(body, inputs, outputs, body.Settings)
 	network := &Network{body, false, 0, nil, nil, false, nil, 0, "", false, 0, false, false, false, false, time.Now()}
 	return network, nil
