@@ -1,6 +1,6 @@
 package points
 
-import "github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
+import "github.com/NubeIO/nubeio-rubix-lib-models-go/model"
 
 type ModbusInputAddr struct {
 	BacnetAddr int `json:"bacnetAddr"`
