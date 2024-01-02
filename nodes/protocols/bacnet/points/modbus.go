@@ -1,6 +1,8 @@
 package points
 
-import "github.com/NubeIO/nubeio-rubix-lib-models-go/model"
+import (
+	"github.com/NubeIO/nubeio-rubix-lib-models-go/datatype"
+)
 
 type ModbusInputAddr struct {
 	BacnetAddr int `json:"bacnetAddr"`
@@ -11,37 +13,37 @@ type ModbusInputAddr struct {
 	Current int `json:"current"`
 }
 
-func ModbusBuildOutput(ioType IoType, id ObjectID) (OutputAddr, model.ObjectType) {
+func ModbusBuildOutput(ioType IoType, id ObjectID) (OutputAddr, datatype.ObjectType) {
 	_, out := outputAddress(0, int(id))
 	return out, typeSelect(ioType, true)
 }
 
-func ModbusBuildInput(ioType IoType, id ObjectID) (ModbusInputAddr, model.ObjectType) {
+func ModbusBuildInput(ioType IoType, id ObjectID) (ModbusInputAddr, datatype.ObjectType) {
 	_, out := InputAddress(0, int(id))
 	return out, typeSelect(ioType, false)
 }
 
-func typeSelect(objectType IoType, write bool) model.ObjectType {
+func typeSelect(objectType IoType, write bool) datatype.ObjectType {
 	if objectType == IoTypeVolts {
 		if write {
-			return model.ObjTypeWriteHolding
+			return datatype.ObjTypeWriteHolding
 		}
-		return model.ObjTypeReadRegister
+		return datatype.ObjTypeReadRegister
 	}
 	if objectType == IoTypeDigital {
 		if write {
-			return model.ObjTypeWriteCoil
+			return datatype.ObjTypeWriteCoil
 		}
-		return model.ObjTypeReadCoil
+		return datatype.ObjTypeReadCoil
 	}
 	if objectType == IoTypeTemp {
-		return model.ObjTypeReadRegister
+		return datatype.ObjTypeReadRegister
 	}
 	if objectType == IoTypePulseOnFall {
-		return model.ObjTypeReadRegister
+		return datatype.ObjTypeReadRegister
 	}
 	if objectType == IoTypePulseOnRise {
-		return model.ObjTypeReadRegister
+		return datatype.ObjTypeReadRegister
 	}
 	return ""
 
