@@ -8,8 +8,8 @@ require (
 	github.com/NubeIO/lib-schema v0.2.18
 	github.com/NubeIO/lib-units v0.0.1
 	github.com/NubeIO/module-core-rql v0.0.0-20230808031702-4f5f7b9389af
-	github.com/NubeIO/nubeio-rubix-lib-modbus-go v0.0.6
-	github.com/NubeIO/nubeio-rubix-lib-models-go v1.11.0
+	github.com/NubeIO/nubeio-rubix-lib-modbus-go v0.0.7
+	github.com/NubeIO/nubeio-rubix-lib-models-go v1.12.0
 	github.com/andanhm/go-prettytime v1.1.0
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f
 	github.com/dop251/goja v0.0.0-20230707174833-636fdf960de1

@@ -11,11 +11,11 @@ github.com/NubeIO/module-core-rql v0.0.0-20230808031702-4f5f7b9389af h1:2VaFOVxR
 github.com/NubeIO/module-core-rql v0.0.0-20230808031702-4f5f7b9389af/go.mod h1:5Bj+rkF5Oh8mxlUs2HMssbOGZvNH85VglS0arFwZ3fs=
 github.com/NubeIO/nubeio-rubix-lib-helpers-go v0.2.7 h1:QKgcOjDkVujyAXWK+OysVFnQKzpZx335vGPG95UNXuI=
 github.com/NubeIO/nubeio-rubix-lib-helpers-go v0.2.7/go.mod h1:oLI6n9wuko0KIEzrLc8saOquiQvtMUUBrUjXf0TLDVQ=
-github.com/NubeIO/nubeio-rubix-lib-modbus-go v0.0.6 h1:qc986440EJlU0yH+VC/wwISmzi1FN6EGocvtYGeKrAE=
-github.com/NubeIO/nubeio-rubix-lib-modbus-go v0.0.6/go.mod h1:lX5HfZfaky9zYQrmR7Vl+NOVPjZVg3W9vVBY07RNeHo=
+github.com/NubeIO/nubeio-rubix-lib-modbus-go v0.0.7 h1:MfwuV6KyAm5tXV3tguFQzCI5VhAEfBFY+aGHudnQoUk=
+github.com/NubeIO/nubeio-rubix-lib-modbus-go v0.0.7/go.mod h1:NrtmLumI5W/Qq+HZmHJd0OEihhLihA3qpbKEjXNlwyQ=
 github.com/NubeIO/nubeio-rubix-lib-models-go v1.0.4/go.mod h1:A1BPuc3UpE1EF3ugdf+8QIIKTT8s3eK+pfUcheJX2JM=
-github.com/NubeIO/nubeio-rubix-lib-models-go v1.11.0 h1:pdIC79IYinUsjonAH+qcIhcdQt+u9mxsPMvhyPX+by0=
-github.com/NubeIO/nubeio-rubix-lib-models-go v1.11.0/go.mod h1:J0Xy/dX/f/xIhEnW6ZhkE2LiyuRk2H9gCb0Uk+2SSSk=
+github.com/NubeIO/nubeio-rubix-lib-models-go v1.12.0 h1:PRtBNSuWFcxHtb14Gs5T+3npvyyd5Oyare+JI5xxSzM=
+github.com/NubeIO/nubeio-rubix-lib-models-go v1.12.0/go.mod h1:tTdOPP0bMUe6FR/zYu3B/TXkG7j1z8Pz+ViNh9dTNl4=
 github.com/PuerkitoBio/purell v1.1.1/go.mod h1:c11w/QuzBsJSee3cPx9rAFu61PvFxuPbtSwDGJws/X0=
 github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578/go.mod h1:uGdkoq3SwY9Y+13GIhn11/XLaGBb4BfwItxLd5jeuXE=
 github.com/THREATINT/go-net v1.2.10/go.mod h1:4n3ITWyUUfaEp8JNAompTT+PuPANXL9i9TyOUijGnwk=
